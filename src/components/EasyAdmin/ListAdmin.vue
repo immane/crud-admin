@@ -16,8 +16,10 @@
         &emsp;
 
         <!-- Top button slot, actions here -->
+        <slot name="extraTopButton" />
+        &emsp;
         <slot name="topButton">
-          <router-link :to="{ name: `${em.name}Create`}">
+          <router-link v-if="!disabledActions.includes('new')" :to="{ name: `${em.name}Create`}">
             <el-button size="medium" type="primary" icon="el-icon-plus" plain>
               新增{{ $router.currentRoute.meta.title }}
             </el-button>
@@ -38,11 +40,11 @@
         @sort-change="changeSort"
       >
         <el-table-column
-          v-for="field in listDisplay"
-          :key="field.plantext"
-          :label="structure[field] ? structure[field]['translation']: field"
+          v-for="(field, index) in properties"
+          :key="index"
+          :label="field.label ? field.label : (structure[field.property] ? structure[field.property]['translation']: field.property)"
           sortable
-          :prop="field"
+          :prop="field.property"
         >
           <template slot-scope="scope">
 
@@ -50,61 +52,84 @@
             |  Fields slot  |
             ---------------->
 
-            <slot :name="field" :value="scope.row[field]" :record="scope.row">
-              <div v-for="(struct, index) in [structure[field]]" :key="index">
-                <!-- Boolean -->
-                <span
-                  v-if="
-                    struct && struct.metadata &&
-                      'boolean' == struct.metadata.type"
-                >
-                  <el-tag :type="scope.row[field] | boolFilter">
-                    {{ scope.row[field] | boolDisplay }}
-                  </el-tag>
-                </span>
+            <slot :name="field.property" :value="extractRelations(scope.row, field.property)" :record="scope.row">
+              <div v-if="Object.keys(structure).includes(field.property)">
+                <!-- Normal fields -->
 
-                <!-- DateTime -->
-                <span
-                  v-else-if="
-                    struct && struct.metadata &&
-                      'datetime' == struct.metadata.type"
-                >
-                  {{ new Date(scope.row[field]) | dateFormat('YYYY-MM-DD hh:mm:ss') }}
-                </span>
+                <div v-for="(struct, i) in [structure[field.property]]" :key="i">
+                  <!-- Dummy -->
+                  <template v-if="false" />
 
-                <!-- Relatived -->
-                <span
-                  v-else-if="
-                    struct && struct.metadata &&
-                      ('ManyToOne' == struct.metadata.type ||
-                        'OneToOne' == struct.metadata.type)
-                  "
-                >
-                  {{ scope.row[field] ? scope.row[field].__toString : '' }}
-                </span>
+                  <!-- Boolean -->
+                  <span
+                    v-else-if="
+                      struct && struct.metadata &&
+                        'boolean' == struct.metadata.type"
+                  >
+                    <el-tag :type="scope.row[field.property] | boolFilter">
+                      {{ scope.row[field.property] | boolDisplay }}
+                    </el-tag>
+                  </span>
 
-                <!-- Others -->
-                <span v-else>
-                  {{ scope.row[field] | htmlStrip }}
-                </span>
+                  <!-- DateTime -->
+                  <span
+                    v-else-if="
+                      struct && struct.metadata &&
+                        'datetime' == struct.metadata.type && scope.row[field.property]"
+                  >
+                    {{ new Date(scope.row[field.property]) | dateFormat('YYYY-MM-DD hh:mm:ss') }}
+                  </span>
+
+                  <!-- Date -->
+                  <span
+                    v-else-if="
+                      struct && struct.metadata &&
+                        'date' == struct.metadata.type && scope.row[field.property]"
+                  >
+                    {{ new Date(scope.row[field.property]) | dateFormat('YYYY-MM-DD') }}
+                  </span>
+
+                  <!-- Relatived -->
+                  <span
+                    v-else-if="
+                      struct && struct.metadata &&
+                        ('ManyToOne' == struct.metadata.type ||
+                          'OneToOne' == struct.metadata.type)
+                    "
+                  >
+                    {{ scope.row[field.property] ? scope.row[field.property].__toString : '' }}
+                  </span>
+
+                  <!-- Others -->
+                  <span v-else>
+                    {{ scope.row[field.property] | htmlStrip }}
+                  </span>
+                </div>
+              </div>
+
+              <div v-else>
+                <!-- Relation fields or others -->
+                {{ extractRelations(scope.row, field.property) }}
               </div>
             </slot>
           </template>
         </el-table-column>
 
-        <el-table-column label="动作" min-width="100">
+        <el-table-column label="动作" min-width="120">
           <template slot-scope="scope">
             <slot name="action" :data="scope.row">
-              <router-link :to="{ name: `${em.name}Update`, params: { id: scope.row.id }}">
+              <router-link v-if="!disabledActions.includes('edit')" :to="{ name: `${em.name}Update`, params: { id: scope.row.id }}">
                 <el-button size="small" icon="el-icon-edit" plain>
                   修改
                 </el-button>
               </router-link>
               &nbsp;&nbsp;
-              <el-popconfirm title="确定删除当前分类？" @onConfirm="removeAction(scope.row.id)">
+              <el-popconfirm v-if="!disabledActions.includes('delete')" title="确定删除当前记录？" @onConfirm="removeAction(scope.row.id)">
                 <el-button slot="reference" size="small" type="danger" icon="el-icon-delete" plain>删除</el-button>
               </el-popconfirm>
             </slot>
+
+            <slot name="extraAction" :data="scope.row" />
           </template>
         </el-table-column>
       </el-table>
@@ -158,10 +183,30 @@ export default {
     // default show fields
     listDisplay: {
       type: Array,
-      default: () => []
+      default: () => [
+        /**
+         * @description
+         *  List display example
+         *  property can including nasted call
+         * @example
+         * [
+         *   'id',
+         *   'user',
+         *   'name',
+         *   { property: 'user.__metadata.profile.phone', label: 'Phone' },
+         *   'createdTime'
+         * ]
+         */
+      ]
     },
     // default list filters
     listFilter: {
+      type: Array,
+      default: () => []
+    },
+    // disable default actions
+    // sample: ['new', 'edit', 'delete']
+    disabledActions: {
       type: Array,
       default: () => []
     }
@@ -171,6 +216,9 @@ export default {
       // entity manager and entity structure
       em: new EntityManage(this.entityConf),
       structure: {},
+
+      // translated fields
+      properties: [],
 
       // table data source
       list: [],
@@ -197,6 +245,7 @@ export default {
   },
   created() {
     this.routeProcess()
+    this.propertieProcess()
 
     /**
      * Fetch base data, like entity structure and validations
@@ -204,6 +253,25 @@ export default {
     this.fetchData()
   },
   methods: {
+    /* Properti process */
+    propertieProcess() {
+      // fields transform
+      const fields =
+        this.listDisplay !== '__all__'
+          ? this.listDisplay
+          : Object.keys(this.structure)
+
+      for (const field of fields) {
+        if (typeof field === 'string') {
+          this.properties.push({
+            property: field
+          })
+        } else {
+          this.properties.push(field)
+        }
+      }
+    },
+
     /* Restore redirected route */
     routeProcess() {
       let redirectRoute = null
@@ -276,6 +344,29 @@ export default {
         this.$message('删除成功')
         this.fetchData()
       })
+    },
+
+    // Extract relation field
+    extractRelations(dataObject, relationField) {
+      // TODO: check if valid expression
+      // Relation format 'a.b.c'
+
+      try {
+        let data = dataObject
+        const relationArray = relationField.split('.')
+
+        relationArray.forEach((value, index) => {
+          if (Object.keys(data).includes(value)) {
+            data = data[value]
+          } else {
+            data = null
+          }
+        })
+
+        return data
+      } catch (e) {
+        return null
+      }
     }
   }
 }

@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">表哥找房管理平台登陆</h3>
+        <h3 class="title">{{ title }}管理平台登陆</h3>
       </div>
 
       <el-form-item prop="username">
@@ -49,6 +49,7 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
+import setting from '@/settings'
 
 export default {
   name: 'Login',
@@ -68,6 +69,7 @@ export default {
       }
     }
     return {
+      title: setting.title,
       loginForm: {
         username: 'admin',
         password: ''

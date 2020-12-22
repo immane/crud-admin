@@ -3,6 +3,7 @@
     <list-admin
       :entity-conf="entity"
       :list-display="fields"
+      :disabled-actions="disabled"
     />
   </div>
 </template>
@@ -32,10 +33,11 @@ export default {
     console.log('Entity:', this.entity)
 
     if (!Object.keys(admin.entities).includes(this.entity)) {
-      console.log('fuck!')
+      console.log('NO!')
     } else {
       this.config = admin.entities[this.entity]
       this.fields = this.config.list.list_display
+      this.disabled = this.config.list.disabled_actions
     }
   }
 }

@@ -84,8 +84,10 @@ export default class EntityManage {
        * }
        */
       const entities = await request.get('/manage/entities')
+
+      // TODO: make this more accurate.
       const list = entities.data.filter(
-        (v, i) => v.match(new RegExp(this.name))
+        (v, i) => v.split('\\').pop() === this.name
       )
 
       if (list.length) {

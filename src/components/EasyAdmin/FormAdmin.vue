@@ -34,8 +34,9 @@
       >
         <el-form-item
           v-if="
-            !['id'].includes(field.property) &&
-              structure[field.property] && structure[field.property].hasOwnProperty('metadata')
+            !['id'].includes(field.property)
+              && structure[field.property]
+              && structure[field.property].hasOwnProperty('metadata')
           "
           :label="structure[field.property] ? structure[field.property]['translation']: field"
         >
@@ -44,24 +45,39 @@
           ---------------->
 
           <slot :name="field" :form="form" :value="form[field.property]" :struct="structure[field.property]">
+            <!-- Dummy -->
+            <template v-if="false" />
+
             <!-- Datetime -->
             <el-date-picker
-              v-if="field.type == 'datetime' || structure[field.property].metadata.type == 'datetime'"
+              v-else-if="field.type == 'datetime' || structure[field.property].metadata.type == 'datetime'"
               v-model="form[field.property]"
               type="datetime"
               placeholder="选择日期时间"
+              :disabled="field.type_options ? field.type_options.disabled : false"
+            />
+
+            <!-- Date -->
+            <el-date-picker
+              v-else-if="field.type == 'date' || structure[field.property].metadata.type == 'date'"
+              v-model="form[field.property]"
+              type="date"
+              placeholder="选择日期"
+              :disabled="field.type_options ? field.type_options.disabled : false"
             />
 
             <!-- Integer -->
             <el-input-number
               v-else-if="field.type == 'integer' || structure[field.property].metadata.type == 'integer'"
               v-model="form[field.property]"
+              :disabled="field.type_options ? field.type_options.disabled : false"
             />
 
             <!-- Boolean -->
             <el-checkbox
               v-else-if="field.type == 'boolean' || structure[field.property].metadata.type == 'boolean'"
               v-model="form[field.property]"
+              :disabled="field.type_options ? field.type_options.disabled : false"
             />
 
             <!-- Textarea -->
@@ -69,11 +85,13 @@
               v-else-if="field.type == 'text' || structure[field.property].metadata.type == 'text'"
               v-model="form[field.property]"
               :height="300"
+              :disabled="field.type_options ? field.type_options.disabled : false"
             />
 
             <!-- Uploads -->
             <el-upload
               v-else-if="field.type === 'image'"
+              :disabled="field.type_options ? field.type_options.disabled : false"
               :action="`${BASE_API}/upload`"
               :limit="1"
               :file-list="
@@ -97,6 +115,7 @@
               v-model="form[field.property]"
               filterable
               placeholder="请选择"
+              :disabled="field.type_options ? field.type_options.disabled : false"
             >
               <el-option
                 v-for="item in options[field.property]"
@@ -107,7 +126,11 @@
             </el-select>
 
             <!-- Others -->
-            <el-input v-else v-model="form[field.property]" />
+            <el-input
+              v-else
+              v-model="form[field.property]"
+              :disabled="field.type_options ? field.type_options.disabled : false"
+            />
           </slot>
         </el-form-item>
       </div>
@@ -115,7 +138,7 @@
       <el-form-item>
         <slot name="action" :form="form">
           <el-button type="primary" @click="onSubmit('return')">保存</el-button>
-          <el-button type="primary" @click="onSubmit()">保存并继续编辑</el-button>
+          <!--<el-button type="primary" @click="onSubmit()">保存并继续编辑</el-button>-->
         </slot>
       </el-form-item>
     </el-form>
@@ -158,7 +181,7 @@ export default {
          * @example
          * [
          *   'id',
-         *   { property: 'cover', type: 'image' },
+         *   { property: 'cover', type: 'image', type_options: { disabled: true } },
          *   { property: 'region',
          *     relationFilter: {
          *       '@filter': 'entity.getLevel() == 0',
@@ -233,7 +256,7 @@ export default {
         const structure = this.structure[field]
 
         // Rule generate
-        if (structure.metadata) {
+        if (structure && Object.keys(structure).includes('metadata')) {
           const metadata = structure.metadata
           this.rules[field] = [
             {
@@ -256,7 +279,6 @@ export default {
                     ? currentProperty.relationFilter
                     : null
                 )
-                console.log(targetList.data.map(v => { return { value: v.id, label: v.name } }))
 
                 this.options[field] =
                   targetList.data.map(v => { return { value: v.id, label: v.__toString || v.name || v.title } })
