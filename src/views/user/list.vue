@@ -65,7 +65,6 @@ export default {
         data: null,
         options: [
           { value: 'ROLE_USER', label: '用户' },
-          { value: 'ROLE_AGENT', label: '代理' },
           { value: 'ROLE_ADMIN', label: '管理员' },
           { value: 'ROLE_SUPER_ADMIN', label: '超级管理员' }
         ]
