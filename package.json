@@ -1,8 +1,8 @@
 {
-  "name": "cousin-house-admin",
-  "version": "4.4.0",
+  "name": "vue-admin-skeleton",
+  "version": "1.0.1",
   "description": "A vue admin template with Element UI & axios & iconfont & permission control & lint",
-  "author": "Pan <panfree23@gmail.com>",
+  "author": "Rin <immane@163.com>",
   "scripts": {
     "dev": "vue-cli-service serve",
     "build:prod": "vue-cli-service build",
@@ -23,6 +23,7 @@
     "normalize.css": "7.0.0",
     "nprogress": "0.2.0",
     "path-to-regexp": "2.4.0",
+    "v-fit-columns": "^0.2.0",
     "vue": "2.6.10",
     "vue-router": "3.0.6",
     "vuex": "3.1.0"

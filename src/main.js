@@ -15,6 +15,10 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 
+// v-fit-columns
+import Plugin from 'v-fit-columns'
+Vue.use(Plugin)
+
 import request from '@/utils/request'
 
 import VueFilterDateFormat from '@vuejs-community/vue-filter-date-format'

@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container">
     <div class="dashboard-text">
-      表哥找房管理后台
+      Vue admin skeleton
     </div>
   </div>
 </template>

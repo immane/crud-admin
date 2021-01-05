@@ -9,11 +9,12 @@ const inflect = require('i')(true)
  * When config is an object
  * Sample:
  *   const em = new EntityManage({name: 'TaxonomyEntity'})
- *   const em = new EntityManage({name: 'TaxonomyEntity', plural: 'taxonomy-entities'})
+ *   const em = new EntityManage({name: 'TaxonomyEntity', prefix: 'manage', plural: 'taxonomy-entities'})
  */
 export default class EntityManage {
     name = null
     plural = null
+    prefix = 'manage'
 
     constructor(conf) {
       // Parameterize text.
@@ -28,6 +29,7 @@ export default class EntityManage {
       } else {
         // object
         this.name = conf.name
+        this.prefix = conf.prefix
         if (Object.keys(conf).includes('plural')) {
           this.plural = conf.plural
         } else {
@@ -83,7 +85,7 @@ export default class EntityManage {
        *    paginator: {...}
        * }
        */
-      const entities = await request.get('/manage/entities')
+      const entities = await request.get(`/system/entities`)
 
       // TODO: make this more accurate.
       const list = entities.data.filter(
@@ -91,28 +93,28 @@ export default class EntityManage {
       )
 
       if (list.length) {
-        const structure = await request.get(`/manage/entities/${list[0]}`)
+        const structure = await request.get(`/system/entities/${list[0]}`)
         return structure.data
       } else throw Error('No entity was found.')
     }
 
     async retrieve(pk) {
-      return await request.get(`/manage/${this.plural}/${pk}`)
+      return await request.get(`/${this.prefix}/${this.plural}/${pk}`)
     }
 
     async list(parameter) {
-      return await request.get(`/manage/${this.plural}`, { params: parameter })
+      return await request.get(`/${this.prefix}/${this.plural}`, { params: parameter })
     }
 
     async create(data) {
-      return await request.post(`/manage/${this.plural}`, data)
+      return await request.post(`/${this.prefix}/${this.plural}`, data)
     }
 
     async update(pk, data) {
-      return await request.put(`/manage/${this.plural}/${pk}`, data)
+      return await request.put(`/${this.prefix}/${this.plural}/${pk}`, data)
     }
 
     async delete(pk) {
-      return await request.delete(`/manage/${this.plural}/${pk}`)
+      return await request.delete(`/${this.prefix}/${this.plural}/${pk}`)
     }
 }

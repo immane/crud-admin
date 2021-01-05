@@ -44,7 +44,7 @@
           |  Fields slot  |
           ---------------->
 
-          <slot :name="field" :form="form" :value="form[field.property]" :struct="structure[field.property]">
+          <slot :name="field.property" :form="form" :value="form[field.property]" :struct="structure[field.property]">
             <!-- Dummy -->
             <template v-if="false" />
 

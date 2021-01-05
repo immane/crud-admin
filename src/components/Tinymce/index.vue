@@ -1,9 +1,11 @@
 <template>
   <div :class="{fullscreen:fullscreen}" class="tinymce-container" :style="{width:containerWidth}">
     <textarea :id="tinymceId" class="tinymce-textarea" />
+    <!--
     <div class="editor-custom-btn-container">
       <editorImage color="#1890ff" class="editor-upload-btn" @successCBK="imageSuccessCBK" />
     </div>
+    -->
   </div>
 </template>
 
@@ -16,6 +18,7 @@ import editorImage from './components/EditorImage'
 import plugins from './plugins'
 import toolbar from './toolbar'
 import load from './dynamicLoadScript'
+import axios from '@/utils/request'
 
 // why use this cdn, detail see https://github.com/PanJiaChen/tinymce-all-in-one
 const tinymceCDN = 'https://cdn.jsdelivr.net/npm/tinymce-all-in-one@4.9.3/tinymce.min.js'
@@ -116,12 +119,12 @@ export default {
       const _this = this
       window.tinymce.init({
         selector: `#${this.tinymceId}`,
-        language: this.languageTypeList['en'],
+        language: this.languageTypeList['zh'],
         height: this.height,
         body_class: 'panel-body ',
         object_resizing: false,
         toolbar: this.toolbar.length > 0 ? this.toolbar : toolbar,
-        menubar: this.menubar,
+        menubar: false, // this.menubar,
         plugins: plugins,
         end_container_on_empty_block: true,
         powerpaste_word_import: 'clean',
@@ -148,10 +151,11 @@ export default {
             _this.fullscreen = e.state
           })
         },
+
         // it will try to keep these URLs intact
         // https://www.tiny.cloud/docs-3x/reference/configuration/Configuration3x@convert_urls/
         // https://stackoverflow.com/questions/5196205/disable-tinymce-absolute-to-relative-url-conversions
-        convert_urls: false
+        convert_urls: false,
         // 整合七牛上传
         // images_dataimg_filter(img) {
         //   setTimeout(() => {
@@ -185,6 +189,27 @@ export default {
         //     console.log(err);
         //   });
         // },
+
+        images_upload_handler(blobInfo, success, failure, progress) {
+          progress(0)
+          const formData = new FormData()
+          formData.append('file', blobInfo.blob())
+          axios({
+            method: 'post',
+            url: `${process.env.VUE_APP_BASE_API}/upload`,
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }).then(
+            res => {
+              progress(100)
+              success(
+                `${process.env.VUE_APP_BASE_API}/uploads/images/${res.data[0]}`
+              )
+            }
+          )
+        }
       })
     },
     destroyTinymce() {

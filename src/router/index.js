@@ -5,63 +5,7 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
-
-/**
- * Easy admin route generator
- * g: generator
- * r: redirect
- */
-const inflect = require('i')(true)
-const r = (entityName, title, icon = 'el-icon-caret-right') => {
-  const entityPath = inflect.dasherize(inflect.underscore(entityName))
-  return [{
-    path: `/dummy/${entityPath}/create`,
-    redirect: `/${entityPath}/create`,
-    name: `${entityName}Create`,
-    hidden: true
-  },
-  {
-    path: `/dummy/${entityPath}/:id/update`,
-    redirect: `/${entityPath}/:id/update`,
-    name: `${entityName}Update`,
-    hidden: true
-  },
-  {
-    path: `/dummy/${entityPath}/list`,
-    redirect: `/${entityPath}/list`,
-    name: `${entityName}List`,
-    meta: {
-      title: title,
-      icon: icon
-    }
-  }
-  ]
-}
-const g = (entityName, title, icon = 'el-icon-caret-right', component = null) => {
-  const entityPath = inflect.dasherize(inflect.underscore(entityName))
-  return [{
-    path: `/${entityPath}/create`,
-    name: `${entityName}Create`,
-    hidden: true,
-    component: async() => component || await require('../views/' + entityPath + '/form.vue') // cannot use import(`@/view/${entityPath}/form`) instead
-  },
-  {
-    path: `/${entityPath}/:id/update`,
-    name: `${entityName}Update`,
-    hidden: true,
-    component: async() => await require('../views/' + entityPath + '/form.vue')
-  },
-  {
-    path: `/${entityPath}/list`,
-    name: `${entityName}List`,
-    component: async() => await require('../views/' + entityPath + '/list.vue'),
-    meta: {
-      title: title,
-      icon: icon
-    }
-  }
-  ]
-}
+import { customRoutes } from './menu'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -115,25 +59,6 @@ export const constantRoutes = [
   }
 ]
 
-/**
- * Customer Menu
- *
- * Change current section and define your menu and relations here.
- */
-export const normalRoutes = [
-  // Publish manage
-  /*
-  {
-    path: '/publish', name: 'PublishManage', component: Layout,
-    meta: { title: 'Post manage', icon: 'el-icon-upload' },
-    children: [
-      ...g('Post', 'Post title'), // g for Generate custom page handler.
-      ...r('Comment', 'Comment title') // r for Redirect default page handler.
-    ]
-  },
-  */
-]
-
 export const lastRoutes = [
   // default admin route
   {
@@ -174,7 +99,7 @@ const createRouter = () => new Router({
   scrollBehavior: () => ({
     y: 0
   }),
-  routes: [...constantRoutes, ...normalRoutes, ...lastRoutes]
+  routes: [...constantRoutes, ...customRoutes, ...lastRoutes]
 })
 
 const router = createRouter()

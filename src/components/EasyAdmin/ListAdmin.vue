@@ -30,6 +30,7 @@
 
     <el-row>
       <el-table
+        v-fit-columns
         v-loading="loading"
         :data="list"
         element-loading-text="加载中..."
@@ -115,8 +116,12 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="动作" min-width="120">
+        <el-table-column label="动作">
           <template slot-scope="scope">
+            <slot name="extraAction" :data="scope.row" />
+
+            &emsp;
+
             <slot name="action" :data="scope.row">
               <router-link v-if="!disabledActions.includes('edit')" :to="{ name: `${em.name}Update`, params: { id: scope.row.id }}">
                 <el-button size="small" icon="el-icon-edit" plain>
@@ -128,8 +133,6 @@
                 <el-button slot="reference" size="small" type="danger" icon="el-icon-delete" plain>删除</el-button>
               </el-popconfirm>
             </slot>
-
-            <slot name="extraAction" :data="scope.row" />
           </template>
         </el-table-column>
       </el-table>
@@ -142,7 +145,7 @@
           :page-sizes="[20, 50, 100, 300]"
           :page-size="pager.limit"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="paginator ? paginator.pageCount : 0"
+          :total="paginator ? paginator.totalCount : 0"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
         />
