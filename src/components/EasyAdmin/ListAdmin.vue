@@ -206,6 +206,7 @@
 
 <script>
 import EntityManage from '@/utils/entity'
+import { asyncRoutes } from '@/router'
 
 export default {
   filters: {
@@ -439,7 +440,7 @@ export default {
       let redirectRoute = null
 
       // Find router by name recursively
-      for (const mainRoute of this.$router.options.routes) {
+      for (const mainRoute of asyncRoutes) {
         if (redirectRoute === null && Object.keys(mainRoute).includes('children')) {
           for (const childrenRoute of mainRoute.children) {
             if (childrenRoute.name === `${this.em.name}List`) {
