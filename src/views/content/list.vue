@@ -1,11 +1,7 @@
 <template>
   <div class="app-container">
-    <el-tabs v-model="category">
-      <el-tab-pane v-for="value in categories" :key="value.id" :label="value.name" :name="`${value.id}`" />
-    </el-tabs>
-
     <list-admin
-      :key="`${category}-${componentKey}`"
+      :key="`${componentKey}`"
       entity-conf="Content"
       :list-display="listDisplay"
       :list-filter="{
@@ -13,7 +9,6 @@
       }"
       :query="{
         '@order': 'id|DESC',
-        '@filter': `entity.getCategory().getId() == ${category}`
       }"
     >
       <template v-slot:cover="{ value }">
@@ -55,12 +50,6 @@ export default {
       category: null,
       categories: []
     }
-  },
-  created() {
-    this.categoryManager.list().then(res => {
-      this.categories = res.data
-      this.category = `${this.categories[0].id}`
-    })
   }
 }
 </script>
