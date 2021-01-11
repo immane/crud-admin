@@ -29,7 +29,6 @@ export default {
   methods: {
     getBreadcrumb() {
       // only show routes with meta.title
-      console.log(this.$route.matched)
       let matched = this.$route.matched.filter(item => item.meta && item.meta.title)
       const first = matched[0]
 
@@ -38,7 +37,6 @@ export default {
       }
 
       this.levelList = matched.filter(item => item.meta && item.meta.title && item.meta.breadcrumb !== false)
-      console.log('levelList', this.levelList)
     },
     isDashboard(route) {
       const name = route && route.name

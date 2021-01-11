@@ -3,9 +3,9 @@
     <list-admin
       entity-conf="User"
       :list-display="listDisplay"
-      :disabled-actions="['new', 'edit', 'delete']"
+      :disabled-actions="['new', 'delete']"
     >
-      <template slot="action" slot-scope="{ data }">
+      <template v-slot:extraAction="{ data }">
         <el-button size="small" @click="dialog.data = data.roles; dialog.pk = data.id; dialog.visible = true;">
           修改权限
         </el-button>

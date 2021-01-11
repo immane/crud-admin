@@ -158,7 +158,6 @@ export default {
      * @param {Object, String} entityConf Entity name or config
      * @param {Array, String} fields Load main fields of entity
      * @param {Number} id Entity ID
-     * @param {Object} relationFilter ManyToOne or OneToOne relations filter
      */
 
     id: {
@@ -183,7 +182,7 @@ export default {
          *   'id',
          *   { property: 'cover', type: 'image', type_options: { disabled: true } },
          *   { property: 'region',
-         *     relationFilter: {
+         *     relation_filter: {
          *       '@filter': 'entity.getLevel() == 0',
          *       '@order': 'name|DESC, id|ASC'
          *     }
@@ -275,15 +274,14 @@ export default {
                 const em = new EntityManage(entityName)
                 const currentProperty = this.properties.find(v => v.property === field)
                 const targetList = await em.list(
-                  typeof currentProperty.relationFilter !== 'undefined'
-                    ? currentProperty.relationFilter
+                  typeof currentProperty.relation_filter !== 'undefined'
+                    ? currentProperty.relation_filter
                     : null
                 )
 
                 this.options[field] =
                   targetList.data.map(v => { return { value: v.id, label: v.__toString || v.name || v.title } })
 
-                console.log('options:', field, this.options[field])
               // eslint-disable-next-line no-empty
               } catch (e) {}
             }
@@ -332,7 +330,7 @@ export default {
       if (this.id) {
         this.em.update(this.id, this.form)
           .then(res => {
-            this.$message('数据修改成功')
+            this.$message({ message: '数据修改成功', type: 'success' })
             if (after === 'return') {
               this.$router.replace({ name: `${this.em.name}List` })
             }
@@ -341,7 +339,7 @@ export default {
       } else {
         this.em.create(this.form)
           .then(res => {
-            this.$message('创建数据成功')
+            this.$message({ message: '创建数据成功', type: 'success' })
             if (after === 'return') {
               this.$router.replace({ name: `${this.em.name}List` })
             }

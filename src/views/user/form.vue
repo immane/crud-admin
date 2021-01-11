@@ -11,7 +11,6 @@
 <script>
 import FormAdmin from '@/components/EasyAdmin/FormAdmin'
 import admin from '@/config'
-const inflect = require('i')(true)
 
 export default {
   components: { FormAdmin },
@@ -26,7 +25,7 @@ export default {
   },
   created() {
     // Load entities data
-    this.entity = inflect.camelize(inflect.underscore(this.entityParam))
+    this.entity = 'User'
 
     if (!Object.keys(admin.entities).includes(this.entity)) {
       console.log('Wrong!')

@@ -1,14 +1,22 @@
 <template>
   <div class="app-container">
+    <el-tabs v-model="category">
+      <el-tab-pane v-for="value in categories" :key="value.id" :label="value.name" :name="`${value.id}`" />
+    </el-tabs>
+
     <list-admin
-      :key="`${componentKey}`"
+      :key="`${category}-${componentKey}`"
       entity-conf="Content"
       :list-display="listDisplay"
+      :list-filter="{
+        'category.id': { 1: '咨询', 2: '新能源汽车加盟', 3: '租赁' }
+      }"
       :query="{
-        '@order': 'id|DESC'
+        '@order': 'id|DESC',
+        '@filter': `entity.getCategory().getId() == ${category}`
       }"
     >
-      <template slot="cover" slot-scope="{ value }">
+      <template v-slot:cover="{ value }">
         <el-image
           class="cover"
           :src="`${BASE_API}/uploads/images/${value}`"
@@ -47,6 +55,12 @@ export default {
       category: null,
       categories: []
     }
+  },
+  created() {
+    this.categoryManager.list().then(res => {
+      this.categories = res.data
+      this.category = `${this.categories[0].id}`
+    })
   }
 }
 </script>

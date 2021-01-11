@@ -16,6 +16,9 @@
               您好，{{ name }}
             </el-dropdown-item>
           </router-link>
+          <el-dropdown-item @click.native="clearCache">
+            <span style="display:block;">清空缓存</span>
+          </el-dropdown-item>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">登出</span>
           </el-dropdown-item>
@@ -45,6 +48,13 @@ export default {
   methods: {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
+    },
+    async clearCache() {
+      await this.$store.dispatch('entity/reset')
+      this.$message({
+        message: '已成功清空缓存',
+        type: 'success'
+      })
     },
     async logout() {
       await this.$store.dispatch('user/logout')

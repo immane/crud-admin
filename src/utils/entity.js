@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import store from '@/store'
 const inflect = require('i')(true)
 
 /**
@@ -85,16 +86,34 @@ export default class EntityManage {
        *    paginator: {...}
        * }
        */
-      const entities = await request.get(`/system/entities`)
+
+      let entities = store.getters.entity.entities ? store.getters.entity.entities : []
+      if (entities instanceof Array && entities.length) {
+        // console.log('Loading entities from store...')
+      } else {
+        // console.log('Loading entities from server...')
+        entities = await request.get(`/system/entities`)
+        entities = entities.data
+        store.dispatch('entity/set_entities', entities)
+      }
 
       // TODO: make this more accurate.
-      const list = entities.data.filter(
+      const list = entities.filter(
         (v, i) => v.split('\\').pop() === this.name
       )
 
       if (list.length) {
-        const structure = await request.get(`/system/entities/${list[0]}`)
-        return structure.data
+        let structure = store.getters.entity.structures
+        if (structure && Object.keys(structure).includes(list[0])) {
+          // console.log('Loading structures from store...')
+          structure = structure[list[0]]
+        } else {
+          // console.log('Loading structures from server...')
+          structure = await request.get(`/system/entities/${list[0]}`)
+          structure = structure.data
+          store.dispatch('entity/set_structures', { entity: list[0], structure: structure })
+        }
+        return structure
       } else throw Error('No entity was found.')
     }
 

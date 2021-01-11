@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container">
     <div class="dashboard-text">
-      Vue admin skeleton
+      管理后台
     </div>
   </div>
 </template>

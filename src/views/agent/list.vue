@@ -1,10 +1,17 @@
 <template>
   <div class="app-container">
     <list-admin
+      :query="{
+        '@filter': `
+          entity.getUser().getToken() == '${token}' ||
+          entity.getUser().getRecommendedUser().getToken() == '${token}' ||
+          entity.getUser().getRecommendedUser().getRecommendedUser().getToken() == '${token}'
+        `
+      }"
       :entity-conf="entity"
       :list-display="fields"
       :list-filter="filters"
-      :disabled-actions="disabled"
+      :disabled-actions="['new', 'edit', 'delete']"
     />
   </div>
 </template>
@@ -12,7 +19,7 @@
 <script>
 import ListAdmin from '@/components/EasyAdmin/ListAdmin'
 import admin from '@/config'
-const inflect = require('i')(true)
+import { mapGetters } from 'vuex'
 
 export default {
   components: { ListAdmin },
@@ -25,9 +32,14 @@ export default {
       entityParam: this.$route.params.entityParam
     }
   },
+  computed: {
+    ...mapGetters([
+      'token'
+    ])
+  },
   created() {
     // Load entities data
-    this.entity = inflect.camelize(inflect.underscore(this.entityParam))
+    this.entity = 'UserProfile'
 
     if (!Object.keys(admin.entities).includes(this.entity)) {
       console.log('NO!')

@@ -5,7 +5,7 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
-import { customRoutes } from './menu'
+import admin from '@/config'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -93,13 +93,19 @@ export const lastRoutes = [
   }
 ]
 
+/**
+ * asyncRoutes
+ * the routes that need to be dynamically loaded based on user roles
+ */
+export const asyncRoutes = [...admin.routes, ...lastRoutes]
+
 const createRouter = () => new Router({
   mode: 'history', // require service support
   base: 'admin',
   scrollBehavior: () => ({
     y: 0
   }),
-  routes: [...constantRoutes, ...customRoutes, ...lastRoutes]
+  routes: constantRoutes
 })
 
 const router = createRouter()

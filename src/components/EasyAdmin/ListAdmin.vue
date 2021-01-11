@@ -3,15 +3,44 @@
     <el-row>
       <el-col :span="4">
         <slot name="title">
-          <strong>
+          <strong style="font-size: 20px;">
             <!-- Title slot here -->
-            {{ $router.currentRoute.meta.title }}
+            <slot name="titleText">
+              {{ $router.currentRoute.meta.title }}
+            </slot>
           </strong>
         </slot>
       </el-col>
       <el-col :span="20" align="right">
         <!-- Top filter or searcher slot-->
-        <slot name="filter" />
+        <slot name="filter">
+          <el-select
+            v-for="(value, key) in filters"
+            :key="key"
+            v-model="listFilterData[key]"
+            filterable
+            clearable
+            :placeholder="value.label"
+          >
+            <el-option
+              v-for="item in value.data"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+          &emsp;
+          <el-button
+            v-if="Object.keys(filters).length"
+            size="medium"
+            icon="el-icon-search"
+            circle
+            @click="
+              filterGenerate();
+              fetchData();
+            "
+          />
+        </slot>
 
         &emsp;
 
@@ -19,7 +48,7 @@
         <slot name="extraTopButton" />
         &emsp;
         <slot name="topButton">
-          <router-link v-if="!disabledActions.includes('new')" :to="{ name: `${em.name}Create`}">
+          <router-link v-if="!disabledActions.includes('new')" :to="{name: `${em.name}Create`}">
             <el-button size="medium" type="primary" icon="el-icon-plus" plain>
               新增{{ $router.currentRoute.meta.title }}
             </el-button>
@@ -34,12 +63,17 @@
         v-loading="loading"
         :data="list"
         element-loading-text="加载中..."
-        border
         fit
         lazy
+        stripe
         highlight-current-row
+        v-bind="tableConf"
+        v-on="tableEvent"
         @sort-change="changeSort"
       >
+
+        <slot name="tableSelection" />
+
         <el-table-column
           v-for="(field, index) in properties"
           :key="index"
@@ -53,9 +87,14 @@
             |  Fields slot  |
             ---------------->
 
-            <slot :name="field.property" :value="extractRelations(scope.row, field.property)" :record="scope.row">
-              <div v-if="Object.keys(structure).includes(field.property)">
-                <!-- Normal fields -->
+            <slot :name="field.property" :value="extractFields(scope.row, field.property)" :record="scope.row">
+              <!-- Dynamic components and JSX function -->
+              <div v-if="Object.keys(field).includes('component')">
+                <component :is="field.component" :data="extractFields(scope.row, field.property)" />
+              </div>
+
+              <!-- Normal fields -->
+              <div v-else-if="Object.keys(structure).includes(field.property)">
 
                 <div v-for="(struct, i) in [structure[field.property]]" :key="i">
                   <!-- Dummy -->
@@ -78,6 +117,7 @@
                       struct && struct.metadata &&
                         'datetime' == struct.metadata.type && scope.row[field.property]"
                   >
+                    <i class="el-icon-time" />
                     {{ new Date(scope.row[field.property]) | dateFormat('YYYY-MM-DD hh:mm:ss') }}
                   </span>
 
@@ -87,6 +127,7 @@
                       struct && struct.metadata &&
                         'date' == struct.metadata.type && scope.row[field.property]"
                   >
+                    <i class="el-icon-time" />
                     {{ new Date(scope.row[field.property]) | dateFormat('YYYY-MM-DD') }}
                   </span>
 
@@ -110,7 +151,7 @@
 
               <div v-else>
                 <!-- Relation fields or others -->
-                {{ extractRelations(scope.row, field.property) }}
+                {{ extractFields(scope.row, field.property) }}
               </div>
             </slot>
           </template>
@@ -173,17 +214,43 @@ export default {
     htmlStrip(text) { return text ? String(text).replace(/<[^>]*>/g, '') : '' }
   },
   props: {
-    // entity config or entity name
+    // Entity config or entity name
     entityConf: {
       type: [Object, String],
       default: () => {}
     },
-    // default query including filter, sorter and pager.
-    query: {
-      type: Object,
+
+    // Table config
+    tableConf: {
+      type: [Object],
       default: () => {}
     },
-    // default show fields
+
+    // Table events
+    tableEvent: {
+      type: [Object],
+      default: () => {}
+    },
+
+    // Default query including filter, sorter and pager.
+    query: {
+      type: Object,
+      default: () => {
+        /**
+         * @description
+         *  Entity query
+         *
+         * @example
+         * {
+         *   '@filter': 'entity.getId() in [1,3,4] && entity.getUser().getProfile().getAge() > 18',
+         *   '@sort': 'id|ASC, createdTime|DESC',
+         *   page: 1, limit: 20,
+         * }
+         */
+      }
+    },
+
+    // Default show fields
     listDisplay: {
       type: Array,
       default: () => [
@@ -191,23 +258,53 @@ export default {
          * @description
          *  List display example
          *  property can including nasted call
+         *
          * @example
          * [
          *   'id',
          *   'user',
-         *   'name',
+         *   { property: 'name', label: 'Name',
+         *     component: {
+         *        props: ['data'],
+         *        render(h) {
+         *          return <p>{this.data}</p>
+         *        }
+         *   }},
          *   { property: 'user.__metadata.profile.phone', label: 'Phone' },
          *   'createdTime'
          * ]
          */
       ]
     },
-    // default list filters
+
+    // Default list filters
     listFilter: {
-      type: Array,
-      default: () => []
+      type: Object,
+      default: () => {
+        /**
+         * @description
+         *  List filter example
+         *
+         * @example
+         * {
+         *    // Reduce style
+         *    status: {
+         *      0: 'Pending', 1: 'Paid', 2: 'Completed'
+         *    }
+         *    // Full style
+         *    'category.id': {
+         *      expression: 'entity.getCategory().getId() == ":value"',
+         *      label: 'Please select',
+         *      data: [
+         *        { value: 'book', label: 'Book' },
+         *        { value: 'paper', label: 'Paper' },
+         *      ]
+         *    }
+         */
+      }
     },
-    // disable default actions
+
+    // Disable default actions
     // sample: ['new', 'edit', 'delete']
     disabledActions: {
       type: Array,
@@ -216,28 +313,36 @@ export default {
   },
   data() {
     return {
-      // entity manager and entity structure
+      // Entity manager and entity structure
+      // sample: 'Category'
       em: new EntityManage(this.entityConf),
       structure: {},
 
-      // translated fields
+      // Translated fields
       properties: [],
 
-      // table data source
+      // Table data source
       list: [],
       paginator: null,
 
-      // sort query: {'@sort': 'id|ASC, createdTime|DESC'}
+      // Translated filter config
+      filters: {},
+
+      // List filters or seacher
+      listFilterData: [],
+      searcherData: [],
+
+      // Sort query: {'@sort': 'id|ASC, createdTime|DESC'}
       sort: {},
-      // entity filter: {'@filter': 'entity.getId() in [1,3,4] && entity.getUser().getProfile().getAge() > 18'}
+      // Filter: {'@filter': 'entity.getId() == 1'}
       filter: {},
-      // pager: {page: 1, limit: 20}
+      // Pager: {page: 1, limit: 20}
       pager: {
         page: 1,
         limit: 20
       },
 
-      // other
+      // Other
       loading: true
     }
   },
@@ -249,6 +354,7 @@ export default {
   created() {
     this.routeProcess()
     this.propertieProcess()
+    this.filterProcess()
 
     /**
      * Fetch base data, like entity structure and validations
@@ -256,7 +362,7 @@ export default {
     this.fetchData()
   },
   methods: {
-    /* Properti process */
+    /* Property process */
     propertieProcess() {
       // fields transform
       const fields =
@@ -271,6 +377,59 @@ export default {
           })
         } else {
           this.properties.push(field)
+        }
+      }
+    },
+
+    /* Filter process */
+
+    filterProcess() {
+      const filter = {}
+      for (const key in this.listFilter) {
+        const field = this.listFilter[key]
+        if (!(Object.keys(field).includes('data') &&
+          this.listFilter.data instanceof Array
+        )) {
+          // transform
+          let expression = ''
+          const relationKeys = key.split('.')
+
+          relationKeys.forEach((value, index) => {
+            const capitalizeKey = value.charAt(0).toUpperCase() + value.slice(1)
+            expression += `.get${capitalizeKey}()`
+          })
+
+          filter[key] = {
+            data: [],
+            label: '请选择',
+            expression: `entity${expression} == ':value'`
+          }
+
+          for (const k in field) {
+            filter[key]['data'].push(
+              { value: k, label: field[k] }
+            )
+          }
+        }
+      }
+      this.filters = filter
+    },
+
+    filterGenerate() {
+      this.filter = {}
+      if (this.query && Object.keys(this.query).includes('@filter')) {
+        this.filter['@filter'] = this.query['@filter']
+      }
+
+      for (const key in this.listFilterData) {
+        const value = this.listFilterData[key]
+        if (value) {
+          const expression = this.filters[key].expression.replaceAll(':value', value)
+          if (this.filter['@filter']) {
+            this.filter['@filter'] += ` && ${expression}`
+          } else {
+            this.filter['@filter'] = expression
+          }
         }
       }
     },
@@ -307,7 +466,9 @@ export default {
            * Combine default constant query to dynamic pager and sort
            * Pager and sort object will change in the page
            */
+          {},
           this.query ? this.query : {},
+          this.filter,
           this.pager,
           this.sort
         )).then(res => {
@@ -344,19 +505,19 @@ export default {
     // Remove action
     removeAction(pk) {
       this.em.delete(pk).then(res => {
-        this.$message('删除成功')
+        this.$message({ message: '删除成功', type: 'success' })
         this.fetchData()
       })
     },
 
     // Extract relation field
-    extractRelations(dataObject, relationField) {
+    extractFields(dataObject, field) {
       // TODO: check if valid expression
       // Relation format 'a.b.c'
 
       try {
         let data = dataObject
-        const relationArray = relationField.split('.')
+        const relationArray = field.split('.')
 
         relationArray.forEach((value, index) => {
           if (Object.keys(data).includes(value)) {
