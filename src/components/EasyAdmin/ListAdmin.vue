@@ -292,6 +292,7 @@ export default {
          *    status: {
          *      0: 'Pending', 1: 'Paid', 2: 'Completed'
          *    }
+         *
          *    // Full style
          *    'category.id': {
          *      expression: 'entity.getCategory().getId() == ":value"',
@@ -301,6 +302,16 @@ export default {
          *        { value: 'paper', label: 'Paper' },
          *      ]
          *    }
+         *
+         *    // Async sample
+         *    'category.id': () => {
+         *      return axios
+         *        .get('/api/categories',
+         *          { params: { '@filter': 'entity.getType().getSlug() == "content"' }})
+         *        .then(res =>
+         *          Object.assign({}, ...res.data.map(v => { return { [v.id]: v.name } })))
+         *    }
+         * }
          */
       }
     },
@@ -386,31 +397,49 @@ export default {
 
     filterProcess() {
       const filter = {}
+      const isFunction = functionToCheck => functionToCheck && {}.toString.call(functionToCheck) === '[object Function]'
+      const transform = (field, key) => {
+        // transform
+        let expression = ''
+        const relationKeys = key.split('.')
+
+        relationKeys.forEach((value, index) => {
+          const capitalizeKey = value.charAt(0).toUpperCase() + value.slice(1)
+          expression += `.get${capitalizeKey}()`
+        })
+
+        filter[key] = {
+          data: [],
+          label: '请选择',
+          expression: `entity${expression} == ':value'`
+        }
+
+        for (const k in field) {
+          filter[key]['data'].push(
+            { value: k, label: field[k] }
+          )
+        }
+      }
+
       for (const key in this.listFilter) {
-        const field = this.listFilter[key]
+        let field = this.listFilter[key]
+
+        // receive async function
+        if (isFunction(field)) {
+          const promise = this.listFilter[key]()
+          if (promise instanceof Promise) {
+            this.listFilter[key]().then(res => {
+              field = res
+              transform(field, key)
+            })
+          } else throw Error('Async filter must return promise object!')
+        }
+
+        // receive normal value
         if (!(Object.keys(field).includes('data') &&
           this.listFilter.data instanceof Array
         )) {
-          // transform
-          let expression = ''
-          const relationKeys = key.split('.')
-
-          relationKeys.forEach((value, index) => {
-            const capitalizeKey = value.charAt(0).toUpperCase() + value.slice(1)
-            expression += `.get${capitalizeKey}()`
-          })
-
-          filter[key] = {
-            data: [],
-            label: '请选择',
-            expression: `entity${expression} == ':value'`
-          }
-
-          for (const k in field) {
-            filter[key]['data'].push(
-              { value: k, label: field[k] }
-            )
-          }
+          transform(field, key)
         }
       }
       this.filters = filter
