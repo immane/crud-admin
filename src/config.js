@@ -1,5 +1,6 @@
 import { g, r } from '@/router/generator'
 import Layout from '@/layout'
+import axios from '@/utils/request'
 
 export default {
   /**
@@ -13,7 +14,7 @@ export default {
       path: '/content', name: 'ContentManage', component: Layout,
       meta: { title: '内容管理', icon: 'el-icon-document', roles: ['ROLE_SUPER_ADMIN'] },
       children: [
-        ...g('Content', '内容')
+        ...r('Content', '内容')
       ]
     },
     // User manage
@@ -43,10 +44,52 @@ export default {
   entities: {
     Content: {
       form: {
-        fields: '__all__'
+        fields: [
+          'title',
+          'category',
+          { property: 'cover', type: 'image' },
+          'enabled',
+          'content'
+        ]
       },
       list: {
-        list_display: ['id', 'category', 'title', 'createdTime']
+        query: {
+          '@order': 'id|DESC'
+        },
+        list_filter: {
+          'category.id': () => {
+            return axios
+              .get('/api/categories',
+                { params: { '@filter': 'entity.getType().getSlug() == "content"' }})
+              .then(res =>
+                Object.assign({}, ...res.data.map(v => { return { [v.id]: v.name } })))
+          }
+        },
+        list_display: [
+          'id',
+          { property: 'cover',
+            component: {
+              props: ['data'],
+              data() {
+                return {
+                  BASE_URL: process.env.VUE_APP_BASE_API
+                }
+              },
+              render(h) {
+                return (
+                  <el-image
+                    style='width: 50px; height: 50px; border: 3px white solid; box-shadow: 1px 1px 5px #ddd;'
+                    src={`${this.BASE_URL}/uploads/images/${this.data}`}
+                    preview-src-list={[`${this.BASE_URL}/uploads/images/${this.data}`]}
+                  />
+                )
+              }
+            }
+          },
+          'category',
+          'title',
+          'createdTime'
+        ]
       }
     },
     Category: {
