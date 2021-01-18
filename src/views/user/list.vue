@@ -1,9 +1,11 @@
 <template>
   <div class="app-container">
     <list-admin
-      entity-conf="User"
-      :list-display="listDisplay"
-      :disabled-actions="['new', 'delete']"
+      :key="componentRefresh"
+      :entity-conf="entity"
+      :list-display="fields"
+      :list-filter="filters"
+      :disabled-actions="disabled"
     >
       <template v-slot:extraAction="{ data }">
         <el-button size="small" @click="dialog.data = data.roles; dialog.pk = data.id; dialog.visible = true;">
@@ -35,7 +37,7 @@
             em.update(dialog.pk, { roles: dialog.data })
               .then(res => $message( { type: 'success', message: '权限修改成功' } ) )
               .catch(err => $message( { type: 'error', message: '权限修改失败' } ) )
-              .finally(() => dialog.visible = false )
+              .finally(() => { dialog.visible = false; componentRefresh++ } )
           "
         >确认</el-button>
       </span>
@@ -44,20 +46,20 @@
 </template>
 
 <script>
-import EntityManage from '@/utils/entity'
 import ListAdmin from '@/components/EasyAdmin/ListAdmin'
+import admin from '@/config'
+import EntityManage from '@/utils/entity'
 
 export default {
   components: { ListAdmin },
   data() {
     return {
       em: new EntityManage('User'),
-      loading: true,
-      componentKey: 0,
-
-      listDisplay: ['id', 'username', 'phone', 'createdTime'],
-      listFilter: [],
-      query: {},
+      entity: '',
+      config: {},
+      fields: [],
+      filters: null,
+      componentRefresh: 0,
 
       dialog: {
         visible: false,
@@ -69,6 +71,19 @@ export default {
           { value: 'ROLE_SUPER_ADMIN', label: '超级管理员' }
         ]
       }
+    }
+  },
+  created() {
+    // Load entities data
+    this.entity = 'User'
+
+    if (!Object.keys(admin.entities).includes(this.entity)) {
+      console.log('NO!')
+    } else {
+      this.config = admin.entities[this.entity]
+      this.fields = this.config.list.list_display
+      this.filters = this.config.list.list_filter
+      this.disabled = this.config.list.disabled_actions
     }
   }
 }

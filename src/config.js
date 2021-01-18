@@ -125,7 +125,8 @@ export default {
         fields: '__all__'
       },
       list: {
-        list_display: ['id', 'username', 'phone', 'createdTime']
+        list_display: ['id', 'username', 'phone', 'createdTime'],
+        disabled_actions: ['new', 'delete']
       }
     },
     UserProfile: {
