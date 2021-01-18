@@ -46,7 +46,12 @@ export default {
       form: {
         fields: [
           'title',
-          'category',
+          { property: 'category',
+            relation_filter: {
+              '@filter': 'entity.getType().getSlug() == "content"',
+              '@order': 'id|ASC'
+            }
+          },
           { property: 'cover', type: 'image' },
           'enabled',
           'content'
