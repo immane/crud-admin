@@ -15,15 +15,15 @@
         <!-- Top filter or searcher slot-->
         <slot name="filter">
           <el-select
-            v-for="(value, key) in filters"
-            :key="key"
-            v-model="listFilterData[key]"
+            v-for="(v, k) in filters"
+            :key="k"
+            v-model="listFilterData[k]"
             filterable
             clearable
-            :placeholder="value.label"
+            :placeholder="v.label"
           >
             <el-option
-              v-for="item in value.data"
+              v-for="item in v.data"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -233,6 +233,12 @@ export default {
       default: () => {}
     },
 
+    // v-model
+    value: {
+      type: Array,
+      default: () => []
+    },
+
     // Default query including filter, sorter and pager.
     query: {
       type: Object,
@@ -334,7 +340,7 @@ export default {
       properties: [],
 
       // Table data source
-      list: [],
+      list: this.value,
       paginator: null,
 
       // Translated filter config
@@ -504,6 +510,9 @@ export default {
         )).then(res => {
           this.list = res.data
           this.paginator = res.paginator
+
+          // emit parent methods
+          this.$emit('input', res.data)
         })
       ]
 

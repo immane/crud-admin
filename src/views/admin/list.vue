@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
     <list-admin
+      v-model="list"
       :entity-conf="entity"
       :list-display="fields"
       :list-filter="filters"
@@ -19,6 +20,7 @@ export default {
   data() {
     return {
       entity: '',
+      list: [],
       config: {},
       fields: [],
       filters: null,

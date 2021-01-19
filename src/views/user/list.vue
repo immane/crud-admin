@@ -2,6 +2,7 @@
   <div class="app-container">
     <list-admin
       :key="componentRefresh"
+      v-model="listData"
       :entity-conf="entity"
       :list-display="fields"
       :list-filter="filters"
@@ -59,6 +60,7 @@ export default {
       config: {},
       fields: [],
       filters: null,
+      listData: [],
       componentRefresh: 0,
 
       dialog: {
