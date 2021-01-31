@@ -1,49 +1,65 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-
-      <div class="title-container">
-        <h3 class="title">{{ title }}管理平台登陆</h3>
+    <div class="session">
+      <div class="left">
+        <svg enable-background="new 0 0 300 302.5" version="1.1" viewBox="0 0 300 302.5" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+          <path class="st01" d="m126 302.2c-2.3 0.7-5.7 0.2-7.7-1.2l-105-71.6c-2-1.3-3.7-4.4-3.9-6.7l-9.4-126.7c-0.2-2.4 1.1-5.6 2.8-7.2l93.2-86.4c1.7-1.6 5.1-2.6 7.4-2.3l125.6 18.9c2.3 0.4 5.2 2.3 6.4 4.4l63.5 110.1c1.2 2 1.4 5.5 0.6 7.7l-46.4 118.3c-0.9 2.2-3.4 4.6-5.7 5.3l-121.4 37.4zm63.4-102.7c2.3-0.7 4.8-3.1 5.7-5.3l19.9-50.8c0.9-2.2 0.6-5.7-0.6-7.7l-27.3-47.3c-1.2-2-4.1-4-6.4-4.4l-53.9-8c-2.3-0.4-5.7 0.7-7.4 2.3l-40 37.1c-1.7 1.6-3 4.9-2.8 7.2l4.1 54.4c0.2 2.4 1.9 5.4 3.9 6.7l45.1 30.8c2 1.3 5.4 1.9 7.7 1.2l52-16.2z" />
+        </svg>
       </div>
+      <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
+        <h4><span>{{ title }}</span><br>管理平台</h4>
+        <p>欢迎，登陆</p>
+        <div class="floating-label">
+          <input
+            id="email"
+            ref="username"
+            v-model="loginForm.username"
+            placeholder="用户名"
+            name="username"
+            type="text"
+            tabindex="1"
+            auto-complete="on"
+          >
+          <label for="email">用户名:</label>
+          <div class="icon">
+            <svg enable-background="new 0 0 100 100" version="1.1" viewBox="0 0 100 100" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+              <g transform="translate(0 -952.36)">
+                <path d="m17.5 977c-1.3 0-2.4 1.1-2.4 2.4v45.9c0 1.3 1.1 2.4 2.4 2.4h64.9c1.3 0 2.4-1.1 2.4-2.4v-45.9c0-1.3-1.1-2.4-2.4-2.4h-64.9zm2.4 4.8h60.2v1.2l-30.1 22-30.1-22v-1.2zm0 7l28.7 21c0.8 0.6 2 0.6 2.8 0l28.7-21v34.1h-60.2v-34.1z" />
+              </g>
+              <rect class="st0" width="100" height="100" />
+            </svg>
 
-      <el-form-item prop="username">
-        <span class="svg-container">
-          <svg-icon icon-class="user" />
-        </span>
-        <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
-        />
-      </el-form-item>
+          </div>
+        </div>
+        <div class="floating-label">
+          <input
+            id="password"
+            :key="passwordType"
+            ref="password"
+            v-model="loginForm.password"
+            :type="passwordType"
+            placeholder="密码"
+            name="password"
+            tabindex="2"
+            auto-complete="on"
+            @keyup.enter.native="handleLogin"
+          >
+          <label for="password">密码:</label>
+          <div class="icon">
 
-      <el-form-item prop="password">
-        <span class="svg-container">
-          <svg-icon icon-class="password" />
-        </span>
-        <el-input
-          :key="passwordType"
-          ref="password"
-          v-model="loginForm.password"
-          :type="passwordType"
-          placeholder="Password"
-          name="password"
-          tabindex="2"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin"
-        />
-        <span class="show-pwd" @click="showPwd">
-          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
-        </span>
-      </el-form-item>
+            <svg enable-background="new 0 0 24 24" version="1.1" viewBox="0 0 24 24" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+              <rect class="st0" width="24" height="24" />
+              <path class="st1" d="M19,21H5V9h14V21z M6,20h12V10H6V20z" />
+              <path class="st1" d="M16.5,10h-1V7c0-1.9-1.6-3.5-3.5-3.5S8.5,5.1,8.5,7v3h-1V7c0-2.5,2-4.5,4.5-4.5s4.5,2,4.5,4.5V10z" />
+              <path class="st1" d="m12 16.5c-0.8 0-1.5-0.7-1.5-1.5s0.7-1.5 1.5-1.5 1.5 0.7 1.5 1.5-0.7 1.5-1.5 1.5zm0-2c-0.3 0-0.5 0.2-0.5 0.5s0.2 0.5 0.5 0.5 0.5-0.2 0.5-0.5-0.2-0.5-0.5-0.5z" />
+            </svg>
+          </div>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
-
-    </el-form>
+        </div>
+        <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登陆</el-button>
+        <a href="https://codepen.io/elujambio/pen/yjwzGP" class="discrete" target="_blank">Version 1.0</a>
+      </el-form>
+    </div>
   </div>
 </template>
 
@@ -122,113 +138,208 @@ export default {
 }
 </script>
 
-<style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
-
-$bg:#283443;
-$light_gray:#fff;
-$cursor: #fff;
-
-@supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
-  .login-container .el-input input {
-    color: $cursor;
-  }
-}
-
-/* reset element-ui css */
-.login-container {
-  .el-input {
-    display: inline-block;
-    height: 47px;
-    width: 85%;
-
-    input {
-      background: transparent;
-      border: 0px;
-      -webkit-appearance: none;
-      border-radius: 0px;
-      padding: 12px 5px 12px 15px;
-      color: $light_gray;
-      height: 47px;
-      caret-color: $cursor;
-
-      &:-webkit-autofill {
-        box-shadow: 0 0 0px 1000px $bg inset !important;
-        -webkit-text-fill-color: $cursor !important;
-      }
-    }
-  }
-
-  .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    color: #454545;
-  }
-}
-</style>
-
 <style lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+.st01{fill:#fff;}
+.st0{fill:none;}
 
+* {
+  font-family: -apple-system, BlinkMacSystemFont, "San Francisco", Helvetica, Arial, sans-serif;
+  font-weight:  300;
+  margin:  0;
+}
+$primary: rgb(182,157,230);
 .login-container {
-  min-height: 100%;
-  width: 100%;
-  background-color: $bg;
-  overflow: hidden;
-
-  .login-form {
-    position: relative;
-    width: 520px;
-    max-width: 100%;
-    padding: 160px 35px 0;
-    margin: 0 auto;
-    overflow: hidden;
-  }
-
-  .tips {
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 10px;
-
+  height:  100vh;
+  width:  100vw;
+  margin:  0 0;
+  display:  flex;
+  align-items:  flex-start;
+  justify-content:  flex-start;
+  background:  #f3f2f2;
+}
+h4 {
+  font-size:  24px;
+  font-weight:  600;
+  color:  #000;
+  opacity:  .85;
+}
+label {
+  font-size:  12.5px;
+  color:  #000;
+  opacity:  .8;
+  font-weight:  400;
+}
+form {
+  padding:  40px 30px;
+  background:  #fefefe;
+  display:  flex;
+  flex-direction:  column;
+  align-items:  flex-start;
+  padding-bottom:  20px;
+  width:  400px;
+  h4 {
+    margin-bottom:  20px;
+    color:  rgba(#000, .5);
     span {
-      &:first-of-type {
-        margin-right: 16px;
+      color:  rgba(#000, 1);
+      font-weight:  700;
+    }
+  }
+  p {
+    line-height:  155%;
+    margin-bottom:  5px;
+    font-size:  14px;
+    color:  #000;
+    opacity:  .65;
+    font-weight:  400;
+    max-width:  200px;
+    margin-bottom:  40px;
+  }
+}
+a.discrete {
+    color:  rgba(#000, .4);
+    font-size:  14px;
+    border-bottom:  solid 1px rgba(#000, .0);
+    padding-bottom:  4px;
+    margin-left:  auto;
+    font-weight:  300;
+    transition:  all .3s ease;
+    margin-top:  40px;
+    &:hover {
+      border-bottom:  solid 1px rgba(#000, .2);
+    }
+  }
+button {
+  -webkit-appearance:  none;
+  width:  auto;
+  min-width:  100px;
+  border-radius:  24px;
+  text-align:  center;
+  padding:  15px 40px;
+  margin-top:  5px;
+  background-color:  saturate($primary, 30%);
+  color:  #fff;
+  font-size:  14px;
+  margin-left:  auto;
+  font-weight:  500;
+  box-shadow:  0px 2px 6px -1px rgba(0,0,0,.13);
+  border:  none;
+  transition:  all .3s ease;
+  outline: 0;
+  &:hover {
+    transform:  translateY(-3px);
+    box-shadow:  0 2px 6px -1px rgba($primary, .65);
+    &:active {
+      transform:  scale(.99);
+    }
+  }
+}
+input {
+  font-size:  16px;
+  padding:  20px 0px;
+  height:  56px;
+  border:  none;
+  border-bottom:  solid 1px rgba(0,0,0,.1);
+  background:  #fff;
+  width:  280px;
+  box-sizing:  border-box;
+  transition:  all .3s linear;
+  color:  #000;
+  font-weight:  400;
+  -webkit-appearance:  none;
+  &:focus {
+    border-bottom:  solid 1px $primary;
+    outline: 0;
+    box-shadow:  0 2px 6px -8px rgba($primary, .45);
+  }
+}
+.floating-label {
+  position:  relative;
+  margin-bottom:  10px;
+  width:  100%;
+  label {
+    position:  absolute;
+    top: calc(50% - 7px);
+    left:  0;
+    opacity:  0;
+    transition:  all .3s ease;
+    padding-left:  44px;
+  }
+  input {
+    width:  calc(100% - 44px);
+    margin-left:  auto;
+    display:  flex;
+  }
+  .icon {
+    position:  absolute;
+    top:  0;
+    left:  0;
+    height:  56px;
+    width:  44px;
+    display:  flex;
+    svg {
+      height:  30px;
+      width:  30px;
+      margin:  auto;
+      opacity:  .15;
+      transition:  all .3s ease;
+      path {
+        transition:  all .3s ease;
       }
     }
   }
-
-  .svg-container {
-    padding: 6px 5px 6px 15px;
-    color: $dark_gray;
-    vertical-align: middle;
-    width: 30px;
-    display: inline-block;
+  input:not(:placeholder-shown) {
+    padding:  28px 0px 12px 0px;
   }
-
-  .title-container {
-    position: relative;
-
-    .title {
-      font-size: 26px;
-      color: $light_gray;
-      margin: 0px auto 40px auto;
-      text-align: center;
-      font-weight: bold;
+  input:not(:placeholder-shown) + label {
+    transform:  translateY(-10px);
+    opacity:  .7;
+  }
+  input:valid:not(:placeholder-shown) + label + .icon {
+    svg {
+      opacity:  1;
+      path {
+        fill:  $primary;
+      }
     }
   }
-
-  .show-pwd {
-    position: absolute;
-    right: 10px;
-    top: 7px;
-    font-size: 16px;
-    color: $dark_gray;
-    cursor: pointer;
-    user-select: none;
+  input:not(:valid):not(:focus) + label + .icon {
+    animation-name: shake-shake;
+    animation-duration: .3s;
+  }
+}
+$displacement:  3px;
+@keyframes shake-shake {
+  0% { transform: translateX(-$displacement);}
+  20% { transform: translateX($displacement); }
+  40% { transform: translateX(-$displacement);}
+  60% { transform: translateX($displacement);}
+  80% { transform: translateX(-$displacement);}
+  100% { transform: translateX(0px);}
+}
+.session {
+  display:  flex;
+  flex-direction:  row;
+  width:  auto;
+  height:  auto;
+  margin:  auto auto;
+  background:  #ffffff;
+  border-radius:  4px;
+  box-shadow:  0px 2px 6px -1px rgba(0,0,0,.12);
+}
+.left {
+  width:  220px;
+  height:  auto;
+  min-height:  100%;
+  position:  relative;
+  background-image: url("https://images.pexels.com/photos/114979/pexels-photo-114979.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940");
+  background-size:  cover;
+  border-top-left-radius:  4px;
+  border-bottom-left-radius:  4px;
+  svg {
+    height:  40px;
+    width:  auto;
+    margin:  20px;
   }
 }
 </style>
