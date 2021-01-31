@@ -6,6 +6,7 @@
       :list-display="fields"
       :list-filter="filters"
       :disabled-actions="disabled"
+      :query="query"
     />
   </div>
 </template>
@@ -20,6 +21,7 @@ export default {
   data() {
     return {
       entity: '',
+      alias: '',
       list: [],
       config: {},
       fields: [],
@@ -29,15 +31,17 @@ export default {
   },
   created() {
     // Load entities data
-    this.entity = inflect.camelize(inflect.underscore(this.entityParam))
+    this.alias = inflect.camelize(inflect.underscore(this.entityParam))
 
-    if (!Object.keys(admin.entities).includes(this.entity)) {
+    if (!Object.keys(admin.entities).includes(this.alias)) {
       console.log('NO!')
     } else {
-      this.config = admin.entities[this.entity]
+      this.config = admin.entities[this.alias]
+      this.entity = Object.keys(this.config).includes('entity') ? this.config.entity : this.alias
       this.fields = this.config.list.list_display
       this.filters = this.config.list.list_filter
       this.disabled = this.config.list.disabled_actions
+      this.query = this.config.list.query
     }
   }
 }

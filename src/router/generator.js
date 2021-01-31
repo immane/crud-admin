@@ -7,7 +7,7 @@
 const inflect = require('i')(true)
 
 // eslint-disable-next-line no-unused-vars
-export const r = (entityName, title, icon = 'el-icon-caret-right') => {
+export const r = (entityName, title, meta = { title: title, icon: 'el-icon-caret-right' }) => {
   const entityPath = inflect.dasherize(inflect.underscore(entityName))
   return [{
     path: `/dummy/${entityPath}/create`,
@@ -25,15 +25,12 @@ export const r = (entityName, title, icon = 'el-icon-caret-right') => {
     path: `/dummy/${entityPath}/list`,
     redirect: `/${entityPath}/list`,
     name: `${entityName}List`,
-    meta: {
-      title: title,
-      icon: icon
-    }
+    meta: meta
   }
   ]
 }
 // eslint-disable-next-line no-unused-vars
-export const g = (entityName, title, icon = 'el-icon-caret-right', component = null) => {
+export const g = (entityName, title, meta = { title: title, icon: 'el-icon-caret-right' }, component = null) => {
   const entityPath = inflect.dasherize(inflect.underscore(entityName))
   return [{
     path: `/${entityPath}/create`,
@@ -51,10 +48,7 @@ export const g = (entityName, title, icon = 'el-icon-caret-right', component = n
     path: `/${entityPath}/list`,
     name: `${entityName}List`,
     component: async() => await require('../views/' + entityPath + '/list.vue'),
-    meta: {
-      title: title,
-      icon: icon
-    }
+    meta: meta
   }
   ]
 }

@@ -156,7 +156,7 @@
 
       <el-form-item>
         <slot name="action" :form="form">
-          <el-button type="primary" @click="onSubmit('return')">保存</el-button>
+          <el-button type="primary" icon="el-icon-edit-outline" @click="onSubmit('return')">保存</el-button>
           <!--<el-button type="primary" @click="onSubmit()">保存并继续编辑</el-button>-->
         </slot>
       </el-form-item>
@@ -199,7 +199,7 @@ export default {
          * @example
          * [
          *   'id',
-         *   { property: 'cover', type: 'image', type_options: { disabled: true } },
+         *   { property: 'cover', type: 'image', required: true, type_options: { disabled: true } },
          *   { property: 'region',
          *     relation_filter: {
          *       '@filter': 'entity.getLevel() == 0',
@@ -272,14 +272,17 @@ export default {
       // fields process
       for (const field of this.plainFields) {
         const structure = this.structure[field]
+        const property = this.properties.find(prop => field === prop.property)
+        const required = Object.keys(property).includes('required') ? property.required : false
 
-        // Rule generate
         if (structure && Object.keys(structure).includes('metadata')) {
           const metadata = structure.metadata
+
+          // Rule generate
           this.rules[field] = [
             {
               type: metadata.type,
-              required: !metadata.nullable
+              required: !metadata.nullable || required
             }
           ]
 
@@ -346,29 +349,26 @@ export default {
       })
     },
     onSubmit(after = null) {
+      const successAndRedirect = () => {
+        this.$message({ message: '数据修改成功', type: 'success' })
+        if (after === 'return') {
+          this.$router.replace({ name: `${this.em.name}List` })
+        }
+      }
+
       this.$refs['form'].validate((valid) => {
         if (valid) {
           if (this.id) {
             this.em.update(this.id, this.form)
-              .then(res => {
-                this.$message({ message: '数据修改成功', type: 'success' })
-                if (after === 'return') {
-                  this.$router.replace({ name: `${this.em.name}List` })
-                }
-              })
+              .then(res => successAndRedirect())
               .catch(err => { this.$message.error(err.message) })
           } else {
             this.em.create(this.form)
-              .then(res => {
-                this.$message({ message: '创建数据成功', type: 'success' })
-                if (after === 'return') {
-                  this.$router.replace({ name: `${this.em.name}List` })
-                }
-              })
+              .then(res => successAndRedirect())
               .catch(err => { this.$message.error(err.message) })
           }
         } else {
-          this.$message({ message: '验证失败，请检查输入是否正确', type: 'error' })
+          this.$message({ message: '验证失败，请检查输入是否正确', type: 'warning' })
           return false
         }
       })
@@ -382,3 +382,4 @@ export default {
   text-align: center;
 }
 </style>
+
