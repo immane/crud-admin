@@ -152,6 +152,21 @@
             />
           </slot>
         </el-form-item>
+
+        <!-- Customize fields -->
+        <template v-else>
+          <el-form-item
+            v-if="field.property !== 'id'"
+            :label="field.property"
+            :prop="field.property"
+          >
+            <el-input
+              v-model="form[field.property]"
+              :disabled="field.type_options ? field.type_options.disabled : false"
+            />
+          </el-form-item>
+        </template>
+
       </div>
 
       <el-form-item>
