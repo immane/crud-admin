@@ -31,142 +31,170 @@
       <div
         v-for="field in properties"
         :key="field.property"
+        :set="currentStruct = structure[field.property]"
       >
         <el-form-item
-          v-if="
-            !['id'].includes(field.property)
-              && structure[field.property]
-              && structure[field.property].hasOwnProperty('metadata')
+          v-if="field.property !== 'id'"
+          :label="
+            Object.keys(field).includes('field_options') &&
+              Object.keys(field.field_options).includes('label')
+              ? field.field_options.label
+              : (currentStruct ? currentStruct['translation']: field.property)
           "
-          :label="structure[field.property] ? structure[field.property]['translation']: field"
           :prop="field.property"
+          v-bind="field.field_options"
+          v-on="field.field_events"
         >
           <!---------------
           |  Fields slot  |
           ---------------->
 
-          <slot :name="field.property" :form="form" :value="form[field.property]" :struct="structure[field.property]">
-            <!-- Dummy -->
-            <template v-if="false" />
+          <!-- Dynamic components and JSX function -->
+          <template v-if="Object.keys(field).includes('component')">
+            <component :is="field.component" :data="form[field.property]" />
+          </template>
 
-            <!-- Datetime -->
-            <el-date-picker
-              v-else-if="field.type == 'datetime' || structure[field.property].metadata.type == 'datetime'"
-              v-model="form[field.property]"
-              type="datetime"
-              placeholder="选择日期时间"
-              :disabled="field.type_options ? field.type_options.disabled : false"
-            />
-
-            <!-- Date -->
-            <el-date-picker
-              v-else-if="field.type == 'date' || structure[field.property].metadata.type == 'date'"
-              v-model="form[field.property]"
-              type="date"
-              placeholder="选择日期"
-              :disabled="field.type_options ? field.type_options.disabled : false"
-            />
-
-            <!-- Integer -->
-            <el-input-number
-              v-else-if="field.type == 'integer' || structure[field.property].metadata.type == 'integer'"
-              v-model="form[field.property]"
-              :disabled="field.type_options ? field.type_options.disabled : false"
-            />
-
-            <!-- Boolean -->
-            <el-checkbox
-              v-else-if="field.type == 'boolean' || structure[field.property].metadata.type == 'boolean'"
-              v-model="form[field.property]"
-              :disabled="field.type_options ? field.type_options.disabled : false"
-            />
-
-            <!-- Textarea -->
-            <tinymce
-              v-else-if="field.type == 'text' || structure[field.property].metadata.type == 'text'"
-              v-model="form[field.property]"
-              :height="300"
-              :disabled="field.type_options ? field.type_options.disabled : false"
-            />
-
-            <!-- Uploads -->
-            <el-upload
-              v-else-if="field.type === 'image'"
-              :disabled="field.type_options ? field.type_options.disabled : false"
-              :action="`${BASE_API}/upload`"
-              :limit="1"
-              :file-list="
-                form[field.property]
-                  ? [{name: form[field.property], url: `${BASE_API}/uploads/images/${form[field.property]}`}]
-                  : []
-              "
-              list-type="picture"
-              :on-remove="(file, fileList) => form[field.property] = ''"
-              :on-success="(res, file) => { form[field.property] = res.data[0] }"
-            >
-              <el-button size="small" type="primary">点击选择媒体/文件</el-button>
-              <div slot="tip" class="el-upload__tip">JPG或PNG文件必须少于10MB</div>
-            </el-upload>
-
-            <el-upload
-              v-else-if="field.type === 'file'"
-              :disabled="field.type_options ? field.type_options.disabled : false"
-              :action="`${BASE_API}/upload`"
-              :limit="1"
-              :file-list="
-                form[field.property]
-                  ? [{name: form[field.property], url: `${BASE_API}/uploads/images/${form[field.property]}`}]
-                  : []
-              "
-              list-type="file"
-              :on-remove="(file, fileList) => form[field.property] = ''"
-              :on-success="(res, file) => { form[field.property] = res.data[0] }"
-            >
-              <el-button size="small" type="primary">点击选择文件</el-button>
-              <div slot="tip" class="el-upload__tip">上传文件必须少于100MB</div>
-            </el-upload>
-
-            <!-- ManyToOne or OneToOne -->
-            <el-select
-              v-else-if="
-                ['ManyToOne', 'OneToOne'].includes(structure[field.property].metadata.type)
-              "
-              v-model="form[field.property]"
-              filterable
-              placeholder="请选择"
-              :disabled="field.type_options ? field.type_options.disabled : false"
-            >
-              <el-option
-                v-for="item in options[field.property]"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-
-            <!-- Others -->
-            <el-input
-              v-else
-              v-model="form[field.property]"
-              :disabled="field.type_options ? field.type_options.disabled : false"
-            />
-          </slot>
-        </el-form-item>
-
-        <!-- Customize fields -->
-        <template v-else>
-          <el-form-item
-            v-if="field.property !== 'id'"
-            :label="field.property"
-            :prop="field.property"
+          <!-- Normal fields -->
+          <template
+            v-else-if="
+              !['id'].includes(field.property)
+                && currentStruct
+                && currentStruct.hasOwnProperty('metadata')
+            "
           >
+            <slot
+              :name="field.property"
+              :form="form"
+              :value="form[field.property]"
+              :struct="currentStruct"
+            >
+              <!-- Dummy -->
+              <template v-if="false" />
+
+              <!-- Datetime -->
+              <el-date-picker
+                v-else-if="field.type == 'datetime' || currentStruct.metadata.type == 'datetime'"
+                v-model="form[field.property]"
+                type="datetime"
+                placeholder="选择日期时间"
+                v-bind="field.type_options"
+                v-on="field.type_events"
+              />
+
+              <!-- Date -->
+              <el-date-picker
+                v-else-if="field.type == 'date' || currentStruct.metadata.type == 'date'"
+                v-model="form[field.property]"
+                type="date"
+                placeholder="选择日期"
+                v-bind="field.type_options"
+                v-on="field.type_events"
+              />
+
+              <!-- Integer -->
+              <el-input-number
+                v-else-if="field.type == 'integer' || currentStruct.metadata.type == 'integer'"
+                v-model="form[field.property]"
+                v-bind="field.type_options"
+                v-on="field.type_events"
+              />
+
+              <!-- Boolean -->
+              <el-checkbox
+                v-else-if="field.type == 'boolean' || currentStruct.metadata.type == 'boolean'"
+                v-model="form[field.property]"
+                v-bind="field.type_options"
+                v-on="field.type_events"
+              />
+
+              <!-- Textarea -->
+              <tinymce
+                v-else-if="field.type == 'text' || currentStruct.metadata.type == 'text'"
+                v-model="form[field.property]"
+                :height="300"
+                v-bind="field.type_options"
+                v-on="field.type_events"
+              />
+
+              <!-- Uploads -->
+              <!-- image -->
+              <el-upload
+                v-else-if="field.type === 'image'"
+                v-bind="field.type_options"
+                :action="`${BASE_API}/upload`"
+                :limit="1"
+                :file-list="
+                  form[field.property]
+                    ? [{name: form[field.property], url: `${BASE_API}/uploads/images/${form[field.property]}`}]
+                    : []
+                "
+                list-type="picture"
+                :on-remove="(file, fileList) => form[field.property] = ''"
+                :on-success="(res, file) => { form[field.property] = res.data[0] }"
+                v-on="field.type_events"
+              >
+                <el-button size="small" type="primary">点击选择媒体/文件</el-button>
+                <div slot="tip" class="el-upload__tip">JPG或PNG文件必须少于10MB</div>
+              </el-upload>
+
+              <!-- file -->
+              <el-upload
+                v-else-if="field.type === 'file'"
+                v-bind="field.type_options"
+                :action="`${BASE_API}/upload`"
+                :limit="1"
+                :file-list="
+                  form[field.property]
+                    ? [{name: form[field.property], url: `${BASE_API}/uploads/images/${form[field.property]}`}]
+                    : []
+                "
+                list-type="file"
+                :on-remove="(file, fileList) => form[field.property] = ''"
+                :on-success="(res, file) => { form[field.property] = res.data[0] }"
+                v-on="field.type_events"
+              >
+                <el-button size="small" type="primary">点击选择文件</el-button>
+                <div slot="tip" class="el-upload__tip">上传文件必须少于100MB</div>
+              </el-upload>
+
+              <!-- ManyToOne or OneToOne -->
+              <el-select
+                v-else-if="
+                  ['ManyToOne', 'OneToOne'].includes(structure[field.property].metadata.type)
+                "
+                v-model="form[field.property]"
+                filterable
+                placeholder="请选择"
+                v-bind="field.type_options"
+                v-on="field.type_events"
+              >
+                <el-option
+                  v-for="item in options[field.property]"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+
+              <!-- Others -->
+              <el-input
+                v-else
+                v-model="form[field.property]"
+                v-bind="field.type_options"
+                v-on="field.type_events"
+              />
+            </slot>
+          </template>
+
+          <!-- Customize fields or others -->
+          <template v-else>
             <el-input
               v-model="form[field.property]"
-              :disabled="field.type_options ? field.type_options.disabled : false"
+              v-bind="field.type_options"
+              v-on="field.type_events"
             />
-          </el-form-item>
-        </template>
-
+          </template>
+        </el-form-item>
       </div>
 
       <el-form-item>
@@ -214,7 +242,14 @@ export default {
          * @example
          * [
          *   'id',
-         *   { property: 'cover', type: 'image', required: true, type_options: { disabled: true } },
+         *   { property: 'cover',
+         *     type: 'image',
+         *     required: true,
+         *     field_options: { label: 'Cover image' },
+         *     field_events: { click: () => alert('Clicked') },
+         *     type_options: { disabled: true },
+         *     type_events: { input: () => alert('Inputed') }
+         *   },
          *   { property: 'region',
          *     relation_filter: {
          *       '@filter': 'entity.getLevel() == 0',
@@ -296,7 +331,8 @@ export default {
           // Rule generate
           this.rules[field] = [
             {
-              type: metadata.type,
+              // TODO: metadata type is different from rule types
+              // type: metadata.type,
               required: !metadata.nullable || required
             }
           ]
@@ -393,8 +429,7 @@ export default {
 </script>
 
 <style scoped>
-.line{
+.line {
   text-align: center;
 }
 </style>
-
