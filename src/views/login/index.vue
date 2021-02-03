@@ -42,7 +42,7 @@
             name="password"
             tabindex="2"
             auto-complete="on"
-            @keyup.enter.native="handleLogin"
+            @keyup.enter="handleLogin"
           >
           <label for="password">密码:</label>
           <div class="icon">
@@ -155,7 +155,9 @@ $primary: rgb(182,157,230);
   display:  flex;
   align-items:  flex-start;
   justify-content:  flex-start;
-  background:  #f3f2f2;
+  /* background:  #f3f2f2; */
+  background-image: url(https://abasltd.com/wp-content/uploads/2019/04/abstract-tech-small-grey-squares-animated-background-motion-graphic-design-video-clip-ultra-hd-4k-3840x2160_bjcehe7ye_thumbnail-full01.png);
+  background-size: cover;
 }
 h4 {
   font-size:  24px;

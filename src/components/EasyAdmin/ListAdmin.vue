@@ -81,7 +81,9 @@
           sortable
           :prop="field.property"
         >
-          <template slot-scope="scope">
+          <template
+            slot-scope="scope"
+          >
 
             <!---------------
             |  Fields slot  |
@@ -94,64 +96,62 @@
               </div>
 
               <!-- Normal fields -->
-              <div v-else-if="Object.keys(structure).includes(field.property)">
-
-                <div v-for="(struct, i) in [structure[field.property]]" :key="i">
-                  <!-- Dummy -->
-                  <template v-if="false" />
-
-                  <!-- Boolean -->
-                  <span
-                    v-else-if="
-                      struct && struct.metadata &&
-                        'boolean' == struct.metadata.type"
-                  >
-                    <el-tag :type="scope.row[field.property] | boolFilter">
-                      {{ scope.row[field.property] | boolDisplay }}
-                    </el-tag>
-                  </span>
-
-                  <!-- DateTime -->
-                  <span
-                    v-else-if="
-                      struct && struct.metadata &&
-                        'datetime' == struct.metadata.type && scope.row[field.property]"
-                  >
-                    <i class="el-icon-time" />
-                    {{ new Date(scope.row[field.property]) | dateFormat('YYYY-MM-DD HH:mm:ss') }}
-                  </span>
-
-                  <!-- Date -->
-                  <span
-                    v-else-if="
-                      struct && struct.metadata &&
-                        'date' == struct.metadata.type && scope.row[field.property]"
-                  >
-                    <i class="el-icon-time" />
-                    {{ new Date(scope.row[field.property]) | dateFormat('YYYY-MM-DD') }}
-                  </span>
-
-                  <!-- Relatived -->
-                  <span
-                    v-else-if="
-                      struct && struct.metadata &&
-                        ('ManyToOne' == struct.metadata.type ||
-                          'OneToOne' == struct.metadata.type)
-                    "
-                  >
-                    {{ scope.row[field.property] ? scope.row[field.property].__toString : '' }}
-                  </span>
-
-                  <!-- Others -->
-                  <span v-else>
-                    {{ scope.row[field.property] | htmlStrip }}
-                  </span>
-                </div>
-              </div>
-
               <div v-else>
-                <!-- Relation fields or others -->
-                {{ extractFields(scope.row, field.property) }}
+
+                <!-- Dummy -->
+                <template v-if="false" />
+
+                <!-- Boolean -->
+                <span
+                  v-else-if="
+                    field.type == 'boolean' ||
+                      checkMetadataType(structure[field.property], 'boolean')
+                  "
+                >
+                  <el-tag :type="scope.row[field.property] | boolFilter">
+                    {{ scope.row[field.property] | boolDisplay }}
+                  </el-tag>
+                </span>
+
+                <!-- DateTime -->
+                <span
+                  v-else-if="
+                    field.type == 'datetime' ||
+                      (checkMetadataType(structure[field.property], 'datetime')
+                        && scope.row[field.property])
+                  "
+                >
+                  <i class="el-icon-time" />
+                  {{ new Date(scope.row[field.property]) | dateFormat('YYYY-MM-DD HH:mm:ss') }}
+                </span>
+
+                <!-- Date -->
+                <span
+                  v-else-if="
+                    field.type == 'date' ||
+                      (checkMetadataType(structure[field.property], 'date')
+                        && scope.row[field.property])
+                  "
+                >
+                  <i class="el-icon-time" />
+                  {{ new Date(scope.row[field.property]) | dateFormat('YYYY-MM-DD') }}
+                </span>
+
+                <!-- Relatived -->
+                <span
+                  v-else-if="
+                    checkMetadataType(structure[field.property], 'ManyToOne')
+                      || checkMetadataType(structure[field.property], 'OneToOne')
+                  "
+                >
+                  {{ scope.row[field.property] ? scope.row[field.property].__toString : '' }}
+                </span>
+
+                <!-- Others -->
+                <span v-else>
+                  <!-- Relation fields or others -->
+                  {{ extractFields(scope.row, field.property) | htmlStrip }}
+                </span>
               </div>
             </slot>
           </template>
@@ -286,6 +286,7 @@ export default {
          *        }
          *   }},
          *   { property: 'user.__metadata.profile.phone', label: 'Phone' },
+         *   { property: 'enabled', type: 'boolean' }
          *   'createdTime'
          * ]
          */
@@ -428,6 +429,11 @@ export default {
     this.fetchData()
   },
   methods: {
+    /* Check if metadata presented */
+    checkMetadataType(currentStruct, type) {
+      return currentStruct && Object.keys(currentStruct).includes('metadata') && currentStruct.metadata.type === type
+    },
+
     /* Property process */
     propertieProcess() {
       // fields transform
