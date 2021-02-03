@@ -118,7 +118,7 @@
                         'datetime' == struct.metadata.type && scope.row[field.property]"
                   >
                     <i class="el-icon-time" />
-                    {{ new Date(scope.row[field.property]) | dateFormat('YYYY-MM-DD hh:mm:ss') }}
+                    {{ new Date(scope.row[field.property]) | dateFormat('YYYY-MM-DD HH:mm:ss') }}
                   </span>
 
                   <!-- Date -->
