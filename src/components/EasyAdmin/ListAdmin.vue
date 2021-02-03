@@ -159,6 +159,14 @@
 
         <el-table-column label="动作">
           <template slot-scope="scope">
+            <component
+              :is="action.component"
+              v-for="action in actions.filter(action => action.position === 'list')"
+              :key="action.name"
+              :record="scope.row"
+              :refresh="fetchData"
+            />
+
             <slot name="extraAction" :data="scope.row" />
 
             &emsp;
@@ -320,6 +328,46 @@ export default {
          * }
          */
       }
+    },
+
+    // Actions
+    actions: {
+      type: Array,
+      default: () => [
+        /**
+         * @description
+         *  Actions sample
+         *  property can including nasted call
+         *
+         * @example
+         * [
+         *  { name: 'recycle',
+         *    position: 'list',
+         *    component: {
+         *      props: ['record', 'refresh'],
+         *      methods: {
+         *        recycleContent(id) {
+         *          axios
+         *            .put(`/manage/contents/${id}`, { isDeleted: true })
+         *            .then(() => {
+         *              this.$message('Move to recycle bin success.')
+         *              this.refresh()
+         *            })
+         *        }
+         *      },
+         *      render(h) {
+         *        return (
+         *          <el-button nativeOnClick={ () => this.recycleContent(this.record.id) }
+         *            slot='reference' size='small' type='danger' icon='el-icon-delete' plain>
+         *              Recycle
+         *          </el-button>
+         *        )
+         *      }
+         *    }
+         *  }
+         * ]
+         */
+      ]
     },
 
     // Disable default actions

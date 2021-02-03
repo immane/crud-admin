@@ -127,11 +127,22 @@ export default {
     },
     User: {
       form: {
-        fields: '__all__'
+        fields: [
+          { property: 'username', field_options: { label: '用户名' }},
+          'phone',
+          { property: 'email', field_options: { label: 'Email' }},
+          { property: 'enabled', type: 'boolean', field_options: { label: '启用' }},
+          { property: 'plainPassword', field_options: { label: '密码' }}
+        ]
       },
       list: {
-        list_display: ['id', 'username', 'phone', 'createdTime'],
-        disabled_actions: ['new', 'delete']
+        list_display: [
+          'id',
+          'username',
+          'phone',
+          { property: 'enabled', type: 'boolean' },
+          'createdTime'
+        ]
       }
     },
     UserProfile: {

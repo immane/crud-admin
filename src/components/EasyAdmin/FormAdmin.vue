@@ -58,8 +58,6 @@
           <template
             v-else-if="
               !['id'].includes(field.property)
-                && currentStruct
-                && currentStruct.hasOwnProperty('metadata')
             "
           >
             <slot
@@ -73,7 +71,7 @@
 
               <!-- Datetime -->
               <el-date-picker
-                v-else-if="field.type == 'datetime' || currentStruct.metadata.type == 'datetime'"
+                v-else-if="field.type == 'datetime' || checkMetadataType(currentStruct, 'datetime')"
                 v-model="form[field.property]"
                 type="datetime"
                 placeholder="选择日期时间"
@@ -83,7 +81,7 @@
 
               <!-- Date -->
               <el-date-picker
-                v-else-if="field.type == 'date' || currentStruct.metadata.type == 'date'"
+                v-else-if="field.type == 'date' || checkMetadataType(currentStruct, 'date')"
                 v-model="form[field.property]"
                 type="date"
                 placeholder="选择日期"
@@ -93,7 +91,7 @@
 
               <!-- Integer -->
               <el-input-number
-                v-else-if="field.type == 'integer' || currentStruct.metadata.type == 'integer'"
+                v-else-if="field.type == 'integer' || checkMetadataType(currentStruct, 'integer')"
                 v-model="form[field.property]"
                 v-bind="field.type_options"
                 v-on="field.type_events"
@@ -101,7 +99,7 @@
 
               <!-- Boolean -->
               <el-checkbox
-                v-else-if="field.type == 'boolean' || currentStruct.metadata.type == 'boolean'"
+                v-else-if="field.type == 'boolean' || checkMetadataType(currentStruct, 'boolean')"
                 v-model="form[field.property]"
                 v-bind="field.type_options"
                 v-on="field.type_events"
@@ -109,7 +107,7 @@
 
               <!-- Textarea -->
               <tinymce
-                v-else-if="field.type == 'text' || currentStruct.metadata.type == 'text'"
+                v-else-if="field.type == 'text' || checkMetadataType(currentStruct, 'text')"
                 v-model="form[field.property]"
                 :height="300"
                 v-bind="field.type_options"
@@ -160,7 +158,8 @@
               <!-- ManyToOne or OneToOne -->
               <el-select
                 v-else-if="
-                  ['ManyToOne', 'OneToOne'].includes(structure[field.property].metadata.type)
+                  currentStruct && currentStruct.hasOwnProperty('metadata') &&
+                    ['ManyToOne', 'OneToOne'].includes(currentStruct.metadata.type)
                 "
                 v-model="form[field.property]"
                 filterable
@@ -186,14 +185,6 @@
             </slot>
           </template>
 
-          <!-- Customize fields or others -->
-          <template v-else>
-            <el-input
-              v-model="form[field.property]"
-              v-bind="field.type_options"
-              v-on="field.type_events"
-            />
-          </template>
         </el-form-item>
       </div>
 
@@ -371,6 +362,9 @@ export default {
     })
   },
   methods: {
+    checkMetadataType(currentStruct, type) {
+      return currentStruct && Object.keys(currentStruct).includes('metadata') && currentStruct.metadata.type === type
+    },
     fetchData(id) {
       this.em.retrieve(id).then(res => {
         const data = res.data
@@ -429,7 +423,8 @@ export default {
 </script>
 
 <style scoped>
-.line {
+.line{
   text-align: center;
 }
 </style>
+
