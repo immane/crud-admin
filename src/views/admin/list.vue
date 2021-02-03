@@ -6,6 +6,7 @@
       :list-display="fields"
       :list-filter="filters"
       :disabled-actions="disabled"
+      :actions="actions"
       :query="query"
     />
   </div>
@@ -40,6 +41,7 @@ export default {
       this.entity = Object.keys(this.config).includes('entity') ? this.config.entity : this.alias
       this.fields = this.config.list.list_display
       this.filters = this.config.list.list_filter
+      this.actions = this.config.list.actions
       this.disabled = this.config.list.disabled_actions
       this.query = this.config.list.query
     }
