@@ -36,8 +36,8 @@
         <el-form-item
           v-if="field.property !== 'id'"
           :label="
-            Object.keys(field).includes('field_options') &&
-              Object.keys(field.field_options).includes('label')
+            (Object.keys(field).includes('field_options') &&
+              Object.keys(field.field_options).includes('label'))
               ? field.field_options.label
               : (currentStruct ? currentStruct['translation']: field.property)
           "
@@ -189,8 +189,8 @@
       </div>
 
       <el-form-item>
-        <slot name="action" :form="form">
-          <el-button type="primary" icon="el-icon-edit-outline" @click="onSubmit('return')">保存</el-button>
+        <slot name="action" :form="form" :submit="onSubmit">
+          <el-button type="primary" icon="el-icon-edit-outline" @click="onSubmit()">保存</el-button>
           <!--<el-button type="primary" @click="onSubmit()">保存并继续编辑</el-button>-->
         </slot>
       </el-form-item>
@@ -314,7 +314,6 @@ export default {
       for (const field of this.plainFields) {
         const structure = this.structure[field]
         const property = this.properties.find(prop => field === prop.property)
-        const required = Object.keys(property).includes('required') ? property.required : false
 
         if (structure && Object.keys(structure).includes('metadata')) {
           const metadata = structure.metadata
@@ -324,7 +323,10 @@ export default {
             {
               // TODO: metadata type is different from rule types
               // type: metadata.type,
-              required: !metadata.nullable || required
+              required:
+                Object.keys(property).includes('required')
+                  ? property.required
+                  : !metadata.nullable
             }
           ]
 
@@ -393,23 +395,19 @@ export default {
         this.$emit('input', form)
       })
     },
-    onSubmit(after = null) {
-      const successAndRedirect = () => {
-        this.$message({ message: '数据修改成功', type: 'success' })
-        if (after === 'return') {
-          this.$router.replace({ name: `${this.em.name}List` })
-        }
-      }
-
+    onSubmit(success = () => {
+      this.$message({ message: '数据修改成功', type: 'success' })
+      this.$router.replace({ name: `${this.em.name}List` })
+    }) {
       this.$refs['form'].validate((valid) => {
         if (valid) {
           if (this.id) {
             this.em.update(this.id, this.form)
-              .then(res => successAndRedirect())
+              .then(res => success())
               .catch(err => { this.$message.error(err.message) })
           } else {
             this.em.create(this.form)
-              .then(res => successAndRedirect())
+              .then(res => success())
               .catch(err => { this.$message.error(err.message) })
           }
         } else {
