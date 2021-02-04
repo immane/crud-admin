@@ -139,6 +139,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .st01{fill:#fff;}
 .st0{fill:none;}
 
@@ -156,7 +157,7 @@ $primary: rgb(182,157,230);
   align-items:  flex-start;
   justify-content:  flex-start;
   /* background:  #f3f2f2; */
-  background-image: url(https://abasltd.com/wp-content/uploads/2019/04/abstract-tech-small-grey-squares-animated-background-motion-graphic-design-video-clip-ultra-hd-4k-3840x2160_bjcehe7ye_thumbnail-full01.png);
+  background-image: url('~@/assets/login_background.png');
   background-size: cover;
 }
 h4 {
