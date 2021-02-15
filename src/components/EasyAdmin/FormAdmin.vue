@@ -175,6 +175,27 @@
                 />
               </el-select>
 
+              <!-- ManyToMany or OneToMany -->
+              <el-select
+                v-else-if="
+                  currentStruct && currentStruct.hasOwnProperty('metadata') &&
+                    ['ManyToMany', 'OneToMany'].includes(currentStruct.metadata.type)
+                "
+                v-model="form[field.property]"
+                filterable
+                placeholder="请选择"
+                v-bind="field.type_options"
+                multiple
+                v-on="field.type_events"
+              >
+                <el-option
+                  v-for="item in options[field.property]"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+
               <!-- Others -->
               <el-input
                 v-else
@@ -331,7 +352,7 @@ export default {
           ]
 
           // Selection generate
-          if (['ManyToOne', 'OneToOne'].includes(metadata.type)) {
+          if (['ManyToOne', 'OneToOne', 'OneToMany', 'ManyToMany'].includes(metadata.type)) {
             let entityName = metadata.targetEntity.split('\\')
             if (entityName) {
               entityName = entityName.pop()
@@ -372,7 +393,7 @@ export default {
         const data = res.data
         const form = {}
 
-        // replace ManyToOne or OneToOne fields
+        // replace relation fields
         for (const key of this.plainFields) {
           if (Object.keys(data).includes(key)) {
             const value = data[key]
@@ -380,8 +401,17 @@ export default {
               if (typeof value === 'object' &&
                     Object.keys(value).includes('id')
               ) {
+                // ManyToOne or OneToOne
                 form[key] = value.id
+              } else if (Array.isArray(value)) {
+                // ManyToOne or OneToOne
+                try {
+                  form[key] = value.map(v => v.id)
+                } catch (e) {
+                  // nothing
+                }
               } else {
+                // Others
                 form[key] = value
               }
             }
