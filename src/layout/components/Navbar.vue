@@ -2,9 +2,15 @@
   <div class="navbar">
     <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
 
+    <div class="back">
+      <a class="back-link" @click="$router.go(-1)"><i class="el-icon-back" /> 返回</a>
+      <el-divider direction="vertical" />
+    </div>
+
     <breadcrumb class="breadcrumb-container" />
 
     <div class="right-menu">
+
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <img :src="avatar" class="user-avatar">
@@ -71,6 +77,19 @@ export default {
   position: relative;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0,21,41,.08);
+
+  .back {
+    display: inline-block;
+    float: left;
+    font-size: 14px;
+    line-height: 50px;
+    a {
+      transition: background .3s;
+      &:hover {
+        color: dodgerblue;
+      }
+    }
+  }
 
   .hamburger-container {
     line-height: 46px;
