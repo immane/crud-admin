@@ -51,7 +51,12 @@
 
           <!-- Dynamic components and JSX function -->
           <template v-if="Object.keys(field).includes('component')">
-            <component :is="field.component" :data="form[field.property]" />
+            <component
+              :is="field.component"
+              :data="form[field.property]"
+              :form="form"
+              :property="field.property"
+            />
           </template>
 
           <!-- Normal fields -->
@@ -117,18 +122,32 @@
               <!-- Uploads -->
               <!-- image -->
               <el-upload
-                v-else-if="field.type === 'image'"
+                v-else-if="field.type === 'image' || field.type === 'images'"
                 v-bind="field.type_options"
                 :action="`${BASE_API}/upload`"
-                :limit="1"
+                :limit="field.type === 'image' ? 1 : 0"
                 :file-list="
                   form[field.property]
-                    ? [{name: form[field.property], url: `${BASE_API}/uploads/images/${form[field.property]}`}]
+                    ? ( field.type === 'image'
+                      ? [{name: form[field.property], url: `${BASE_API}/uploads/images/${form[field.property]}`}]
+                      : form[field.property].map(photo => { return { name: photo, url: `${BASE_API}/uploads/images/${photo}`} })
+                    )
                     : []
                 "
                 list-type="picture"
-                :on-remove="(file, fileList) => form[field.property] = ''"
-                :on-success="(res, file) => { form[field.property] = res.data[0] }"
+                :on-remove="(file, fileList) => {
+                  if(field.type === 'image') form[field.property] = ''
+                  else form[field.property] = fileList.map(photo => photo.name)
+                }"
+                :on-success="(res, file) => {
+                  if(field.type === 'image') {
+                    form[field.property] = res.data[0]
+                  }
+                  else {
+                    if(!Object.keys(form).includes(field.property) || !Array.isArray(form[field.property])) form[field.property] = []
+                    form[field.property] = [...form[field.property], ...res.data]
+                  }
+                }"
                 v-on="field.type_events"
               >
                 <el-button size="small" type="primary">点击选择媒体/文件</el-button>
@@ -270,7 +289,9 @@ export default {
          *   },
          *   'name',
          *   'parent',
-         *   'enabled'
+         *   { property: 'enabled',
+         *     default_value: true  // Default only appear in create mode, update mode form will replace by retrieved data.
+         *   }
          * ]
          */
       ]
@@ -291,7 +312,7 @@ export default {
       plainFields: [],
 
       // form data
-      form: this.value,
+      form: {},
 
       // field vaildations
       rules: {},
@@ -304,6 +325,18 @@ export default {
 
       // loading
       loading: true
+    }
+  },
+  watch: {
+    form: {
+      handler: function(value) {
+        // TODO: Is here need cleaning blank values?
+        // this.cleanBlankAttributes(this.form)
+
+        // Merge this.form => this.value
+        Object.assign(this.value, this.form)
+      },
+      deep: true
     }
   },
   created() {
@@ -336,6 +369,7 @@ export default {
         const structure = this.structure[field]
         const property = this.properties.find(prop => field === prop.property)
 
+        // Auto generate from structure
         if (structure && Object.keys(structure).includes('metadata')) {
           const metadata = structure.metadata
 
@@ -359,6 +393,8 @@ export default {
 
               try {
                 const em = new EntityManage(entityName)
+                em.prefix = this.em.prefix
+
                 const currentProperty = this.properties.find(v => v.property === field)
                 const targetList = await em.list(
                   typeof currentProperty.relation_filter !== 'undefined'
@@ -376,9 +412,12 @@ export default {
         }
       }
 
-      // loading update data
       if (this.id) {
+        // Load update data
         this.fetchData(this.id)
+      } else {
+        // Load default data
+        this.setDefaultData()
       }
 
       this.loading = false
@@ -388,6 +427,31 @@ export default {
     checkMetadataType(currentStruct, type) {
       return currentStruct && Object.keys(currentStruct).includes('metadata') && currentStruct.metadata.type === type
     },
+
+    setDefaultData() {
+      // default value process
+      const form = Object.assign({}, this.value)
+      for (const field of this.plainFields) {
+        const property = this.properties.find(prop => field === prop.property)
+        // All fields
+
+        // Set default value
+        if (Object.keys(property).includes('default_value')) {
+          form[field] = property.default_value
+        } else {
+          if (typeof form[field] === 'undefined') {
+            form[field] = null
+          }
+        }
+      }
+
+      // set form
+      this.form = form
+
+      // Emit parent methods
+      this.$emit('input', this.form)
+    },
+
     fetchData(id) {
       this.em.retrieve(id).then(res => {
         const data = res.data
@@ -403,8 +467,8 @@ export default {
               ) {
                 // ManyToOne or OneToOne
                 form[key] = value.id
-              } else if (Array.isArray(value)) {
-                // ManyToOne or OneToOne
+              } else if (Array.isArray(value) && value.every(v => Object.keys(v).includes('id'))) {
+                // ManyToMany or OneToMany
                 try {
                   form[key] = value.map(v => v.id)
                 } catch (e) {
@@ -421,16 +485,31 @@ export default {
         // set form
         this.form = form
 
-        // emit parent methods
-        this.$emit('input', form)
+        // Emit parent methods
+        // this.$emit('input', this.form)
       })
     },
+
+    cleanBlankAttributes(data) {
+      for (var propName in data) {
+        if (data[propName] === null || data[propName] === undefined) {
+          delete data[propName]
+        }
+      }
+    },
+
     onSubmit(success = () => {
       this.$message({ message: '数据修改成功', type: 'success' })
-      this.$router.replace({ name: `${this.em.name}List` })
+
+      // Router go back default
+      // this.$router.replace({ name: `${this.em.name}List` })
+      this.$router.go(-1)
     }) {
       this.$refs['form'].validate((valid) => {
         if (valid) {
+          // Remove blank attributes
+          this.cleanBlankAttributes(this.form)
+
           if (this.id) {
             this.em.update(this.id, this.form)
               .then(res => success())

@@ -8,6 +8,7 @@
       :disabled-actions="disabled"
       :actions="actions"
       :query="query"
+      :data-processor="dataProcessor"
     />
   </div>
 </template>
@@ -44,6 +45,7 @@ export default {
       this.actions = this.config.list.actions
       this.disabled = this.config.list.disabled_actions
       this.query = this.config.list.query
+      this.dataProcessor = this.config.list.data_processor
     }
   }
 }

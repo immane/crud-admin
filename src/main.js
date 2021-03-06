@@ -23,6 +23,9 @@ import request from '@/utils/request'
 
 import VueFilterDateFormat from '@vuejs-community/vue-filter-date-format'
 
+import $getValue from 'get-value'
+Vue.prototype.$getValue = $getValue
+
 Vue.prototype.axios = request
 
 Vue.use(ElementUI, { locale })

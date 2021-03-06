@@ -62,6 +62,7 @@ export default {
           '@order': 'id|DESC'
         },
         list_filter: {
+          'title': null,
           'category.id': () => {
             return axios
               .get('/api/categories',
@@ -97,6 +98,7 @@ export default {
         ]
       }
     },
+
     Category: {
       form: {
         fields: '__all__'
@@ -105,6 +107,7 @@ export default {
         list_display: ['id', 'type', 'name', 'parent', 'enabled', 'sequence']
       }
     },
+
     Option: {
       form: {
         fields: [
@@ -125,26 +128,29 @@ export default {
         list_display: ['id', 'name', 'slug']
       }
     },
+
     User: {
       form: {
         fields: [
           { property: 'username', field_options: { label: '用户名' }},
           'phone',
           { property: 'email', field_options: { label: 'Email' }},
-          { property: 'enabled', type: 'boolean', field_options: { label: '启用' }},
+          { property: 'enabled', type: 'boolean', default_value: true, field_options: { label: '是否启用？' }},
           { property: 'plainPassword', field_options: { label: '密码' }}
         ]
       },
       list: {
         list_display: [
           'id',
-          'username',
+          { property: 'username', label: '用户名' },
           'phone',
-          { property: 'enabled', type: 'boolean' },
+          'token',
+          { property: 'enabled', type: 'boolean', label: '是否启用' },
           'createdTime'
         ]
       }
     },
+
     UserProfile: {
       form: {
         fields: '__all__'

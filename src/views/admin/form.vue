@@ -2,6 +2,7 @@
   <div class="app-container">
     <form-admin
       :id="Number($route.params.id)"
+      v-model="form"
       :entity-conf="entity"
       :fields="fields"
     />
@@ -20,6 +21,7 @@ export default {
       id: Number(this.$route.params.id),
       entityParam: this.$route.params.entityParam,
       fields: null,
+      form: this.$route.query,
       entity: '',
       alias: '',
       config: {}

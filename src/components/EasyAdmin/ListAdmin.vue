@@ -6,7 +6,7 @@
           <strong style="font-size: 20px;">
             <!-- Title slot here -->
             <slot name="titleText">
-              {{ $router.currentRoute.meta.title }}
+              {{ titleText }}
             </slot>
           </strong>
         </slot>
@@ -14,31 +14,41 @@
       <el-col :span="20" align="right">
         <!-- Top filter or searcher slot-->
         <slot name="filter">
-          <el-select
-            v-for="(v, k) in filters"
-            :key="k"
-            v-model="listFilterData[k]"
-            filterable
-            clearable
-            :placeholder="v.label"
-          >
-            <el-option
-              v-for="item in v.data"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-          &emsp;
+          <span v-for="(v, k) in filters" :key="k" style="margin-right: .5em">
+            <el-input
+              v-if="v.data === null"
+              v-model="listFilterData[k]"
+              :placeholder="`${v.label} '${k}'`"
+              style="width: 200px;"
+              size="medium"
+            >
+              <i slot="prefix" class="el-input__icon el-icon-search" />
+            </el-input>
+
+            <el-select
+              v-else
+              v-model="listFilterData[k]"
+              filterable
+              clearable
+              :placeholder="`${v.label} '${k}'`"
+              size="medium"
+            >
+              <el-option
+                v-for="item in v.data"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </span>
+
           <el-button
             v-if="Object.keys(filters).length"
             size="medium"
             icon="el-icon-search"
+            style="margin-right: 1em"
             circle
-            @click="
-              filterGenerate();
-              fetchData();
-            "
+            @click="filterGenerate(); fetchData();"
           />
         </slot>
 
@@ -59,6 +69,7 @@
 
     <el-row>
       <el-table
+        :key="refreshTable"
         v-fit-columns
         v-loading="loading"
         :data="list"
@@ -68,6 +79,7 @@
         stripe
         highlight-current-row
         v-bind="tableConf"
+        style="width: 100%"
         v-on="tableEvent"
         @sort-change="changeSort"
       >
@@ -80,6 +92,8 @@
           :label="field.label ? field.label : (structure[field.property] ? structure[field.property]['translation']: field.property)"
           sortable
           :prop="field.property"
+          v-bind="field.field_options"
+          v-on="field.field_events"
         >
           <template
             slot-scope="scope"
@@ -89,10 +103,21 @@
             |  Fields slot  |
             ---------------->
 
-            <slot :name="field.property" :value="extractFields(scope.row, field.property)" :record="scope.row">
+            <slot
+              :name="field.property"
+              :value="extractFields(scope.row, field.property)"
+              :record="scope.row"
+              :refresh="fetchData"
+            >
               <!-- Dynamic components and JSX function -->
               <div v-if="Object.keys(field).includes('component')">
-                <component :is="field.component" :data="extractFields(scope.row, field.property)" />
+                <component
+                  :is="field.component"
+                  :data="extractFields(scope.row, field.property)"
+                  :scope="scope"
+                  :record="scope.row"
+                  :refresh="fetchData"
+                />
               </div>
 
               <!-- Normal fields -->
@@ -100,6 +125,8 @@
 
                 <!-- Dummy -->
                 <template v-if="false" />
+
+                <!-- System (have metadata) -->
 
                 <!-- Boolean -->
                 <span
@@ -147,6 +174,19 @@
                   {{ scope.row[field.property] ? scope.row[field.property].__toString : '' }}
                 </span>
 
+                <!-- Custom (do not have metadata) -->
+
+                <!-- Image -->
+                <span
+                  v-else-if="field.type == 'image'"
+                >
+                  <el-image
+                    style="width: 50px; height: 50px; border: 3px white solid; box-shadow: 1px 1px 5px #ddd;"
+                    :src="`${BASE_URL}/uploads/images/${scope.row[field.property]}`"
+                    :preview-src-list="[`${BASE_URL}/uploads/images/${scope.row[field.property]}`]"
+                  />
+                </span>
+
                 <!-- Others -->
                 <span v-else>
                   <!-- Relation fields or others -->
@@ -157,7 +197,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="动作">
+        <el-table-column v-if="!disabledActions.includes('lines')" label="动作">
           <template slot-scope="scope">
             <component
               :is="action.component"
@@ -172,22 +212,26 @@
             &emsp;
 
             <slot name="action" :data="scope.row">
-              <router-link v-if="!disabledActions.includes('edit')" :to="{ name: `${em.name}Update`, params: { id: scope.row.id }}">
-                <el-button size="small" icon="el-icon-edit" plain>
-                  修改
-                </el-button>
-              </router-link>
+              <slot name="action:edit" :data="scope.row">
+                <router-link v-if="!disabledActions.includes('edit')" :to="{ name: `${em.name}Update`, params: { id: scope.row.id }}">
+                  <el-button size="small" icon="el-icon-edit" plain>
+                    修改
+                  </el-button>
+                </router-link>
+              </slot>
               &nbsp;&nbsp;
-              <el-popconfirm v-if="!disabledActions.includes('delete')" title="确定删除当前记录？" @onConfirm="removeAction(scope.row.id)">
-                <el-button slot="reference" size="small" type="danger" icon="el-icon-delete" plain>删除</el-button>
-              </el-popconfirm>
+              <slot name="action:delete" :data="scope.row">
+                <el-popconfirm v-if="!disabledActions.includes('delete')" title="确定删除当前记录？" @onConfirm="removeAction(scope.row.id)">
+                  <el-button slot="reference" size="small" type="danger" icon="el-icon-delete" plain>删除</el-button>
+                </el-popconfirm>
+              </slot>
             </slot>
           </template>
         </el-table-column>
       </el-table>
     </el-row>
 
-    <el-row>
+    <el-row v-if="!disabledActions.includes('pager')">
       <div class="block">
         <el-pagination
           :current-page.sync="pager.page"
@@ -299,26 +343,37 @@ export default {
       default: () => {
         /**
          * @description
+         *  Selection filter or Searcher
          *  List filter example
          *
          * @example
          * {
-         *    // Reduce style
+         *    // Reduce style //
+         *    // 1. Selection
          *    status: {
          *      0: 'Pending', 1: 'Paid', 2: 'Completed'
          *    }
+         *    // 2. input
+         *    status: null
          *
-         *    // Full style
+         *    // Full style //
+         *    // 1. Selection
          *    'category.id': {
          *      expression: 'entity.getCategory().getId() == ":value"',
-         *      label: 'Please select',
+         *      label: 'Please Provide Category',
          *      data: [
          *        { value: 'book', label: 'Book' },
          *        { value: 'paper', label: 'Paper' },
          *      ]
          *    }
+         *    // 2. input
+         *    'user.username': {
+         *      expression: 'entity.getUser().getUsername() matches "/:value/"',
+         *      label: 'Please Provide Username',
+         *      data: null
+         *    }
          *
-         *    // Async sample
+         *    // Async sample //
          *    'category.id': () => {
          *      return axios
          *        .get('/api/categories',
@@ -372,10 +427,44 @@ export default {
     },
 
     // Disable default actions
-    // sample: ['new', 'edit', 'delete']
+    // sample: ['new', 'edit', 'delete', 'lines', 'pager']
     disabledActions: {
       type: Array,
       default: () => []
+    },
+
+    // Data processor
+    dataProcessor: {
+      type: Function,
+      default: (context, dataProcessor = {}) => {
+        // Loading start
+        context.loading = true
+
+        const promise = [
+          // Fetch Structure
+          context.em.structure().then(res => { context.structure = res }),
+
+          // Fetch Data
+          context.em.list(Object.assign(
+            /**
+             * Combine default constant query to dynamic pager and sort
+             * Pager and sort object will change in the page
+             */
+            {},
+            context.query ? context.query : {},
+            context.filter,
+            context.pager,
+            context.sort
+          )).then(res => {
+            // Assign data
+            context.list = res.data
+            context.paginator = res.paginator
+          })
+        ]
+
+        Promise.all(promise.map(p => p.catch(e => e)))
+          .then(res => { context.loading = false })
+      }
     }
   },
   data() {
@@ -385,11 +474,17 @@ export default {
       em: new EntityManage(this.entityConf),
       structure: {},
 
+      // Table refresh key
+      refreshTable: 0,
+
+      // Page title
+      titleText: '',
+
       // Translated fields
       properties: [],
 
       // Table data source
-      list: this.value,
+      list: [],
       paginator: null,
 
       // Translated filter config
@@ -397,7 +492,6 @@ export default {
 
       // List filters or seacher
       listFilterData: [],
-      searcherData: [],
 
       // Sort query: {'@sort': 'id|ASC, createdTime|DESC'}
       sort: {},
@@ -409,15 +503,30 @@ export default {
         limit: 20
       },
 
+      // Base url
+      BASE_URL: process.env.VUE_APP_BASE_API,
+
       // Other
       loading: true
     }
   },
+
   watch: {
-    $route(to, from) {
-      this.fetchData()
+    value: {
+      handler: function(value) {
+        this.list = value
+        this.refreshTable++
+      },
+      deep: true
+    },
+    list: {
+      handler: function(value) {
+        this.$emit('input', value)
+      },
+      deep: true
     }
   },
+
   created() {
     this.routeProcess()
     this.propertieProcess()
@@ -469,15 +578,19 @@ export default {
         })
 
         filter[key] = {
-          data: [],
-          label: '请选择',
-          expression: `entity${expression} == ':value'`
+          data: field === null ? null : [],
+          label: 'Provide',
+          expression: field === null
+            ? `entity${expression} matches '/:value/'`
+            : `entity${expression} == ':value'`
         }
 
-        for (const k in field) {
-          filter[key]['data'].push(
-            { value: k, label: field[k] }
-          )
+        if (field) {
+          for (const k in field) {
+            filter[key]['data'].push(
+              { value: k, label: field[k] }
+            )
+          }
         }
       }
 
@@ -496,12 +609,13 @@ export default {
         }
 
         // receive normal value
-        if (!(Object.keys(field).includes('data') &&
+        if (field === null || !(Object.keys(field).includes('data') &&
           this.listFilter.data instanceof Array
         )) {
           transform(field, key)
         }
       }
+
       this.filters = filter
     },
 
@@ -516,9 +630,9 @@ export default {
         if (value) {
           const expression = this.filters[key].expression.replaceAll(':value', value)
           if (this.filter['@filter']) {
-            this.filter['@filter'] += ` && ${expression}`
+            this.filter['@filter'] += ` && (${expression})`
           } else {
-            this.filter['@filter'] = expression
+            this.filter['@filter'] = `(${expression})`
           }
         }
       }
@@ -540,38 +654,14 @@ export default {
         }
       }
       if (redirectRoute) {
-        this.$route.meta.title = redirectRoute.meta.title
+        this.titleText = redirectRoute.meta.title
       }
     },
 
     // Get data from web apis.
     fetchData() {
-      this.loading = true
-
-      const promise = [
-        this.em.structure().then(res => { this.structure = res }),
-
-        this.em.list(Object.assign(
-          /**
-           * Combine default constant query to dynamic pager and sort
-           * Pager and sort object will change in the page
-           */
-          {},
-          this.query ? this.query : {},
-          this.filter,
-          this.pager,
-          this.sort
-        )).then(res => {
-          this.list = res.data
-          this.paginator = res.paginator
-
-          // emit parent methods
-          this.$emit('input', res.data)
-        })
-      ]
-
-      Promise.all(promise.map(p => p.catch(e => e)))
-        .then(res => { this.loading = false })
+      // data process callback
+      this.dataProcessor(this)
     },
 
     // Sorter changed

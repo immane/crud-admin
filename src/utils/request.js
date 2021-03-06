@@ -12,7 +12,7 @@ import {
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 5000 // request timeout
+  timeout: 30000 // request timeout
 })
 
 // request interceptor
@@ -69,6 +69,7 @@ service.interceptors.response.use(
       switch (error.response.status) {
         case 403:
           // to re-login
+          /*
           MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
             confirmButtonText: 'Re-Login',
             cancelButtonText: 'Cancel',
@@ -78,7 +79,8 @@ service.interceptors.response.use(
               location.reload()
             })
           })
-          break
+          */
+          throw error
         default:
           Message({
             message: error.response.data.message,
