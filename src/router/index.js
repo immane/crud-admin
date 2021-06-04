@@ -47,15 +47,17 @@ export const constantRoutes = [
     path: '/',
     component: Layout,
     redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: {
-        title: '控制台',
-        icon: 'dashboard'
+    children: [
+      {
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/dashboard/index'),
+        meta: {
+          title: '控制台',
+          icon: 'dashboard'
+        }
       }
-    }]
+    ]
   }
 ]
 
@@ -64,27 +66,36 @@ export const lastRoutes = [
   {
     path: '',
     component: Layout,
-    children: [{
-      path: `/:entityParam/create`,
-      name: `EasyAdminCreate`,
-      hidden: true,
-      component: () => import('@/views/admin/form')
-    },
-    {
-      path: `/:entityParam/:id/update`,
-      name: `EasyAdminUpdate`,
-      hidden: true,
-      component: () => import('@/views/admin/form')
-    },
-    {
-      path: `/:entityParam/list`,
-      name: `EasyAdminList`,
-      component: () => import('@/views/admin/list'),
-      hidden: true
-    }
+    children: [
+      {
+        path: `/:entityParam/create`,
+        name: `EasyAdminCreate`,
+        hidden: true,
+        component: () => import('@/views/admin/form')
+      },
+      {
+        path: `/:entityParam/:id/update`,
+        name: `EasyAdminUpdate`,
+        hidden: true,
+        component: () => import('@/views/admin/form')
+      },
+      {
+        path: `/:entityParam/list`,
+        name: `EasyAdminList`,
+        component: () => import('@/views/admin/list'),
+        hidden: true
+      }
     ]
-  },
+  }
+]
 
+/**
+ * asyncRoutes
+ * the routes that need to be dynamically loaded based on user roles
+ */
+export const asyncRoutes = [
+  ...admin.routes,
+  ...lastRoutes,
   // 404,page,must be placed at the end !!!
   {
     path: '*',
@@ -93,20 +104,15 @@ export const lastRoutes = [
   }
 ]
 
-/**
- * asyncRoutes
- * the routes that need to be dynamically loaded based on user roles
- */
-export const asyncRoutes = [...admin.routes, ...lastRoutes]
-
-const createRouter = () => new Router({
-  mode: 'history', // require service support
-  base: 'admin',
-  scrollBehavior: () => ({
-    y: 0
-  }),
-  routes: constantRoutes
-})
+const createRouter = () =>
+  new Router({
+    mode: 'history', // require service support
+    base: 'admin',
+    scrollBehavior: () => ({
+      y: 0
+    }),
+    routes: constantRoutes
+  })
 
 const router = createRouter()
 

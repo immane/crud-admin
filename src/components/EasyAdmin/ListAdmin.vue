@@ -182,8 +182,8 @@
                 >
                   <el-image
                     style="width: 50px; height: 50px; border: 3px white solid; box-shadow: 1px 1px 5px #ddd;"
-                    :src="`${BASE_URL}/uploads/images/${scope.row[field.property]}`"
-                    :preview-src-list="[`${BASE_URL}/uploads/images/${scope.row[field.property]}`]"
+                    :src="getPicture(scope.row[field.property])"
+                    :preview-src-list="[getPicture(scope.row[field.property])]"
                   />
                 </span>
 
@@ -259,6 +259,7 @@
 <script>
 import EntityManage from '@/utils/entity'
 import { asyncRoutes } from '@/router'
+import SIP from '@/utils/simple-image-process'
 
 export default {
   filters: {
@@ -353,7 +354,7 @@ export default {
          *    status: {
          *      0: 'Pending', 1: 'Paid', 2: 'Completed'
          *    }
-         *    // 2. input
+         *    // 2. Input
          *    status: null
          *
          *    // Full style //
@@ -366,7 +367,7 @@ export default {
          *        { value: 'paper', label: 'Paper' },
          *      ]
          *    }
-         *    // 2. input
+         *    // 2. Input
          *    'user.username': {
          *      expression: 'entity.getUser().getUsername() matches "/:value/"',
          *      label: 'Please Provide Username',
@@ -503,9 +504,6 @@ export default {
         limit: 20
       },
 
-      // Base url
-      BASE_URL: process.env.VUE_APP_BASE_API,
-
       // Other
       loading: true
     }
@@ -541,6 +539,11 @@ export default {
     /* Check if metadata presented */
     checkMetadataType(currentStruct, type) {
       return currentStruct && Object.keys(currentStruct).includes('metadata') && currentStruct.metadata.type === type
+    },
+
+    // Get picture
+    getPicture(url) {
+      return SIP.getPicture(url)
     },
 
     /* Property process */

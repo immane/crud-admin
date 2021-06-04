@@ -15,6 +15,9 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 
+import BaiduMap from 'vue-baidu-map' // baidu map
+Vue.use(BaiduMap, { ak: '2iFp9GeyUKWLhDYPWtkZLHRDM1C2EmjW' })
+
 // v-fit-columns
 import Plugin from 'v-fit-columns'
 Vue.use(Plugin)

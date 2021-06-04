@@ -129,8 +129,8 @@
                 :file-list="
                   form[field.property]
                     ? ( field.type === 'image'
-                      ? [{name: form[field.property], url: `${BASE_API}/uploads/images/${form[field.property]}`}]
-                      : form[field.property].map(photo => { return { name: photo, url: `${BASE_API}/uploads/images/${photo}`} })
+                      ? [{name: form[field.property], url: getPicture(form[field.property]) }]
+                      : form[field.property].map(photo => { return { name: photo, url: getPicture(photo) } })
                     )
                     : []
                 "
@@ -162,7 +162,7 @@
                 :limit="1"
                 :file-list="
                   form[field.property]
-                    ? [{name: form[field.property], url: `${BASE_API}/uploads/images/${form[field.property]}`}]
+                    ? [{name: form[field.property], url: getPicture(form[field.property]) }]
                     : []
                 "
                 list-type="file"
@@ -241,6 +241,7 @@
 <script>
 import EntityManage from '@/utils/entity'
 import Tinymce from '@/components/Tinymce'
+import SIP from '@/utils/simple-image-process'
 
 export default {
   components: { Tinymce },
@@ -399,7 +400,7 @@ export default {
                 const targetList = await em.list(
                   typeof currentProperty.relation_filter !== 'undefined'
                     ? currentProperty.relation_filter
-                    : null
+                    : { '@display': 'reduce' }
                 )
 
                 this.options[field] =
@@ -427,6 +428,9 @@ export default {
     checkMetadataType(currentStruct, type) {
       return currentStruct && Object.keys(currentStruct).includes('metadata') && currentStruct.metadata.type === type
     },
+
+    // Get picture
+    getPicture(url) { return SIP.getPicture(url) },
 
     setDefaultData() {
       // default value process
@@ -498,7 +502,7 @@ export default {
       }
     },
 
-    onSubmit(success = () => {
+    onSubmit(success = (res) => {
       this.$message({ message: '数据修改成功', type: 'success' })
 
       // Router go back default
@@ -512,11 +516,11 @@ export default {
 
           if (this.id) {
             this.em.update(this.id, this.form)
-              .then(res => success())
+              .then(res => success(res))
               .catch(err => { this.$message.error(err.message) })
           } else {
             this.em.create(this.form)
-              .then(res => success())
+              .then(res => success(res))
               .catch(err => { this.$message.error(err.message) })
           }
         } else {
