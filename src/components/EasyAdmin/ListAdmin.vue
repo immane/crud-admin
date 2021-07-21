@@ -20,8 +20,8 @@
               v-if="v.type === 'datetime' || v.type === 'date' || v.type === 'time'"
               v-model="listFilterData[k]"
               :type="v.type"
-              :placeholder="`${v.label} '${k}'`"
-              style="width: 200px;"
+              :placeholder="`${v.label ? v.label : k}`"
+              style="width: 150px;"
               size="medium"
               :value-format="{
                 datetime: 'yyyy-MM-dd HH:mm:ss',
@@ -35,8 +35,8 @@
             <el-input
               v-else-if="v.type === 'input'"
               v-model="listFilterData[k]"
-              :placeholder="`${v.label} '${k}'`"
-              style="width: 200px;"
+              :placeholder="`${v.label ? v.label : k}`"
+              style="width: 150px;"
               size="medium"
             >
               <i slot="prefix" class="el-input__icon el-icon-search" />
@@ -48,7 +48,8 @@
               v-model="listFilterData[k]"
               filterable
               clearable
-              :placeholder="`${v.label} '${k}'`"
+              :placeholder="`${v.label ? v.label : k}`"
+              style="width: 150px;"
               size="medium"
             >
               <el-option
@@ -373,11 +374,12 @@ export default {
          *
          *    // 1. Selection
          *    status: {
+         *      __label: 'Status',
          *      0: 'Pending', 1: 'Paid', 2: 'Completed'
          *    }
          *
          *    // 2. Input
-         *    status: null
+         *    status: 'Label here'
          *
          *    ////////////////
          *    // Full style //
@@ -397,16 +399,14 @@ export default {
          *    // 2. Input
          *    'user.username': {
          *      expression: 'entity.getUser().getUsername() matches "/:value/"',
-         *      label: 'Please Provide Username',
-         *      data: null
+         *      label: 'Please Provide Username'
          *    }
          *
          *    // 3. DateTime / Date / Time
          *    beforeCreatedTime: {
          *      expression: 'entity.getCreatedTime() >= datetime.get(":value")',
-         *      label: 'Before',
-         *      type: 'datetime',
-         *      data: null
+         *      label: 'Before Time',
+         *      type: 'datetime'
          *    }
          *
          *    //////////////////
@@ -418,7 +418,7 @@ export default {
          *        .get('/api/categories',
          *          { params: { '@filter': 'entity.getType().getSlug() == "content"' }})
          *        .then(res =>
-         *          Object.assign({}, ...res.data.map(v => { return { [v.id]: v.name } })))
+         *          Object.assign({ __label: 'Category' }, ...res.data.map(v => { return { [v.id]: v.name } })))
          *    }
          * }
          */
@@ -619,19 +619,23 @@ export default {
         })
 
         filter[key] = {
-          data: field === null ? null : [],
-          type: field === null ? 'input' : 'select',
-          label: 'Provide',
-          expression: field === null
+          data: typeof field === 'string' || field === null ? null : [],
+          type: typeof field === 'string' || field === null ? 'input' : 'select',
+          label: typeof field === 'string' ? field : '',
+          expression: typeof field === 'string' || field === null
             ? `entity${expression} matches '/:value/'`
             : `entity${expression} == ':value'`
         }
 
-        if (field) {
+        if (typeof field === 'object') {
           for (const k in field) {
-            filter[key]['data'].push(
-              { value: k, label: field[k] }
-            )
+            if (k === '__label') {
+              filter[key]['label'] = field[k]
+            } else {
+              filter[key]['data'].push(
+                { value: k, label: field[k] }
+              )
+            }
           }
         }
       }
@@ -652,7 +656,7 @@ export default {
 
         // receive normal value
         if (
-          field === null ||
+          field === null || typeof field === 'string' ||
           !Object.keys(field).includes('expression')
         ) {
           transform(field, key)
