@@ -15,8 +15,25 @@
         <!-- Top filter or searcher slot-->
         <slot name="filter">
           <span v-for="(v, k) in filters" :key="k" style="margin-right: .5em">
+            <!-- Datetime -->
+            <el-date-picker
+              v-if="v.type === 'datetime' || v.type === 'date' || v.type === 'time'"
+              v-model="listFilterData[k]"
+              :type="v.type"
+              :placeholder="`${v.label} '${k}'`"
+              style="width: 200px;"
+              size="medium"
+              :value-format="{
+                datetime: 'yyyy-MM-dd HH:mm:ss',
+                date: 'yyyy-MM-dd',
+                time: 'HH:mm:ss',
+              }[v.type]
+              "
+            />
+
+            <!-- Input -->
             <el-input
-              v-if="v.data === null"
+              v-else-if="v.type === 'input'"
               v-model="listFilterData[k]"
               :placeholder="`${v.label} '${k}'`"
               style="width: 200px;"
@@ -25,6 +42,7 @@
               <i slot="prefix" class="el-input__icon el-icon-search" />
             </el-input>
 
+            <!-- Select -->
             <el-select
               v-else
               v-model="listFilterData[k]"
@@ -349,24 +367,33 @@ export default {
          *
          * @example
          * {
+         *    //////////////////
          *    // Reduce style //
+         *    //////////////////
+         *
          *    // 1. Selection
          *    status: {
          *      0: 'Pending', 1: 'Paid', 2: 'Completed'
          *    }
+         *
          *    // 2. Input
          *    status: null
          *
+         *    ////////////////
          *    // Full style //
+         *    ////////////////
+         *
          *    // 1. Selection
-         *    'category.id': {
+         *    'category': {
          *      expression: 'entity.getCategory().getId() == ":value"',
          *      label: 'Please Provide Category',
+         *      type: 'select', // Types: select, input, datetime, date, time
          *      data: [
          *        { value: 'book', label: 'Book' },
          *        { value: 'paper', label: 'Paper' },
          *      ]
          *    }
+         *
          *    // 2. Input
          *    'user.username': {
          *      expression: 'entity.getUser().getUsername() matches "/:value/"',
@@ -374,7 +401,18 @@ export default {
          *      data: null
          *    }
          *
+         *    // 3. DateTime / Date / Time
+         *    beforeCreatedTime: {
+         *      expression: 'entity.getCreatedTime() >= datetime.get(":value")',
+         *      label: 'Before',
+         *      type: 'datetime',
+         *      data: null
+         *    }
+         *
+         *    //////////////////
          *    // Async sample //
+         *    //////////////////
+         *
          *    'category.id': () => {
          *      return axios
          *        .get('/api/categories',
@@ -582,6 +620,7 @@ export default {
 
         filter[key] = {
           data: field === null ? null : [],
+          type: field === null ? 'input' : 'select',
           label: 'Provide',
           expression: field === null
             ? `entity${expression} matches '/:value/'`
@@ -612,10 +651,14 @@ export default {
         }
 
         // receive normal value
-        if (field === null || !(Object.keys(field).includes('data') &&
-          this.listFilter.data instanceof Array
-        )) {
+        if (
+          field === null ||
+          !Object.keys(field).includes('expression')
+        ) {
           transform(field, key)
+        } else {
+          // full style
+          filter[key] = field
         }
       }
 
