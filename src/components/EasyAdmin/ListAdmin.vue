@@ -15,6 +15,14 @@
         <!-- Top filter or searcher slot-->
         <slot name="filter">
           <span v-for="(v, k) in filters" :key="k" style="margin-right: .5em">
+            <!-- Dynamic components and JSX function -->
+            <div v-if="Object.keys(v).includes('component')">
+              <component
+                :is="v.component"
+                v-model="listFilterData[k]"
+              />
+            </div>
+
             <!-- Datetime -->
             <el-date-picker
               v-if="v.type === 'datetime' || v.type === 'date' || v.type === 'time'"
@@ -38,6 +46,7 @@
               :placeholder="`${v.label ? v.label : k}`"
               style="width: 150px;"
               size="medium"
+              clearable
             >
               <i slot="prefix" class="el-input__icon el-icon-search" />
             </el-input>
@@ -77,7 +86,7 @@
         <slot name="extraTopButton" />
         &emsp;
         <slot name="topButton">
-          <router-link v-if="!disabledActions.includes('new')" :to="{name: `${em.name}Create`}">
+          <router-link v-if="!disabledActions.includes('new')" to="create">
             <el-button size="medium" type="primary" icon="el-icon-plus" plain>
               新增{{ $router.currentRoute.meta.title }}
             </el-button>
@@ -192,6 +201,20 @@
                 >
                   {{ scope.row[field.property] ? scope.row[field.property].__toString : '' }}
                 </span>
+                <span
+                  v-else-if="
+                    checkMetadataType(structure[field.property], 'ManyToMany')
+                      || checkMetadataType(structure[field.property], 'OneToMany')
+                  "
+                >
+                  <el-tag
+                    v-for="(relationField, relationIndex) in scope.row[field.property]"
+                    :key="relationIndex"
+                    :style="{ margin: '0 .2em' }"
+                  >
+                    {{ relationField.__toString }}
+                  </el-tag>
+                </span>
 
                 <!-- Custom (do not have metadata) -->
 
@@ -232,7 +255,7 @@
 
             <slot name="action" :data="scope.row">
               <slot name="action:edit" :data="scope.row">
-                <router-link v-if="!disabledActions.includes('edit')" :to="{ name: `${em.name}Update`, params: { id: scope.row.id }}">
+                <router-link v-if="!disabledActions.includes('edit')" :to="`${scope.row.id}/update`">
                   <el-button size="small" icon="el-icon-edit" plain>
                     修改
                   </el-button>
