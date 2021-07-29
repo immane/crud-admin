@@ -11,7 +11,12 @@ export default {
       ]
     },
     form: {
-      fields: '__all__'
+      fields: [
+        'title',
+        'type',
+        { property: 'pictures', type: 'images' },
+        'comment'
+      ]
     }
   },
 
@@ -20,7 +25,8 @@ export default {
       list_display: [
         'id',
         { property: 'image', type: 'image' },
-        { property: 'album',
+        {
+          property: 'album',
           component: {
             props: ['data'],
             render(h) {
@@ -47,11 +53,66 @@ export default {
     }
   },
 
+  Balance: {
+    form: {
+      fields: ['user', 'amount']
+    },
+    list: {
+      list_filter: {
+        usernameOrNickname: {
+          expression: 'entity.getUser().__toString() matches "/:value/"',
+          label: '用户名 / 昵称',
+          type: 'input'
+        }
+      },
+      list_display: [
+        'id', 'user', 'amount'
+      ]
+    }
+  },
+
+  BalanceLog: {
+    form: {
+      fields: '__all__'
+    },
+    list: {
+      query: {
+        '@order': 'createdTime|DESC'
+      },
+      disabled_actions: ['new', 'edit', 'delete', 'lines'],
+      list_display: [
+        'id',
+        'source',
+        {
+          property: 'user',
+          label: '收款人'
+        },
+        'type',
+        'before',
+        {
+          property: 'amount',
+          component: {
+            props: ['data'],
+            render(h) {
+              return (
+                <span>{this.data >= 0 ? '+' : ''}{this.data}</span>
+              )
+            }
+          }
+        },
+        'after',
+        'comment',
+        'createdTime'
+      ]
+    }
+  },
+
   Content: {
     form: {
       fields: [
         'title',
-        { property: 'category',
+        {
+          property: 'category',
           relation_filter: {
             '@filter': 'entity.getType().getSlug() == "content"',
             '@order': 'id|ASC'
@@ -72,7 +133,8 @@ export default {
             .get('/api/categories',
               { params: { '@filter': 'entity.getType().getSlug() == "content"' }})
             .then(res =>
-              Object.assign({}, ...res.data.map(v => { return { [v.id]: v.name } })))
+              Object.assign({ __label: '分类' },
+                ...res.data.map(v => { return { [v.id]: v.name } })))
         }
       },
       list_display: [
@@ -97,7 +159,27 @@ export default {
       ]
     },
     list: {
-      list_display: ['id', 'type', 'name', 'parent', 'enabled', 'sequence']
+      list_display: ['id', 'type', 'name', 'parent', 'enabled', 'sequence'],
+      list_filter: {
+        'type.id': () => {
+          return axios
+            .get('/manage/types')
+            .then(res =>
+              Object.assign({ __label: '类型' },
+                ...res.data.map(v => { return { [v.id]: v.name } })
+              )
+            )
+        },
+        'parent.id': () => {
+          return axios
+            .get('/manage/categories')
+            .then(res =>
+              Object.assign({ __label: '上级分类' },
+                ...res.data.map(v => { return { [v.id]: v.name } })
+              )
+            )
+        }
+      }
     }
   },
 
@@ -134,11 +216,12 @@ export default {
       ]
     },
     list: {
+      query: {
+        '@filter': `entity.getWechatOpenId() == null`
+      },
       list_display: [
         'id',
         { property: 'username', label: '用户名' },
-        'phone',
-        'token',
         { property: 'enabled', type: 'boolean', label: '是否启用' },
         'createdTime'
       ]
@@ -150,13 +233,38 @@ export default {
       fields: '__all__'
     },
     list: {
-      disabled_actions: ['new', 'delete'],
+      disabled_actions: ['new', 'delete', 'edit', 'lines'],
       list_display: [
         'id',
         { property: 'avatarUrl', type: 'image' },
         'nickname',
         'user',
-        'region'
+        {
+          property: 'amount',
+          label: '余额',
+          component: {
+            props: ['scope'],
+            data() {
+              return { amount: 0 }
+            },
+            created() {
+              axios.get(
+                `/manage/users/${this.scope.row.user.id}`,
+                { params: { '@expands': "['entity.balance']" }}
+              ).then((res) => {
+                console.log(res)
+                if (res.data.balance != null) {
+                  this.amount = res.data.balance.__metadata.amount
+                }
+              })
+            },
+            render(h) {
+              return (
+                <el-tag>{this.amount}</el-tag>
+              )
+            }
+          }
+        }
       ]
     }
   }

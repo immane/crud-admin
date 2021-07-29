@@ -11,6 +11,16 @@ export default [
     ]
   },
 
+  // Balance manage
+  {
+    path: '/balance', name: 'BalanceManage', component: Layout,
+    meta: { title: '财务管理', icon: 'el-icon-money', roles: ['ROLE_SUPER_ADMIN'] },
+    children: [
+      ...r('Balance', '余额'),
+      ...r('BalanceLog', '余额记录')
+    ]
+  },
+
   // User manage
   {
     path: '/user', name: 'UserManage', component: Layout,

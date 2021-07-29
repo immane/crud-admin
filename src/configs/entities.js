@@ -1,4 +1,4 @@
-const entityCollections = require.context('@/configs', true, /\.js$/)
+const entityCollections = require.context('@/configs/collections', true, /\.js$/)
 
 /**
  * You do not need `import entities from './entities/Entity'`
@@ -9,7 +9,7 @@ const entityCollections = require.context('@/configs', true, /\.js$/)
  * 1. Collection js only appear in the first level directory;
  * 2. AVOID using the SAME ENTITY NAMES, or the entity may be overwritten by some another entities.
  *
- * |---collections
+ * |--- admin_collections
  * |   |-- collection1.js
  * |   |-- collection2.js
  * |   |-- collection3
@@ -19,6 +19,8 @@ const entityCollections = require.context('@/configs', true, /\.js$/)
  * |       |-- collection5
  * |       |   |-- Entity3.js
  * |       |-- Entity4.js
+ * |--- user_collections
+ * |   |-- ...
  *
  */
 export default entityCollections.keys().reduce((entities, entityPath) => {
