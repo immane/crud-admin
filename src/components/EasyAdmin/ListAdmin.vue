@@ -51,6 +51,14 @@
               <i slot="prefix" class="el-input__icon el-icon-search" />
             </el-input>
 
+            <!-- Boolean -->
+            <el-switch
+              v-else-if="v.type === 'boolean'"
+              v-model="listFilterData[k]"
+              :inactive-text="`${v.label ? v.label : k}`"
+              size="medium"
+            />
+
             <!-- Select -->
             <el-select
               v-else
@@ -205,6 +213,7 @@
                   v-else-if="
                     checkMetadataType(structure[field.property], 'ManyToMany')
                       || checkMetadataType(structure[field.property], 'OneToMany')
+                      || Array.isArray(scope.row[field.property])
                   "
                 >
                   <el-tag
@@ -212,7 +221,7 @@
                     :key="relationIndex"
                     :style="{ margin: '0 .2em' }"
                   >
-                    {{ relationField.__toString }}
+                    {{ Object.keys(relationField).includes('__toString') ? relationField.__toString : '' }}
                   </el-tag>
                 </span>
 
@@ -422,10 +431,18 @@ export default {
          *    // 2. Input
          *    'user.username': {
          *      expression: 'entity.getUser().getUsername() matches "/:value/"',
-         *      label: 'Please Provide Username'
+         *      label: 'Please Provide Username',
+         *      type: 'input'
          *    }
          *
-         *    // 3. DateTime / Date / Time
+         *    // 3. Input
+         *    'userEnabled': {
+         *      expression: 'entity.getUser().getIsEnabled() == :value',
+         *      label: 'User enabled',
+         *      type: 'boolean'
+         *    }
+         *
+         *    // 4. DateTime / Date / Time
          *    beforeCreatedTime: {
          *      expression: 'entity.getCreatedTime() >= datetime.get(":value")',
          *      label: 'Before Time',
