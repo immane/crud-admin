@@ -81,6 +81,7 @@
                 type="datetime"
                 placeholder="选择日期时间"
                 v-bind="field.type_options"
+                value-format="yyyy-MM-dd HH:mm:ss"
                 v-on="field.type_events"
               />
 
@@ -91,6 +92,7 @@
                 type="date"
                 placeholder="选择日期"
                 v-bind="field.type_options"
+                value-format="yyyy-MM-dd"
                 v-on="field.type_events"
               />
 
