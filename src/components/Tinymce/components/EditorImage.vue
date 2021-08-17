@@ -1,10 +1,11 @@
 <template>
   <div class="upload-container">
     <el-button :style="{background:color,borderColor:color}" icon="el-icon-upload" size="mini" type="primary" @click=" dialogVisible=true">
-      upload
+      上传
     </el-button>
     <el-dialog :visible.sync="dialogVisible">
       <el-upload
+        drag
         :multiple="true"
         :file-list="fileList"
         :show-file-list="true"
@@ -13,17 +14,16 @@
         :before-upload="beforeUpload"
         class="editor-slide-upload"
         action="https://httpbin.org/post"
-        list-type="picture-card"
+        list-type="picture"
       >
-        <el-button size="small" type="primary">
-          Click upload
-        </el-button>
+        <i class="el-icon-upload" />
+        <div class="el-upload__text">拖拉图片至此处 或<em>点击上传</em></div>
       </el-upload>
       <el-button @click="dialogVisible = false">
-        Cancel
+        取消
       </el-button>
       <el-button type="primary" @click="handleSubmit">
-        Confirm
+        确认
       </el-button>
     </el-dialog>
   </div>
