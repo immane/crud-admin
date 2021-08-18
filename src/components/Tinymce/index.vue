@@ -154,59 +154,50 @@ export default {
         // https://www.tiny.cloud/docs-3x/reference/configuration/Configuration3x@convert_urls/
         // https://stackoverflow.com/questions/5196205/disable-tinymce-absolute-to-relative-url-conversions
         convert_urls: false,
-        // 整合七牛上传
-        // images_dataimg_filter(img) {
-        //   setTimeout(() => {
-        //     const $image = $(img);
-        //     $image.removeAttr('width');
-        //     $image.removeAttr('height');
-        //     if ($image[0].height && $image[0].width) {
-        //       $image.attr('data-wscntype', 'image');
-        //       $image.attr('data-wscnh', $image[0].height);
-        //       $image.attr('data-wscnw', $image[0].width);
-        //       $image.addClass('wscnph');
-        //     }
-        //   }, 0);
-        //   return img
-        // },
-        // images_upload_handler(blobInfo, success, failure, progress) {
-        //   progress(0);
-        //   const token = _this.$store.getters.token;
-        //   getToken(token).then(response => {
-        //     const url = response.data.qiniu_url;
-        //     const formData = new FormData();
-        //     formData.append('token', response.data.qiniu_token);
-        //     formData.append('key', response.data.qiniu_key);
-        //     formData.append('file', blobInfo.blob(), url);
-        //     upload(formData).then(() => {
-        //       success(url);
-        //       progress(100);
-        //     })
-        //   }).catch(err => {
-        //     failure('出现未知问题，刷新页面，或者联系程序员')
-        //     console.log(err);
-        //   });
-        // },
 
         images_upload_handler(blobInfo, success, failure, progress) {
-          progress(0)
-          const formData = new FormData()
-          formData.append('file', blobInfo.blob())
-          axios({
-            method: 'post',
-            url: `${process.env.VUE_APP_BASE_API}/upload`,
-            data: formData,
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          }).then(
-            res => {
-              progress(100)
-              success(
-                `${process.env.VUE_APP_BASE_API}/uploads/images/${res.data[0]}`
+          const upload_handlers = {
+            server: (blobInfo, success, failure, progress) => {
+              progress(0)
+              const formData = new FormData()
+              formData.append('file', blobInfo.blob())
+              axios({
+                method: 'post',
+                url: `${process.env.VUE_APP_BASE_API}/upload`,
+                data: formData,
+                headers: {
+                  'Content-Type': 'multipart/form-data'
+                }
+              }).then(
+                res => {
+                  progress(100)
+                  success(
+                    `${process.env.VUE_APP_BASE_API}/uploads/images/${res.data[0]}`
+                  )
+                }
               )
+            },
+
+            ipfs: async(blobInfo, success, failure, progress) => {
+              const { create } = require('ipfs-http-client')
+              const IPFS_GATEWAY = 'infura-ipfs.io'
+              const client = create(`https://${IPFS_GATEWAY}:5001/api/v0`)
+
+              progress(0)
+              try {
+                const added = await client.add(blobInfo.blob())
+                console.log('IPFS added', added)
+                const url = `https://${IPFS_GATEWAY}/ipfs/${added.path}`
+                console.log('Uploaded file url', url)
+                progress(100)
+                success(url)
+              } catch (error) {
+                console.log('Error uploading file: ', error)
+              }
             }
-          )
+          }
+
+          upload_handlers['ipfs'](blobInfo, success, failure, progress)
         }
       })
     },
