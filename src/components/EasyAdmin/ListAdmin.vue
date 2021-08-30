@@ -165,16 +165,31 @@
                 <!-- System (have metadata) -->
 
                 <!-- Boolean -->
-                <span
+                <template
                   v-else-if="
                     field.type == 'boolean' ||
                       checkMetadataType(structure[field.property], 'boolean')
                   "
                 >
-                  <el-tag :type="scope.row[field.property] | boolFilter">
+                  <el-switch
+                    v-if="field.editable"
+                    v-model="scope.row[field.property]"
+                    active-color="#67C23A"
+                    inactive-color="#F56C6C"
+                    size="medium"
+                    @change="() => {
+                      em.update(scope.row.id, {[field.property]: scope.row[field.property]})
+                        .then(() => $message.success('修改属性成功'))
+                    }"
+                  />
+
+                  <el-tag
+                    v-else
+                    :type="scope.row[field.property] | boolFilter"
+                  >
                     {{ scope.row[field.property] | boolDisplay }}
                   </el-tag>
-                </span>
+                </template>
 
                 <!-- DateTime -->
                 <span
@@ -209,21 +224,25 @@
                 >
                   {{ scope.row[field.property] ? scope.row[field.property].__toString : '' }}
                 </span>
-                <span
+                <div
                   v-else-if="
                     checkMetadataType(structure[field.property], 'ManyToMany')
                       || checkMetadataType(structure[field.property], 'OneToMany')
                       || Array.isArray(scope.row[field.property])
                   "
+                  :style="{ display: 'flex', flexWrap: 'wrap' }"
                 >
-                  <el-tag
+                  <template
                     v-for="(relationField, relationIndex) in scope.row[field.property]"
-                    :key="relationIndex"
-                    :style="{ margin: '0 .2em' }"
                   >
-                    {{ Object.keys(relationField).includes('__toString') ? relationField.__toString : '' }}
-                  </el-tag>
-                </span>
+                    <el-tag
+                      :key="relationIndex"
+                      :style="{ margin: '2px' }"
+                    >
+                      {{ Object.keys(relationField).includes('__toString') ? relationField.__toString : '' }}
+                    </el-tag>
+                  </template>
+                </div>
 
                 <!-- Custom (do not have metadata) -->
 
@@ -382,7 +401,7 @@ export default {
          *        }
          *   }},
          *   { property: 'user.__metadata.profile.phone', label: 'Phone' },
-         *   { property: 'enabled', type: 'boolean' }
+         *   { property: 'enabled', type: 'boolean', editable: true }
          *   'createdTime'
          * ]
          */
