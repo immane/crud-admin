@@ -113,6 +113,14 @@
               />
 
               <!-- Textarea -->
+              <el-input
+                v-else-if="field.type == 'textarea'"
+                v-model="form[field.property]"
+                type="textarea"
+                :rows="3"
+              />
+
+              <!-- Rich text -->
               <tinymce
                 v-else-if="field.type == 'text' || checkMetadataType(currentStruct, 'text')"
                 v-model="form[field.property]"
@@ -184,6 +192,7 @@
                 "
                 v-model="form[field.property]"
                 filterable
+                clearable
                 placeholder="请选择"
                 v-bind="field.type_options"
                 v-on="field.type_events"
@@ -204,6 +213,7 @@
                 "
                 v-model="form[field.property]"
                 filterable
+                clearable
                 placeholder="请选择"
                 v-bind="field.type_options"
                 multiple
@@ -227,6 +237,12 @@
             </slot>
           </template>
 
+          <!-- Help text -->
+          <template v-if="Object.keys(field).includes('help')">
+            <span style="color: gray;">
+              <i class="el-icon-info" /> {{ field.help }}
+            </span>
+          </template>
         </el-form-item>
       </div>
 
@@ -282,7 +298,8 @@ export default {
          *     field_options: { label: 'Cover image' },
          *     field_events: { click: () => alert('Clicked') },
          *     type_options: { disabled: true },
-         *     type_events: { input: () => alert('Inputed') }
+         *     type_events: { input: () => alert('Inputed') },
+         *     help: 'This is a help text'
          *   },
          *   { property: 'region',
          *     relation_filter: {
