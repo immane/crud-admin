@@ -134,7 +134,7 @@
               <el-upload
                 v-else-if="field.type === 'image' || field.type === 'images'"
                 v-bind="field.type_options"
-                :action="`${BASE_API}/upload`"
+                :action="`${BASE_API}/upload?storage=qiniu`"
                 :limit="field.type === 'image' ? 1 : 0"
                 :file-list="
                   form[field.property]
@@ -168,7 +168,7 @@
               <el-upload
                 v-else-if="field.type === 'file'"
                 v-bind="field.type_options"
-                :action="`${BASE_API}/upload`"
+                :action="`${BASE_API}/upload?storage=qiniu`"
                 :limit="1"
                 :file-list="
                   form[field.property]
@@ -239,9 +239,14 @@
 
           <!-- Help text -->
           <template v-if="Object.keys(field).includes('help')">
-            <span style="color: gray;">
-              <i class="el-icon-info" /> {{ field.help }}
-            </span>
+            <div class="help-text" style="display: flex;">
+              <div>
+                <p class="el-icon-info" />
+              </div>
+              <div>
+                <p v-html="field.help" />
+              </div>
+            </div>
           </template>
         </el-form-item>
       </div>
@@ -552,8 +557,18 @@ export default {
 }
 </script>
 
-<style scoped>
-.line{
+<style lang="scss" scoped>
+.help-text {
+  display: flex;
+  p {
+    color: gray;
+    line-height: 1.3em;
+  }
+  div {
+    padding: 0 3px;
+  }
+}
+.line {
   text-align: center;
 }
 </style>
