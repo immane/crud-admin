@@ -184,48 +184,107 @@
                 <div slot="tip" class="el-upload__tip">上传文件必须少于100MB</div>
               </el-upload>
 
+              <!-- Relations -->
+
               <!-- ManyToOne or OneToOne -->
-              <el-select
+              <template
                 v-else-if="
                   currentStruct && currentStruct.hasOwnProperty('metadata') &&
                     ['ManyToOne', 'OneToOne'].includes(currentStruct.metadata.type)
                 "
-                v-model="form[field.property]"
-                filterable
-                clearable
-                placeholder="请选择"
-                v-bind="field.type_options"
-                v-on="field.type_events"
               >
-                <el-option
-                  v-for="item in options[field.property]"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
+                <el-select
+                  v-model="form[field.property]"
+                  filterable
+                  clearable
+                  placeholder="请选择"
+                  v-bind="field.type_options"
+                  v-on="field.type_events"
+                >
+                  <el-option
+                    v-for="item in options[field.property]"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+
+                <router-link
+                  v-if="field.creationUrl"
+                  tag="a"
+                  target="_blank"
+                  :to="{ path: field.creationUrl }"
+                >
+                  <el-button
+                    type="success"
+                    icon="el-icon-plus"
+                    circle
+                    size="mini"
+                    style="margin: 0px 10px;"
+                  />
+                </router-link>
+              </template>
 
               <!-- ManyToMany or OneToMany -->
-              <el-select
+              <template
                 v-else-if="
                   currentStruct && currentStruct.hasOwnProperty('metadata') &&
                     ['ManyToMany', 'OneToMany'].includes(currentStruct.metadata.type)
                 "
-                v-model="form[field.property]"
-                filterable
-                clearable
-                placeholder="请选择"
-                v-bind="field.type_options"
-                multiple
-                v-on="field.type_events"
               >
-                <el-option
-                  v-for="item in options[field.property]"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
+                <template
+                  v-if="field.type === 'transfer'"
+                >
+                  <el-transfer
+                    v-model="form[field.property]"
+                    filterable
+                    filter-placeholder="请选择"
+                    :props="{
+                      key: 'value',
+                      label: 'label'
+                    }"
+                    :data="options[field.property]"
+                    v-bind="field.type_options"
+                    v-on="field.type_events"
+                  />
+                </template>
+
+                <template v-else>
+                  <el-select
+                    v-model="form[field.property]"
+                    filterable
+                    clearable
+                    placeholder="请选择"
+                    v-bind="field.type_options"
+                    multiple
+                    v-on="field.type_events"
+                  >
+                    <el-option
+                      v-for="item in options[field.property]"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </template>
+
+                <router-link
+                  v-if="field.creationUrl"
+                  tag="a"
+                  target="_blank"
+                  :to="{ path: field.creationUrl }"
+                >
+                  <el-button
+                    type="success"
+                    icon="el-icon-plus"
+                    circle
+                    size="mini"
+                    style="margin: 0px 10px;"
+                  />
+                </router-link>
+              </template>
+
+              <!-- End of relations -->
 
               <!-- Others -->
               <el-input
@@ -258,6 +317,7 @@
         </slot>
       </el-form-item>
     </el-form>
+
   </div>
 </template>
 
@@ -267,6 +327,7 @@ import Tinymce from '@/components/Tinymce'
 import SIP from '@/utils/simple-image-process'
 
 export default {
+  name: 'FormAdmin',
   components: { Tinymce },
   props: {
     /**
@@ -449,6 +510,10 @@ export default {
     })
   },
   methods: {
+    log(...arg) {
+      return console.log(...arg)
+    },
+
     checkMetadataType(currentStruct, type) {
       return currentStruct && Object.keys(currentStruct).includes('metadata') && currentStruct.metadata.type === type
     },

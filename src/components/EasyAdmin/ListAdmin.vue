@@ -332,6 +332,7 @@ import { asyncRoutes } from '@/router'
 import SIP from '@/utils/simple-image-process'
 
 export default {
+  name: 'ListAdmin',
   filters: {
     boolFilter(status) { return { false: 'danger', true: 'success' }[status] },
     boolDisplay(status) { return { false: '否', true: '是' }[status] },
