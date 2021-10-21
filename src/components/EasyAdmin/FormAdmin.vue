@@ -3,9 +3,10 @@
     <el-row>
       <el-col :span="4">
         <slot name="title">
-          <strong>
+          <strong style="font-size: 20px;">
             <!-- Title slot here -->
             {{ $router.currentRoute.meta.title }}
+            新增 / 修改
           </strong>
         </slot>
       </el-col>
@@ -28,287 +29,90 @@
       label-width="120px"
       element-loading-text="加载中..."
     >
-      <div
-        v-for="field in properties"
-        :key="field.property"
-        :set="currentStruct = structure[field.property]"
+      <el-tabs
+        v-model="activeTab"
       >
-        <el-form-item
-          v-if="field.property !== 'id'"
-          :label="
-            (Object.keys(field).includes('field_options') &&
-              Object.keys(field.field_options).includes('label'))
-              ? field.field_options.label
-              : (currentStruct ? currentStruct['translation']: field.property)
-          "
-          :prop="field.property"
-          v-bind="field.field_options"
-          v-on="field.field_events"
+        <el-tab-pane
+          v-for="(tab, tabIndex) in tabs"
+          :key="tabIndex"
+          :label="tab"
+          :name="String(tabIndex)"
         >
-          <!---------------
-          |  Fields slot  |
-          ---------------->
-
-          <!-- Dynamic components and JSX function -->
-          <template v-if="Object.keys(field).includes('component')">
-            <component
-              :is="field.component"
-              :data="form[field.property]"
-              :form="form"
-              :property="field.property"
-            />
-          </template>
-
-          <!-- Normal fields -->
-          <template
-            v-else-if="
-              !['id'].includes(field.property)
-            "
+          <div
+            v-for="field in properties"
+            :key="field.property"
+            :set="currentStruct = structure[field.property]"
           >
-            <slot
-              :name="field.property"
-              :form="form"
-              :value="form[field.property]"
-              :struct="currentStruct"
+            <template
+              v-if="
+                (!tabIndex && !Object.keys(field).includes('tab'))
+                  || tab == field.tab
+              "
             >
-              <!-- Dummy -->
-              <template v-if="false" />
-
-              <!-- Datetime -->
-              <el-date-picker
-                v-else-if="field.type == 'datetime' || checkMetadataType(currentStruct, 'datetime')"
-                v-model="form[field.property]"
-                type="datetime"
-                placeholder="选择日期时间"
-                v-bind="field.type_options"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                v-on="field.type_events"
-              />
-
-              <!-- Date -->
-              <el-date-picker
-                v-else-if="field.type == 'date' || checkMetadataType(currentStruct, 'date')"
-                v-model="form[field.property]"
-                type="date"
-                placeholder="选择日期"
-                v-bind="field.type_options"
-                value-format="yyyy-MM-dd"
-                v-on="field.type_events"
-              />
-
-              <!-- Integer -->
-              <el-input-number
-                v-else-if="field.type == 'integer' || checkMetadataType(currentStruct, 'integer')"
-                v-model="form[field.property]"
-                v-bind="field.type_options"
-                v-on="field.type_events"
-              />
-
-              <!-- Boolean -->
-              <el-checkbox
-                v-else-if="field.type == 'boolean' || checkMetadataType(currentStruct, 'boolean')"
-                v-model="form[field.property]"
-                v-bind="field.type_options"
-                v-on="field.type_events"
-              />
-
-              <!-- Textarea -->
-              <el-input
-                v-else-if="field.type == 'textarea'"
-                v-model="form[field.property]"
-                type="textarea"
-                :rows="3"
-              />
-
-              <!-- Rich text -->
-              <tinymce
-                v-else-if="field.type == 'text' || checkMetadataType(currentStruct, 'text')"
-                v-model="form[field.property]"
-                :height="300"
-                v-bind="field.type_options"
-                v-on="field.type_events"
-              />
-
-              <!-- Uploads -->
-              <!-- image -->
-              <el-upload
-                v-else-if="field.type === 'image' || field.type === 'images'"
-                v-bind="field.type_options"
-                :action="`${BASE_API}/upload?storage=qiniu`"
-                :limit="field.type === 'image' ? 1 : 0"
-                :file-list="
-                  form[field.property]
-                    ? ( field.type === 'image'
-                      ? [{name: form[field.property], url: getPicture(form[field.property]) }]
-                      : form[field.property].map(photo => { return { name: photo, url: getPicture(photo) } })
-                    )
-                    : []
+              <el-form-item
+                v-if="field.property !== 'id'"
+                :label="
+                  (Object.keys(field).includes('field_options') &&
+                    Object.keys(field.field_options).includes('label'))
+                    ? field.field_options.label
+                    : (currentStruct ? currentStruct['translation']: field.property)
                 "
-                list-type="picture"
-                :on-remove="(file, fileList) => {
-                  if(field.type === 'image') form[field.property] = ''
-                  else form[field.property] = fileList.map(photo => photo.name)
-                }"
-                :on-success="(res, file) => {
-                  if(field.type === 'image') {
-                    form[field.property] = res.data[0]
-                  }
-                  else {
-                    if(!Object.keys(form).includes(field.property) || !Array.isArray(form[field.property])) form[field.property] = []
-                    form[field.property] = [...form[field.property], ...res.data]
-                  }
-                }"
-                v-on="field.type_events"
+                :prop="field.property"
+                v-bind="field.field_options"
+                v-on="field.field_events"
               >
-                <el-button size="small" type="primary">点击选择媒体/文件</el-button>
-                <div slot="tip" class="el-upload__tip">JPG或PNG文件必须少于10MB</div>
-              </el-upload>
+                <!---------------
+                |  Fields slot  |
+                ---------------->
 
-              <!-- file -->
-              <el-upload
-                v-else-if="field.type === 'file'"
-                v-bind="field.type_options"
-                :action="`${BASE_API}/upload?storage=qiniu`"
-                :limit="1"
-                :file-list="
-                  form[field.property]
-                    ? [{name: form[field.property], url: getPicture(form[field.property]) }]
-                    : []
-                "
-                list-type="file"
-                :on-remove="(file, fileList) => form[field.property] = ''"
-                :on-success="(res, file) => { form[field.property] = res.data[0] }"
-                v-on="field.type_events"
-              >
-                <el-button size="small" type="primary">点击选择文件</el-button>
-                <div slot="tip" class="el-upload__tip">上传文件必须少于100MB</div>
-              </el-upload>
-
-              <!-- Relations -->
-
-              <!-- ManyToOne or OneToOne -->
-              <template
-                v-else-if="
-                  currentStruct && currentStruct.hasOwnProperty('metadata') &&
-                    ['ManyToOne', 'OneToOne'].includes(currentStruct.metadata.type)
-                "
-              >
-                <el-select
-                  v-model="form[field.property]"
-                  filterable
-                  clearable
-                  placeholder="请选择"
-                  v-bind="field.type_options"
-                  v-on="field.type_events"
-                >
-                  <el-option
-                    v-for="item in options[field.property]"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                <!-- Dynamic components and JSX function -->
+                <template v-if="Object.keys(field).includes('component')">
+                  <component
+                    :is="field.component"
+                    :data="form[field.property]"
+                    :form="form"
+                    :property="field.property"
                   />
-                </el-select>
+                </template>
 
-                <router-link
-                  v-if="field.creationUrl"
-                  tag="a"
-                  target="_blank"
-                  :to="{ path: field.creationUrl }"
-                >
-                  <el-button
-                    type="success"
-                    icon="el-icon-plus"
-                    circle
-                    size="mini"
-                    style="margin: 0px 10px;"
-                  />
-                </router-link>
-              </template>
-
-              <!-- ManyToMany or OneToMany -->
-              <template
-                v-else-if="
-                  currentStruct && currentStruct.hasOwnProperty('metadata') &&
-                    ['ManyToMany', 'OneToMany'].includes(currentStruct.metadata.type)
-                "
-              >
+                <!-- Plugin fields -->
                 <template
-                  v-if="field.type === 'transfer'"
+                  v-else-if="
+                    !['id'].includes(field.property)
+                  "
                 >
-                  <el-transfer
-                    v-model="form[field.property]"
-                    filterable
-                    filter-placeholder="请选择"
-                    :props="{
-                      key: 'value',
-                      label: 'label'
-                    }"
-                    :data="options[field.property]"
-                    v-bind="field.type_options"
-                    v-on="field.type_events"
-                  />
-                </template>
-
-                <template v-else>
-                  <el-select
-                    v-model="form[field.property]"
-                    filterable
-                    clearable
-                    placeholder="请选择"
-                    v-bind="field.type_options"
-                    multiple
-                    v-on="field.type_events"
+                  <slot
+                    :name="field.property"
+                    :form="form"
+                    :value="form[field.property]"
+                    :struct="currentStruct"
                   >
-                    <el-option
-                      v-for="item in options[field.property]"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
+                    <component
+                      :is="loadPlugin(field.type ? field.type : getMetadataType(currentStruct))"
+                      :em-prefix="em.prefix"
+                      :form="form"
+                      :field="field"
+                      :struct="structure[field.property]"
                     />
-                  </el-select>
+                  </slot>
                 </template>
 
-                <router-link
-                  v-if="field.creationUrl"
-                  tag="a"
-                  target="_blank"
-                  :to="{ path: field.creationUrl }"
-                >
-                  <el-button
-                    type="success"
-                    icon="el-icon-plus"
-                    circle
-                    size="mini"
-                    style="margin: 0px 10px;"
-                  />
-                </router-link>
-              </template>
-
-              <!-- End of relations -->
-
-              <!-- Others -->
-              <el-input
-                v-else
-                v-model="form[field.property]"
-                v-bind="field.type_options"
-                v-on="field.type_events"
-              />
-            </slot>
-          </template>
-
-          <!-- Help text -->
-          <template v-if="Object.keys(field).includes('help')">
-            <div class="help-text" style="display: flex;">
-              <div>
-                <p class="el-icon-info" />
-              </div>
-              <div>
-                <p v-html="field.help" />
-              </div>
-            </div>
-          </template>
-        </el-form-item>
-      </div>
+                <!-- Help text -->
+                <template v-if="Object.keys(field).includes('help')">
+                  <div class="help-text" style="display: flex;">
+                    <div>
+                      <p class="el-icon-info" />
+                    </div>
+                    <div>
+                      <p v-html="field.help" />
+                    </div>
+                  </div>
+                </template>
+              </el-form-item>
+            </template>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
 
       <el-form-item>
         <slot name="action" :form="form" :submit="onSubmit">
@@ -324,11 +128,11 @@
 <script>
 import EntityManage from '@/utils/entity'
 import Tinymce from '@/components/Tinymce'
-import SIP from '@/utils/simple-image-process'
+import vueJsonEditor from 'vue-json-editor'
 
 export default {
   name: 'FormAdmin',
-  components: { Tinymce },
+  components: { Tinymce, vueJsonEditor },
   props: {
     /**
      * @description Form admin initialize properties.
@@ -359,6 +163,7 @@ export default {
          * [
          *   'id',
          *   { property: 'cover',
+         *     // types: datatime, date, integer, boolean, textarea, text, image, images, file, transfer
          *     type: 'image',
          *     required: true,
          *     field_options: { label: 'Cover image' },
@@ -403,8 +208,9 @@ export default {
       // field vaildations
       rules: {},
 
-      // m2o or o2o options
-      options: {},
+      // tabs
+      tabs: new Set(['默认']),
+      activeTab: 0,
 
       // translated fields
       properties: [],
@@ -471,29 +277,9 @@ export default {
             }
           ]
 
-          // Selection generate
-          if (['ManyToOne', 'OneToOne', 'OneToMany', 'ManyToMany'].includes(metadata.type)) {
-            let entityName = metadata.targetEntity.split('\\')
-            if (entityName) {
-              entityName = entityName.pop()
-
-              try {
-                const em = new EntityManage(entityName)
-                em.prefix = this.em.prefix
-
-                const currentProperty = this.properties.find(v => v.property === field)
-                const targetList = await em.list(
-                  typeof currentProperty.relation_filter !== 'undefined'
-                    ? currentProperty.relation_filter
-                    : { '@display': 'reduce' }
-                )
-
-                this.options[field] =
-                  targetList.data.map(v => { return { value: v.id, label: v.__toString || v.name || v.title } })
-
-              // eslint-disable-next-line no-empty
-              } catch (e) {}
-            }
+          // Tab
+          if (Object.keys(property).includes('tab')) {
+            this.tabs.add(property.tab)
           }
         }
       }
@@ -514,12 +300,26 @@ export default {
       return console.log(...arg)
     },
 
-    checkMetadataType(currentStruct, type) {
-      return currentStruct && Object.keys(currentStruct).includes('metadata') && currentStruct.metadata.type === type
+    loadPlugin(type) {
+      const typeMapping = {
+        'images': 'image',
+        'ManyToOne': 'RelationToOne',
+        'OneToOne': 'RelationToOne',
+        'ManyToMany': 'RelationToMany',
+        'OneToMany': 'RelationToMany'
+      }
+
+      try {
+        const targetType = (type in typeMapping) ? typeMapping[type] : type
+        return require(`./plugins/form/${targetType}.vue`).default
+      } catch (e) {
+        return require(`./plugins/form/input.vue`).default
+      }
     },
 
-    // Get picture
-    getPicture(url) { return SIP.getPicture(url) },
+    getMetadataType(currentStruct) {
+      return currentStruct?.metadata?.type
+    },
 
     setDefaultData() {
       // default value process
@@ -633,8 +433,8 @@ export default {
     padding: 0 3px;
   }
 }
+
 .line {
   text-align: center;
 }
 </style>
-
