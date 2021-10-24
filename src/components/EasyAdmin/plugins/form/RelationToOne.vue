@@ -34,6 +34,35 @@
 </template>
 
 <script>
+/**
+ * @description Many to one relations
+ * @example
+ */
+/*
+  // Reduce
+  { property: 'region',
+    relation_filter: {
+      '@filter': 'entity.getLevel() == 0',
+      '@order': 'name|DESC, id|ASC'
+    }
+  }
+
+  // Full
+  {
+    property: 'gift',
+    type: 'RelationToOne',
+    relation_filter: {
+      '@filter': 'entity.getCategory().getType().getSlug() == "specification"',
+      '@order': 'name|DESC, id|ASC'
+    }
+    field_options: {
+      label: 'Present'
+    },
+    type_options: {
+      entity_name: 'Specification'
+    }
+  }
+*/
 import EntityManage from '@/utils/entity'
 export default {
   props: {
@@ -61,7 +90,13 @@ export default {
     }
   },
   async created() {
-    let entityName = this.struct?.metadata?.targetEntity?.split('\\')
+    let entityName = null
+    if (this.field?.type_options?.entity_name) {
+      entityName = this.field?.type_options?.entity_name?.split('\\')
+    } else {
+      entityName = this.struct?.metadata?.targetEntity?.split('\\')
+    }
+
     if (entityName) {
       entityName = entityName.pop()
       try {
