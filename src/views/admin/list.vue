@@ -6,9 +6,10 @@
       :list-display="fields"
       :list-filter="filters"
       :disabled-actions="disabled"
-      :actions="actions"
       :query="query"
       :data-processor="dataProcessor"
+      :actions="actions"
+      :config="config"
     />
   </div>
 </template>
@@ -27,6 +28,7 @@ export default {
       list: [],
       config: {},
       fields: [],
+      actions: [],
       filters: null,
       entityParam: this.$route.params.entityParam
     }
@@ -42,10 +44,10 @@ export default {
       this.entity = Object.keys(this.config).includes('entity') ? this.config.entity : this.alias
       this.fields = this.config.list.list_display
       this.filters = this.config.list.list_filter
-      this.actions = this.config.list.actions
       this.disabled = this.config.list.disabled_actions
       this.query = this.config.list.query
       this.dataProcessor = this.config.list.data_processor
+      this.actions = this.config.list.actions
     }
   }
 }

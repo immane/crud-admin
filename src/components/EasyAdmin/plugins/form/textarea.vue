@@ -1,8 +1,10 @@
 <template>
   <el-input
     v-model="form[field.property]"
+    :autosize="{ minRows: 2 }"
     type="textarea"
-    :rows="3"
+    v-bind="field.type_options"
+    v-on="field.type_events"
   />
 </template>
 

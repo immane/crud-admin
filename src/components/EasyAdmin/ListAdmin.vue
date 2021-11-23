@@ -224,6 +224,7 @@
                 >
                   {{ scope.row[field.property] ? scope.row[field.property].__toString : '' }}
                 </span>
+
                 <div
                   v-else-if="
                     checkMetadataType(structure[field.property], 'ManyToMany')
@@ -233,7 +234,7 @@
                   :style="{ display: 'flex', flexWrap: 'wrap' }"
                 >
                   <template
-                    v-for="(relationField, relationIndex) in scope.row[field.property]"
+                    v-for="(relationField, relationIndex) in scope.row[field.property].slice(0, 5)"
                   >
                     <el-tag
                       :key="relationIndex"
@@ -241,6 +242,36 @@
                     >
                       {{ Object.keys(relationField).includes('__toString') ? relationField.__toString : '' }}
                     </el-tag>
+                  </template>
+
+                  <template
+                    v-if="scope.row[field.property].length > 5"
+                  >
+                    <el-tooltip
+                      placement="bottom"
+                      effect="light"
+                    >
+                      <el-tag
+                        :key="relationIndex"
+                        :style="{ margin: '2px' }"
+                      >
+                        ...
+                      </el-tag>
+
+                      <div slot="content">
+                        <div
+                          v-for="(relationField, relationIndex) in scope.row[field.property]"
+                          :key="relationIndex"
+                          style="max-width: 50vw; overflow-y: scroll; display: flex; flex-wrap: wrap;"
+                        >
+                          <el-tag
+                            :style="{ margin: '2px' }"
+                          >
+                            {{ Object.keys(relationField).includes('__toString') ? relationField.__toString : '' }}
+                          </el-tag>
+                        </div>
+                      </div>
+                    </el-tooltip>
                   </template>
                 </div>
 
@@ -283,13 +314,31 @@
 
             <slot name="action" :data="scope.row">
               <slot name="action:edit" :data="scope.row">
+                <!--
                 <router-link v-if="!disabledActions.includes('edit')" :to="`${scope.row.id}/update`">
                   <el-button size="small" icon="el-icon-edit" plain>
                     修改
                   </el-button>
                 </router-link>
+                -->
+
+                <el-button
+                  size="small"
+                  icon="el-icon-edit"
+                  plain
+                  @click="() => {
+                    dialog.title = '修改记录'
+                    dialog.data.id = scope.row.id
+                    dialog.refresh++
+                    dialog.show = true
+                  }"
+                >
+                  修改
+                </el-button>
               </slot>
+
               &nbsp;&nbsp;
+
               <slot name="action:delete" :data="scope.row">
                 <el-popconfirm v-if="!disabledActions.includes('delete')" title="确定删除当前记录？" @onConfirm="removeAction(scope.row.id)">
                   <el-button slot="reference" size="small" type="danger" icon="el-icon-delete" plain>删除</el-button>
@@ -314,6 +363,16 @@
         />
       </div>
     </el-row>
+
+    <template>
+      <el-dialog width="80%" :title="dialog.title" :visible.sync="dialog.show">
+        <component
+          :is="dialog.component"
+          :key="dialog.refresh"
+          :data="dialog.data"
+        />
+      </el-dialog>
+    </template>
   </div>
 </template>
 
@@ -324,21 +383,33 @@
 .el-table td, .el-table th {
     padding: 8px 0;
 }
+.el-dialog body {
+    padding: 0;
+}
 </style>
 
 <script>
 import EntityManage from '@/utils/entity'
 import { asyncRoutes } from '@/router'
 import SIP from '@/utils/simple-image-process'
+import FormAdmin from '@/components/EasyAdmin/FormAdmin'
 
 export default {
   name: 'ListAdmin',
+
   filters: {
     boolFilter(status) { return { false: 'danger', true: 'success' }[status] },
     boolDisplay(status) { return { false: '否', true: '是' }[status] },
     htmlStrip(text) { return text ? String(text).replace(/<[^>]*>/g, '') : '' }
   },
+
   props: {
+    // Main config
+    config: {
+      type: [Object],
+      default: () => {}
+    },
+
     // Entity config or entity name
     entityConf: {
       type: [Object, String],
@@ -566,6 +637,7 @@ export default {
       }
     }
   },
+
   data() {
     return {
       // Entity manager and entity structure
@@ -602,6 +674,58 @@ export default {
         limit: 20
       },
 
+      // Dialog
+      dialog: {
+        title: 'Dialog',
+        show: false,
+        component: null,
+        refresh: 0,
+        data: {},
+
+        defaultComponents: {
+          formEdit: {
+            components: { FormAdmin },
+            props: ['data'],
+            data() {
+              return {
+                submit: null
+              }
+            },
+            /* Use scope-slot in JSX */
+            render(h) {
+              return (
+                <form-admin
+                  id={this.data?.id}
+                  entity-conf={this.data?.entityConf}
+                  fields={this.data?.fields}
+                  config={this.data?.config}
+
+                  { ... {
+                    scopedSlots: {
+                      title: () => { return <span/> },
+                      action: scope => {
+                        return (
+                          <el-button
+                            type='primary' icon='el-icon-edit-outline'
+                            onclick={() => {
+                              scope.submit(() => {
+                                this.$message({ message: '数据修改成功', type: 'success' })
+                                this.data.dialog.show = false
+                              })
+                            }}>
+                            保存
+                          </el-button>
+                        )
+                      }
+                    }
+                  }}
+                />
+              )
+            }
+          }
+        }
+      },
+
       // Other
       loading: true
     }
@@ -624,19 +748,44 @@ export default {
   },
 
   created() {
+    // Process router convert
     this.routeProcess()
+
+    // Process entity and structure properties
     this.propertieProcess()
+
+    // Process filter
     this.filterProcess()
+
+    // Load dialog component
+    this.loadDialogComponent(
+      {
+        entityConf: this.entityConf,
+        fields: this.config?.form.fields,
+        config: this.config
+      },
+      this.dialog.defaultComponents.formEdit
+    )
 
     /**
      * Fetch base data, like entity structure and validations
      */
     this.fetchData()
   },
+
   methods: {
     /* Check if metadata presented */
     checkMetadataType(currentStruct, type) {
       return currentStruct && Object.keys(currentStruct).includes('metadata') && currentStruct.metadata.type === type
+    },
+
+    loadDialogComponent(data, component = null) {
+      if (component) {
+        this.dialog.component = component
+      }
+      this.dialog.data = data
+      data.dialog = this.dialog
+      this.dialog.refresh++
     },
 
     // Get picture

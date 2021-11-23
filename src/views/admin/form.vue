@@ -5,6 +5,7 @@
       v-model="form"
       :entity-conf="entity"
       :fields="fields"
+      :config="config"
     />
   </div>
 </template>

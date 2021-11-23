@@ -7,6 +7,7 @@
       :list-display="fields"
       :list-filter="filters"
       :disabled-actions="disabled"
+      :query="query"
     >
       <template v-slot:extraAction="{ data }">
         <el-button size="small" @click="dialog.data = data.roles; dialog.pk = data.id; dialog.visible = true;">
@@ -69,8 +70,8 @@ export default {
         data: null,
         options: [
           { value: 'ROLE_USER', label: '用户' },
-          { value: 'ROLE_ADMIN', label: '管理员' },
-          { value: 'ROLE_SUPER_ADMIN', label: '超级管理员' }
+          { value: 'ROLE_SUPER_ADMIN', label: '超级管理员' },
+          { value: 'ROLE_STAFF', label: '店员' }
         ]
       }
     }
@@ -85,6 +86,7 @@ export default {
       this.config = admin.entities[this.entity]
       this.fields = this.config.list.list_display
       this.filters = this.config.list.list_filter
+      this.query = this.config.list.query
       this.disabled = this.config.list.disabled_actions
     }
   }
