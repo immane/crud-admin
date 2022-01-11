@@ -94,6 +94,71 @@
         <slot name="extraTopButton" />
         &emsp;
         <slot name="topButton">
+          <!-- Export action -->
+          <template v-if="!disabledActions.includes('export')">
+            <el-button
+              size="medium"
+              type="primary"
+              icon="el-icon-download"
+              plain
+              @click="() => {
+                const loading = this.$loading({
+                  lock: true,
+                  text: '数据导出中',
+                  spinner: 'el-icon-loading',
+                  background: 'rgba(0, 0, 0, 0.7)'
+                })
+
+                // default config
+                const exportConf = config.list.export
+                let query = {}, label = {}
+                if(exportConf) {
+                  if(exportConf.hasOwnProperty('query'))
+                    query = exportConf.query
+                  if(exportConf.hasOwnProperty('label'))
+                    label = exportConf.label
+                }
+
+                // Use current filter
+                query = Object.assign({}, filter, query)
+
+                em.list(query).then(res => {
+                  loading.close()
+                  let keys = []
+                  res.data.forEach(datum => {
+                    keys = Object.keys(datum)
+                    keys.forEach(key => {
+                      const value = datum[key]
+                      if(typeof datum[key] === 'object' && datum[key] !== null) {
+                        datum[key] = datum[key].hasOwnProperty('__toString')
+                          ? datum[key].__toString : '[Object]'
+                      }
+                      else if(Array.isArray(datum[key])) {
+                        datum[key] = '[Array]'
+                      }
+                    })
+                  })
+
+                  const data = res.data
+                  if(label
+                    && Object.keys(label).length === 0
+                    && Object.getPrototypeOf(label) === Object.prototype
+                  ) {
+                    keys.forEach(v => { label[v] = v } )
+                  }
+
+                  const exportExcelCsv = require('export-excel-csv').default
+                  exportExcelCsv(label, data, `export-${em.name}.csv`)
+                })
+              }"
+            >
+              导出
+            </el-button>
+          </template>
+
+          &emsp;
+
+          <!-- New action -->
           <router-link v-if="!disabledActions.includes('new')" to="create">
             <el-button size="medium" type="primary" icon="el-icon-plus" plain>
               新增{{ $router.currentRoute.meta.title }}
@@ -314,14 +379,15 @@
 
             <slot name="action" :data="scope.row">
               <slot name="action:edit" :data="scope.row">
-                <!--
+                <!-- Redirect -->
                 <router-link v-if="!disabledActions.includes('edit')" :to="`${scope.row.id}/update`">
                   <el-button size="small" icon="el-icon-edit" plain>
                     修改
                   </el-button>
                 </router-link>
-                -->
 
+                <!-- Popup -->
+                <!--
                 <el-button
                   size="small"
                   icon="el-icon-edit"
@@ -335,6 +401,7 @@
                 >
                   修改
                 </el-button>
+                -->
               </slot>
 
               &nbsp;&nbsp;
@@ -392,7 +459,6 @@
 import EntityManage from '@/utils/entity'
 import { asyncRoutes } from '@/router'
 import SIP from '@/utils/simple-image-process'
-import FormAdmin from '@/components/EasyAdmin/FormAdmin'
 
 export default {
   name: 'ListAdmin',
@@ -404,7 +470,13 @@ export default {
   },
 
   props: {
-    // Main config
+    /**
+     * Main config
+     * {
+     *    form: [...],
+     *    list: [...]
+     * }
+     */
     config: {
       type: [Object],
       default: () => {}
@@ -432,6 +504,30 @@ export default {
     value: {
       type: Array,
       default: () => []
+    },
+
+    // Export dummy (not extra used)
+    export: {
+      type: [Object],
+      default: () => {
+        return {
+        /**
+         * @description
+         *  Export dummy
+         *
+         * @example
+         *  export: {
+         *    query: {
+         *      '@display': '["id", "name"]'
+         *    },
+         *    label: {
+         *      'id': 'ID',
+         *      'name': '名称'
+         *    }
+         *  }
+         */
+        }
+      }
     },
 
     // Default query including filter, sorter and pager.
@@ -684,6 +780,7 @@ export default {
 
         defaultComponents: {
           formEdit: {
+            /*
             components: { FormAdmin },
             props: ['data'],
             data() {
@@ -691,7 +788,7 @@ export default {
                 submit: null
               }
             },
-            /* Use scope-slot in JSX */
+            // Use scope-slot in JSX
             render(h) {
               return (
                 <form-admin
@@ -722,6 +819,7 @@ export default {
                 />
               )
             }
+        */
           }
         }
       },
@@ -774,6 +872,11 @@ export default {
   },
 
   methods: {
+    /* Debug */
+    _console() {
+      return console
+    },
+
     /* Check if metadata presented */
     checkMetadataType(currentStruct, type) {
       return currentStruct && Object.keys(currentStruct).includes('metadata') && currentStruct.metadata.type === type
