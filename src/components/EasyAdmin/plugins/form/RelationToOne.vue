@@ -4,7 +4,9 @@
       v-model="form[field.property]"
       filterable
       clearable
+      reserve-keyword
       placeholder="请选择"
+      :remote-method="remoteSearch"
       v-bind="field.type_options"
       v-on="field.type_events"
     >
@@ -42,7 +44,7 @@
   // Reduce
   { property: 'region',
     relation_filter: {
-      '@filter': 'entity.getLevel() == 0',
+      '@filter': 'entity.getLevel() == ":value"',
       '@order': 'name|DESC, id|ASC'
     }
   }
@@ -52,14 +54,15 @@
     property: 'gift',
     type: 'RelationToOne',
     relation_filter: {
-      '@filter': 'entity.getCategory().getType().getSlug() == "specification"',
+      '@filter': 'entity.getCategory().getType().getSlug() == ":value"',
       '@order': 'name|DESC, id|ASC'
     }
     field_options: {
       label: 'Present'
     },
     type_options: {
-      entity_name: 'Specification'
+      entity_name: 'Specification',
+      remote: true  // Enable remote search with filter's ":value"
     }
   }
 */
@@ -83,29 +86,56 @@ export default {
       default: () => { return {} }
     }
   },
+
   data() {
     return {
+      // component option
+      loading: false,
+
       // m2o or o2o options
+      entity: null,
       options: []
     }
   },
+
   async created() {
-    let entityName = null
     if (this.field?.type_options?.entity_name) {
-      entityName = this.field?.type_options?.entity_name?.split('\\')
+      this.entity = this.field?.type_options?.entity_name?.split('\\')?.pop()
     } else {
-      entityName = this.struct?.metadata?.targetEntity?.split('\\')
+      this.entity = this.struct?.metadata?.targetEntity?.split('\\')?.pop()
     }
 
-    if (entityName) {
-      entityName = entityName.pop()
+    if (this.entity && !this.field?.type_options?.remote) {
+      this.fetchData(this.entity, this.field.relation_filter ?? {})
+    }
+  },
+
+  methods: {
+    async remoteSearch(query) {
+      if (query !== '') {
+        this.loading = true
+        await this.fetchData(this.entity, this.field.relation_filter ?? {}, query)
+        this.loading = false
+      } else {
+        this.options = []
+      }
+    },
+
+    async fetchData(entityName, relationFilter, query = null) {
       try {
         const em = new EntityManage(entityName)
         em.prefix = this.emPrefix
 
-        const targetList = await em.list(
-          this.field.relation_filter ?? { '@display': 'reduce' }
-        )
+        const currentFilter = Object.assign({}, relationFilter)
+
+        currentFilter['@display'] = 'reduce'
+        currentFilter['limit'] = 1e10
+
+        if (relationFilter['@filter'] && query) {
+          currentFilter['@filter'] = relationFilter['@filter'].replaceAll(':value', query)
+        }
+
+        const targetList = await em.list(currentFilter)
 
         this.options =
           targetList.data.map(v => { return { value: v.id, label: v.__toString || v.name || v.title } })
