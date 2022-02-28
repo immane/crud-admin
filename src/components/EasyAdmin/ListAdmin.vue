@@ -229,7 +229,7 @@
 
                 <!-- System (have metadata) -->
 
-                <!-- Boolean -->
+                <!-- String / Integer / Float / Decimal -->
                 <div
                   v-else-if="
                     field.type == 'string' || checkMetadataType(structure[field.property], 'string')
@@ -239,7 +239,8 @@
                   "
                   :key="editing['refresh']"
                   @dblclick="
-                    editing = { refresh: 0 }
+                    editing = { refresh: 0, 'temp-value': null }
+                    editing[`temp-value`] = scope.row[field.property]
                     editing[`editable:${scope.row.id}-${field.property}`] = true
                     editing['refresh']++
                   "
@@ -250,22 +251,19 @@
                         editing[`editable:${scope.row.id}-${field.property}`]"
                   >
                     <el-input
-                      v-model="scope.row[field.property]"
-                      size="small"
-                      width="100%"
-                    >
-                      <template slot="append"><i
-                        class="el-icon-edit"
-                        @click="
-                          // update fields
-                          em.update(scope.row.id, {[field.property]: scope.row[field.property]})
-                            .then(() => $message.success('修改属性成功'))
-                            .catch(() => $message.error('修改属性失败'))
-                          // refresh edit status
-                          editing = { refresh: 0 }
-                        "
-                      /></template>
-                    </el-input>
+                      v-model="editing[`temp-value`]"
+                      prefix-icon="el-icon-edit"
+                      autofocus
+                      @keyup.esc.native="editing = { refresh: 0, 'temp-value': null }"
+                      @keyup.enter.native="
+                        // update fields
+                        em.update(scope.row.id, {[field.property]: editing[`temp-value`]})
+                          .then(() => $message.success('修改属性成功'), fetchData())
+                          .catch(() => $message.error('修改属性失败'))
+                        // refresh edit status
+                        editing = { refresh: 0, 'temp-value': null }
+                      "
+                    />
                   </template>
 
                   <template v-else>
