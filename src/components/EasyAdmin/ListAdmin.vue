@@ -230,6 +230,50 @@
                 <!-- System (have metadata) -->
 
                 <!-- Boolean -->
+                <div
+                  v-else-if="
+                    field.type == 'string' || checkMetadataType(structure[field.property], 'string')
+                      || field.type == 'integer' || checkMetadataType(structure[field.property], 'integer')
+                      || field.type == 'float' || checkMetadataType(structure[field.property], 'float')
+                      || field.type == 'decimal' || checkMetadataType(structure[field.property], 'decimal')
+                  "
+                  :key="editing['refresh']"
+                  @dblclick="
+                    editing = { refresh: 0 }
+                    editing[`editable:${scope.row.id}-${field.property}`] = true
+                    editing['refresh']++
+                  "
+                >
+                  <template
+                    v-if="
+                      Object.keys(editing).includes(`editable:${scope.row.id}-${field.property}`) &&
+                        editing[`editable:${scope.row.id}-${field.property}`]"
+                  >
+                    <el-input
+                      v-model="scope.row[field.property]"
+                      size="small"
+                      width="100%"
+                    >
+                      <template slot="append"><i
+                        class="el-icon-edit"
+                        @click="
+                          // update fields
+                          em.update(scope.row.id, {[field.property]: scope.row[field.property]})
+                            .then(() => $message.success('修改属性成功'))
+                            .catch(() => $message.error('修改属性失败'))
+                          // refresh edit status
+                          editing = { refresh: 0 }
+                        "
+                      /></template>
+                    </el-input>
+                  </template>
+
+                  <template v-else>
+                    {{ scope.row[field.property] }}
+                  </template>
+                </div>
+
+                <!-- Boolean -->
                 <template
                   v-else-if="
                     field.type == 'boolean' ||
@@ -617,7 +661,7 @@ export default {
          *
          *    // 2. Input
          *    'user.username': {
-         *      expression: 'entity.getUser().getUsername() matches "/:value/"',
+         *      expression: 'entity.getUser().getUsername() matches ":value"',
          *      label: 'Please Provide Username',
          *      type: 'input'
          *    }
@@ -759,6 +803,11 @@ export default {
 
       // List filters or seacher
       listFilterData: [],
+
+      // Editable object
+      editing: {
+        refresh: 0 // refresh key
+      },
 
       // Sort query: {'@sort': 'id|ASC, createdTime|DESC'}
       sort: {},
@@ -935,7 +984,7 @@ export default {
           type: typeof field === 'string' || field === null ? 'input' : 'select',
           label: typeof field === 'string' ? field : '',
           expression: typeof field === 'string' || field === null
-            ? `entity${expression} matches '/:value/'`
+            ? `entity${expression} matches ':value'`
             : `entity${expression} == ':value'`
         }
 
