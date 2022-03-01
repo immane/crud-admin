@@ -230,46 +230,24 @@
                 <!-- System (have metadata) -->
 
                 <!-- String / Integer / Float / Decimal -->
-                <div
+                <template
                   v-else-if="
-                    field.type == 'string' || checkMetadataType(structure[field.property], 'string')
+                    (field.property != 'id' && field.type != 'image') && (
+                      field.type == 'string' || checkMetadataType(structure[field.property], 'string')
                       || field.type == 'integer' || checkMetadataType(structure[field.property], 'integer')
                       || field.type == 'float' || checkMetadataType(structure[field.property], 'float')
                       || field.type == 'decimal' || checkMetadataType(structure[field.property], 'decimal')
-                  "
-                  :key="editing['refresh']"
-                  @dblclick="
-                    editing = { refresh: 0, 'temp-value': null }
-                    editing[`temp-value`] = scope.row[field.property]
-                    editing[`editable:${scope.row.id}-${field.property}`] = true
-                    editing['refresh']++
+                    )
                   "
                 >
-                  <template
-                    v-if="
-                      Object.keys(editing).includes(`editable:${scope.row.id}-${field.property}`) &&
-                        editing[`editable:${scope.row.id}-${field.property}`]"
-                  >
-                    <el-input
-                      v-model="editing[`temp-value`]"
-                      prefix-icon="el-icon-edit"
-                      autofocus
-                      @keyup.esc.native="editing = { refresh: 0, 'temp-value': null }"
-                      @keyup.enter.native="
-                        // update fields
-                        em.update(scope.row.id, {[field.property]: editing[`temp-value`]})
-                          .then(() => $message.success('修改属性成功'), fetchData())
-                          .catch(() => $message.error('修改属性失败'))
-                        // refresh edit status
-                        editing = { refresh: 0, 'temp-value': null }
-                      "
-                    />
-                  </template>
-
-                  <template v-else>
-                    {{ scope.row[field.property] }}
-                  </template>
-                </div>
+                  <component
+                    :is="require(`./plugins/list/editable-plain.vue`).default"
+                    :em="em"
+                    :scope="scope"
+                    :field="field"
+                    :struct="structure[field.property]"
+                  />
+                </template>
 
                 <!-- Boolean -->
                 <template
@@ -880,7 +858,7 @@ export default {
     value: {
       handler: function(value) {
         this.list = value
-        this.refreshTable++
+        // this.refreshTable++
       },
       deep: true
     },
