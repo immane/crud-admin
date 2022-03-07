@@ -946,34 +946,42 @@ export default {
       const filter = {}
       const isFunction = functionToCheck => functionToCheck && {}.toString.call(functionToCheck) === '[object Function]'
       const transform = (field, key) => {
-        // transform
-        let expression = ''
-        const relationKeys = key.split('.')
+        if (
+          field === null || typeof field === 'string' ||
+          !Object.keys(field).includes('expression')
+        ) {
+          // transform
+          let expression = ''
+          const relationKeys = key.split('.')
 
-        relationKeys.forEach((value, index) => {
-          const capitalizeKey = value.charAt(0).toUpperCase() + value.slice(1)
-          expression += `.get${capitalizeKey}()`
-        })
+          relationKeys.forEach((value, index) => {
+            const capitalizeKey = value.charAt(0).toUpperCase() + value.slice(1)
+            expression += `.get${capitalizeKey}()`
+          })
 
-        filter[key] = {
-          data: typeof field === 'string' || field === null ? null : [],
-          type: typeof field === 'string' || field === null ? 'input' : 'select',
-          label: typeof field === 'string' ? field : '',
-          expression: typeof field === 'string' || field === null
-            ? `entity${expression} matches ':value'`
-            : `entity${expression} == ':value'`
-        }
+          filter[key] = {
+            data: typeof field === 'string' || field === null ? null : [],
+            type: typeof field === 'string' || field === null ? 'input' : 'select',
+            label: typeof field === 'string' ? field : '',
+            expression: typeof field === 'string' || field === null
+              ? `entity${expression} matches ':value'`
+              : `entity${expression} == ':value'`
+          }
 
-        if (typeof field === 'object') {
-          for (const k in field) {
-            if (k === '__label') {
-              filter[key]['label'] = field[k]
-            } else {
-              filter[key]['data'].push(
-                { value: k, label: field[k] }
-              )
+          if (typeof field === 'object') {
+            for (const k in field) {
+              if (k === '__label') {
+                filter[key]['label'] = field[k]
+              } else {
+                filter[key]['data'].push(
+                  { value: k, label: field[k] }
+                )
+              }
             }
           }
+        } else {
+          // full style
+          filter[key] = field
         }
       }
 
@@ -992,15 +1000,7 @@ export default {
         }
 
         // receive normal value
-        if (
-          field === null || typeof field === 'string' ||
-          !Object.keys(field).includes('expression')
-        ) {
-          transform(field, key)
-        } else {
-          // full style
-          filter[key] = field
-        }
+        transform(field, key)
       }
 
       this.filters = filter
