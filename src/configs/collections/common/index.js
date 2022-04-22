@@ -216,9 +216,6 @@ export default {
       ]
     },
     list: {
-      query: {
-        '@filter': `entity.getWechatOpenId() == null`
-      },
       list_display: [
         'id',
         { property: 'username', label: '用户名' },

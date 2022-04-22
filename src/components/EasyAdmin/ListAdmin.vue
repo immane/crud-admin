@@ -285,7 +285,7 @@
                   "
                 >
                   <i class="el-icon-time" />
-                  {{ new Date(scope.row[field.property]) | dateFormat('YYYY-MM-DD HH:mm:ss') }}
+                  {{ new Date(extractFields(scope.row, field.property)) | dateFormat('YYYY-MM-DD HH:mm:ss') }}
                 </span>
 
                 <!-- Date -->
@@ -297,7 +297,7 @@
                   "
                 >
                   <i class="el-icon-time" />
-                  {{ new Date(scope.row[field.property]) | dateFormat('YYYY-MM-DD') }}
+                  {{ new Date(extractFields(scope.row, field.property)) | dateFormat('YYYY-MM-DD') }}
                 </span>
 
                 <!-- Relatived -->
