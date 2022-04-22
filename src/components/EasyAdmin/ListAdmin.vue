@@ -238,6 +238,7 @@
                       || field.type == 'float' || checkMetadataType(structure[field.property], 'float')
                       || field.type == 'decimal' || checkMetadataType(structure[field.property], 'decimal')
                     )
+                      && field.editable
                   "
                 >
                   <component
