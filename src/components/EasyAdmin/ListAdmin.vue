@@ -1032,9 +1032,10 @@ export default {
 
       // Find router by name recursively
       for (const mainRoute of asyncRoutes) {
+        console.log(mainRoute)
         if (redirectRoute === null && Object.keys(mainRoute).includes('children')) {
           for (const childrenRoute of mainRoute.children) {
-            if (childrenRoute.name === `${this.em.name}List`) {
+            if (childrenRoute.redirect === this.$route.path) {
               redirectRoute = childrenRoute
               break
             }
