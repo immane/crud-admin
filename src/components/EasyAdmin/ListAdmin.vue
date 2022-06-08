@@ -91,7 +91,13 @@
         &emsp;
 
         <!-- Top button slot, actions here -->
-        <slot name="extraTopButton" />
+        <slot name="extraTopButton">
+          <component
+            :is="action.component"
+            v-for="action in actions.filter(action => action.position === 'top')"
+            :key="action.name"
+          />
+        </slot>
         &emsp;
         <slot name="topButton">
           <!-- Export action -->
@@ -685,7 +691,7 @@ export default {
          * @example
          * [
          *  { name: 'recycle',
-         *    position: 'list',
+         *    position: 'list', // eg: list, top
          *    component: {
          *      props: ['record', 'refresh'],
          *      methods: {

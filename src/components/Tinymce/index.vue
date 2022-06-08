@@ -19,7 +19,8 @@ import load from './dynamicLoadScript'
 import axios from '@/utils/request'
 
 // why use this cdn, detail see https://github.com/PanJiaChen/tinymce-all-in-one
-const tinymceCDN = 'https://cdn.jsdelivr.net/npm/tinymce-all-in-one@4.9.3/tinymce.min.js'
+// const tinymceCDN = 'https://cdn.jsdelivr.net/npm/tinymce-all-in-one@4.9.3/tinymce.min.js'
+const tinymceCDN = 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/tinymce/4.9.3/tinymce.min.js'
 
 export default {
   name: 'Tinymce',
@@ -117,7 +118,7 @@ export default {
       const _this = this
       window.tinymce.init({
         selector: `#${this.tinymceId}`,
-        language: this.languageTypeList['zh'],
+        language: this.languageTypeList['en'],
         height: this.height,
         body_class: 'panel-body ',
         object_resizing: false,

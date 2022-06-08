@@ -1,7 +1,7 @@
 <template>
   <el-upload
     v-bind="field.type_options"
-    :action="`${BASE_API}/upload?storage=qiniu`"
+    :action="`${BASE_API}/upload`"
     :limit="field.type === 'image' ? 1 : 0"
     :file-list="
       form[field.property]
