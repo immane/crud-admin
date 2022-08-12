@@ -72,6 +72,8 @@
                     :data="form[field.property]"
                     :form="form"
                     :property="field.property"
+                    :fields="properties"
+                    :field="field"
                   />
                 </template>
 
@@ -175,7 +177,7 @@ export default {
          *   { property: 'region',
          *     relation_filter: {
          *       '@filter': 'entity.getLevel() == 0',
-         *       '@order': 'name|DESC, id|ASC'
+         *       '@order': 'entity.name|DESC, entity.id|ASC'
          *     }
          *   },
          *   'name',
