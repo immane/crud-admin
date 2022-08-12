@@ -96,12 +96,17 @@
             :is="action.component"
             v-for="action in actions.filter(action => action.position === 'top')"
             :key="action.name"
+            style="margin-right: .5em"
+            :refresh="fetchData"
           />
         </slot>
         &emsp;
         <slot name="topButton">
           <!-- Export action -->
-          <template v-if="!disabledActions.includes('export')">
+          <template
+            v-if="!disabledActions.includes('export')
+              && config && config.list && config.list.export"
+          >
             <el-button
               size="medium"
               type="primary"
@@ -117,16 +122,20 @@
 
                 // default config
                 const exportConf = config.list.export
-                let query = {}, label = {}
+                const confQuery = config.list.query
+                let query = {}, label = {}, listQuery = {}
                 if(exportConf) {
                   if(exportConf.hasOwnProperty('query'))
                     query = exportConf.query
                   if(exportConf.hasOwnProperty('label'))
                     label = exportConf.label
                 }
+                if(confQuery) {
+                  listQuery = confQuery
+                }
 
                 // Use current filter
-                query = Object.assign({}, filter, query)
+                query = Object.assign({}, listQuery, filter, query)
 
                 em.list(query).then(res => {
                   loading.close()
@@ -153,7 +162,7 @@
                     keys.forEach(v => { label[v] = v } )
                   }
 
-                  const exportExcelCsv = require('export-excel-csv').default
+                  const exportExcelCsv = require('@/utils/exportExcelCsv').default
                   exportExcelCsv(label, data, `export-${em.name}.csv`)
                 })
               }"
@@ -192,6 +201,11 @@
       >
 
         <slot name="tableSelection" />
+
+        <el-table-column
+          label="#"
+          type="index"
+        />
 
         <el-table-column
           v-for="(field, index) in properties"
@@ -283,18 +297,6 @@
                   </el-tag>
                 </template>
 
-                <!-- DateTime -->
-                <span
-                  v-else-if="
-                    field.type == 'datetime' ||
-                      (checkMetadataType(structure[field.property], 'datetime')
-                        && scope.row[field.property])
-                  "
-                >
-                  <i class="el-icon-time" />
-                  {{ new Date(extractFields(scope.row, field.property)) | dateFormat('YYYY-MM-DD HH:mm:ss') }}
-                </span>
-
                 <!-- Date -->
                 <span
                   v-else-if="
@@ -305,6 +307,18 @@
                 >
                   <i class="el-icon-time" />
                   {{ new Date(extractFields(scope.row, field.property)) | dateFormat('YYYY-MM-DD') }}
+                </span>
+
+                <!-- DateTime -->
+                <span
+                  v-else-if="
+                    field.type == 'datetime' ||
+                      (checkMetadataType(structure[field.property], 'datetime')
+                        && scope.row[field.property])
+                  "
+                >
+                  <i class="el-icon-time" />
+                  {{ new Date(extractFields(scope.row, field.property)) | dateFormat('YYYY-MM-DD HH:mm:ss') }}
                 </span>
 
                 <!-- Relatived -->
@@ -390,7 +404,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column v-if="!disabledActions.includes('lines')" label="动作">
+        <el-table-column v-if="!disabledActions.includes('lines')" label="操作">
           <template slot-scope="scope">
             <component
               :is="action.component"
@@ -568,7 +582,7 @@ export default {
          * @example
          * {
          *   '@filter': 'entity.getId() in [1,3,4] && entity.getUser().getProfile().getAge() > 18',
-         *   '@sort': 'id|ASC, createdTime|DESC',
+         *   '@sort': 'entity.id|ASC, entity.createdTime|DESC',
          *   page: 1, limit: 20,
          * }
          */
@@ -621,6 +635,7 @@ export default {
          *    // 1. Selection
          *    status: {
          *      __label: 'Status',
+         *      __default: 0,
          *      0: 'Pending', 1: 'Paid', 2: 'Completed'
          *    }
          *
@@ -639,21 +654,24 @@ export default {
          *      data: [
          *        { value: 'book', label: 'Book' },
          *        { value: 'paper', label: 'Paper' },
-         *      ]
+         *      ],
+         *      default: 'book'
          *    }
          *
          *    // 2. Input
          *    'user.username': {
          *      expression: 'entity.getUser().getUsername() matches ":value"',
          *      label: 'Please Provide Username',
-         *      type: 'input'
+         *      type: 'input',
+         *      default: 'Rin'
          *    }
          *
          *    // 3. Input
          *    'userEnabled': {
          *      expression: 'entity.getUser().getIsEnabled() == :value',
          *      label: 'User enabled',
-         *      type: 'boolean'
+         *      type: 'boolean',
+         *      default: true
          *    }
          *
          *    // 4. DateTime / Date / Time
@@ -672,7 +690,7 @@ export default {
          *        .get('/api/categories',
          *          { params: { '@filter': 'entity.getType().getSlug() == "content"' }})
          *        .then(res =>
-         *          Object.assign({ __label: 'Category' }, ...res.data.map(v => { return { [v.id]: v.name } })))
+         *          Object.assign({ __label: 'Category', __default: "1" }, ...res.data.map(v => { return { [v.id]: v.name } })))
          *    }
          * }
          */
@@ -691,7 +709,7 @@ export default {
          * @example
          * [
          *  { name: 'recycle',
-         *    position: 'list', // eg: list, top
+         *    position: 'list',
          *    component: {
          *      props: ['record', 'refresh'],
          *      methods: {
@@ -731,6 +749,7 @@ export default {
       type: Function,
       default: (context, dataProcessor = {}) => {
         // Loading start
+        context.list = []
         context.loading = true
 
         const promise = [
@@ -785,7 +804,7 @@ export default {
       filters: {},
 
       // List filters or seacher
-      listFilterData: [],
+      listFilterData: {},
 
       // Editable object
       editing: {
@@ -877,7 +896,7 @@ export default {
     }
   },
 
-  created() {
+  async created() {
     // Process router convert
     this.routeProcess()
 
@@ -885,7 +904,10 @@ export default {
     this.propertieProcess()
 
     // Process filter
-    this.filterProcess()
+    await this.filterProcess()
+
+    // Generate filter
+    this.filterGenerate()
 
     // Load dialog component
     this.loadDialogComponent(
@@ -949,7 +971,7 @@ export default {
 
     /* Filter process */
 
-    filterProcess() {
+    async filterProcess() {
       const filter = {}
       const isFunction = functionToCheck => functionToCheck && {}.toString.call(functionToCheck) === '[object Function]'
       const transform = (field, key) => {
@@ -970,6 +992,7 @@ export default {
             data: typeof field === 'string' || field === null ? null : [],
             type: typeof field === 'string' || field === null ? 'input' : 'select',
             label: typeof field === 'string' ? field : '',
+            default: null,
             expression: typeof field === 'string' || field === null
               ? `entity${expression} matches ':value'`
               : `entity${expression} == ':value'`
@@ -979,6 +1002,8 @@ export default {
             for (const k in field) {
               if (k === '__label') {
                 filter[key]['label'] = field[k]
+              } else if (k === '__default') {
+                filter[key]['default'] = field[k]
               } else {
                 filter[key]['data'].push(
                   { value: k, label: field[k] }
@@ -990,6 +1015,14 @@ export default {
           // full style
           filter[key] = field
         }
+
+        // ///////////////////////////////////////////////////////
+        // Set default value
+        // DO NOT USE non-responsive set value
+        // this.listFilterData[key] = filter[key]['default']
+        //
+        // Responsive set
+        this.$set(this.listFilterData, key, filter[key]['default'])
       }
 
       for (const key in this.listFilter) {
@@ -999,15 +1032,14 @@ export default {
         if (isFunction(field)) {
           const promise = this.listFilter[key]()
           if (promise instanceof Promise) {
-            this.listFilter[key]().then(res => {
-              field = res
-              transform(field, key)
-            })
+            const res = await this.listFilter[key]()
+            field = res
+            transform(res, key)
           } else throw Error('Async filter must return promise object!')
+        } else {
+          // receive normal value
+          transform(field, key)
         }
-
-        // receive normal value
-        transform(field, key)
       }
 
       this.filters = filter
@@ -1038,7 +1070,6 @@ export default {
 
       // Find router by name recursively
       for (const mainRoute of asyncRoutes) {
-        console.log(mainRoute)
         if (redirectRoute === null && Object.keys(mainRoute).includes('children')) {
           for (const childrenRoute of mainRoute.children) {
             if (childrenRoute.redirect === this.$route.path) {
@@ -1062,7 +1093,7 @@ export default {
     // Sorter changed
     changeSort(val) {
       const orderMap = { ascending: 'ASC', descending: 'DESC' }
-      this.sort['@order'] = val.order ? `${val.prop}|${orderMap[val.order]}` : ''
+      this.sort['@order'] = val.order ? `entity.${val.prop}|${orderMap[val.order]}` : ''
 
       // Reload data
       this.fetchData()
