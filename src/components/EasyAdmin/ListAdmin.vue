@@ -14,77 +14,12 @@
       <el-col :span="20" align="right">
         <!-- Top filter or searcher slot-->
         <slot name="filter">
-          <span v-for="(v, k) in filters" :key="k" style="margin-right: .5em">
-            <!-- Dynamic components and JSX function -->
-            <div v-if="Object.keys(v).includes('component')">
-              <component
-                :is="v.component"
-                v-model="listFilterData[k]"
-              />
-            </div>
-
-            <!-- Datetime -->
-            <el-date-picker
-              v-if="v.type === 'datetime' || v.type === 'date' || v.type === 'time'"
-              v-model="listFilterData[k]"
-              :type="v.type"
-              :placeholder="`${v.label ? v.label : k}`"
-              style="width: 150px;"
-              size="medium"
-              :value-format="{
-                datetime: 'yyyy-MM-dd HH:mm:ss',
-                date: 'yyyy-MM-dd',
-                time: 'HH:mm:ss',
-              }[v.type]
-              "
-            />
-
-            <!-- Input -->
-            <el-input
-              v-else-if="v.type === 'input'"
-              v-model="listFilterData[k]"
-              :placeholder="`${v.label ? v.label : k}`"
-              style="width: 150px;"
-              size="medium"
-              clearable
-            >
-              <i slot="prefix" class="el-input__icon el-icon-search" />
-            </el-input>
-
-            <!-- Boolean -->
-            <el-switch
-              v-else-if="v.type === 'boolean'"
-              v-model="listFilterData[k]"
-              :inactive-text="`${v.label ? v.label : k}`"
-              size="medium"
-            />
-
-            <!-- Select -->
-            <el-select
-              v-else
-              v-model="listFilterData[k]"
-              filterable
-              clearable
-              :placeholder="`${v.label ? v.label : k}`"
-              style="width: 150px;"
-              size="medium"
-            >
-              <el-option
-                v-for="item in v.data"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </span>
-
-          <el-button
-            v-if="Object.keys(filters).length"
-            size="medium"
-            icon="el-icon-search"
-            style="margin-right: 1em"
-            circle
-            @click="filterGenerate(); fetchData();"
+          <search-filter
+            v-model="listFilterData"
+            :query="query"
+            :filter.sync="filter"
+            :fetch-data-func="fetchData"
+            :list-filter="listFilter"
           />
         </slot>
 
@@ -500,9 +435,11 @@
 import EntityManage from '@/utils/entity'
 import { asyncRoutes } from '@/router'
 import SIP from '@/utils/simple-image-process'
+import SearchFilter from './SearchFilter.vue'
 
 export default {
   name: 'ListAdmin',
+  components: { SearchFilter },
 
   filters: {
     boolFilter(status) { return { false: 'danger', true: 'success' }[status] },
@@ -626,73 +563,8 @@ export default {
          *  Selection filter or Searcher
          *  List filter example
          *
-         * @example
-         * {
-         *    //////////////////
-         *    // Reduce style //
-         *    //////////////////
-         *
-         *    // 1. Selection
-         *    status: {
-         *      __label: 'Status',
-         *      __default: 0,
-         *      0: 'Pending', 1: 'Paid', 2: 'Completed'
-         *    }
-         *
-         *    // 2. Input
-         *    status: 'Label here'
-         *
-         *    ////////////////
-         *    // Full style //
-         *    ////////////////
-         *
-         *    // 1. Selection
-         *    'category': {
-         *      expression: 'entity.getCategory().getId() == ":value"',
-         *      label: 'Please Provide Category',
-         *      type: 'select', // Types: select, input, datetime, date, time
-         *      data: [
-         *        { value: 'book', label: 'Book' },
-         *        { value: 'paper', label: 'Paper' },
-         *      ],
-         *      default: 'book'
-         *    }
-         *
-         *    // 2. Input
-         *    'user.username': {
-         *      expression: 'entity.getUser().getUsername() matches ":value"',
-         *      label: 'Please Provide Username',
-         *      type: 'input',
-         *      default: 'Rin'
-         *    }
-         *
-         *    // 3. Input
-         *    'userEnabled': {
-         *      expression: 'entity.getUser().getIsEnabled() == :value',
-         *      label: 'User enabled',
-         *      type: 'boolean',
-         *      default: true
-         *    }
-         *
-         *    // 4. DateTime / Date / Time
-         *    beforeCreatedTime: {
-         *      expression: 'entity.getCreatedTime() >= datetime.get(":value")',
-         *      label: 'Before Time',
-         *      type: 'datetime'
-         *    }
-         *
-         *    //////////////////
-         *    // Async sample //
-         *    //////////////////
-         *
-         *    'category.id': () => {
-         *      return axios
-         *        .get('/api/categories',
-         *          { params: { '@filter': 'entity.getType().getSlug() == "content"' }})
-         *        .then(res =>
-         *          Object.assign({ __label: 'Category', __default: "1" }, ...res.data.map(v => { return { [v.id]: v.name } })))
-         *    }
-         * }
+         * @reference
+         *  @/components/EasyAdmin/SearchFilter.vue
          */
       }
     },
@@ -870,7 +742,7 @@ export default {
                 />
               )
             }
-        */
+            */
           }
         }
       },
@@ -903,12 +775,6 @@ export default {
     // Process entity and structure properties
     this.propertieProcess()
 
-    // Process filter
-    await this.filterProcess()
-
-    // Generate filter
-    this.filterGenerate()
-
     // Load dialog component
     this.loadDialogComponent(
       {
@@ -921,8 +787,9 @@ export default {
 
     /**
      * Fetch base data, like entity structure and validations
+     * Used filter fetch data instead.
      */
-    this.fetchData()
+    // this.fetchData()
   },
 
   methods: {
@@ -965,101 +832,6 @@ export default {
           })
         } else {
           this.properties.push(field)
-        }
-      }
-    },
-
-    /* Filter process */
-
-    async filterProcess() {
-      const filter = {}
-      const isFunction = functionToCheck => functionToCheck && {}.toString.call(functionToCheck) === '[object Function]'
-      const transform = (field, key) => {
-        if (
-          field === null || typeof field === 'string' ||
-          !Object.keys(field).includes('expression')
-        ) {
-          // transform
-          let expression = ''
-          const relationKeys = key.split('.')
-
-          relationKeys.forEach((value, index) => {
-            const capitalizeKey = value.charAt(0).toUpperCase() + value.slice(1)
-            expression += `.get${capitalizeKey}()`
-          })
-
-          filter[key] = {
-            data: typeof field === 'string' || field === null ? null : [],
-            type: typeof field === 'string' || field === null ? 'input' : 'select',
-            label: typeof field === 'string' ? field : '',
-            default: null,
-            expression: typeof field === 'string' || field === null
-              ? `entity${expression} matches ':value'`
-              : `entity${expression} == ':value'`
-          }
-
-          if (typeof field === 'object') {
-            for (const k in field) {
-              if (k === '__label') {
-                filter[key]['label'] = field[k]
-              } else if (k === '__default') {
-                filter[key]['default'] = field[k]
-              } else {
-                filter[key]['data'].push(
-                  { value: k, label: field[k] }
-                )
-              }
-            }
-          }
-        } else {
-          // full style
-          filter[key] = field
-        }
-
-        // ///////////////////////////////////////////////////////
-        // Set default value
-        // DO NOT USE non-responsive set value
-        // this.listFilterData[key] = filter[key]['default']
-        //
-        // Responsive set
-        this.$set(this.listFilterData, key, filter[key]['default'])
-      }
-
-      for (const key in this.listFilter) {
-        let field = this.listFilter[key]
-
-        // receive async function
-        if (isFunction(field)) {
-          const promise = this.listFilter[key]()
-          if (promise instanceof Promise) {
-            const res = await this.listFilter[key]()
-            field = res
-            transform(res, key)
-          } else throw Error('Async filter must return promise object!')
-        } else {
-          // receive normal value
-          transform(field, key)
-        }
-      }
-
-      this.filters = filter
-    },
-
-    filterGenerate() {
-      this.filter = {}
-      if (this.query && Object.keys(this.query).includes('@filter')) {
-        this.filter['@filter'] = this.query['@filter']
-      }
-
-      for (const key in this.listFilterData) {
-        const value = this.listFilterData[key]
-        if (value) {
-          const expression = this.filters[key].expression.replaceAll(':value', value)
-          if (this.filter['@filter']) {
-            this.filter['@filter'] += ` && (${expression})`
-          } else {
-            this.filter['@filter'] = `(${expression})`
-          }
         }
       }
     },
