@@ -175,7 +175,11 @@ export default {
          *        .get('/api/categories',
          *          { params: { '@filter': 'entity.getType().getSlug() == "content"' }})
          *        .then(res =>
-         *          Object.assign({ __label: 'Category', __default: 1 }, ...res.data.map(v => { return { [v.id]: v.name } })))
+         *          Object.assign(
+         *            { __label: 'Category', __default: 1 },
+         *            ...res.data.map(v => { return { [v.id]: v.name } })
+         *          )
+         *        )
          *    }
          * }
          */

@@ -4,7 +4,15 @@
       type="primary"
       size="small"
       icon="el-icon-plus"
-      @click="form[field.property].push({})"
+      @click="
+        if(
+          form[field.property] === undefined
+          || form[field.property] === ''
+        ) {
+          form[field.property] = []
+        }
+        form[field.property].push({})
+      "
     >
       增加
     </el-button>
