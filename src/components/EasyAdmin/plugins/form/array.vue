@@ -1,43 +1,58 @@
 <template>
   <div>
-    <el-button
-      type="primary"
-      size="small"
-      icon="el-icon-plus"
-      @click="
-        if(
-          form[field.property] === undefined
-          || form[field.property] === ''
-        ) {
-          form[field.property] = []
-        }
-        form[field.property].push({})
-      "
-    >
-      增加
-    </el-button>
-    <div
-      v-for="(property, index) in form[field.property]"
-      :key="index"
-    >
-      <form-admin
-        v-model="form[field.property][index]"
-        entity-conf="Option"
-        :fields="fields"
-      >
-        <template v-slot:title><span /></template>
-        <template v-slot:action><span /></template>
-      </form-admin>
+    <div v-if="!fields">
+      <el-select
+        v-model="form[field.property]"
+        multiple
+        filterable
+        allow-create
+        default-first-option
+        clearable
+        placeholder="请输入并按回车新增"
+      />
+    </div>
 
-      <p circle style="text-align: right">
-        <el-button
-          type="danger"
-          size="small"
-          icon="el-icon-delete"
-          circle
-          @click="form[field.property].splice(index, 1)"
-        />
-      </p>
+    <div v-else>
+      <el-button
+        type="primary"
+        size="small"
+        icon="el-icon-plus"
+        @click="
+          if (
+            form[field.property] === undefined ||
+            form[field.property] == ''
+          ) {
+            form[field.property] = [];
+          }
+          form[field.property].push({});
+        "
+      >
+        增加
+      </el-button>
+
+      <div
+        v-for="(property, index) in form[field.property]"
+        :key="`${property}-${index}`"
+      >
+        <form-admin
+          v-model="form[field.property][index]"
+          entity-conf="Option"
+          :fields="fields"
+        >
+          <template v-slot:title><span /></template>
+          <template v-slot:action><span /></template>
+        </form-admin>
+
+        <p circle style="text-align: right">
+          <el-button
+            type="danger"
+            size="small"
+            icon="el-icon-delete"
+            circle
+            @click="form[field.property].splice(index, 1)"
+          />
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -66,18 +81,22 @@ export default {
   props: {
     form: {
       type: Object,
-      default: () => { return {} }
+      default: () => {
+        return {}
+      }
     },
     field: {
       type: Object,
-      default: () => { return {} }
+      default: () => {
+        return {}
+      }
     }
   },
   data() {
     return {
-      fields: this.field?.type_options?.fields ??
-        [{ property: 'common', type: 'input', field_options: { label: '默认' }}]
+      fields: this.field?.type_options?.fields
     }
-  }
+  },
+  created() {}
 }
 </script>
