@@ -9,7 +9,14 @@
         default-first-option
         clearable
         placeholder="请输入并按回车新增"
-      />
+      >
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
     </div>
 
     <div v-else>
@@ -65,11 +72,20 @@
 /*
   { property: 'pictures',
     type: 'array',     // Auto detected.
-    type_options: { fields: [
-      { property: 'picture', type: 'image', field_options: { label: 'Picture' }},
-      { property: 'link', type: 'input', field_options: { label: 'Url' }},
-      { property: 'listOrder', type: 'input', field_options: { label: 'List order' }}
-    ] },
+    type_options: {
+      // Single fields
+      options: [
+        { value: 'value_1', label: 'Label_1' },
+        { value: 'value_2', label: 'Label_2' },
+        { value: 'value_n', label: 'Label_n' }
+      ]
+      // Complex fields
+      fields: [
+        { property: 'picture', type: 'image', field_options: { label: 'Picture' }},
+        { property: 'link', type: 'input', field_options: { label: 'Url' }},
+        { property: 'listOrder', type: 'input', field_options: { label: 'List order' }}
+      ]
+    },
     default_value: []  // Default value must be set.
   }
 */
@@ -94,7 +110,8 @@ export default {
   },
   data() {
     return {
-      fields: this.field?.type_options?.fields
+      fields: this.field?.type_options?.fields,
+      options: this.field?.type_options?.options ?? []
     }
   },
   created() {}
