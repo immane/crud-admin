@@ -10,6 +10,10 @@ const dynamicLoadScript = (src, callback) => {
   const existingScript = document.getElementById(src)
   const cb = callback || function() {}
 
+  if (callbacks === null) {
+    callbacks = []
+  }
+
   if (!existingScript) {
     const script = document.createElement('script')
     script.src = src // src url for the third-party library being loaded.
@@ -40,6 +44,9 @@ const dynamicLoadScript = (src, callback) => {
     }
     script.onerror = function() {
       this.onerror = this.onload = null
+      if (script && script.parentNode) {
+        script.parentNode.removeChild(script)
+      }
       cb(new Error('Failed to load ' + src), script)
     }
   }

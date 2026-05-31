@@ -19,8 +19,12 @@ import load from './dynamicLoadScript'
 import axios from '@/utils/request'
 
 // why use this cdn, detail see https://github.com/PanJiaChen/tinymce-all-in-one
-// const tinymceCDN = 'https://cdn.jsdelivr.net/npm/tinymce-all-in-one@4.9.3/tinymce.min.js'
-const tinymceCDN = 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/tinymce/4.9.3/tinymce.min.js'
+const tinymceSources = [
+  process.env.VUE_APP_TINYMCE_SRC,
+  'https://cdn.jsdelivr.net/npm/tinymce-all-in-one@4.9.3/tinymce.min.js',
+  'https://unpkg.com/tinymce-all-in-one@4.9.3/tinymce.min.js',
+  '/tinymce/tinymce.min.js'
+].filter(Boolean)
 
 export default {
   name: 'Tinymce',
@@ -104,14 +108,39 @@ export default {
     this.destroyTinymce()
   },
   methods: {
-    init() {
-      // dynamic load tinymce from cdn
-      load(tinymceCDN, (err) => {
-        if (err) {
-          this.$message.error(err.message)
-          return
+    loadTinymceFromSource(src) {
+      return new Promise((resolve, reject) => {
+        load(src, (err) => {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve(src)
+        })
+      })
+    },
+
+    async tryLoadTinymce() {
+      let lastError = null
+
+      for (const src of tinymceSources) {
+        try {
+          await this.loadTinymceFromSource(src)
+          return src
+        } catch (err) {
+          lastError = err
         }
+      }
+
+      throw lastError || new Error('Failed to load TinyMCE script')
+    },
+
+    init() {
+      // dynamic load tinymce with source fallbacks
+      this.tryLoadTinymce().then(() => {
         this.initTinymce()
+      }).catch((err) => {
+        this.$message.error(err.message)
       })
     },
     initTinymce() {

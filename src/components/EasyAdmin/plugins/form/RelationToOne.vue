@@ -45,7 +45,7 @@
   { property: 'region',
     relation_filter: {
       '@filter': 'entity.getLevel() == ":value"',
-      '@order': 'name|DESC, id|ASC'
+      '@order': 'entity.name|DESC, entity.id|ASC'
     }
   }
 
@@ -55,7 +55,7 @@
     type: 'RelationToOne',
     relation_filter: {
       '@filter': 'entity.getCategory().getType().getSlug() == ":value"',
-      '@order': 'name|DESC, id|ASC'
+      '@order': 'entity.name|DESC, entity.id|ASC'
     }
     field_options: {
       label: 'Present'

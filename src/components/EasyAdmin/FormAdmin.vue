@@ -131,6 +131,7 @@
 import EntityManage from '@/utils/entity'
 import Tinymce from '@/components/Tinymce'
 import vueJsonEditor from 'vue-json-editor'
+import { createUiFeedback } from './ui/feedback'
 
 export default {
   name: 'FormAdmin',
@@ -302,6 +303,10 @@ export default {
       return console.log(...arg)
     },
 
+    uiFeedback() {
+      return createUiFeedback(this)
+    },
+
     loadPlugin(type) {
       const typeMapping = {
         'images': 'image',
@@ -394,7 +399,7 @@ export default {
     },
 
     onSubmit(success = (res) => {
-      this.$message({ message: '数据修改成功', type: 'success' })
+      this.uiFeedback().success('数据修改成功')
 
       // Router go back default
       // this.$router.replace({ name: `${this.em.name}List` })
@@ -408,14 +413,14 @@ export default {
           if (this.id) {
             this.em.update(this.id, this.form)
               .then(res => success(res))
-              .catch(err => { this.$message.error(err.message) })
+              .catch(err => { this.uiFeedback().error(err.message) })
           } else {
             this.em.create(this.form)
               .then(res => success(res))
-              .catch(err => { this.$message.error(err.message) })
+              .catch(err => { this.uiFeedback().error(err.message) })
           }
         } else {
-          this.$message({ message: '验证失败，请检查输入是否正确', type: 'warning' })
+          this.uiFeedback().warning('验证失败，请检查输入是否正确')
           return false
         }
       })

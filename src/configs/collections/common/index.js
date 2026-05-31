@@ -77,7 +77,7 @@ export default {
     },
     list: {
       query: {
-        '@order': 'createdTime|DESC'
+        '@order': 'entity.createdTime|DESC'
       },
       disabled_actions: ['new', 'edit', 'delete', 'lines'],
       list_display: [
@@ -115,7 +115,7 @@ export default {
           property: 'category',
           relation_filter: {
             '@filter': 'entity.getType().getSlug() == "content"',
-            '@order': 'id|ASC'
+            '@order': 'entity.id|ASC'
           }
         },
         { property: 'cover', type: 'image' },
@@ -125,7 +125,7 @@ export default {
     },
     list: {
       query: {
-        '@order': 'id|DESC'
+        '@order': 'entity.id|DESC'
       },
       list_filter: {
         'category.id': () => {

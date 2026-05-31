@@ -48,7 +48,7 @@
               icon="el-icon-download"
               plain
               @click="() => {
-                const loading = this.$loading({
+                const loading = startLoading({
                   lock: true,
                   text: '数据导出中',
                   spinner: 'el-icon-loading',
@@ -220,7 +220,7 @@
                     size="medium"
                     @change="() => {
                       em.update(scope.row.id, {[field.property]: scope.row[field.property]})
-                        .then(() => $message.success('修改属性成功'))
+                        .then(() => notifySuccess('修改属性成功'))
                     }"
                   />
 
@@ -436,6 +436,7 @@ import EntityManage from '@/utils/entity'
 import { asyncRoutes } from '@/router'
 import SIP from '@/utils/simple-image-process'
 import SearchFilter from './SearchFilter.vue'
+import { createUiFeedback } from './ui/feedback'
 
 export default {
   name: 'ListAdmin',
@@ -683,7 +684,7 @@ export default {
         refresh: 0 // refresh key
       },
 
-      // Sort query: {'@sort': 'id|ASC, createdTime|DESC'}
+      // Sort query: {'@sort': 'entity.id|ASC, entity.createdTime|DESC'}
       sort: {},
       // Filter: {'@filter': 'entity.getId() == 1'}
       filter: {},
@@ -793,6 +794,18 @@ export default {
   },
 
   methods: {
+    uiFeedback() {
+      return createUiFeedback(this)
+    },
+
+    startLoading(options = {}) {
+      return this.uiFeedback().loading(options)
+    },
+
+    notifySuccess(message) {
+      this.uiFeedback().success(message)
+    },
+
     /* Debug */
     _console() {
       return console
@@ -886,7 +899,7 @@ export default {
     // Remove action
     removeAction(pk) {
       this.em.delete(pk).then(res => {
-        this.$message({ message: '删除成功', type: 'success' })
+        this.notifySuccess('删除成功')
         this.fetchData()
       })
     },
