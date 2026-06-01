@@ -1,96 +1,701 @@
-# vue-admin-template
+# Vue Admin Skeleton
 
-English | [简体中文](./README-zh.md)
+<p align="center">
+  <br>
+  <b>A config-driven admin panel framework powered by Vue 2, Element UI and EasyAdmin</b>
+  <br><br>
+  <img src="https://img.shields.io/badge/vue-2.6.11-brightgreen?logo=vue.js" alt="Vue 2">
+  <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
+  <img src="https://img.shields.io/badge/build-passing-brightgreen" alt="Build">
+  <img src="https://img.shields.io/badge/node-%3E%3D8.9-green?logo=node.js" alt="Node">
+  <br><br>
+</p>
 
-> A minimal vue admin template with Element UI & axios & iconfont & permission control & lint
+---
 
-**Live demo:** http://panjiachen.github.io/vue-admin-template
+## 📖 Overview
 
+**Vue Admin Skeleton** is a full-featured, production-ready admin panel scaffold built on Vue 2. It provides a complete set of enterprise-grade features — authentication, role-based permission control, dynamic routing, tag-view navigation — along with a powerful **configuration-driven CRUD engine** called **EasyAdmin**.
 
-**The current version is `v4.0+` build on `vue-cli`. If you want to use the old version , you can switch branch to [tag/3.11.0](https://github.com/PanJiaChen/vue-admin-template/tree/tag/3.11.0), it does not rely on `vue-cli`**
+EasyAdmin eliminates boilerplate: define your entity schema once as a JSON-like config, and it auto-generates list views (with filtering, sorting, pagination, export), form views (with validation, dynamic field types, tab organization), and CRUD routes. It ships with 17 pluggable field types and supports custom render functions for maximum flexibility.
 
+Originally forked from [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) by [PanJiaChen](https://github.com/PanJiaChen), this project has been significantly extended with the EasyAdmin engine, entity introspection from a backend API, and a customizable plugin system.
 
-## GitAds
+---
 
-[<img src="https://images.gitads.io/PanJiaChen/vue-admin-template" alt="GitAds" />](https://tracking.gitads.io/?repo=PanJiaChen/vue-admin-template)
+## ✨ Features
 
-## Build Setup
+- **Configuration-Driven CRUD Engine (EasyAdmin)** — Declare entities in config; get full list/form/routes for free
+- **17+ Plug-and-Play Form Fields** — input, textarea, select, boolean, integer, date, datetime, image, file, JSON, code editor, relation pickers, transfer, and more
+- **Automatic Entity Introspection** — Queries backend `/system/entities` API to infer field types, nullability, and relationships
+- **Role-Based Access Control** — Dynamic route generation filtered by user roles via Vuex + router guard
+- **Token-Based Authentication** — JWT-style token stored in cookies with Axios interceptor injection
+- **Tag-View Navigation** — Open multiple pages as tabs with keep-alive caching
+- **Responsive Layout** — Collapsible sidebar, breadcrumb navigation, fixed header option
+- **Environment-Aware Configuration** — Separate `.env` files for development, staging, and production
+- **Mock Server with Hot-Reload** — Develop against realistic mock data without a backend
+- **SVG Sprite Icons** — Webpack-configured SVG sprite loader for performant icon usage
+- **Code Splitting & Build Optimization** — Chunk splitting (vendor, Element UI, commons), preload, runtime inlining
+- **Export to CSV/Excel** — Built-in data export with configurable column labels
+- **Rich Text Editing** — Integrated TinyMCE component
+- **Unit Testing** — Jest + Vue Test Utils with coverage reporting
+- **ESLint + TypeScript** — Code quality and partial type checking
+- **Electron Support** — Optional desktop packaging via `vue-cli-plugin-electron-builder`
 
+---
+
+## 🧱 Tech Stack
+
+| Category | Technology | Version |
+|----------|-----------|---------|
+| Framework | Vue.js (Options API) | 2.6.11 |
+| UI Library | Element UI | 2.13.2 |
+| State | Vuex (namespaced modules) | 3.1.0 |
+| Routing | Vue Router (history mode) | 3.0.6 |
+| HTTP | Axios | 0.21.1 |
+| Build | Vue CLI 4 / Webpack 4 | 4.4.4 |
+| CSS | SCSS + Autoprefixer | — |
+| Testing | Jest + Vue Test Utils | — |
+| Linting | ESLint 6 + eslint-plugin-vue | 6.7.2 |
+| Lang | JavaScript + partial TypeScript | — |
+
+---
+
+## 🏛 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                       Browser / Electron                     │
+├─────────────────────────────────────────────────────────────┤
+│  App.vue                                                     │
+│  ├── permission.js  ← Route Guard (Auth + Role Check)       │
+│  ├── Layout/        ← Shell (Sidebar + Navbar + AppMain)    │
+│  │   ├── Navbar     ← Breadcrumb, User Menu, Tags           │
+│  │   └── Sidebar    ← Dynamic Menu from Route Config         │
+│  └── Views/         ← Page Components                        │
+│      ├── admin/list.vue   ──→  ListAdmin.vue                │
+│      ├── admin/form.vue   ──→  FormAdmin.vue                │
+│      ├── login/                                             │
+│      └── dashboard/                                         │
+├─────────────────────────────────────────────────────────────┤
+│  Store (Vuex)                                                │
+│  ├── user        ← Auth Token, Roles, Profile               │
+│  ├── permission  ← Dynamic Route Generation                  │
+│  ├── app         ← Sidebar State, Device Detection           │
+│  ├── entity      ← Backend Entity Schema Cache               │
+│  ├── tagsView    ← Open Tab State                           │
+│  └── settings    ← App Config                               │
+├─────────────────────────────────────────────────────────────┤
+│  API Layer                                                   │
+│  ├── utils/request.ts  ← Axios Instance + Interceptors       │
+│  ├── utils/entity.ts   ← EntityManage (CRUD Operations)      │
+│  └── api/user.ts       ← Auth Endpoints                      │
+├─────────────────────────────────────────────────────────────┤
+│  EasyAdmin Engine                                            │
+│  ├── FormAdmin.vue     ← Dynamic Form Generator              │
+│  ├── ListAdmin.vue     ← Dynamic Table Generator             │
+│  ├── SearchFilter.vue  ← Dynamic Filter Builder               │
+│  └── plugins/form/     ← 17 Field-Type Plugins               │
+├─────────────────────────────────────────────────────────────┤
+│  Config Layer                                                │
+│  ├── configs/routes.js       ← Menu / Route Definitions      │
+│  ├── configs/collections/    ← Entity Schema Definitions     │
+│  └── configs/entities.js     ← Auto-Loader                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Data Flow
+
+```
+User Login → getToken() → router.beforeEach() checks token
+  ↓
+hasToken? → await store.dispatch('user/getInfo') → get roles
+  ↓
+store.dispatch('permission/generateRoutes', roles)
+  ↓
+router.addRoutes(accessRoutes) → dynamic menu rendered
+  ↓
+User visits /:entityParam/list
+  ↓
+admin/list.vue reads configs/collections/ → renders ListAdmin
+  ↓
+ListAdmin calls EntityManage.list() → Axios GET /manage/{entity}
+  ↓
+Response rendered as Element UI table via list_display config
+```
+
+---
+
+## 📁 Project Structure
+
+```
+crud-admin/
+├── public/
+│   ├── favicon.ico
+│   └── index.html                 # HTML template
+├── mock/                          # Mock server (dev only)
+│   ├── index.js                   # Mock route registration
+│   ├── mock-server.js             # Express-based hot-reload server
+│   ├── user.js                    # Login/user mock endpoints
+│   └── table.js                   # Dynamic table mock data
+├── src/
+│   ├── api/                       # API endpoint definitions
+│   │   └── user.ts                # login(), getInfo(), logout()
+│   ├── assets/                    # Static assets (images, fonts)
+│   ├── components/                # Shared components
+│   │   ├── Breadcrumb/            # Route-based breadcrumb
+│   │   ├── EasyAdmin/             # ⭐ Core CRUD Engine
+│   │   │   ├── FormAdmin.vue      # Dynamic form generator
+│   │   │   ├── ListAdmin.vue      # Dynamic list/table generator
+│   │   │   ├── SearchFilter.vue   # Dynamic filter builder
+│   │   │   ├── plugins/form/      # 17 field-type plugins
+│   │   │   │   ├── input.vue
+│   │   │   │   ├── textarea.vue
+│   │   │   │   ├── select.vue
+│   │   │   │   ├── boolean.vue
+│   │   │   │   ├── integer.vue
+│   │   │   │   ├── date.vue
+│   │   │   │   ├── datetime.vue
+│   │   │   │   ├── image.vue
+│   │   │   │   ├── file.vue
+│   │   │   │   ├── array.vue
+│   │   │   │   ├── code.vue
+│   │   │   │   ├── json.vue
+│   │   │   │   ├── json-custom.vue
+│   │   │   │   ├── transfer.vue
+│   │   │   │   ├── RelationToOne.vue
+│   │   │   │   └── RelationToMany.vue
+│   │   │   ├── plugins/list/      # List plugins
+│   │   │   │   └── editable-plain.vue
+│   │   │   └── ui/
+│   │   │       └── feedback.ts    # Notification service
+│   │   ├── Hamburger/             # Sidebar toggle
+│   │   ├── SvgIcon/               # SVG icon component
+│   │   └── Tinymce/               # Rich text editor
+│   ├── configs/                   # Declarative configs
+│   │   ├── index.js               # Config merger
+│   │   ├── routes.js              # Menu & route definitions
+│   │   ├── entities.js            # Auto-loader for collection configs
+│   │   └── collections/           # ⭐ Entity Schema Definitions
+│   │       └── common/
+│   │           └── index.js       # All entity CRUD configs
+│   ├── icons/                     # SVG icon assets
+│   │   ├── index.js               # Global registration
+│   │   ├── svg/                   # Individual SVG files
+│   │   └── svgo.yml               # SVGO optimization config
+│   ├── layout/                    # App shell
+│   │   ├── index.vue              # Main layout wrapper
+│   │   ├── components/
+│   │   │   ├── AppMain.vue        # <router-view> wrapper
+│   │   │   ├── Navbar.vue         # Top bar
+│   │   │   ├── Sidebar/           # Side navigation
+│   │   │   └── index.js
+│   │   └── mixin/
+│   │       └── ResizeHandler.js   # Responsive sidebar
+│   ├── router/                    # Routing
+│   │   ├── index.js               # Vue Router setup
+│   │   └── generator.js           # Route generators g() and r()
+│   ├── store/                     # Vuex state management
+│   │   ├── index.js               # Auto-loading store modules
+│   │   ├── getters.js
+│   │   └── modules/
+│   │       ├── app.js             # Sidebar state
+│   │       ├── entity.js          # Entity schema cache
+│   │       ├── permission.js      # Route filtering
+│   │       ├── settings.js        # App settings
+│   │       ├── tagsView.js        # Open tabs
+│   │       └── user.js            # Auth state
+│   ├── styles/                    # Global styles
+│   │   ├── index.scss
+│   │   ├── element-ui.scss        # Element UI overrides
+│   │   ├── variables.scss         # Design tokens
+│   │   ├── mixin.scss
+│   │   ├── sidebar.scss
+│   │   └── transition.scss        # Route transitions
+│   ├── types/                     # TypeScript type definitions
+│   │   ├── admin.ts               # FieldOption, EntityConfig, etc.
+│   │   └── api.ts                 # ApiResponse, EntityStructure
+│   ├── utils/                     # Utility functions
+│   │   ├── auth.js                # Cookie-based token management
+│   │   ├── entity.ts              # EntityManage CRUD class
+│   │   ├── request.ts             # Axios instance + interceptors
+│   │   ├── index.js               # parseTime, formatTime, etc.
+│   │   ├── validate.js            # Input validation
+│   │   ├── exportExcelCsv.js      # CSV export utility
+│   │   └── get-page-title.js      # Page title builder
+│   ├── views/                     # Page views
+│   │   ├── admin/
+│   │   │   ├── list.vue           # Generic CRUD list page
+│   │   │   └── form.vue           # Generic CRUD form page
+│   │   ├── dashboard/
+│   │   │   └── index.vue          # Dashboard
+│   │   ├── login/
+│   │   │   └── index.vue          # Login page
+│   │   ├── user/
+│   │   │   ├── list.vue           # User-specific list
+│   │   │   └── form.vue           # User-specific form
+│   │   └── 404.vue
+│   ├── App.vue                    # Root component
+│   ├── main.js                    # App entry point
+│   ├── permission.js              # Router guard (auth + roles)
+│   └── settings.js                # App title, layout options
+├── tests/
+│   └── unit/
+│       ├── components/            # Component tests
+│       └── utils/                 # Utility tests
+├── .env.development               # Dev environment variables
+├── .env.production                # Prod environment variables
+├── .env.staging                   # Staging environment variables
+├── .eslintrc.js                   # ESLint configuration
+├── .editorconfig                  # Editor settings
+├── babel.config.js                # Babel configuration
+├── jest.config.js                 # Jest configuration
+├── tsconfig.json                  # TypeScript configuration
+├── vue.config.js                  # Webpack customization
+├── package.json
+└── .travis.yml                    # CI configuration
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js** >= 8.9 (recommended: 12+)
+- **npm** >= 3.0.0
+
+### Installation
 
 ```bash
-# clone the project
-git clone https://github.com/PanJiaChen/vue-admin-template.git
+# Clone the repository
+git clone <your-repo-url>
+cd crud-admin
 
-# enter the project directory
-cd vue-admin-template
-
-# install dependency
+# Install dependencies
 npm install
+```
 
-# develop
+### Development
+
+```bash
+# Start dev server with hot-reload at localhost:9528
 npm run dev
 ```
 
-This will automatically open http://localhost:9528
+The dev server includes a built-in **mock server** that intercepts API requests and returns realistic test data. No backend required during frontend development.
 
-## Build
-
-```bash
-# build for test environment
-npm run build:stage
-
-# build for production environment
-npm run build:prod
-```
-
-## Advanced
+### Lint & Type Check
 
 ```bash
-# preview the release environment effect
-npm run preview
-
-# preview the release environment effect + static resource analysis
-npm run preview -- --report
-
-# code format check
+# Run ESLint
 npm run lint
 
-# code format check and auto fix
-npm run lint -- --fix
+# Run TypeScript type checking
+npm run type-check
 ```
 
-Refer to [Documentation](https://panjiachen.github.io/vue-element-admin-site/guide/essentials/deploy.html) for more information
+### Testing
 
-## Demo
+```bash
+# Run unit tests
+npm run test:unit
 
-![demo](https://github.com/PanJiaChen/PanJiaChen.github.io/blob/master/images/demo.gif)
+# Run CI tests (lint + unit tests)
+npm run test:ci
+```
 
-## Extra
+### Build
 
-If you want router permission && generate menu by user roles , you can use this branch [permission-control](https://github.com/PanJiaChen/vue-admin-template/tree/permission-control)
+```bash
+# Build for production
+npm run build:prod
 
-For `typescript` version, you can use [vue-typescript-admin-template](https://github.com/Armour/vue-typescript-admin-template) (Credits: [@Armour](https://github.com/Armour))
+# Build for staging
+npm run build:stage
+```
 
-## Related Project
+### Preview Production Build
 
-- [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin)
+```bash
+npm run preview
+```
 
-- [electron-vue-admin](https://github.com/PanJiaChen/electron-vue-admin)
+---
 
-- [vue-typescript-admin-template](https://github.com/Armour/vue-typescript-admin-template)
+## ⚙️ Configuration
 
-- [awesome-project](https://github.com/PanJiaChen/vue-element-admin/issues/2312)
+### Environment Variables
 
-## Browsers support
+Three environment files control the build:
 
-Modern browsers and Internet Explorer 10+.
+| File | Purpose | `VUE_APP_BASE_API` |
+|------|---------|-------------------|
+| `.env.development` | Dev server | `http://localhost:9528` |
+| `.env.staging` | Staging deploy | `/stage-api` |
+| `.env.production` | Production deploy | `''` (relative) |
 
-| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="IE / Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>IE / Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Safari |
-| --------- | --------- | --------- | --------- |
-| IE10, IE11, Edge| last 2 versions| last 2 versions| last 2 versions
+### App Settings
 
-## License
+Edit `src/settings.js`:
 
-[MIT](https://github.com/PanJiaChen/vue-admin-template/blob/master/LICENSE) license.
+```js
+module.exports = {
+  title: 'Vue admin skeleton',   // App title
+  fixedHeader: true,             // Fix top navbar
+  sidebarLogo: false             // Show logo in sidebar
+}
+```
 
-Copyright (c) 2017-present PanJiaChen
+### Build Customization
+
+`vue.config.js` configures Webpack via Vue CLI. Key settings:
+- **publicPath**: `/admin/` in production
+- **Dev Server**: port 9528 with mock middleware
+- **Chunk Splitting**: vendor, Element UI, and commons (>3 usages)
+- **Preload**: initial chunks (excluding runtime and hot-update)
+- **SVG Sprite**: inline SVG icons via `svg-sprite-loader`
+- **Runtime Inline**: embedded in HTML for performance
+
+---
+
+## 🧩 EasyAdmin CRUD Engine
+
+EasyAdmin is the heart of this project — a configuration-driven engine that **auto-generates CRUD interfaces** from declarative entity definitions.
+
+### How It Works
+
+```
+┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│  Entity Config   │     │  Backend API      │     │  Rendered UI      │
+│  (collections/)  │     │  /system/entities │     │                   │
+│                  │     │                   │     │  ┌─────────────┐  │
+│  fields: [...]   │────▶│  field types,     │────▶│  │ ListAdmin   │  │
+│  list_display    │     │  nullability,     │     │  │ (table)     │  │
+│  list_filter     │     │  relations        │     │  └─────────────┘  │
+│                  │     │                   │     │  ┌─────────────┐  │
+│                  │     │                   │     │  │ FormAdmin   │  │
+│                  │     │                   │     │  │ (form)      │  │
+│                  │     │                   │     │  └─────────────┘  │
+└──────────────────┘     └──────────────────┘     └──────────────────┘
+```
+
+### Step 1 — Define an Entity Config
+
+In `src/configs/collections/common/index.js`:
+
+```js
+export default {
+  Content: {
+    form: {
+      fields: [
+        'title',
+        {
+          property: 'category',
+          relation_filter: {
+            '@filter': 'entity.getType().getSlug() == "content"',
+            '@order': 'entity.id|ASC'
+          }
+        },
+        { property: 'cover', type: 'image' },
+        'enabled',
+        'content'
+      ]
+    },
+    list: {
+      query: { '@order': 'entity.id|DESC' },
+      list_filter: {
+        'category.id': () => {
+          return axios
+            .get('/api/categories',
+              { params: { '@filter': 'entity.getType().getSlug() == "content"' }})
+            .then(res =>
+              Object.assign({ __label: '分类' },
+                ...res.data.map(v => ({ [v.id]: v.name }))))
+        }
+      },
+      list_display: [
+        'id',
+        { property: 'cover', type: 'image' },
+        'category',
+        'title',
+        'createdTime'
+      ]
+    }
+  }
+}
+```
+
+### Step 2 — Register Routes
+
+In `src/configs/routes.js`:
+
+```js
+import { r } from '@/router/generator'
+
+export default [
+  {
+    path: '/content',
+    name: 'ContentManage',
+    component: Layout,
+    meta: { title: '内容管理', icon: 'el-icon-document', roles: ['ROLE_SUPER_ADMIN'] },
+    children: [
+      ...r('Content', '内容')  // Auto-generates list/create/edit routes
+    ]
+  }
+]
+```
+
+**That's it** — you now have fully functional list and form pages for the `Content` entity.
+
+### Route Generators
+
+Two helper functions create routes:
+
+| Function | Behavior |
+|----------|----------|
+| `r(entity, title)` | Redirect routes — reuses `admin/list.vue` and `admin/form.vue` (param-driven) |
+| `g(entity, title)` | Direct routes — expects `views/{entity}/list.vue` and `views/{entity}/form.vue` (custom views) |
+
+### Field Type Plugins
+
+EasyAdmin ships with 17 field type plugins that are auto-resolved from entity metadata:
+
+| Plugin | Type | Description |
+|--------|------|-------------|
+| `input.vue` | string | Basic text input |
+| `textarea.vue` | text | Multi-line text area |
+| `text.vue` | — | Read-only text display |
+| `select.vue` | — | Dropdown selector |
+| `boolean.vue` | boolean | Toggle switch |
+| `integer.vue` | integer | Numeric input |
+| `date.vue` | date | Date picker |
+| `datetime.vue` | datetime | DateTime picker |
+| `image.vue` | image / images | Image upload/preview |
+| `file.vue` | — | File upload |
+| `array.vue` | array | Array editor |
+| `code.vue` | — | Prism-based code editor |
+| `json.vue` | — | JSON editor |
+| `json-custom.vue` | — | Custom JSON editor |
+| `transfer.vue` | — | Shuttle/transfer component |
+| `RelationToOne.vue` | ManyToOne / OneToOne | Relation picker |
+| `RelationToMany.vue` | ManyToMany / OneToMany | Multi-relation picker |
+
+If no plugin matches, `input.vue` is used as the fallback.
+
+### Field Configuration Reference
+
+Each field in the `fields` array can be a simple string or a detailed object:
+
+```ts
+interface FieldOption {
+  property: string           // Entity property name (required)
+  label?: string             // Override display label
+  type?: string              // Force field type (image, boolean, etc.)
+  required?: boolean         // Override nullable from backend metadata
+  editable?: boolean         // Read-only in edit mode
+  tab?: string               // Group into a named tab
+  default_value?: unknown    // Default value for create mode
+  field_options?: object     // Props passed to el-form-item
+  field_events?: object      // Events bound to el-form-item
+  type_options?: object      // Props passed to the field plugin
+  type_events?: object       // Events bound to the field plugin
+  relation_filter?: object   // Filter for relation queries
+  component?: object         // Custom component (render function or SFC)
+  help?: string              // Help text below the field
+}
+```
+
+### List Configuration Reference
+
+```ts
+interface ListConfig {
+  list_display?: FieldConfig[]    // Columns to display
+  list_filter?: object            // Filter configuration
+  query?: object                  // Default query parameters
+  disabled_actions?: string[]     // Hide actions: new, edit, delete, lines, export
+  data_processor?: Function       // Transform fetched data
+  actions?: object[]              // Custom action buttons
+  export?: object                 // Export configuration
+}
+```
+
+### Custom Column Components
+
+Use JSX render functions for complex column rendering:
+
+```js
+{
+  property: 'amount',
+  component: {
+    props: ['data'],
+    render(h) {
+      return <span>{this.data >= 0 ? '+' : ''}{this.data}</span>
+    }
+  }
+}
+```
+
+---
+
+## 🔐 Authentication & Authorization
+
+### Token Flow
+
+```
+Login → POST /user/login → server returns token
+  ↓
+token stored in cookie (js-cookie)
+  ↓
+Every request → Axios interceptor adds X-Auth-Token header
+  ↓
+Logout → cookie cleared, Vuex reset, router reset
+```
+
+### Route Guard (`src/permission.js`)
+
+```
+router.beforeEach()
+  ├── No token → redirect to /login (unless in whitelist)
+  ├── Has token → on /login → redirect to /
+  └── Has token → not on /login
+      ├── Has roles → proceed
+      └── No roles → fetch user info → generate routes → addRoutes → proceed
+```
+
+### Role-Based Routes
+
+Routes define required roles via `meta.roles`:
+
+```js
+{
+  path: '/content',
+  meta: {
+    title: '内容管理',
+    roles: ['ROLE_SUPER_ADMIN']    // Only super admin can see this
+  }
+}
+```
+
+The `permission.js` Vuex module filters `asyncRoutes` by user roles. Routes without `meta.roles` are accessible to all authenticated users.
+
+---
+
+## 🌐 API Integration
+
+### Axios Instance (`src/utils/request.ts`)
+
+- **Base URL**: `VUE_APP_BASE_API` from environment
+- **Timeout**: 30 seconds
+- **Request Interceptor**: Injects `X-Auth-Token` header from cookie
+- **Response Interceptor**: Checks `response.data.code === 0` for success; shows Element UI `Message` on error
+
+### API Response Format
+
+```json
+{
+  "code": 0,
+  "message": "Success",
+  "data": { ... },
+  "paginator": {
+    "totalCount": 42
+  }
+}
+```
+
+### EntityManage Class (`src/utils/entity.ts`)
+
+Wraps typical CRUD operations:
+
+| Method | HTTP | Endpoint |
+|--------|------|----------|
+| `structure()` | GET | `/system/entities/{entity}` |
+| `list(params)` | GET | `/manage/{plural}` |
+| `retrieve(pk)` | GET | `/manage/{plural}/{pk}` |
+| `create(data)` | POST | `/manage/{plural}` |
+| `update(pk, data)` | PUT | `/manage/{plural}/{pk}` |
+| `delete(pk)` | DELETE | `/manage/{plural}/{pk}` |
+
+### Expected Backend Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/login` | POST | User authentication |
+| `/user/info` | GET | Current user profile + roles |
+| `/user/logout` | POST | Invalidate token |
+| `/system/entities` | GET | List all entity class names |
+| `/system/entities/{entity}` | GET | Entity field structure (types, relations, nullability) |
+| `/manage/{entity}` | GET | Paginated entity list |
+| `/manage/{entity}/{id}` | GET | Single entity record |
+| `/manage/{entity}` | POST | Create entity record |
+| `/manage/{entity}/{id}` | PUT | Update entity record |
+| `/manage/{entity}/{id}` | DELETE | Delete entity record |
+
+---
+
+## 🧪 Testing
+
+```bash
+# Run all unit tests
+npm run test:unit
+
+# Run CI validation (lint + tests)
+npm run test:ci
+```
+
+Tests are organized in `tests/unit/`:
+- **Component tests**: Breadcrumb, Hamburger, SvgIcon, EasyAdmin feedback UI
+- **Utility tests**: `request.ts`, `validate.js`, `entity.ts`, `formatTime`, `parseTime`, `param2Obj`
+
+Configuration: `jest.config.js`
+
+---
+
+## 📦 Deployment
+
+### Build Output
+
+```
+dist/
+├── static/
+│   ├── css/
+│   ├── js/
+│   │   ├── chunk-elementUI.{hash}.js    # Element UI (separate chunk)
+│   │   ├── chunk-libs.{hash}.js         # Other node_modules
+│   │   ├── chunk-commons.{hash}.js      # Shared components
+│   │   └── app.{hash}.js               # Application code
+│   └── img/
+├── favicon.ico
+└── index.html
+```
+
+### Deployment Notes
+
+1. Set `VUE_APP_BASE_API` in `.env.production` to your API server URL
+2. Run `npm run build:prod`
+3. Deploy the `dist/` directory to your web server
+4. Ensure your server handles client-side routing — redirect all paths to `index.html` for history mode:
+   - **Nginx**: `try_files $uri $uri/ /admin/index.html;`
+   - **Apache**: Use `.htaccess` with mod_rewrite (provided in `public/.htaccess`)
+
+---
+
+## 🖥 Electron
+
+For desktop deployment, this project includes Electron support via `src/background.js`. Requires `vue-cli-plugin-electron-builder`. Consult the [plugin documentation](https://nklayman.github.io/vue-cli-plugin-electron-builder/) for setup instructions.
+
+---
+
+## 📄 License
+
+MIT
+
+---
+
+## 🤝 Acknowledgments
+
+This project is based on the excellent work of:
+
+- [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) by [PanJiaChen](https://github.com/PanJiaChen) — the original admin template
+- [vue-admin-template](https://github.com/PanJiaChen/vue-admin-template) — the simplified base template
+- [Element UI](https://element.eleme.io/) — the UI component library

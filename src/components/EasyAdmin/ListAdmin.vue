@@ -109,11 +109,21 @@
           &emsp;
 
           <!-- New action -->
-          <router-link v-if="!disabledActions.includes('new')" to="create">
-            <el-button size="medium" type="primary" icon="el-icon-plus" plain>
-              新增{{ $router.currentRoute.meta.title }}
-            </el-button>
-          </router-link>
+          <el-button
+            v-if="!disabledActions.includes('new')"
+            size="medium"
+            type="primary"
+            icon="el-icon-plus"
+            plain
+            @click="() => {
+              dialog.title = '新增记录'
+              delete dialog.data.id
+              dialog.refresh++
+              dialog.show = true
+            }"
+          >
+            新增{{ $router.currentRoute.meta.title }}
+          </el-button>
         </slot>
       </el-col>
     </el-row>
@@ -355,16 +365,9 @@
 
             <slot name="action" :data="scope.row">
               <slot name="action:edit" :data="scope.row">
-                <!-- Redirect -->
-                <router-link v-if="!disabledActions.includes('edit')" :to="`${scope.row.id}/update`">
-                  <el-button size="small" icon="el-icon-edit" plain>
-                    修改
-                  </el-button>
-                </router-link>
-
-                <!-- Popup -->
-                <!--
+                <!-- Popup dialog -->
                 <el-button
+                  v-if="!disabledActions.includes('edit')"
                   size="small"
                   icon="el-icon-edit"
                   plain
@@ -377,7 +380,6 @@
                 >
                   修改
                 </el-button>
-                -->
               </slot>
 
               &nbsp;&nbsp;
@@ -408,7 +410,14 @@
     </el-row>
 
     <template>
-      <el-dialog width="80%" :title="dialog.title" :visible.sync="dialog.show">
+      <el-dialog
+        class="easy-admin-dialog"
+        width="80%"
+        :title="dialog.title"
+        :visible.sync="dialog.show"
+        top="0"
+        @closed="fetchData"
+      >
         <component
           :is="dialog.component"
           :key="dialog.refresh"
@@ -419,15 +428,38 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 .el-row {
     margin-bottom: 1rem;
 }
 .el-table td, .el-table th {
     padding: 8px 0;
 }
-.el-dialog body {
-    padding: 0;
+
+::v-deep .easy-admin-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  max-width: 1200px;
+  margin: 0 auto !important;
+}
+
+::v-deep .easy-admin-dialog .el-dialog__header {
+  flex-shrink: 0;
+}
+
+::v-deep .easy-admin-dialog .el-dialog__body {
+  overflow-y: auto;
+  flex: 1;
+}
+</style>
+
+<style>
+.el-dialog__wrapper {
+  display: flex;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
 }
 </style>
 
@@ -436,6 +468,7 @@ import EntityManage from '@/utils/entity'
 import { asyncRoutes } from '@/router'
 import SIP from '@/utils/simple-image-process'
 import SearchFilter from './SearchFilter.vue'
+import FormAdmin from './FormAdmin.vue'
 import { createUiFeedback } from './ui/feedback'
 
 export default {
@@ -704,7 +737,6 @@ export default {
 
         defaultComponents: {
           formEdit: {
-            /*
             components: { FormAdmin },
             props: ['data'],
             data() {
@@ -712,7 +744,6 @@ export default {
                 submit: null
               }
             },
-            // Use scope-slot in JSX
             render(h) {
               return (
                 <form-admin
@@ -723,19 +754,19 @@ export default {
 
                   { ... {
                     scopedSlots: {
-                      title: () => { return <span/> },
+                      formTitle: () => { return <span/> },
                       action: scope => {
                         return (
-                          <el-button
-                            type='primary' icon='el-icon-edit-outline'
-                            onclick={() => {
-                              scope.submit(() => {
-                                this.$message({ message: '数据修改成功', type: 'success' })
-                                this.data.dialog.show = false
-                              })
-                            }}>
-                            保存
-                          </el-button>
+                            <el-button
+                              type='primary' icon='el-icon-edit-outline'
+                              onclick={() => {
+                                scope.submit(() => {
+                                  this.$message({ message: '数据修改成功', type: 'success' })
+                                  this.data.dialog.show = false
+                                })
+                              }}>
+                              保存
+                            </el-button>
                         )
                       }
                     }
@@ -743,7 +774,6 @@ export default {
                 />
               )
             }
-            */
           }
         }
       },

@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-row>
       <el-col :span="4">
-        <slot name="title">
+        <slot name="formTitle">
           <strong style="font-size: 20px;">
             <!-- Title slot here -->
             {{ $router.currentRoute.meta.title }}
