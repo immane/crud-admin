@@ -97,7 +97,6 @@
                     keys.forEach(v => { label[v] = v } )
                   }
 
-                  const exportExcelCsv = require('@/utils/exportExcelCsv').default
                   exportExcelCsv(label, data, `export-${em.name}.csv`)
                 })
               }"
@@ -207,7 +206,7 @@
                   "
                 >
                   <component
-                    :is="require(`./plugins/list/editable-plain.vue`).default"
+                    :is="EditablePlain"
                     :em="em"
                     :scope="scope"
                     :field="field"
@@ -463,13 +462,15 @@
 }
 </style>
 
-<script>
+<script lang="jsx">
 import EntityManage from '@/utils/entity'
 import { asyncRoutes } from '@/router'
 import SIP from '@/utils/simple-image-process'
 import SearchFilter from './SearchFilter.vue'
 import FormAdmin from './FormAdmin.vue'
 import { createUiFeedback } from './ui/feedback'
+import EditablePlain from './plugins/list/editable-plain.vue'
+import exportExcelCsv from '@/utils/exportExcelCsv'
 
 export default {
   name: 'ListAdmin',
@@ -688,6 +689,8 @@ export default {
 
   data() {
     return {
+      EditablePlain,
+
       // Entity manager and entity structure
       // sample: 'Category'
       em: new EntityManage(this.entityConf),

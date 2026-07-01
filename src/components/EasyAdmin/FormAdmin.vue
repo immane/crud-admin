@@ -130,12 +130,13 @@
 <script>
 import EntityManage from '@/utils/entity'
 import Tinymce from '@/components/Tinymce'
-import vueJsonEditor from 'vue-json-editor'
 import { createUiFeedback } from './ui/feedback'
+
+const formPlugins = import.meta.glob('./plugins/form/*.vue')
 
 export default {
   name: 'FormAdmin',
-  components: { Tinymce, vueJsonEditor },
+  components: { Tinymce },
   props: {
     /**
      * @description Form admin initialize properties.
@@ -194,7 +195,7 @@ export default {
   data() {
     return {
       // base api
-      BASE_API: process.env.VUE_APP_BASE_API,
+      BASE_API: process.env.VITE_BASE_API,
 
       // entity manager instance
       em: new EntityManage(this.entityConf),
@@ -318,9 +319,9 @@ export default {
 
       try {
         const targetType = (type in typeMapping) ? typeMapping[type] : type
-        return require(`./plugins/form/${targetType}.vue`).default
+        return formPlugins[`./plugins/form/${targetType}.vue`]
       } catch (e) {
-        return require(`./plugins/form/input.vue`).default
+        return formPlugins['./plugins/form/input.vue']
       }
     },
 

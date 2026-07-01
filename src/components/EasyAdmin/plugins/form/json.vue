@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import vueJsonEditor from 'vue-json-editor'
+import vueJsonEditor from '@/components/Compat/VueJsonEditor.vue'
 
 export default {
   components: { vueJsonEditor },
