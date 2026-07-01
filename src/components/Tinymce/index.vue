@@ -20,7 +20,7 @@ import axios from '@/utils/request'
 
 // why use this cdn, detail see https://github.com/PanJiaChen/tinymce-all-in-one
 const tinymceSources = [
-  process.env.VUE_APP_TINYMCE_SRC,
+  process.env.VITE_TINYMCE_SRC,
   'https://cdn.jsdelivr.net/npm/tinymce-all-in-one@4.9.3/tinymce.min.js',
   'https://unpkg.com/tinymce-all-in-one@4.9.3/tinymce.min.js',
   '/tinymce/tinymce.min.js'
@@ -193,7 +193,7 @@ export default {
               formData.append('file', blobInfo.blob())
               axios({
                 method: 'post',
-                url: `${process.env.VUE_APP_BASE_API}/upload`,
+                url: `${process.env.VITE_BASE_API}/upload`,
                 data: formData,
                 headers: {
                   'Content-Type': 'multipart/form-data'
@@ -202,7 +202,7 @@ export default {
                 res => {
                   progress(100)
                   success(
-                    `${process.env.VUE_APP_BASE_API}/uploads/images/${res.data[0]}`
+                    `${process.env.VITE_BASE_API}/uploads/images/${res.data[0]}`
                   )
                 }
               )

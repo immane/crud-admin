@@ -1,4 +1,4 @@
-const entityCollections = require.context('@/configs/collections', true, /\.js$/)
+const entityCollections = import.meta.glob('./collections/**/*.js', { eager: true })
 
 /**
  * You do not need `import entities from './entities/Entity'`
@@ -23,8 +23,8 @@ const entityCollections = require.context('@/configs/collections', true, /\.js$/
  * |   |-- ...
  *
  */
-export default entityCollections.keys().reduce((entities, entityPath) => {
-  const entityName = entityPath.replace(/^\.\/(.*)\.\w+$/, '$1')
+export default Object.keys(entityCollections).reduce((entities, entityPath) => {
+  const entityName = entityPath.replace(/^\.\/collections\/(.*)\.\w+$/, '$1')
   const pathArray = entityName.split('/')
 
   if (pathArray.length === 2) {
@@ -33,14 +33,14 @@ export default entityCollections.keys().reduce((entities, entityPath) => {
     // collections has no name
     // const [collectionName] = pathArray.slice(-1)
     // console.log('collection name:', collectionName)
-    const value = entityCollections(entityPath)
+    const value = entityCollections[entityPath]
     Object.assign(entities, value.default)
   } else if (pathArray.length > 2) {
     // Entities
     // set './Collection/Entity.js' => 'Entity'
     const [entityName] = pathArray.slice(-1)
     // console.log('Entity name:', entityName)
-    const value = entityCollections(entityPath)
+    const value = entityCollections[entityPath]
     entities[entityName] = value.default
   }
   return entities

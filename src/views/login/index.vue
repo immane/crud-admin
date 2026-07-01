@@ -157,7 +157,7 @@ $primary: rgb(182,157,230);
   align-items:  flex-start;
   justify-content:  flex-start;
   /* background:  #f3f2f2; */
-  background-image: url('~@/assets/login_background.png');
+  background-image: url('@/assets/login_background.png');
   background-size: cover;
 }
 h4 {

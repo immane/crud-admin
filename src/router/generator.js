@@ -4,7 +4,10 @@
  * g: generator
  * r: redirect
  */
-const inflect = require('i')(true)
+import inflectFactory from 'i'
+
+const inflect = inflectFactory(true)
+const viewComponents = import.meta.glob('../views/**/*.vue')
 
 // eslint-disable-next-line no-unused-vars
 export const r = (entityName, title, meta = { title: title, icon: 'el-icon-caret-right' }) => {
@@ -32,22 +35,24 @@ export const r = (entityName, title, meta = { title: title, icon: 'el-icon-caret
 // eslint-disable-next-line no-unused-vars
 export const g = (entityName, title, meta = { title: title, icon: 'el-icon-caret-right' }, component = null) => {
   const entityPath = inflect.dasherize(inflect.underscore(entityName))
+  const formComponent = viewComponents[`../views/${entityPath}/form.vue`]
+  const listComponent = viewComponents[`../views/${entityPath}/list.vue`]
   return [{
     path: `/${entityPath}/create`,
     name: `${entityName}Create`,
     hidden: true,
-    component: async() => component || await require('../views/' + entityPath + '/form.vue') // cannot use import(`@/view/${entityPath}/form`) instead
+    component: component || formComponent
   },
   {
     path: `/${entityPath}/:id/update`,
     name: `${entityName}Update`,
     hidden: true,
-    component: async() => await require('../views/' + entityPath + '/form.vue')
+    component: formComponent
   },
   {
     path: `/${entityPath}/list`,
     name: `${entityName}List`,
-    component: async() => await require('../views/' + entityPath + '/list.vue'),
+    component: listComponent,
     meta: meta
   }
   ]
