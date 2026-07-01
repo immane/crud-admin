@@ -1,5 +1,9 @@
 export interface Paginator {
   totalCount?: number
+  total?: number
+  page?: number
+  limit?: number
+  pages?: number
   [key: string]: unknown
 }
 

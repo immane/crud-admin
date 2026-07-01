@@ -18,7 +18,7 @@
             v-model="listFilterData"
             :query="query"
             :filter.sync="filter"
-            :fetch-data-func="fetchData"
+            :fetch-data-func="fetchFilteredData"
             :list-filter="listFilter"
           />
         </slot>
@@ -402,7 +402,7 @@
           :page-sizes="[20, 50, 100, 300]"
           :page-size="pager.limit"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="paginator ? paginator.totalCount : 0"
+          :total="pagerTotal"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
         />
@@ -676,7 +676,7 @@ export default {
           )).then(res => {
             // Assign data
             context.list = res.data
-            context.paginator = res.paginator
+            context.paginator = context.normalizePaginator(res.paginator)
           })
         ]
 
@@ -780,6 +780,13 @@ export default {
 
       // Other
       loading: true
+    }
+  },
+
+  computed: {
+    pagerTotal() {
+      if (!this.paginator) return 0
+      return Number(this.paginator.totalCount ?? this.paginator.total ?? 0)
     }
   },
 
@@ -905,6 +912,18 @@ export default {
       this.dataProcessor(this)
     },
 
+    fetchFilteredData() {
+      this.pager.page = 1
+      this.fetchData()
+    },
+
+    normalizePaginator(paginator = {}) {
+      return {
+        ...paginator,
+        totalCount: Number(paginator.totalCount ?? paginator.total ?? 0)
+      }
+    },
+
     // Sorter changed
     changeSort(val) {
       const orderMap = { ascending: 'ASC', descending: 'DESC' }
@@ -917,6 +936,7 @@ export default {
     // Pager size changed
     handleSizeChange(val) {
       this.pager.limit = val
+      this.pager.page = 1
       this.fetchData()
     },
 
