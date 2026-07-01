@@ -16,8 +16,32 @@ function proxyRequestBody(proxyReq: any, req: any) {
   proxyReq.write(bodyData)
 }
 
+function createApiProxy(target: string) {
+  return {
+    target,
+    changeOrigin: true,
+    secure: false,
+    configure(proxy: any) {
+      proxy.on('proxyReq', proxyRequestBody)
+      proxy.on('error', (error: Error) => {
+        console.error('[vite proxy]', error.message)
+      })
+    }
+  }
+}
+
+function createProxyConfig(target?: string) {
+  if (!target) return undefined
+
+  return {
+    '/api': createApiProxy(target),
+    '/system': createApiProxy(target)
+  }
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
+  const proxyTarget = env.VITE_PROXY_TARGET
 
   return {
     base: mode === 'development' ? '/' : '/admin/',
@@ -29,45 +53,30 @@ export default defineConfig(({ mode }) => {
       'process.env.VITE_TINYMCE_SRC': JSON.stringify(env.VITE_TINYMCE_SRC || '')
     },
     plugins: [
-    vue({
-      script: {
-        babelParserPlugins: ['jsx']
-      }
-    }),
-    vueJsx({
-      include: [/\.[jt]sx?$/, /\.vue\?vue&type=script/]
-    })
+      vue({
+        script: {
+          babelParserPlugins: ['jsx']
+        }
+      }),
+      vueJsx({
+        include: [/\.[jt]sx?$/, /\.vue\?vue&type=script/]
+      })
     ],
     resolve: {
-    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
-    alias: {
-      '@': resolve('src')
-    }
+      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
+      alias: {
+        '@': resolve('src')
+      }
     },
     server: {
-    port: Number(process.env.port || process.env.npm_config_port) || 9528,
-    open: true,
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-        configure(proxy) {
-          proxy.on('proxyReq', proxyRequestBody)
-        }
-      },
-      '/system': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-        configure(proxy) {
-          proxy.on('proxyReq', proxyRequestBody)
-        }
-      }
-    }
+      port: Number(process.env.port || process.env.npm_config_port) || 9528,
+      open: true,
+      proxy: createProxyConfig(proxyTarget)
     },
     build: {
-    outDir: 'dist',
-    assetsDir: 'static',
-    sourcemap: false
+      outDir: 'dist',
+      assetsDir: 'static',
+      sourcemap: false
     }
   }
 })
