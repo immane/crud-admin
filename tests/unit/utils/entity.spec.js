@@ -88,9 +88,9 @@ describe('utils/entity.ts', () => {
     await em.update(1, { username: 'u2' })
     await em.delete(1)
 
-    expect(mockGet).toHaveBeenCalledWith('/manage/users', { params: { page: 1 } })
-    expect(mockPost).toHaveBeenCalledWith('/manage/users', { username: 'u' })
-    expect(mockPut).toHaveBeenCalledWith('/manage/users/1', { username: 'u2' })
-    expect(mockDelete).toHaveBeenCalledWith('/manage/users/1')
+    expect(mockGet).toHaveBeenCalledWith('/api/v1/manage/users', { params: { page: 1 } })
+    expect(mockPost).toHaveBeenCalledWith('/api/v1/manage/users', { username: 'u' })
+    expect(mockPut).toHaveBeenCalledWith('/api/v1/manage/users/1', { username: 'u2' })
+    expect(mockDelete).toHaveBeenCalledWith('/api/v1/manage/users/1')
   })
 })

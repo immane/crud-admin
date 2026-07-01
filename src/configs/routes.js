@@ -1,46 +1,60 @@
-import { g, r } from '@/router/generator'
+import { r } from '@/router/generator'
 import Layout from '@/layout'
 
 export default [
-  // Content manage
+  {
+    path: '/catalog', name: 'CatalogManage', component: Layout,
+    meta: { title: '商品管理', icon: 'el-icon-goods', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    children: [
+      ...r('Product', '商品')
+    ]
+  },
+
+  {
+    path: '/order', name: 'OrderManage', component: Layout,
+    meta: { title: '订单管理', icon: 'el-icon-s-order', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    children: [
+      ...r('Order', '订单'),
+      ...r('Invoice', '发票')
+    ]
+  },
+
   {
     path: '/content', name: 'ContentManage', component: Layout,
-    meta: { title: '内容管理', icon: 'el-icon-document', roles: ['ROLE_SUPER_ADMIN'] },
+    meta: { title: '内容管理', icon: 'el-icon-document', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Content', '内容')
+      ...r('Content', '内容'),
+      ...r('Page', '页面'),
+      ...r('Comment', '评论'),
+      ...r('Media', '媒体')
     ]
   },
 
-  // Balance manage
   {
-    path: '/balance', name: 'BalanceManage', component: Layout,
-    meta: { title: '财务管理', icon: 'el-icon-money', roles: ['ROLE_SUPER_ADMIN'] },
+    path: '/wallet', name: 'WalletManage', component: Layout,
+    meta: { title: '钱包管理', icon: 'el-icon-money', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Balance', '余额'),
-      ...r('BalanceLog', '余额记录')
+      ...r('Wallet', '钱包'),
+      ...r('WalletTransaction', '交易记录')
     ]
   },
 
-  // User manage
   {
     path: '/user', name: 'UserManage', component: Layout,
-    meta: { title: '用户管理', icon: 'el-icon-user', roles: ['ROLE_SUPER_ADMIN'] },
+    meta: { title: '用户管理', icon: 'el-icon-user', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...g('User', '用户'),
-      ...r('UserProfile', '资料')
+      ...r('User', '用户'),
+      ...r('WechatUser', '微信用户')
     ]
   },
 
-  // System manage
   {
-    path: '/system', name: 'SystemManage', component: Layout,
-    meta: { title: '系统选项', icon: 'el-icon-setting', roles: ['ROLE_SUPER_ADMIN'] },
+    path: '/system-option', name: 'SystemOptionManage', component: Layout,
+    meta: { title: '系统选项', icon: 'el-icon-setting', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Type', '词汇表'),
       ...r('Category', '分类'),
-      ...r('Album', '相册'),
-      ...r('Picture', '图片'),
-      ...r('Option', '配置')
+      ...r('Tag', '标签'),
+      ...r('Setting', '配置')
     ]
   }
 ]
