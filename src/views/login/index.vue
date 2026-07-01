@@ -87,7 +87,7 @@ export default {
     return {
       title: setting.title,
       loginForm: {
-        username: 'admin',
+        username: 'user@example.com',
         password: ''
       },
       loginRules: {
