@@ -133,6 +133,14 @@ import Tinymce from '@/components/Tinymce'
 import { createUiFeedback } from './ui/feedback'
 
 const formPlugins = import.meta.glob('./plugins/form/*.vue')
+const formPluginCache = {}
+
+const resolveFormPlugin = path => {
+  if (!formPluginCache[path]) {
+    formPluginCache[path] = () => formPlugins[path]().then(module => module.default)
+  }
+  return formPluginCache[path]
+}
 
 export default {
   name: 'FormAdmin',
@@ -317,12 +325,11 @@ export default {
         'OneToMany': 'RelationToMany'
       }
 
-      try {
-        const targetType = (type in typeMapping) ? typeMapping[type] : type
-        return formPlugins[`./plugins/form/${targetType}.vue`]
-      } catch (e) {
-        return formPlugins['./plugins/form/input.vue']
-      }
+      const targetType = typeMapping[type] || type || 'input'
+      const path = formPlugins[`./plugins/form/${targetType}.vue`]
+        ? `./plugins/form/${targetType}.vue`
+        : './plugins/form/input.vue'
+      return resolveFormPlugin(path)
     },
 
     getMetadataType(currentStruct) {
