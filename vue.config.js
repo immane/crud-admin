@@ -15,6 +15,15 @@ const name = defaultSettings.title || 'Admin' // page title
 // port = 9528 npm run dev OR npm run dev --port = 9528
 const port = process.env.port || process.env.npm_config_port || 9528 // dev port
 
+function proxyRequestBody(proxyReq, req) {
+  if (!req.body || !Object.keys(req.body).length) return
+
+  const bodyData = JSON.stringify(req.body)
+  proxyReq.setHeader('Content-Type', 'application/json')
+  proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData))
+  proxyReq.write(bodyData)
+}
+
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
   /**
@@ -35,6 +44,18 @@ module.exports = {
     overlay: {
       warnings: false,
       errors: true
+    },
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        onProxyReq: proxyRequestBody
+      },
+      '/system': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        onProxyReq: proxyRequestBody
+      }
     },
     before: require('./mock/mock-server.js')
   },

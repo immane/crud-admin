@@ -4,6 +4,7 @@ import router, { resetRouter } from '@/router'
 
 const state = {
   token: getToken(),
+  refreshToken: '',
   name: '',
   avatar: '',
   introduction: '',
@@ -13,6 +14,9 @@ const state = {
 const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token
+  },
+  SET_REFRESH_TOKEN: (state, refreshToken) => {
+    state.refreshToken = refreshToken
   },
   SET_INTRODUCTION: (state, introduction) => {
     state.introduction = introduction
@@ -33,11 +37,13 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ identifier: username.trim(), password: password }).then(response => {
         const { data } = response
-        console.log('token:', data)
-        commit('SET_TOKEN', data)
-        setToken(data)
+        const token = data.access_token
+
+        commit('SET_TOKEN', token)
+        commit('SET_REFRESH_TOKEN', data.refresh_token || '')
+        setToken(token)
         resolve()
       }).catch(error => {
         reject(error)
@@ -55,7 +61,8 @@ const actions = {
           reject('Verification failed, please Login again.')
         }
 
-        const { roles, username } = data
+        const roles = data.roles || []
+        const username = data.username || data.email || data.identifier || ''
 
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
@@ -75,8 +82,9 @@ const actions = {
   // user logout
   logout({ commit, state, dispatch }) {
     return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
+      logout(state.refreshToken).then(() => {
         commit('SET_TOKEN', '')
+        commit('SET_REFRESH_TOKEN', '')
         commit('SET_ROLES', [])
         removeToken()
         resetRouter()
@@ -96,6 +104,7 @@ const actions = {
   resetToken({ commit }) {
     return new Promise(resolve => {
       commit('SET_TOKEN', '')
+      commit('SET_REFRESH_TOKEN', '')
       commit('SET_ROLES', [])
       removeToken()
       resolve()
@@ -103,28 +112,25 @@ const actions = {
   },
 
   // dynamically modify permissions
-  changeRoles({ commit, dispatch }, role) {
-    return new Promise(async resolve => {
-      const token = role + '-token'
+  async changeRoles({ commit, dispatch }, role) {
+    const token = role + '-token'
 
-      commit('SET_TOKEN', token)
-      setToken(token)
+    commit('SET_TOKEN', token)
+    commit('SET_REFRESH_TOKEN', '')
+    setToken(token)
 
-      const { roles } = await dispatch('getInfo')
+    const { roles } = await dispatch('getInfo')
 
-      resetRouter()
+    resetRouter()
 
-      // generate accessible routes map based on roles
-      const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
+    // generate accessible routes map based on roles
+    const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
 
-      // dynamically add accessible routes
-      router.addRoutes(accessRoutes)
+    // dynamically add accessible routes
+    router.addRoutes(accessRoutes)
 
-      // reset visited views and cached views
-      dispatch('tagsView/delAllViews', null, { root: true })
-
-      resolve()
-    })
+    // reset visited views and cached views
+    dispatch('tagsView/delAllViews', null, { root: true })
   }
 }
 

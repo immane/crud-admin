@@ -47,13 +47,13 @@ describe('utils/request.ts', () => {
     responseError = undefined
   })
 
-  it('injects X-Auth-Token header when store has token', async() => {
+  it('injects Authorization bearer header when store has token', async() => {
     await import('@/utils/request')
 
     const config = { headers: {} }
     const output = requestSuccess(config)
 
-    expect(output.headers['X-Auth-Token']).toBe('token-1')
+    expect(output.headers.Authorization).toBe('Bearer token-1')
   })
 
   it('returns data when API response code is 0', async() => {
@@ -63,6 +63,31 @@ describe('utils/request.ts', () => {
     const output = responseSuccess(response)
 
     expect(output).toEqual(response.data)
+  })
+
+  it('returns data when API response code is 200', async() => {
+    await import('@/utils/request')
+
+    const response = { data: { code: 200, data: { id: 1 } } }
+    const output = responseSuccess(response)
+
+    expect(output).toEqual(response.data)
+  })
+
+  it('returns success envelope for 204 empty responses', async() => {
+    await import('@/utils/request')
+
+    const output = responseSuccess({ status: 204, data: '' })
+
+    expect(output).toEqual({ code: 0, data: null, message: 'SUCCESS' })
+  })
+
+  it('wraps successful raw JSON responses', async() => {
+    await import('@/utils/request')
+
+    const output = responseSuccess({ status: 200, data: { access_token: 'token-1' } })
+
+    expect(output).toEqual({ code: 0, data: { access_token: 'token-1' }, message: 'SUCCESS' })
   })
 
   it('rejects and notifies when API response code is non-zero', async() => {

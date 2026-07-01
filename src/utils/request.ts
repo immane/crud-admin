@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios'
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
@@ -15,7 +15,7 @@ service.interceptors.request.use(
       if (!config.headers) {
         config.headers = {}
       }
-      config.headers['X-Auth-Token'] = getToken()
+      config.headers.Authorization = `Bearer ${getToken()}`
     }
     return config
   },
@@ -23,10 +23,18 @@ service.interceptors.request.use(
 )
 
 service.interceptors.response.use(
-  (response: { data: ApiResponse }) => {
+  (response: AxiosResponse<ApiResponse>) => {
+    if (response.status === 204) {
+      return { code: 0, data: null, message: 'SUCCESS' }
+    }
+
     const res = response.data
 
-    if (res.code !== 0) {
+    if (typeof res.code === 'undefined') {
+      return { code: 0, data: res, message: 'SUCCESS' }
+    }
+
+    if (![0, 200].includes(res.code)) {
       Message({
         message: res.message || 'Error',
         type: 'error',
