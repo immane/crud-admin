@@ -1,10 +1,10 @@
-# Task 02: Vue3 入口和全局插件迁移
+# Task 02: Vue3 Entry and Global Plugin Migration
 
-## 目标
+## Goal
 
-将应用启动方式迁移到 Vue3 `createApp`，并完成全局插件、全局属性和全局组件的基础迁移。
+Migrate the app bootstrap to Vue3 `createApp`, and complete the migration of global plugins, global properties, and global components.
 
-## 范围
+## Scope
 
 - `src/main.js`
 - `src/main.ts`
@@ -12,37 +12,37 @@
 - `src/icons/index.js`
 - `src/shims-vue.d.ts`
 - `src/utils/request.ts`
-- 全局样式入口
+- Global style entry
 
-## 前置检查
+## Pre-checks
 
-- Task 01 已完成。
-- 已确认目标 UI 库使用 `element-plus`。
-- 已确认 `vue-baidu-map`、`v-fit-columns`、`vue-json-editor`、`vue-prism-editor` 的 Vue3 替代策略。
+- Task 01 is complete.
+- Target UI library confirmed as `element-plus`.
+- Vue3 replacement strategy confirmed for `vue-baidu-map`, `v-fit-columns`, `vue-json-editor`, `vue-prism-editor`.
 
-## 实施步骤
+## Implementation Steps
 
-1. 将实际入口统一为 `src/main.ts`。
-2. 删除 `src/main.ts` 中仅转发 `src/main.js` 的写法。
-3. 使用 `createApp(App)` 创建应用实例。
-4. 将 `new Vue({ ... }).$mount` 或 `el: '#app'` 替换为 `app.mount('#app')`。
-5. 将 `Vue.use(...)` 替换为 `app.use(...)`。
-6. 将 `Vue.prototype.$getValue` 替换为 `app.config.globalProperties.$getValue`。
-7. 将 `Vue.prototype.axios` 替换为 `app.config.globalProperties.axios`，或改为显式 import。
-8. 将全局 `svg-icon` 注册改为 `app.component(...)`。
-9. 替换 Element UI 初始化为 Element Plus 初始化。
-10. 替换全局 CSS import 路径，确保样式在 Vite 中可加载。
+1. Unify the real entry to `src/main.ts`.
+2. Remove the forwarding-only `import './main.js'` from `src/main.ts`.
+3. Use `createApp(App)` to create the app instance.
+4. Replace `new Vue({ ... }).$mount` or `el: '#app'` with `app.mount('#app')`.
+5. Replace `Vue.use(...)` with `app.use(...)`.
+6. Replace `Vue.prototype.$getValue` with `app.config.globalProperties.$getValue`.
+7. Replace `Vue.prototype.axios` with `app.config.globalProperties.axios` or use explicit imports.
+8. Change global `svg-icon` registration to `app.component(...)`.
+9. Replace Element UI initialization with Element Plus.
+10. Update global CSS import paths to ensure styles load correctly in Vite.
 
-## 验收标准
+## Acceptance Criteria
 
-- 应用入口不再引用 `Vue` 构造函数。
-- 入口不再使用 `Vue.use`、`Vue.prototype`、`new Vue`。
-- 全局样式正常加载。
-- `App.vue` 能被 Vue3 正常挂载。
-- 控制台无入口级 runtime error。
+- App entry no longer references the `Vue` constructor.
+- No `Vue.use`, `Vue.prototype`, or `new Vue` in the entry.
+- Global styles load correctly.
+- `App.vue` mounts successfully with Vue3.
+- No entry-level runtime errors in the console.
 
-## 风险
+## Risks
 
-- Vue2 插件可能无法直接 `app.use`。
-- Vue3 已移除 filters，依赖 filters 的页面仍需后续任务处理。
-- 部分全局属性在 TypeScript 中需要补充类型声明。
+- Vue2 plugins may not directly work with `app.use`.
+- Vue3 removed filters; pages relying on filters still need to be handled in follow-up tasks.
+- Some global properties need type declarations in TypeScript.

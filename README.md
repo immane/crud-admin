@@ -262,8 +262,8 @@ crud-admin/
 
 ### Prerequisites
 
-- **Node.js** >= 8.9 (recommended: 12+)
-- **npm** >= 3.0.0
+- **Node.js** >= 14.18 (required by Vite 5)
+- **npm** >= 6.0.0
 
 ### Installation
 
@@ -610,11 +610,11 @@ Wraps typical CRUD operations:
 | Method | HTTP | Endpoint |
 |--------|------|----------|
 | `structure()` | GET | `/system/entities/{entity}` |
-| `list(params)` | GET | `/manage/{plural}` |
-| `retrieve(pk)` | GET | `/manage/{plural}/{pk}` |
-| `create(data)` | POST | `/manage/{plural}` |
-| `update(pk, data)` | PUT | `/manage/{plural}/{pk}` |
-| `delete(pk)` | DELETE | `/manage/{plural}/{pk}` |
+| `list(params)` | GET | `/api/v1/manage/{plural}` |
+| `retrieve(pk)` | GET | `/api/v1/manage/{plural}/{pk}` |
+| `create(data)` | POST | `/api/v1/manage/{plural}` |
+| `update(pk, data)` | PUT | `/api/v1/manage/{plural}/{pk}` |
+| `delete(pk)` | DELETE | `/api/v1/manage/{plural}/{pk}` |
 
 ### Expected Backend Endpoints
 
@@ -625,11 +625,11 @@ Wraps typical CRUD operations:
 | `/api/auth/logout` | POST | Invalidate refresh token |
 | `/system/entities` | GET | List all entity class names |
 | `/system/entities/{entity}` | GET | Entity field structure (types, relations, nullability) |
-| `/manage/{entity}` | GET | Paginated entity list |
-| `/manage/{entity}/{id}` | GET | Single entity record |
-| `/manage/{entity}` | POST | Create entity record |
-| `/manage/{entity}/{id}` | PUT | Update entity record |
-| `/manage/{entity}/{id}` | DELETE | Delete entity record |
+| `/api/v1/manage/{entity}` | GET | Paginated entity list |
+| `/api/v1/manage/{entity}/{id}` | GET | Single entity record |
+| `/api/v1/manage/{entity}` | POST | Create entity record |
+| `/api/v1/manage/{entity}/{id}` | PUT | Update entity record |
+| `/api/v1/manage/{entity}/{id}` | DELETE | Delete entity record |
 
 ---
 
@@ -683,7 +683,17 @@ For desktop deployment, this project includes Electron support via `src/backgrou
 
 ---
 
-## 📄 License
+## � Documentation
+
+- **[Architecture Design](docs/design/architecture.md)** — System layers, bootstrap flow, auth flow, routing, state management
+- **[Code & API Contracts](docs/design/contracts.md)** — Request/response formats, auth contract, CRUD contract, component props contract
+- **[EasyAdmin Design](docs/design/easyadmin-design.md)** — Plugin system, data flow, filter builder, EntityManage class, extension points
+- **[EasyAdmin Config Contract](docs/design/easyadmin-config-contract.md)** — Complete config schema reference (FieldOption, ListConfig, FilterConfig)
+- **[AI Context](docs/ai/context.md)** — Quick reference for AI assistants working on this project
+
+---
+
+## �📄 License
 
 MIT
 

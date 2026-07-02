@@ -1,10 +1,10 @@
-# Task 01: Vite 基建迁移
+# Task 01: Vite Infrastructure Migration
 
-## 目标
+## Goal
 
-将项目从 Vue CLI/Webpack 构建链路迁移到 Vite，为后续 Vue3 迁移建立可启动、可构建的基础环境。
+Migrate the project from Vue CLI/Webpack build chain to Vite, establishing a bootable and buildable foundation for subsequent Vue3 migration.
 
-## 范围
+## Scope
 
 - `package.json`
 - `vite.config.ts`
@@ -16,35 +16,35 @@
 - `public/`
 - `vue.config.js`
 
-## 前置检查
+## Pre-checks
 
-- 记录当前 `npm run lint`、`npm run type-check`、`npm run test:unit`、`npm run build:prod` 的结果。
-- 确认 `src/background.js` 是否仍需支持 Electron。
-- 确认生产部署 base path 是否继续使用 `/admin/`。
+- Record current results of `npm run lint`, `npm run type-check`, `npm run test:unit`, `npm run build:prod`.
+- Confirm whether `src/background.js` still needs Electron support.
+- Confirm whether production base path continues to be `/admin/`.
 
-## 实施步骤
+## Implementation Steps
 
-1. 新增 `vite.config.ts`。
-2. 配置 `@vitejs/plugin-vue` 和 `@vitejs/plugin-vue-jsx`。
-3. 配置 `@` alias 指向 `src`。
-4. 配置 Vite `base`，开发环境使用 `/`，生产环境使用 `/admin/`。
-5. 将 `vue.config.js` 中的 `/api`、`/system` proxy 迁移到 `server.proxy`。
-6. 将 `public/index.html` 迁移为根目录 `index.html`。
-7. 替换 HTML 中的 Vue CLI 模板变量，例如 `<%= BASE_URL %>` 和 `<%= webpackConfig.name %>`。
-8. 将环境变量从 `VUE_APP_*` 改为 `VITE_*`。
-9. 更新 `package.json` scripts：`dev`、`build`、`preview`、`type-check`。
-10. 移除 Vue CLI/Webpack 专属依赖。
-11. 新增 Vite、Vue 插件、Vue TS 检查相关依赖。
+1. Add `vite.config.ts`.
+2. Configure `@vitejs/plugin-vue` and `@vitejs/plugin-vue-jsx`.
+3. Configure `@` alias pointing to `src`.
+4. Configure Vite `base`: `/` for dev, `/admin/` for production.
+5. Migrate `/api` and `/system` proxy from `vue.config.js` to `server.proxy`.
+6. Move `public/index.html` to root `index.html`.
+7. Replace Vue CLI template variables in HTML (e.g., `<%= BASE_URL %>`, `<%= webpackConfig.name %>`).
+8. Rename environment variables from `VUE_APP_*` to `VITE_*`.
+9. Update `package.json` scripts: `dev`, `build`, `preview`, `type-check`.
+10. Remove Vue CLI/Webpack-specific dependencies.
+11. Add Vite, Vue plugin, and Vue TS checking dependencies.
 
-## 验收标准
+## Acceptance Criteria
 
-- `npm run dev` 能启动 Vite dev server。
-- `index.html` 能正确挂载 `#app`。
-- Vite 能识别 `@/` 路径别名。
-- `/api` 和 `/system` 代理仍然可用。
-- `npm run build` 至少进入 Vite 构建流程，不再依赖 `vue-cli-service`。
+- `npm run dev` starts Vite dev server.
+- `index.html` correctly mounts `#app`.
+- Vite recognizes `@/` path alias.
+- `/api` and `/system` proxies still work.
+- `npm run build` at least enters Vite build flow, no longer depends on `vue-cli-service`.
 
-## 风险
+## Risks
 
-- 旧的 Webpack 特性暂时仍会报错，例如 `require.context`、动态 `require()`。
-- 本任务只迁构建基础，不要求业务页面全部可运行。
+- Old Webpack features may still error out, e.g., `require.context`, dynamic `require()`.
+- This task only migrates build foundations; business pages are not required to be fully operational.

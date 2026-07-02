@@ -1,10 +1,10 @@
-# Task 03: Router 4 和权限路由迁移
+# Task 03: Router 4 and Permission Routes Migration
 
-## 目标
+## Goal
 
-将 Vue Router 3 迁移到 Vue Router 4，并保持登录态校验、角色权限、动态路由和路由重置行为稳定。
+Migrate from Vue Router 3 to Vue Router 4, maintaining stable login validation, role-based permissions, dynamic routing, and route reset behavior.
 
-## 范围
+## Scope
 
 - `src/router/index.js`
 - `src/router/generator.js`
@@ -13,36 +13,36 @@
 - `src/store/modules/user.js`
 - `src/configs/routes.js`
 
-## 前置检查
+## Pre-checks
 
-- Task 02 已完成。
-- 已确认生产 base path 是否继续为 `/admin/`。
-- 已列出所有动态 route name，避免路由重置时遗漏。
+- Task 02 is complete.
+- Production base path confirmed as `/admin/`.
+- All dynamic route names are listed to avoid omissions during route reset.
 
-## 实施步骤
+## Implementation Steps
 
-1. 使用 `createRouter` 替换 `new Router`。
-2. 使用 `createWebHistory('/admin/')` 替换 `mode: 'history'` 和 `base: 'admin'`。
-3. 将通配路由 `path: '*'` 改为 `path: '/:pathMatch(.*)*'`。
-4. 删除 `Vue.use(Router)`。
-5. 将 `router.addRoutes(accessRoutes)` 改为 `router.addRoute(...)`。
-6. 实现递归动态路由添加工具函数。
-7. 重写 `resetRouter()`，使用 `router.removeRoute(name)` 清理动态路由。
-8. 在 `src/router/generator.js` 中用 `import.meta.glob` 替代动态 `require()`。
-9. 检查 `src/permission.js` 中 `beforeEach` 逻辑，必要时从 `next` 风格逐步迁到 return 风格。
-10. 更新 `src/store/modules/user.js` 中的切换角色和登出路由重置逻辑。
+1. Replace `new Router` with `createRouter`.
+2. Replace `mode: 'history'` and `base: 'admin'` with `createWebHistory('/admin/')`.
+3. Replace wildcard route `path: '*'` with `path: '/:pathMatch(.*)*'`.
+4. Remove `Vue.use(Router)`.
+5. Replace `router.addRoutes(accessRoutes)` with `router.addRoute(...)`.
+6. Implement a recursive dynamic route addition utility function.
+7. Rewrite `resetRouter()` to use `router.removeRoute(name)` for cleanup.
+8. Replace dynamic `require()` in `src/router/generator.js` with `import.meta.glob`.
+9. Review `beforeEach` logic in `src/permission.js`, gradually migrate from `next` style to return style if needed.
+10. Update role switching and logout route reset logic in `src/store/modules/user.js`.
 
-## 验收标准
+## Acceptance Criteria
 
-- 未登录访问受保护页面会跳转登录页。
-- 登录成功后能根据 roles 添加动态路由。
-- 刷新页面后动态路由能恢复。
-- 登出后动态路由被清理。
-- 访问不存在路径跳转 404。
-- `router.addRoutes` 不再出现。
+- Unauthenticated access to protected pages redirects to login.
+- After successful login, dynamic routes are added based on roles.
+- Dynamic routes are restored after page refresh.
+- Dynamic routes are cleaned up after logout.
+- Non-existent paths redirect to 404.
+- `router.addRoutes` no longer appears.
 
-## 风险
+## Risks
 
-- 父子动态路由添加顺序错误会导致子路由不可访问。
-- 动态路由 name 缺失会导致 `removeRoute` 无法清理。
-- Vite 无法处理运行时拼接路径的 `import()`，必须使用 `import.meta.glob` 映射。
+- Incorrect parent-child dynamic route addition order can make child routes inaccessible.
+- Missing dynamic route names can prevent `removeRoute` from cleaning up.
+- Vite cannot handle runtime path-concatenated `import()`; `import.meta.glob` mapping is required.

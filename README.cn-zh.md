@@ -262,8 +262,8 @@ crud-admin/
 
 ### 前置要求
 
-- **Node.js** >= 8.9（推荐：12+）
-- **npm** >= 3.0.0
+- **Node.js** >= 14.18（Vite 5 要求）
+- **npm** >= 6.0.0
 
 ### 安装
 
@@ -610,11 +610,11 @@ router.beforeEach()
 | 方法 | HTTP | 接口 |
 |--------|------|----------|
 | `structure()` | GET | `/system/entities/{entity}` |
-| `list(params)` | GET | `/manage/{plural}` |
-| `retrieve(pk)` | GET | `/manage/{plural}/{pk}` |
-| `create(data)` | POST | `/manage/{plural}` |
-| `update(pk, data)` | PUT | `/manage/{plural}/{pk}` |
-| `delete(pk)` | DELETE | `/manage/{plural}/{pk}` |
+| `list(params)` | GET | `/api/v1/manage/{plural}` |
+| `retrieve(pk)` | GET | `/api/v1/manage/{plural}/{pk}` |
+| `create(data)` | POST | `/api/v1/manage/{plural}` |
+| `update(pk, data)` | PUT | `/api/v1/manage/{plural}/{pk}` |
+| `delete(pk)` | DELETE | `/api/v1/manage/{plural}/{pk}` |
 
 ### 期望的后端接口
 
@@ -625,11 +625,11 @@ router.beforeEach()
 | `/api/auth/logout` | POST | 使 refresh token 失效 |
 | `/system/entities` | GET | 列出所有实体类名 |
 | `/system/entities/{entity}` | GET | 实体字段结构（类型、关联、可空性） |
-| `/manage/{entity}` | GET | 分页实体列表 |
-| `/manage/{entity}/{id}` | GET | 单个实体记录 |
-| `/manage/{entity}` | POST | 创建实体记录 |
-| `/manage/{entity}/{id}` | PUT | 更新实体记录 |
-| `/manage/{entity}/{id}` | DELETE | 删除实体记录 |
+| `/api/v1/manage/{entity}` | GET | 分页实体列表 |
+| `/api/v1/manage/{entity}/{id}` | GET | 单个实体记录 |
+| `/api/v1/manage/{entity}` | POST | 创建实体记录 |
+| `/api/v1/manage/{entity}/{id}` | PUT | 更新实体记录 |
+| `/api/v1/manage/{entity}/{id}` | DELETE | 删除实体记录 |
 
 ---
 
@@ -680,6 +680,16 @@ dist/
 ## Electron
 
 对于桌面端部署，本项目通过 `src/background.js` 包含了 Electron 支持。请参考 Electron 文档获取集成详情。
+
+---
+
+## 📚 文档
+
+- **[架构设计](docs/design/architecture.md)** — 系统分层、启动流程、认证流程、路由、状态管理
+- **[代码与 API 契约](docs/design/contracts.md)** — 请求/响应格式、认证契约、CRUD 契约、组件 Props 契约
+- **[EasyAdmin 设计](docs/design/easyadmin-design.md)** — 插件系统、数据流、筛选器、EntityManage 类、扩展点
+- **[EasyAdmin 配置契约](docs/design/easyadmin-config-contract.md)** — 完整配置 Schema 参考 (FieldOption, ListConfig, FilterConfig)
+- **[AI 上下文](docs/ai/context.md)** — 面向 AI 助手的项目快速参考
 
 ---
 
