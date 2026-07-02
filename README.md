@@ -2,12 +2,12 @@
 
 <p align="center">
   <br>
-  <b>A config-driven admin panel framework powered by Vue 2, Element UI and EasyAdmin</b>
+  <b>A config-driven admin panel framework powered by Vue 2.7, Element UI and EasyAdmin</b>
   <br><br>
-  <img src="https://img.shields.io/badge/vue-2.6.11-brightgreen?logo=vue.js" alt="Vue 2">
+  <img src="https://img.shields.io/badge/vue-2.7.16-brightgreen?logo=vue.js" alt="Vue 2.7">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
-  <img src="https://img.shields.io/badge/build-passing-brightgreen" alt="Build">
-  <img src="https://img.shields.io/badge/node-%3E%3D8.9-green?logo=node.js" alt="Node">
+  <img src="https://img.shields.io/badge/vite-5.x-646CFF?logo=vite" alt="Vite">
+  <img src="https://img.shields.io/badge/node-%3E%3D14-green?logo=node.js" alt="Node">
   <br><br>
 </p>
 
@@ -29,18 +29,18 @@ Originally forked from [vue-element-admin](https://github.com/PanJiaChen/vue-ele
 - **17+ Plug-and-Play Form Fields** — input, textarea, select, boolean, integer, date, datetime, image, file, JSON, code editor, relation pickers, transfer, and more
 - **Automatic Entity Introspection** — Queries backend `/system/entities` API to infer field types, nullability, and relationships
 - **Role-Based Access Control** — Dynamic route generation filtered by user roles via Vuex + router guard
-- **Token-Based Authentication** — JWT-style token stored in cookies with Axios interceptor injection
+- **Token-Based Authentication** — JWT Bearer token stored in cookies, injected via `Authorization` header through Axios interceptor
 - **Tag-View Navigation** — Open multiple pages as tabs with keep-alive caching
 - **Responsive Layout** — Collapsible sidebar, breadcrumb navigation, fixed header option
 - **Environment-Aware Configuration** — Separate `.env` files for development, staging, and production
 - **Mock Server with Hot-Reload** — Develop against realistic mock data without a backend
-- **SVG Sprite Icons** — Webpack-configured SVG sprite loader for performant icon usage
-- **Code Splitting & Build Optimization** — Chunk splitting (vendor, Element UI, commons), preload, runtime inlining
+- **SVG Sprite Icons** — Vite-configured SVG sprite loader for performant icon usage
+- **Code Splitting & Build Optimization** — Vite-powered chunk splitting with tree-shaking, preload directives, and CSS code-split
 - **Export to CSV/Excel** — Built-in data export with configurable column labels
 - **Rich Text Editing** — Integrated TinyMCE component
 - **Unit Testing** — Jest + Vue Test Utils with coverage reporting
 - **ESLint + TypeScript** — Code quality and partial type checking
-- **Electron Support** — Optional desktop packaging via `vue-cli-plugin-electron-builder`
+- **Electron Support** — Optional desktop packaging via `src/background.js`
 
 ---
 
@@ -48,16 +48,16 @@ Originally forked from [vue-element-admin](https://github.com/PanJiaChen/vue-ele
 
 | Category | Technology | Version |
 |----------|-----------|---------|
-| Framework | Vue.js (Options API) | 2.6.11 |
+| Framework | Vue.js (Options API + Composition API) | 2.7.16 |
 | UI Library | Element UI | 2.13.2 |
 | State | Vuex (namespaced modules) | 3.1.0 |
 | Routing | Vue Router (history mode) | 3.0.6 |
 | HTTP | Axios | 0.21.1 |
-| Build | Vue CLI 4 / Webpack 4 | 4.4.4 |
-| CSS | SCSS + Autoprefixer | — |
-| Testing | Jest + Vue Test Utils | — |
+| Build | Vite | 5.x |
+| CSS | SCSS (Dart Sass) + PostCSS | — |
+| Testing | Jest 27 + Vue Test Utils | — |
 | Linting | ESLint 6 + eslint-plugin-vue | 6.7.2 |
-| Lang | JavaScript + partial TypeScript | — |
+| Lang | JavaScript + TypeScript | 6.0 |
 
 ---
 
@@ -251,7 +251,7 @@ crud-admin/
 ├── babel.config.js                # Babel configuration
 ├── jest.config.js                 # Jest configuration
 ├── tsconfig.json                  # TypeScript configuration
-├── vue.config.js                  # Webpack customization
+├── vite.config.ts                 # Vite build configuration
 ├── package.json
 └── .travis.yml                    # CI configuration
 ```
@@ -329,9 +329,9 @@ npm run preview
 
 Three environment files control the build:
 
-| File | Purpose | `VUE_APP_BASE_API` |
+| File | Purpose | `VITE_BASE_API` |
 |------|---------|-------------------|
-| `.env.development` | Dev server | `http://localhost:9528` |
+| `.env.development` | Dev server | `''` (uses proxy) |
 | `.env.staging` | Staging deploy | `/stage-api` |
 | `.env.production` | Production deploy | `''` (relative) |
 
@@ -349,13 +349,13 @@ module.exports = {
 
 ### Build Customization
 
-`vue.config.js` configures Webpack via Vue CLI. Key settings:
-- **publicPath**: `/admin/` in production
-- **Dev Server**: port 9528 with mock middleware
-- **Chunk Splitting**: vendor, Element UI, and commons (>3 usages)
-- **Preload**: initial chunks (excluding runtime and hot-update)
-- **SVG Sprite**: inline SVG icons via `svg-sprite-loader`
-- **Runtime Inline**: embedded in HTML for performance
+`vite.config.ts` configures the Vite build. Key settings:
+- **base**: `/admin/` in production, `/` in development
+- **Dev Server**: port 9528 with API proxy support
+- **Plugins**: `@vitejs/plugin-vue2` + `@vitejs/plugin-vue2-jsx`
+- **Aliases**: `@` → `src/`
+- **Define**: Injects `process.env.VITE_*` environment variables at compile time
+- **CSS**: SCSS (Dart Sass) with global variables from `src/styles/variables.ts`
 
 ---
 
@@ -543,13 +543,13 @@ Use JSX render functions for complex column rendering:
 ### Token Flow
 
 ```
-Login → POST /user/login → server returns token
+Login → POST /api/auth/login → server returns JWT (access_token + refresh_token)
   ↓
-token stored in cookie (js-cookie)
+access_token stored in cookie (js-cookie)
   ↓
-Every request → Axios interceptor adds X-Auth-Token header
+Every request → Axios interceptor adds Authorization: Bearer <token> header
   ↓
-Logout → cookie cleared, Vuex reset, router reset
+Logout → POST /api/auth/logout with refresh_token → cookie cleared, Vuex reset, router reset
 ```
 
 ### Route Guard (`src/permission.js`)
@@ -585,10 +585,10 @@ The `permission.js` Vuex module filters `asyncRoutes` by user roles. Routes with
 
 ### Axios Instance (`src/utils/request.ts`)
 
-- **Base URL**: `VUE_APP_BASE_API` from environment
+- **Base URL**: `VITE_BASE_API` from environment
 - **Timeout**: 30 seconds
-- **Request Interceptor**: Injects `X-Auth-Token` header from cookie
-- **Response Interceptor**: Checks `response.data.code === 0` for success; shows Element UI `Message` on error
+- **Request Interceptor**: Injects `Authorization: Bearer <token>` header from cookie when token exists
+- **Response Interceptor**: Checks `response.data.code === 0` or `200` for success; handles `204 No Content` gracefully; shows Element UI `Message` on error
 
 ### API Response Format
 
@@ -620,9 +620,9 @@ Wraps typical CRUD operations:
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/login` | POST | User authentication |
-| `/user/info` | GET | Current user profile + roles |
-| `/user/logout` | POST | Invalidate token |
+| `/api/auth/login` | POST | User authentication (identifier + password → JWT) |
+| `/api/v1/app/users/me` | GET | Current user profile + roles |
+| `/api/auth/logout` | POST | Invalidate refresh token |
 | `/system/entities` | GET | List all entity class names |
 | `/system/entities/{entity}` | GET | Entity field structure (types, relations, nullability) |
 | `/manage/{entity}` | GET | Paginated entity list |
@@ -660,10 +660,7 @@ dist/
 ├── static/
 │   ├── css/
 │   ├── js/
-│   │   ├── chunk-elementUI.{hash}.js    # Element UI (separate chunk)
-│   │   ├── chunk-libs.{hash}.js         # Other node_modules
-│   │   ├── chunk-commons.{hash}.js      # Shared components
-│   │   └── app.{hash}.js               # Application code
+│   │   └── (hashed chunk files)
 │   └── img/
 ├── favicon.ico
 └── index.html
@@ -671,18 +668,18 @@ dist/
 
 ### Deployment Notes
 
-1. Set `VUE_APP_BASE_API` in `.env.production` to your API server URL
+1. Set `VITE_BASE_API` in `.env.production` to your API server URL
 2. Run `npm run build:prod`
 3. Deploy the `dist/` directory to your web server
 4. Ensure your server handles client-side routing — redirect all paths to `index.html` for history mode:
-   - **Nginx**: `try_files $uri $uri/ /admin/index.html;`
-   - **Apache**: Use `.htaccess` with mod_rewrite (provided in `public/.htaccess`)
+   - **Nginx**: `try_files $uri $uri/ /index.html;`
+   - **Apache**: Use `.htaccess` with mod_rewrite
 
 ---
 
 ## 🖥 Electron
 
-For desktop deployment, this project includes Electron support via `src/background.js`. Requires `vue-cli-plugin-electron-builder`. Consult the [plugin documentation](https://nklayman.github.io/vue-cli-plugin-electron-builder/) for setup instructions.
+For desktop deployment, this project includes Electron support via `src/background.js`. Refer to the Electron documentation for integration details.
 
 ---
 
