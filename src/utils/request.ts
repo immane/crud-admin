@@ -5,7 +5,7 @@ import { getToken } from '@/utils/auth'
 import { ApiResponse } from '@/types/api'
 
 const service: any = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API,
+  baseURL: process.env.VITE_BASE_API,
   timeout: 30000
 })
 

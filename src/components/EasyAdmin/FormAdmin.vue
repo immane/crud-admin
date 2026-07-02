@@ -130,12 +130,21 @@
 <script>
 import EntityManage from '@/utils/entity'
 import Tinymce from '@/components/Tinymce'
-import vueJsonEditor from 'vue-json-editor'
 import { createUiFeedback } from './ui/feedback'
+
+const formPlugins = import.meta.glob('./plugins/form/*.vue')
+const formPluginCache = {}
+
+const resolveFormPlugin = path => {
+  if (!formPluginCache[path]) {
+    formPluginCache[path] = () => formPlugins[path]().then(module => module.default)
+  }
+  return formPluginCache[path]
+}
 
 export default {
   name: 'FormAdmin',
-  components: { Tinymce, vueJsonEditor },
+  components: { Tinymce },
   props: {
     /**
      * @description Form admin initialize properties.
@@ -194,7 +203,7 @@ export default {
   data() {
     return {
       // base api
-      BASE_API: process.env.VUE_APP_BASE_API,
+      BASE_API: process.env.VITE_BASE_API,
 
       // entity manager instance
       em: new EntityManage(this.entityConf),
@@ -316,12 +325,11 @@ export default {
         'OneToMany': 'RelationToMany'
       }
 
-      try {
-        const targetType = (type in typeMapping) ? typeMapping[type] : type
-        return require(`./plugins/form/${targetType}.vue`).default
-      } catch (e) {
-        return require(`./plugins/form/input.vue`).default
-      }
+      const targetType = typeMapping[type] || type || 'input'
+      const path = formPlugins[`./plugins/form/${targetType}.vue`]
+        ? `./plugins/form/${targetType}.vue`
+        : './plugins/form/input.vue'
+      return resolveFormPlugin(path)
     },
 
     getMetadataType(currentStruct) {

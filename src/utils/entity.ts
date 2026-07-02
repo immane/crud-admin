@@ -2,8 +2,9 @@ import request from '@/utils/request'
 import store from '@/store'
 import { API_PREFIX, SYSTEM_API_PREFIX, apiPath } from '@/api/prefix'
 import { ApiResponse, EntityStructure } from '@/types/api'
+import inflectFactory from 'i'
 
-const inflect = require('i')(true)
+const inflect = inflectFactory(true)
 
 type EntityConf = string | {
   name: string

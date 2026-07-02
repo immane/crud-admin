@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2018",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "ignoreDeprecations": "6.0",
     "strict": false,
     "allowJs": true,
@@ -13,7 +13,7 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "types": [
-      "webpack-env",
+      "vite/client",
       "jest",
       "node"
     ],

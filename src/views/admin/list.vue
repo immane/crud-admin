@@ -17,7 +17,9 @@
 <script>
 import ListAdmin from '@/components/EasyAdmin/ListAdmin'
 import admin from '@/config'
-const inflect = require('i')(true)
+import inflectFactory from 'i'
+
+const inflect = inflectFactory(true)
 
 export default {
   components: { ListAdmin },

@@ -25,7 +25,6 @@
 </template>
 
 <script>
-import path from 'path'
 import { isExternal } from '@/utils/validate'
 import Item from './Item'
 import AppLink from './Link'
@@ -61,8 +60,7 @@ export default {
       const showingChildren = children.filter(item => {
         if (item.hidden) {
           return false
-        } 
-        else {
+        } else {
           // Temp set(will be used if only has one showing child)
           this.onlyOneChild = item
           return true
@@ -89,7 +87,10 @@ export default {
       if (isExternal(this.basePath)) {
         return this.basePath
       }
-      return path.resolve(this.basePath, routePath)
+      if (routePath.startsWith('/')) {
+        return routePath
+      }
+      return `${this.basePath}/${routePath}`.replace(/\/+/g, '/')
     }
   }
 }

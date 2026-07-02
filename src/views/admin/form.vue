@@ -13,7 +13,9 @@
 <script>
 import FormAdmin from '@/components/EasyAdmin/FormAdmin'
 import admin from '@/config'
-const inflect = require('i')(true)
+import inflectFactory from 'i'
+
+const inflect = inflectFactory(true)
 
 export default {
   components: { FormAdmin },

@@ -33,7 +33,7 @@ export default {
   data() {
     return {
       // base api
-      BASE_API: process.env.VUE_APP_BASE_API
+      BASE_API: process.env.VITE_BASE_API
     }
   }
 }
