@@ -37,22 +37,10 @@ export default {
     }
   },
   watch: {
-    'field.property': {
+    form: {
       immediate: true,
       handler() {
-        const v = this.form[this.field.property]
-        if (v != null) {
-          try {
-            this.internalValue = typeof v === 'string' ? JSON.parse(v) : v
-          } catch (e) {
-            this.internalValue = v
-          }
-        } else {
-          this.internalValue = {}
-        }
-        if (this.editor) {
-          this.editor.set(this.internalValue)
-        }
+        this.syncFromForm()
       }
     }
   },
@@ -86,6 +74,21 @@ export default {
         })
       }
       await loading
+    },
+    syncFromForm() {
+      const v = this.form[this.field.property]
+      if (v != null) {
+        try {
+          this.internalValue = typeof v === 'string' ? JSON.parse(v) : v
+        } catch (e) {
+          this.internalValue = v
+        }
+      } else {
+        this.internalValue = {}
+      }
+      if (this.editor) {
+        this.editor.set(this.internalValue)
+      }
     },
     createEditor() {
       const options = {
