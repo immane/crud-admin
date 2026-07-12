@@ -28,7 +28,7 @@
               :refresh="fetchData"
             />
             <component
-              :is="loadListPlugin(getListPluginType(field, structure[field.property], extractField(record, field.property)))"
+              :is="loadPlugin(getListPluginType(field, structure[field.property], extractField(record, field.property)))"
               v-else-if="getListPluginType(field, structure[field.property], extractField(record, field.property))"
               :value="extractField(record, field.property)"
               :field="field"
@@ -48,14 +48,18 @@
 import EntityManage from '@/utils/entity'
 import { createUiFeedback } from './ui/feedback'
 
+const detailPlugins = import.meta.glob('./plugins/detail/*.vue')
 const listPlugins = import.meta.glob('./plugins/list/*.vue')
-const listPluginCache = {}
+const pluginCache = {}
 
-const resolveListPlugin = path => {
-  if (!listPluginCache[path]) {
-    listPluginCache[path] = () => listPlugins[path]().then(module => module.default)
+const resolvePlugin = path => {
+  if (!pluginCache[path]) {
+    pluginCache[path] = () => {
+      const loader = detailPlugins[path] || listPlugins[path]
+      return loader ? loader().then(module => module.default) : null
+    }
   }
-  return listPluginCache[path]
+  return pluginCache[path]
 }
 
 export default {
@@ -107,12 +111,13 @@ export default {
       if (['ManyToMany', 'OneToMany'].includes(type)) return 'RelationToMany'
       return null
     },
-    loadListPlugin(type) {
+    loadPlugin(type) {
       const typeMapping = {
         ManyToOne: 'RelationToOne', OneToOne: 'RelationToOne',
         ManyToMany: 'RelationToMany', OneToMany: 'RelationToMany', datetime_immutable: 'datetime'
       }
-      return resolveListPlugin(`./plugins/list/${typeMapping[type] || type}.vue`)
+      const resolvedType = typeMapping[type] || type
+      return resolvePlugin(`./plugins/detail/${resolvedType}.vue`) || resolvePlugin(`./plugins/list/${resolvedType}.vue`)
     },
     extractField(data, property) {
       return property.split('.').reduce((value, key) => value != null ? value[key] : null, data)
