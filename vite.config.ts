@@ -1,6 +1,6 @@
 import { defineConfig, loadEnv } from 'vite'
-import vue from '@vitejs/plugin-vue2'
-import vueJsx from '@vitejs/plugin-vue2-jsx'
+import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 import path from 'node:path'
 
 function resolve(dir: string) {
@@ -53,19 +53,15 @@ export default defineConfig(({ mode }) => {
       'process.env.VITE_TINYMCE_SRC': JSON.stringify(env.VITE_TINYMCE_SRC || '')
     },
     plugins: [
-      vue({
-        script: {
-          babelParserPlugins: ['jsx']
-        }
-      }),
-      vueJsx({
-        include: [/\.[jt]sx?$/, /\.vue\?vue&type=script/]
-      })
+      vue(),
+      vueJsx({ include: [/\.[jt]sx?$/] })
     ],
     resolve: {
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
       alias: {
         '@': resolve('src')
+        ,
+        vue: '@vue/compat'
       }
     },
     server: {

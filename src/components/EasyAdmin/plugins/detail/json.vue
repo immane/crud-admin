@@ -16,7 +16,7 @@
           {{ expanded ? '收起' : `展开全部 (${lines.length} 行)` }}
         </el-button>
       </div>
-      <pre class="detail-json__code"><code><template v-for="(line, idx) in visibleLines"><span :key="idx" :class="syntaxClass(line)">{{ line }}</span><br :key="'br-' + idx"></template></code></pre>
+      <pre class="detail-json__code"><code><template v-for="(line, idx) in visibleLines" :key="idx"><span :class="syntaxClass(line)">{{ line }}</span><br></template></code></pre>
     </template>
   </div>
 </template>

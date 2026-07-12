@@ -1,25 +1,16 @@
 <template>
-  <prism-editor
+  <el-input
     v-model="form[field.property]"
+    type="textarea"
+    :rows="12"
     class="my-editor"
-    :highlight="highlighter"
-    line-numbers
     v-bind="field.type_options"
     v-on="field.type_events"
   />
 </template>
 
 <script>
-import { PrismEditor } from 'vue-prism-editor'
-import 'vue-prism-editor/dist/prismeditor.min.css'
-
-import { highlight, languages } from 'prismjs/components/prism-core'
-import 'prismjs/components/prism-clike'
-import 'prismjs/components/prism-javascript'
-import 'prismjs/themes/prism-tomorrow.css' // import syntax highlighting styles
-
 export default {
-  components: { PrismEditor },
   props: {
     form: {
       type: Object,
@@ -28,11 +19,6 @@ export default {
     field: {
       type: Object,
       default: () => { return {} }
-    }
-  },
-  methods: {
-    highlighter(code) {
-      return highlight(code, languages.js) // returns html
     }
   }
 }

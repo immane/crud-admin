@@ -5,11 +5,8 @@
 </template>
 
 <script>
-import 'vue-json-editor/assets/jsoneditor.css'
-import jsoneditorUrl from 'vue-json-editor/assets/jsoneditor.min.js?url'
-
-let JSONEditor = null
-let loading = null
+import JSONEditor from 'jsoneditor'
+import 'jsoneditor/dist/jsoneditor.css'
 
 export default {
   props: {
@@ -59,7 +56,6 @@ export default {
     }
   },
   async mounted() {
-    await this.ensureJsonEditor()
     this.createEditor()
   },
   beforeDestroy() {
@@ -69,26 +65,6 @@ export default {
     }
   },
   methods: {
-    async ensureJsonEditor() {
-      if (JSONEditor) return
-      if (typeof window !== 'undefined' && window.JSONEditor) {
-        JSONEditor = window.JSONEditor
-        return
-      }
-      if (!loading) {
-        loading = new Promise((resolve, reject) => {
-          const script = document.createElement('script')
-          script.src = jsoneditorUrl
-          script.onload = () => {
-            JSONEditor = window.JSONEditor
-            resolve()
-          }
-          script.onerror = reject
-          document.head.appendChild(script)
-        })
-      }
-      await loading
-    },
     createEditor() {
       const options = {
         mode: this.editorMode,

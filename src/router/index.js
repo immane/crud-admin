@@ -1,7 +1,4 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-
-Vue.use(Router)
+import { createRouter, createWebHistory } from 'vue-router'
 
 /* Layout */
 import Layout from '@/layout'
@@ -104,28 +101,34 @@ export const asyncRoutes = [
   ...lastRoutes,
   // 404,page,must be placed at the end !!!
   {
-    path: '*',
+    path: '/:pathMatch(.*)*',
     redirect: '/404',
     hidden: true
   }
 ]
 
-const createRouter = () =>
-  new Router({
-    mode: 'history', // require service support
-    base: 'admin',
+const createAppRouter = () =>
+  createRouter({
+    history: createWebHistory(import.meta.env.BASE_URL),
     scrollBehavior: () => ({
       y: 0
     }),
     routes: constantRoutes
   })
 
-const router = createRouter()
+const router = createAppRouter()
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
-  const newRouter = createRouter()
-  router.matcher = newRouter.matcher // reset router
+  const staticRouteNames = new Set()
+  const collectNames = routes => routes.forEach(route => {
+    if (route.name) staticRouteNames.add(route.name)
+    if (route.children) collectNames(route.children)
+  })
+  collectNames(constantRoutes)
+  router.getRoutes().forEach(route => {
+    if (route.name && !staticRouteNames.has(route.name)) router.removeRoute(route.name)
+  })
 }
 
 export default router

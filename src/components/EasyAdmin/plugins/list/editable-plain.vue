@@ -1,12 +1,7 @@
 <template>
   <div
     :key="editing['refresh']"
-    @dblclick="
-      editing = { refresh: 0, value: null }
-      editing['value'] = scope.row[field.property]
-      editing['editable'] = `${scope.row.id}-${field.property}`
-      editing['refresh']++
-    "
+    @dblclick="startEdit"
   >
     <template
       v-if="editing['editable'] == `${scope.row.id}-${field.property}`"
@@ -16,16 +11,9 @@
         v-focus="editing['editable'] == `${scope.row.id}-${field.property}`"
         resize="horizontal"
         prefix-icon="el-icon-edit"
-        @blur="editing = { refresh: 0, value: null }"
-        @keyup.esc.native="editing = { refresh: 0, value: null }"
-        @keyup.enter.native="
-          // update fields
-          em.update(scope.row.id, {[field.property]: editing['value']})
-            .then(() => $message.success('修改属性成功'), scope.row[field.property] = editing['value'])
-            .catch(() => $message.error('修改属性失败'))
-          // refresh edit status
-          editing = { refresh: 0, value: null }
-        "
+        @blur="cancelEdit"
+        @keyup.esc="cancelEdit"
+        @keyup.enter="saveEdit"
       />
     </template>
 
@@ -38,8 +26,10 @@
 <script>
 export default {
   directives: {
-    focus: el => {
-      el.querySelector('input').focus()
+    focus: {
+      mounted(el) {
+        el.querySelector('input')?.focus()
+      }
     }
   },
   props: {
@@ -64,6 +54,27 @@ export default {
         value: null
       },
       editing: {}
+    }
+  },
+  methods: {
+    startEdit() {
+      this.editing = {
+        refresh: this.editing.refresh + 1 || 1,
+        value: this.scope.row[this.field.property],
+        editable: `${this.scope.row.id}-${this.field.property}`
+      }
+    },
+    cancelEdit() {
+      this.editing = { refresh: 0, value: null }
+    },
+    saveEdit() {
+      this.em.update(this.scope.row.id, { [this.field.property]: this.editing.value })
+        .then(() => {
+          this.$message.success('修改属性成功')
+          this.scope.row[this.field.property] = this.editing.value
+          this.cancelEdit()
+        })
+        .catch(() => this.$message.error('修改属性失败'))
     }
   }
 }

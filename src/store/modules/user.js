@@ -135,7 +135,7 @@ const actions = {
     const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
 
     // dynamically add accessible routes
-    router.addRoutes(accessRoutes)
+    accessRoutes.forEach(route => router.addRoute(route))
 
     // reset visited views and cached views
     dispatch('tagsView/delAllViews', null, { root: true })

@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { Message } from 'element-ui'
+import { ElMessage } from 'element-plus'
 import store from '@/store'
 import router from '@/router'
 import { getToken, getRefreshToken, setToken, setRefreshToken } from '@/utils/auth'
@@ -28,8 +28,8 @@ const isAuthRequest = (url?: string) => authPaths.some(path => url?.includes(pat
 
 const clearSession = async() => {
   await store.dispatch('user/resetToken')
-  if (router.currentRoute.path !== '/login') {
-    router.replace({ path: '/login', query: { redirect: router.currentRoute.fullPath } })
+  if (router.currentRoute.value.path !== '/login') {
+    router.replace({ path: '/login', query: { redirect: router.currentRoute.value.fullPath } })
   }
 }
 
@@ -108,7 +108,7 @@ service.interceptors.response.use(
         }) as AxiosError<any>
         return retryUnauthorizedRequest(error)
       }
-      Message({
+      ElMessage({
         message: res.message || 'Error',
         type: 'error',
         duration: 5 * 1000
@@ -124,7 +124,7 @@ service.interceptors.response.use(
     }
     const errorMessage = error.response?.data?.message || error.message || 'Error'
 
-    Message({
+    ElMessage({
       message: errorMessage,
       type: 'error',
       duration: 5 * 1000
