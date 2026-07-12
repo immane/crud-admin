@@ -56,7 +56,7 @@ export default class EntityManage {
       throw Error('No entity was found.')
     }
 
-    let structureMap = store.getters.entity.structures
+    const structureMap = store.getters.entity.structures
     if (structureMap && Object.prototype.hasOwnProperty.call(structureMap, list[0])) {
       return structureMap[list[0]]
     }

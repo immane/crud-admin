@@ -1,72 +1,73 @@
 import { r } from '@/router/generator'
+import { t } from '@/i18n'
 import Layout from '@/layout'
 
 export default [
   {
     path: '/product', name: 'ProductManage', component: Layout,
-    meta: { title: '商品管理', icon: 'el-icon-goods', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('Product Management'), icon: 'el-icon-goods', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Product', '商品')
+      ...r('Product', t('Product'))
     ]
   },
 
   {
     path: '/order', name: 'OrderManage', component: Layout,
-    meta: { title: '订单管理', icon: 'el-icon-s-order', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('Order Management'), icon: 'el-icon-tickets', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Order', '订单'),
-      ...r('Invoice', '发票'),
-      ...r('OrderItem', '订单明细')
+      ...r('Order', t('Order')),
+      ...r('Invoice', t('Invoice')),
+      ...r('OrderItem', t('Order Item'))
     ]
   },
 
   {
     path: '/promotion', name: 'PromotionManage', component: Layout,
-    meta: { title: '促销管理', icon: 'el-icon-s-promotion', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('Promotion Management'), icon: 'el-icon-s-promotion', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Promotion', '促销活动'),
-      ...r('PromotionTemplate', '促销模板')
+      ...r('Promotion', t('Promotion')),
+      ...r('PromotionTemplate', t('Promotion Template'))
     ]
   },
 
   {
     path: '/content', name: 'ContentManage', component: Layout,
-    meta: { title: '内容管理', icon: 'el-icon-document', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('Content Management'), icon: 'el-icon-notebook', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Content', '内容'),
-      ...r('Page', '页面'),
-      ...r('Comment', '评论'),
-      ...r('Media', '媒体')
+      ...r('Content', t('Content')),
+      ...r('Page', t('Page')),
+      ...r('Comment', t('Comment')),
+      ...r('Media', t('Media'))
     ]
   },
 
   {
     path: '/wallet', name: 'WalletManage', component: Layout,
-    meta: { title: '钱包管理', icon: 'el-icon-money', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('Wallet Management'), icon: 'el-icon-wallet', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Wallet', '钱包'),
-      ...r('WalletTransaction', '交易记录'),
-      ...r('WalletPaymentDeduction', '支付扣款')
+      ...r('Wallet', t('Wallet')),
+      ...r('WalletTransaction', t('Transaction')),
+      ...r('WalletPaymentDeduction', t('Payment Deduction'))
     ]
   },
 
   {
     path: '/user', name: 'UserManage', component: Layout,
-    meta: { title: '用户管理', icon: 'el-icon-user', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('User Management'), icon: 'el-icon-user', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('User', '用户'),
-      ...r('Profile', '用户资料'),
-      ...r('WechatUser', '微信用户')
+      ...r('User', t('User')),
+      ...r('Profile', t('Profile')),
+      ...r('WechatUser', t('Wechat User'))
     ]
   },
 
   {
     path: '/system-option', name: 'SystemOptionManage', component: Layout,
-    meta: { title: '系统选项', icon: 'el-icon-setting', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('System Options'), icon: 'el-icon-setting', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Category', '分类'),
-      ...r('Tag', '标签'),
-      ...r('Setting', '配置')
+      ...r('Category', t('Category')),
+      ...r('Tag', t('Tag')),
+      ...r('Setting', t('Setting'))
     ]
   }
 ]

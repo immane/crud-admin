@@ -8,15 +8,15 @@
         <el-button
           v-if="lines.length > collapseLimit"
           type="text"
-          size="mini"
+          size="small"
           icon="el-icon-arrow-down"
           class="detail-json__toggle"
           @click="expanded = !expanded"
         >
-          {{ expanded ? '收起' : `展开全部 (${lines.length} 行)` }}
+          {{ expanded ? 'Collapse' : `Expand all (${lines.length} lines)` }}
         </el-button>
       </div>
-      <pre class="detail-json__code"><code><template v-for="(line, idx) in visibleLines"><span :key="idx" :class="syntaxClass(line)">{{ line }}</span><br :key="'br-' + idx"></template></code></pre>
+      <pre class="detail-json__code"><code><template v-for="(line, idx) in visibleLines" :key="idx"><span :class="syntaxClass(line)">{{ line }}</span><br></template></code></pre>
     </template>
   </div>
 </template>

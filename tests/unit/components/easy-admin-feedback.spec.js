@@ -1,9 +1,9 @@
 const mockMessage = jest.fn()
 const mockLoadingService = jest.fn(() => ({ close: jest.fn() }))
 
-jest.mock('element-ui', () => ({
-  Message: mockMessage,
-  Loading: {
+jest.mock('element-plus', () => ({
+  ElMessage: mockMessage,
+  ElLoading: {
     service: mockLoadingService
   }
 }))
@@ -39,7 +39,7 @@ describe('EasyAdmin ui feedback', () => {
     expect(vm.$loading).toHaveBeenCalledWith({ text: 'load' })
   })
 
-  it('falls back to element-ui globals when vm is absent', async() => {
+  it('falls back to Element Plus globals when vm is absent', async() => {
     const { createUiFeedback } = await import('@/components/EasyAdmin/ui/feedback')
     const feedback = createUiFeedback()
 

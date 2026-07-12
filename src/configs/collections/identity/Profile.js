@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 
 export default {
@@ -8,11 +9,11 @@ export default {
         { property: 'avatar', type: 'image', required: false },
         { property: 'level', type: 'select', default_value: 'bronze', type_options: {
           options: [
-            { value: 'bronze', label: '青铜' },
-            { value: 'silver', label: '白银' },
-            { value: 'gold', label: '黄金' },
-            { value: 'platinum', label: '铂金' },
-            { value: 'diamond', label: '钻石' }
+            { value: 'bronze', label: t('Bronze') },
+            { value: 'silver', label: t('Silver') },
+            { value: 'gold', label: t('Gold') },
+            { value: 'platinum', label: t('Platinum') },
+            { value: 'diamond', label: t('Diamond') }
           ]
         }},
         { property: 'metadata', type: 'json', required: false }
@@ -21,37 +22,20 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        nickname: '昵称',
+        nickname: t('Nickname'),
         level: {
-          __label: '等级',
-          bronze: '青铜',
-          silver: '白银',
-          gold: '黄金',
-          platinum: '铂金',
-          diamond: '钻石'
+          __label: t('Level'),
+          bronze: t('Bronze'),
+          silver: t('Silver'),
+          gold: t('Gold'),
+          platinum: t('Platinum'),
+          diamond: t('Diamond')
         }
       },
-      list_display: [
-        'id',
-        'user',
-        'nickname',
-        'level',
-        'joinedAt',
-        'createdAt'
-      ]
+      list_display: ['id', 'user', 'nickname', 'level', 'joinedAt', 'createdAt']
     },
     detail: {
-      detail_display: [
-        'id',
-        'user',
-        'nickname',
-        { property: 'avatar', type: 'image', full_width: true },
-        'level',
-        { property: 'metadata', type: 'json', full_width: true },
-        'joinedAt',
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 
 export default {
@@ -13,9 +14,9 @@ export default {
         { property: 'config', type: 'json', required: false },
         { property: 'conflictMode', type: 'select', default_value: 'stackable', type_options: {
           options: [
-            { value: 'stackable', label: '可叠加' },
-            { value: 'exclusive', label: '互斥' },
-            { value: 'priority', label: '按优先级' }
+            { value: 'stackable', label: t('Stackable') },
+            { value: 'exclusive', label: t('Exclusive') },
+            { value: 'priority', label: t('By Priority') }
           ]
         }}
       ]
@@ -23,40 +24,18 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        name: '活动名称',
-        storeCode: '门店编码',
+        name: t('Promotion Name'),
+        storeCode: t('Store Code'),
         enabled: {
-          label: '启用',
+          label: t('Enabled'),
           type: 'boolean',
           expression: 'entity.getEnabled() == :value'
         }
       },
-      list_display: [
-        'id',
-        'name',
-        'enabled',
-        'startTime',
-        'endTime',
-        'conflictMode',
-        'template',
-        'createdAt'
-      ]
+      list_display: ['id', 'name', 'enabled', 'startTime', 'endTime', 'conflictMode', 'template', 'createdAt']
     },
     detail: {
-      detail_display: [
-        'id',
-        'name',
-        'enabled',
-        { property: 'description', type: 'text', full_width: true },
-        'storeCode',
-        'startTime',
-        'endTime',
-        'conflictMode',
-        'template',
-        { property: 'config', type: 'json', full_width: true },
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

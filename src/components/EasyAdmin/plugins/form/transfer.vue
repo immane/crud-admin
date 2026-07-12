@@ -3,15 +3,15 @@
     v-model="form[field.property]"
     class="transfer-field"
     filterable
-    :titles="['待选列表', '已选列表']"
-    filter-placeholder="请选择"
+    :titles="[$t('Available'), $t('Selected')]"
+    :filter-placeholder="$t('Please select')"
     :props="{
       key: 'value',
       label: 'label'
     }"
     :data="options"
     v-bind="field.type_options"
-    v-on="field.type_events"
+    v-on="field.type_events || {}"
   />
 </template>
 

@@ -1,13 +1,13 @@
 # AI Context
 
 > Vue Admin Skeleton — AI Assistant Context Document  
-> Last updated: 2026-07-12
+> Last updated: 2026-07-13
 
 ---
 
 ## Project Overview
 
-**Vue Admin Skeleton** is a Vue 2.7 + Element UI + Vite admin dashboard scaffold, featuring **EasyAdmin** — a configuration-driven CRUD engine at its core.
+**Vue Admin Skeleton** is a Vue 3 + Element Plus + Vite admin dashboard scaffold, featuring **EasyAdmin** — a configuration-driven CRUD engine at its core.
 
 - **Name**: vue-admin-skeleton
 - **Purpose**: Enterprise admin dashboard (content management, order management, user management, etc.)
@@ -19,15 +19,16 @@
 
 | Category | Technology | Version |
 |----------|-----------|---------|
-| Framework | Vue.js | 2.7.16 |
-| UI Library | Element UI | 2.13.2 |
-| State Mgmt | Vuex (namespaced) | 3.1.0 |
-| Routing | Vue Router (history) | 3.0.6 |
+| Framework | Vue.js | 3.5 |
+| UI Library | Element Plus | 2.9 |
+| State Mgmt | Vuex (namespaced) | 4.1 |
+| Routing | Vue Router (history) | 4.5 |
 | HTTP | Axios | 0.21.1 |
 | Build | Vite | 5.x |
 | CSS | SCSS (Dart Sass) | — |
-| Testing | Jest 27 | — |
+| Testing | Vitest | 2.1 |
 | Types | TypeScript | 6.0 |
+| Icons | @element-plus/icons-vue | 2.3 |
 
 ---
 
@@ -35,7 +36,7 @@
 
 ```
 src/
-├── main.js              # Entry: install plugins, mount Vue
+├── main.js              # Entry: createApp, install plugins, mount
 ├── main.ts              # Vite bridge: import './main.js'
 ├── App.vue              # Root: <router-view />
 ├── permission.js         # Navigation guard (auth + roles)
@@ -46,26 +47,34 @@ src/
 ├── components/EasyAdmin/  # ⭐ Core CRUD Engine
 │   ├── FormAdmin.vue     # Dynamic form builder
 │   ├── ListAdmin.vue     # Dynamic list builder
+│   ├── DetailAdmin.vue   # Configurable record detail page
 │   ├── SearchFilter.vue  # Dynamic filter builder
 │   ├── plugins/form/     # 17 field-type plugins
-│   └── plugins/list/     # 8 list-rendering plugins
+│   ├── plugins/list/     # 9 list-rendering plugins
+│   └── plugins/detail/   # Detail-only plugins (json, image)
 ├── configs/              # Declarative configs
 │   ├── routes.js         # Menu/route definitions
 │   ├── entities.js       # Auto-loader (import.meta.glob)
 │   └── collections/      # Entity schema definitions (per bundle)
+├── icons/                # SVG icons (sprite + legacy compat map)
+│   ├── index.js          # installIcons: SVGO sprite + global svg-icon component
+│   ├── legacy-icons.js   # installLegacyIcons: el-icon-* → @element-plus/icons-vue
+│   └── svg/              # SVGO-optimized SVG files
 ├── layout/               # Layout (Sidebar + Navbar + AppMain)
 ├── router/               # Vue Router + r()/g() generators
 ├── store/                # Vuex (auto-loads modules/)
 ├── styles/               # Global SCSS
+│   ├── index.scss        # Entry
+│   └── sidebar.scss      # Sidebar/collapse layout styles
 ├── types/                # TypeScript type definitions
 ├── utils/                # Utilities
 │   ├── auth.js           # Cookie token management
 │   ├── entity.ts         # EntityManage CRUD class
 │   └── request.ts        # Axios JWT instance
 └── views/                # Page views
-    ├── admin/            # Generic CRUD (list + form)
+    ├── admin/            # Generic CRUD (list + form + detail)
     ├── login/            # Login page
-    └── dashboard/        # Dashboard
+    └── dashboard/        # Enterprise dashboard
 ```
 
 ---
@@ -78,7 +87,7 @@ src/
 
 Config location: `src/configs/collections/{bundle}/{EntityName}.js` (per-entity files organized by bundle)  
 Route generation: `src/configs/routes.js` using `r()` helper  
-View reuse: `views/admin/list.vue` + `views/admin/form.vue` resolve config from `$route.params.entityParam`
+View reuse: `views/admin/list.vue` + `views/admin/form.vue` + `views/admin/detail.vue` resolve config from `$route.params.entityParam`
 
 #### Entity Config File Structure
 
@@ -100,9 +109,13 @@ export default {
   EntityName: {
     entity?: string | { name, prefix?, plural? },
     form: { fields: [...] },
-    list: { query, list_filter, list_display, disabled_actions, ... }
+    list: { query, list_filter, list_display, disabled_actions, ... },
+    detail: { detail_display, disabled_actions, ... }
   }
 }
+```
+
+The `detail_display` falls back to `list.list_display` → `form.fields` → all API fields. Detail fields use the same `FieldOption` contract and list rendering plugins as `list_display`.
 ```
 
 The auto-loader (`entities.js`) uses `import.meta.glob` to collect all `.js` files under `collections/`. Files at depth 2 (e.g., `trade/Product.js`) are treated as collections and merged via `Object.assign`. Files at depth 3+ would be treated as standalone entities.
@@ -124,25 +137,52 @@ const modulesFiles = import.meta.glob('./modules/**/*.js', { eager: true })
 
 // EasyAdmin plugin auto-discovery (form fields)
 const formPlugins = import.meta.glob('./plugins/form/*.vue')
+const formPluginCache = {}
+const resolveFormPlugin = path => {
+  if (!formPluginCache[path]) {
+    formPluginCache[path] = defineAsyncComponent(() => formPlugins[path]().then(m => m.default))
+  }
+  return formPluginCache[path]
+}
 
 // EasyAdmin plugin auto-discovery (list columns)
 const listPlugins = import.meta.glob('./plugins/list/*.vue')
+const listPluginCache = {}
+const resolveListPlugin = path => {
+  if (!listPluginCache[path]) {
+    listPluginCache[path] = defineAsyncComponent(() => listPlugins[path]().then(m => m.default))
+  }
+  return listPluginCache[path]
+}
 
-// Entity config auto-loading
-const entityCollections = import.meta.glob('./collections/**/*.js', { eager: true })
+// EasyAdmin plugin auto-discovery (detail view)
+const detailPlugins = import.meta.glob('./plugins/detail/*.vue')
+
+// Entity config auto-loading (supports .js and .jsx)
+const entityCollections = import.meta.glob('./collections/**/*.{js,jsx}', { eager: true })
 ```
 
 ### 3. JWT Bearer Token Authentication
 
 - Token stored in Cookie: `dream_studio_admin_token`
+- Refresh token stored in Cookie: `dream_studio_admin_refresh_token`
 - Request interceptor: `Authorization: Bearer {token}`
 - Login: `POST /api/auth/login { identifier, password }` → `{ access_token, refresh_token }`
+- Token refresh: `POST /api/auth/token/refresh { refresh_token }` → `{ access_token, refresh_token }` (rotates both)
+- Auto-refresh: Axios response interceptor catches 401, queues concurrent requests,
+  refreshes once, retries original requests. On failure → `clearSession()` → `/login`.
 
 ### 4. Dynamic Routing + Permission Filtering
 
 - Static routes: `/login`, `/404`, `/dashboard`
 - Dynamic routes: generated post-login based on roles (`permission/generateRoutes`)
+  using `addRoute()` (Vue Router 4). `resetRouter()` removes dynamic routes by name.
 - Navigation guard: `src/permission.js` → `router.beforeEach()`
+- EasyAdmin generic routes (`create`, `update`, `detail`, `list`) are registered as
+  named routes with `/` prefix and a parent `Layout` component, using `createRouter`
+  + `createWebHistory` (Vue Router 4 API).
+- The `r()` generator uses redirect functions (not string templates) to preserve
+  URL params in Vue Router 4: `redirect: to => /\`/${to.params.id}/update\``
 
 ### 5. Metadata-Driven Field Types
 
@@ -168,8 +208,8 @@ const entityCollections = import.meta.glob('./collections/**/*.js', { eager: tru
 | `datetime.vue` | datetime | `<el-date-picker>` (yyyy-MM-dd HH:mm:ss) |
 | `image.vue` | image | `<el-upload>` (single image, wall mode) |
 | `file.vue` | — | `<el-upload>` (single file, Qiniu) |
-| `code.vue` | — | `<PrismEditor>` (JS highlight) |
-| `json.vue` | — | `<jsoneditor>` (tree/code view, vanilla API) |
+| `code.vue` | — | `<el-input type="textarea">` (no syntax highlight) |
+| `json.vue` | — | `<jsoneditor>` (tree/code view, direct npm import, no Vue wrapper) |
 | `json-custom.vue` | — | Nested `<FormAdmin>` (sub-object editor) |
 | `array.vue` | array | `<el-select multiple>` or nested `<FormAdmin>` |
 | `RelationToOne.vue` | ManyToOne, OneToOne | `<el-select>` (remote search) |
@@ -192,6 +232,17 @@ const entityCollections = import.meta.glob('./collections/**/*.js', { eager: tru
 
 List plugins are loaded dynamically via `import.meta.glob`, following the same pattern as form plugins. The `getListPluginType()` method resolves the plugin type from `field.type` or backend metadata, and `loadListPlugin()` returns the async component.
 
+### Detail Plugins (`plugins/detail/`)
+
+DetailAdmin uses a fallback chain: `plugins/detail/` → `plugins/list/` → plain text. Detail-only plugins override list defaults where detail presentation differs.
+
+| Plugin File | Type Mapping | Render Component |
+|-------------|--------------|------------------|
+| `image.vue` | image | Full-width `<el-image>` with border, shadow, preview |
+| `json.vue` | json | `<pre>` with 2-space indent, syntax coloring, expand/collapse |
+
+Adding a new detail plugin: create `plugins/detail/{type}.vue` with the same props as list plugins (`value`, `field`, `scope`, `em`, `struct`). It auto-discover via `import.meta.glob` and takes priority over the list counterpart.
+
 ---
 
 ## Quick Reference
@@ -203,12 +254,19 @@ List plugins are loaded dynamically via `import.meta.glob`, following the same p
    export default {
      EntityName: {
        form: { fields: [...] },
-       list: { list_display: [...], list_filter: {...} }
+       list: { list_display: [...], list_filter: {...} },
+       detail: { detail_display: [...], disabled_actions: [...] }  // optional
      }
    }
    ```
 2. Add `...r('EntityName', '中文名')` in `src/configs/routes.js`
 3. Done — no new page files needed
+
+### Adding a New Detail Plugin
+
+1. Create `src/components/EasyAdmin/plugins/detail/{type}.vue` with props: `value`, `field`, `scope`, `em`, `struct`
+2. Add the type name to `getListPluginType()` in `DetailAdmin.vue` (if not already present)
+3. Done — priority over list plugins, auto-discovered via `import.meta.glob`
 
 ### Adding a New List Plugin
 
@@ -230,15 +288,71 @@ List plugins are loaded dynamically via `import.meta.glob`, following the same p
 
 ```bash
 npm run dev          # Development (localhost:9528)
-npm run build:prod   # Production build
+npm run build        # Production build
 npm run lint         # ESLint
 npm run type-check   # TypeScript check
-npm run test:unit    # Unit tests
+npm run test         # Vitest unit tests
 ```
 
 ---
 
 ## Known Patterns
+
+### Legacy Icon System (`el-icon-*` → Element Plus SVG)
+
+The project has hundreds of references to old `el-icon-*` class names in templates,
+config menus, and route definitions. Instead of rewriting them all, a compatibility
+layer maps `el-icon-*` to Element Plus SVG icon components:
+
+- `src/icons/legacy-icons.js` — Registers each `el-icon-xxx` name as a global Vue
+  component mapped to the corresponding `@element-plus/icons-vue` component (38 mappings).
+- Sidebar `Item.vue` renders icons via `resolveComponent(icon)` with class `.sub-el-icon`.
+- The inline `<i class="el-icon-xxx">` pattern is migrated to `<el-icon><icon-comp /></el-icon>`.
+- Element Plus's `icon` prop on `el-button` etc. resolves globally registered components.
+
+Icon mappings (routes.js):
+- Dashboard: el-icon-s-home → HomeFilled
+- 商品管理: el-icon-goods → Goods
+- 订单管理: el-icon-tickets → Tickets
+- 促销管理: el-icon-s-promotion → Promotion
+- 内容管理: el-icon-notebook → Notebook
+- 钱包管理: el-icon-wallet → Wallet
+- 用户管理: el-icon-user → User
+- 系统选项: el-icon-setting → Setting
+
+### Sidebar Collapse Mechanism
+
+The sidebar collapse is controlled by Vuex `app/toggleSideBar`. In collapsed mode:
+
+- `el-menu` gets `.el-menu--collapse` class (width 54px).
+- Text `<span>` is hidden via Element Plus CSS: `.el-menu--collapse > .el-menu-item > span`
+  and `.el-menu--collapse > .el-sub-menu > .el-sub-menu__title > span`.
+- Icons are centered via `justify-content: center` + `margin: 0 !important` on `.sub-el-icon`.
+- `el-menu-item` must be a DIRECT child of `el-menu` for the `>` CSS selector to work.
+  This required removing the `<div v-if>` and `<app-link>` wrappers from `SidebarItem.vue`.
+- `el-menu` uses the `router` prop for automatic route navigation on click.
+
+### EasyAdmin Field Type Resolution
+
+Form fields resolve plugins via `resolvePluginType()` (Vue 3 compatible replacement
+for Vue 2's `v-set` pattern):
+- Explicit `field.type` takes priority.
+- Metadata types are normalized (case-insensitive) and only known relation types
+  (`ManyToOne`, `OneToOne`, `ManyToMany`, `OneToMany`) map to relation plugins.
+- All other metadata types fall back to `'input'` (not `'select'`).
+- The old `:set="currentStruct = structure[field.property]"` template trick is
+  removed — use `structure[field.property]` directly in templates.
+- Plugin async components are wrapped in `defineAsyncComponent()`.
+
+### Form Plugins — Vue 3 Model Contract
+
+- `v-model="form[field.property]"` works because the parent `form` object is reactive
+  and Vue 3 handles prop mutations.
+- File/image upload plugins use `:on-exceed="handleExceed"` to replace existing files
+  (clear files → handleStart → submit) since Element Plus limits upload by count.
+- Simple text input uses `.sync`-free pattern: `:model-value` + `@update:model-value`.
+- Relation plugins fetch options via `EntityManage.list()` and cache in local `data()`.
+- JSON editor uses direct `import JSONEditor from 'jsoneditor'` (no Vue wrapper).
 
 ### Nested API Resources (e.g., Specifications under Products)
 
@@ -252,13 +366,36 @@ The productId comes from the parent `FormAdmin.id` prop. The entity config file 
 
 ### JSON Editor
 
-The `json.vue` form plugin uses the vanilla `jsoneditor` library (not `vue-json-editor` wrapper). The CSS is imported directly; the JS is loaded via dynamic `<script>` from a Vite `?url` asset import. This avoids esbuild IIFE compatibility issues.
+The `json.vue` form plugin uses the vanilla `jsoneditor` library directly from npm (not `vue-json-editor` or `vue-json-editor`). Import: `import JSONEditor from 'jsoneditor'` + `import 'jsoneditor/dist/jsoneditor.css'`. No dynamic script loading needed.
 
 ### Dialog Detail
 
-- ListAdmin inline dialog opens/closes without a route change
-- `@closed="fetchData"` refreshes list data via API (no page navigation)
-- The `submit` callback in the dialog overrides the default success handler to close the dialog instead of calling `$router.go(-1)`
+- ListAdmin edit dialog uses a template-level `<form-admin>` component (no JSX
+  indirection). The dialog mounts `FormAdmin` directly when `dialog.show` is true,
+  with `v-if="dialog.show"` to force remount on each open.
+- The `submit` callback in the dialog's action slot calls `closeEditDialog()` which
+  shows a success message and closes the dialog.
+- `@closed="fetchData"` refreshes list data via API after dialog close.
+- `v-model` replaces the old `.sync` modifier for Vue 3.
+
+### Auto Token Refresh
+
+- Axios interceptor catches HTTP 401 and business code 401 in `src/utils/request.ts`
+- Concurrent expired requests queue behind a single `refreshPromise` to avoid
+  refresh-token replay detection
+- Refresh endpoint: `POST /api/auth/token/refresh { refresh_token }`
+- On success: writes new access_token + rotated refresh_token to Vuex and cookies
+- On failure: `clearSession()` → `resetToken()` → redirect `/login`
+- Auth endpoints (`login`, `logout`, `token/refresh`) are excluded from the 401 retry
+
+### Dashboard
+
+- `src/views/dashboard/index.vue` fetches live data from `EntityManage` for
+  Order, Product, User, WalletTransaction
+- SVG sparkline chart derived from order amounts (no chart library dependency)
+- Browser geolocation + Open-Meteo API for local weather; falls back to Beijing
+- All API calls are `.catch(() => ...)` — dashboard remains functional even when
+  backend is unreachable
 
 ---
 
@@ -272,4 +409,20 @@ The `json.vue` form plugin uses the vanilla `jsoneditor` library (not `vue-json-
 | EasyAdmin Config Contract | `docs/design/easyadmin-config-contract.md` |
 | Migration Plan | `docs/plan/vue3-tsx-vite-migration.md` |
 
-(End of file - total 297 lines)
+## Migration Notes (Vue 2 → Vue 3)
+
+- **Entry**: `main.js` switched from `new Vue()` to `createApp(App)`. No `Vue.use()`
+  — plugins are installed on the app instance.
+- **Vue compat**: `@vue/compat` was used during early migration but has been removed.
+  The app runs without compat mode.
+- **Router**: `new Router()` → `createRouter()` + `createWebHistory()`.
+  `router.addRoutes()` → `router.addRoute()`. `*` catch-all → `/:pathMatch(.*)*`.
+- **Store**: `new Vuex.Store()` → `createStore()`. Module registration unchanged.
+- **Filters**: Vue 2 `| dateFormat` replaced by plain methods in date/datetime list plugins.
+- **JSX files**: Entity configs with JSX syntax use `.jsx` extension (Product, Wallet).
+  The Vite config enables JSX for all `.js`/`.jsx` files.
+- **Testing**: Jest 27 replaced by Vitest 2.1. `jest.config.js` removed. Tests migrated
+  to `@vue/test-utils@2`, `createLocalVue` removed, components use `global.plugins`.
+- **Proxy**: Vite config proxies `/api`, `/system`, `/upload`, `/uploads` to backend in dev.
+- **Process.env**: `process.env.VITE_*` references are defined via `vite.config.ts`
+  (define plugin) for backward compatibility.

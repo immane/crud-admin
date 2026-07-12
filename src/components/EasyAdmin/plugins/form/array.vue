@@ -8,7 +8,7 @@
         allow-create
         default-first-option
         clearable
-        placeholder="请输入并按回车新增"
+        :placeholder="$t('Type and press Enter to add')"
       >
         <el-option
           v-for="item in options"
@@ -34,7 +34,7 @@
           form[field.property].push({});
         "
       >
-        增加
+        {{ $t('Add') }}
       </el-button>
 
       <div
@@ -114,6 +114,10 @@ export default {
       options: this.field?.type_options?.options ?? []
     }
   },
-  created() {}
+  created() {
+    if (!Array.isArray(this.form[this.field.property])) {
+      this.form[this.field.property] = []
+    }
+  }
 }
 </script>

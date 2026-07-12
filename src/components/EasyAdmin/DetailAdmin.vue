@@ -1,5 +1,5 @@
 <template>
-  <section v-loading="loading" class="detail-admin" element-loading-text="加载中...">
+  <section v-loading="loading" class="detail-admin" element-loading-text="Loading...">
     <header class="detail-admin__header">
       <div>
         <p class="detail-admin__eyebrow">RECORD DETAIL</p>
@@ -8,8 +8,8 @@
       </div>
       <div class="detail-admin__actions">
         <slot name="actions" :record="record" :refresh="fetchData">
-          <el-button icon="el-icon-arrow-left" @click="$router.go(-1)">返回</el-button>
-          <el-button v-if="editable" type="primary" icon="el-icon-edit" @click="goToUpdate">编辑</el-button>
+          <el-button icon="el-icon-arrow-left" @click="$router.go(-1)">{{ $t('Back') }}</el-button>
+          <el-button v-if="editable" type="primary" icon="el-icon-edit" @click="goToUpdate">{{ $t('Edit') }}</el-button>
         </slot>
       </div>
     </header>
@@ -45,6 +45,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent, markRaw, toRaw } from 'vue'
 import EntityManage from '@/utils/entity'
 import { createUiFeedback } from './ui/feedback'
 
@@ -54,10 +55,10 @@ const pluginCache = {}
 
 const resolvePlugin = path => {
   if (!pluginCache[path]) {
-    pluginCache[path] = () => {
+    pluginCache[path] = defineAsyncComponent(() => {
       const loader = detailPlugins[path] || listPlugins[path]
       return loader().then(module => module.default)
-    }
+    })
   }
   return pluginCache[path]
 }
@@ -82,7 +83,7 @@ export default {
   },
   created() {
     this.properties = (this.fields === '__all__' ? [] : this.fields).map(field =>
-      typeof field === 'string' ? { property: field } : field
+      typeof field === 'string' ? { property: field } : (field.component ? { ...field, component: markRaw(toRaw(field.component)) } : field)
     )
     this.fetchData()
   },
@@ -97,7 +98,7 @@ export default {
             this.properties = Object.keys(structure).map(property => ({ property }))
           }
         })
-        .catch(error => createUiFeedback(this).error(error.message || '记录加载失败'))
+        .catch(error => createUiFeedback(this).error(error.message || this.$t('Failed to load record')))
         .finally(() => { this.loading = false })
     },
     getLabel(field) {

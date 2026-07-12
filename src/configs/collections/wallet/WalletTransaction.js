@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 
 export default {
@@ -11,49 +12,28 @@ export default {
       disabled_actions: ['new', 'edit', 'delete'],
       list_filter: {
         type: {
-          __label: '类型',
-          deposit: '充值',
-          withdrawal: '提现',
-          transfer: '转账',
-          fee: '手续费',
-          refund: '退款'
+          __label: t('Type'),
+          deposit: t('Deposit'),
+          withdrawal: t('Withdrawal'),
+          transfer: t('Transfer'),
+          fee: t('Fee'),
+          refund: t('Refund')
         },
         status: {
-          __label: '状态',
-          pending: '待处理',
-          completed: '已完成',
-          failed: '失败',
-          reversed: '已冲正'
+          __label: t('Status'),
+          pending: t('Pending'),
+          completed: t('Completed'),
+          failed: t('Failed'),
+          reversed: t('Reversed')
         }
       },
       list_display: [
-        'id',
-        'uuid',
-        'amount',
-        'type',
-        'status',
-        'fromWallet',
-        'toWallet',
-        'referenceId',
-        'createdAt'
+        'id', 'uuid', 'amount', 'type', 'status',
+        'fromWallet', 'toWallet', 'referenceId', 'createdAt'
       ]
     },
     detail: {
-      detail_display: [
-        'id',
-        'uuid',
-        'amount',
-        'currency',
-        'type',
-        'status',
-        'fromWallet',
-        'toWallet',
-        'referenceId',
-        'referenceType',
-        'metadata',
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

@@ -1,10 +1,13 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 
 import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 
-import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
-import locale from 'element-ui/lib/locale/lang/zh-CN' // lang i18n
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import enLocale from 'element-plus/es/locale/lang/en'
+import zhLocale from 'element-plus/es/locale/lang/zh-cn'
+import zhTwLocale from 'element-plus/es/locale/lang/zh-tw'
+import jaLocale from 'element-plus/es/locale/lang/ja'
 
 import '@/styles/index.scss' // global css
 
@@ -12,33 +15,35 @@ import App from './App'
 import store from './store'
 import router from './router'
 
-import '@/icons' // icon
+import installIcons from '@/icons'
+import installLegacyIcons from '@/icons/legacy-icons'
+import i18n from '@/i18n'
+import { t } from '@/i18n'
 import '@/permission' // permission control
 
-import BaiduMap from 'vue-baidu-map' // baidu map
-Vue.use(BaiduMap, { ak: '2iFp9GeyUKWLhDYPWtkZLHRDM1C2EmjW' })
-
-// v-fit-columns
-import Plugin from 'v-fit-columns'
-Vue.use(Plugin)
-
 import request from '@/utils/request'
-
-import VueFilterDateFormat from '@vuejs-community/vue-filter-date-format'
-
 import $getValue from 'get-value'
-Vue.prototype.$getValue = $getValue
 
-Vue.prototype.axios = request
+const localeMap = { en: enLocale, zh: zhLocale, 'zh-Hant': zhTwLocale, ja: jaLocale }
 
-Vue.use(ElementUI, { locale })
-Vue.use(VueFilterDateFormat)
+function detectLocale() {
+  const stored = localStorage.getItem('app_locale')
+  if (stored && localeMap[stored]) return stored
+  const nav = navigator.language || ''
+  if (nav.startsWith('zh')) return 'zh'
+  return 'en'
+}
 
-Vue.config.productionTip = false
+const currentLocale = detectLocale()
 
-new Vue({
-  el: '#app',
-  router,
-  store,
-  render: h => h(App)
-})
+const app = createApp(App)
+installIcons(app)
+installLegacyIcons(app)
+app.config.globalProperties.$getValue = $getValue
+app.config.globalProperties.$axios = request
+app.directive('fit-columns', { mounted: () => {} })
+app.use(store)
+app.use(router)
+app.use(i18n)
+app.use(ElementPlus, { locale: localeMap[currentLocale] })
+app.mount('#app')

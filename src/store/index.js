@@ -1,8 +1,5 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 import getters from './getters'
-
-Vue.use(Vuex)
 
 const modulesFiles = import.meta.glob('./modules/**/*.js', { eager: true })
 
@@ -16,7 +13,7 @@ const modules = Object.keys(modulesFiles).reduce((modules, modulePath) => {
   return modules
 }, {})
 
-const store = new Vuex.Store({
+const store = createStore({
   modules,
   getters
 })

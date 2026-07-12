@@ -1,9 +1,9 @@
 <template>
   <div class="upload-container">
-    <el-button :style="{background:color,borderColor:color}" icon="el-icon-upload" size="mini" type="primary" @click=" dialogVisible=true">
-      上传
+    <el-button :style="{background:color,borderColor:color}" icon="el-icon-upload" size="small" type="primary" @click=" dialogVisible=true">
+      {{ $t('Upload') }}
     </el-button>
-    <el-dialog :visible.sync="dialogVisible">
+    <el-dialog v-model="dialogVisible">
       <el-upload
         drag
         :multiple="true"
@@ -16,14 +16,14 @@
         action="https://httpbin.org/post"
         list-type="picture"
       >
-        <i class="el-icon-upload" />
-        <div class="el-upload__text">拖拉图片至此处 或<em>点击上传</em></div>
+        <el-icon><el-icon-upload /></el-icon>
+        <div class="el-upload__text" v-html="$t('Drag images here or &lt;em&gt;click to upload&lt;/em&gt;')"></div>
       </el-upload>
       <el-button @click="dialogVisible = false">
-        取消
+        Cancel
       </el-button>
       <el-button type="primary" @click="handleSubmit">
-        确认
+        Confirm
       </el-button>
     </el-dialog>
   </div>

@@ -43,7 +43,12 @@ export default {
   data() {
     return {
       fields: this.field?.type_options?.fields ??
-        [{ property: 'common', type: 'input', field_options: { label: '默认' }}]
+        [{ property: 'common', type: 'input', field_options: { label: $t('Default') }}]
+    }
+  },
+  created() {
+    if (!this.form[this.field.property] || Array.isArray(this.form[this.field.property])) {
+      this.form[this.field.property] = {}
     }
   }
 }

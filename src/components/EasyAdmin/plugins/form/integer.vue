@@ -2,7 +2,7 @@
   <el-input-number
     v-model="form[field.property]"
     v-bind="field.type_options"
-    v-on="field.type_events"
+    v-on="field.type_events || {}"
   />
 </template>
 

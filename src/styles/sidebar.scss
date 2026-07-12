@@ -108,11 +108,12 @@
         padding: 0 !important;
 
         .svg-icon {
-          margin-left: 20px;
+          margin-left: 0;
+          margin-right: 0;
         }
 
         .sub-el-icon {
-          margin-left: 19px;
+          margin: 0 !important;
         }
       }
     }
@@ -124,11 +125,12 @@
         padding: 0 !important;
 
         .svg-icon {
-          margin-left: 20px;
+          margin-left: 0;
+          margin-right: 0;
         }
 
         .sub-el-icon {
-          margin-left: 19px;
+          margin: 0 !important;
         }
 
         .el-submenu__icon-arrow {
@@ -140,6 +142,7 @@
     .el-menu--collapse {
       .el-submenu {
         &>.el-submenu__title {
+          justify-content: center;
           &>span {
             height: 0;
             width: 0;
@@ -148,6 +151,12 @@
             display: inline-block;
           }
         }
+      }
+      .el-menu-item {
+        justify-content: center;
+      }
+      .sub-el-icon {
+        margin: 0 !important;
       }
     }
   }

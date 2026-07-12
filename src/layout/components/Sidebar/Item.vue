@@ -1,7 +1,8 @@
 <script lang="jsx">
+import { h, resolveComponent } from 'vue'
+
 export default {
   name: 'MenuItem',
-  functional: true,
   props: {
     icon: {
       type: String,
@@ -12,30 +13,36 @@ export default {
       default: ''
     }
   },
-  render(h, context) {
-    const { icon, title } = context.props
-    const vnodes = []
+  setup(props) {
+    const { icon, title } = props
 
-    if (icon) {
-      if (icon.includes('el-icon')) {
-        vnodes.push(<i class={[icon, 'sub-el-icon']} />)
-      } else {
-        vnodes.push(<svg-icon icon-class={icon}/>)
+    return () => {
+      const vnodes = []
+
+      if (icon) {
+        if (icon.includes('el-icon')) {
+          vnodes.push(
+            h(resolveComponent(icon), { class: 'sub-el-icon' })
+          )
+        } else {
+          vnodes.push(h(resolveComponent('svg-icon'), { iconClass: icon }))
+        }
       }
-    }
 
-    if (title) {
-      vnodes.push(<span slot='title'>{(title)}</span>)
+      if (title) {
+        vnodes.push(h('span', null, title))
+      }
+      return vnodes
     }
-    return vnodes
   }
 }
 </script>
 
 <style scoped>
 .sub-el-icon {
-  color: currentColor;
-  width: 1em;
-  height: 1em;
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 </style>

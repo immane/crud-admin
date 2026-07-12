@@ -5,18 +5,18 @@
       <div v-if="Object.keys(v).includes('component')">
         <component
           :is="v.component"
-          v-model="value[k]"
+          v-model="filterData[k]"
         />
       </div>
 
       <!-- Datetime -->
       <el-date-picker
         v-if="v.type === 'datetime' || v.type === 'date' || v.type === 'time'"
-        v-model="value[k]"
+        v-model="filterData[k]"
         :type="v.type"
         :placeholder="`${v.label ? v.label : k}`"
         style="width: 150px;"
-        size="medium"
+        size="default"
         :value-format="{
           datetime: 'yyyy-MM-dd HH:mm:ss',
           date: 'yyyy-MM-dd',
@@ -28,32 +28,32 @@
       <!-- Input -->
       <el-input
         v-else-if="v.type === 'input'"
-        v-model="value[k]"
+        v-model="filterData[k]"
         :placeholder="`${v.label ? v.label : k}`"
         style="width: 150px;"
-        size="medium"
+        size="default"
         clearable
       >
-        <i slot="prefix" class="el-input__icon el-icon-search" />
+        <template #prefix><el-icon><el-icon-search /></el-icon></template>
       </el-input>
 
       <!-- Boolean -->
       <el-switch
         v-else-if="v.type === 'boolean'"
-        v-model="value[k]"
+        v-model="filterData[k]"
         :inactive-text="`${v.label ? v.label : k}`"
-        size="medium"
+        size="default"
       />
 
       <!-- Select -->
       <el-select
         v-else
-        v-model="value[k]"
+        v-model="filterData[k]"
         filterable
         clearable
         :placeholder="`${v.label ? v.label : k}`"
         style="width: 150px;"
-        size="medium"
+        size="default"
       >
         <el-option
           v-for="item in v.data"
@@ -66,7 +66,7 @@
 
     <el-button
       v-if="Object.keys(filters).length"
-      size="medium"
+      size="default"
       icon="el-icon-search"
       style="margin-right: 1em"
       circle
@@ -82,9 +82,9 @@ export default {
 
   props: {
     // v-model
-    value: {
+    modelValue: {
       type: Object,
-      default: () => []
+      default: () => ({})
     },
 
     query: {
@@ -193,15 +193,15 @@ export default {
       list: [],
 
       // Translated filter config
-      filters: {}
+      filters: {},
+      filterData: {}
     }
   },
 
   watch: {
-    value: {
+    modelValue: {
       handler: function(value) {
-        this.list = value
-        // this.refreshTable++
+        this.filterData = { ...value }
       },
       deep: true
     }
@@ -273,13 +273,7 @@ export default {
           filter[key] = field
         }
 
-        // ///////////////////////////////////////////////////////
-        // Set default value
-        // DO NOT USE non-responsive set value
-        // this.value[key] = filter[key]['default']
-        //
-        // Responsive set
-        this.$set(this.value, key, filter[key]['default'])
+        this.filterData[key] = filter[key]['default']
       }
 
       for (const key in this.listFilter) {
@@ -308,8 +302,8 @@ export default {
         filter['@filter'] = this.query['@filter']
       }
 
-      for (const key in this.value) {
-        const value = this.value[key]
+      for (const key in this.filterData) {
+        const value = this.filterData[key]
         if (value) {
           const expression = this.filters[key].expression.replaceAll(':value', value)
           if (filter['@filter']) {
@@ -319,6 +313,7 @@ export default {
           }
         }
       }
+      this.$emit('update:modelValue', { ...this.filterData })
       this.$emit('update:filter', filter)
     },
 

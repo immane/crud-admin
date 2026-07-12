@@ -6,9 +6,22 @@ Migrate the current Vue2 + Vue CLI + Element UI admin dashboard to Vue3 + TSX + 
 
 This migration does not recommend a one-time rewrite. The project is not large, but it has runtime behaviors such as dynamic routing, dynamic component loading, Element UI component system, Vuex permission state, and EasyAdmin config-driven CRUD — making it suitable for phased in-place migration.
 
+## Migration Status
+
+Completed on branch `upgrade/vue3`.
+
+- Vue 3.5, Vue Router 4, Vuex 4 and Element Plus are now the runtime stack.
+- The temporary `@vue/compat` bridge was used only for the first boot milestone and has been removed.
+- EasyAdmin list, form and detail components now use Vue 3 component models,
+  slots and `defineAsyncComponent` plugin loaders.
+- `r()` redirects preserve route params under Vue Router 4; generic EasyAdmin
+  routes are registered at boot to support direct URLs without a router warning.
+- Jest has been replaced by Vitest. The migrated suite has 38 passing tests.
+- `npm run lint`, `npm run type-check`, `npm run test` and `npm run build` pass.
+
 ## Current Project Assessment
 
-Current tech stack:
+Pre-migration stack:
 
 - `vue@2.6.11`
 - `vue-router@3.0.6`
@@ -30,18 +43,28 @@ Core directories:
 - `src/icons/index.js`: Webpack SVG sprite registration
 - `src/utils/request.ts`: Axios wrapper and UI error notifications
 
+Current runtime stack:
+
+- `vue@3.5`
+- `vue-router@4`
+- `vuex@4`
+- `element-plus@2`
+- `@vitejs/plugin-vue` + `@vitejs/plugin-vue-jsx`
+- `vitest` + `@vue/test-utils@2`
+- `jsoneditor` direct integration; the Vue 2 wrapper is removed
+
 ## Recommended Target Stack
 
-Phase 1 target:
+Target stack:
 
-- `vue@3`
+- `vue@3.5`
 - `vite`
 - `typescript`
 - `@vitejs/plugin-vue`
 - `@vitejs/plugin-vue-jsx`
 - `vue-router@4`
 - `vuex@4`
-- `element-plus`
+- `element-plus@2`
 - `vitest`
 - `@vue/test-utils@2`
 

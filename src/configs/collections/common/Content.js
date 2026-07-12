@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import axios from '@/utils/request'
 import { API_PREFIX, apiPath } from '@/api/prefix'
 import { orderByIdDesc } from '../helpers'
@@ -15,33 +16,15 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        title: '标题',
+        title: t('Title'),
         'category.id': () => axios
           .get(apiPath(API_PREFIX, 'manage/categories'))
-          .then(res => Object.assign({ __label: '分类' }, ...res.data.map(v => ({ [v.id]: v.name }))))
+          .then(res => Object.assign({ __label: t('Category') }, ...res.data.map(v => ({ [v.id]: v.name }))))
       },
-      list_display: [
-        'id',
-        'title',
-        'category',
-        'tags',
-        'createdAt',
-        'updatedAt'
-      ]
+      list_display: ['id', 'title', 'category', 'tags', 'createdAt', 'updatedAt']
     },
     detail: {
-      detail_display: [
-        'id',
-        'title',
-        'category',
-        'tags',
-        'author',
-        { property: 'body', type: 'text', full_width: true },
-        'status',
-        'publishedAt',
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

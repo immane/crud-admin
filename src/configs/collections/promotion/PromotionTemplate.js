@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 
 export default {
@@ -16,36 +17,18 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        name: '模板名称',
-        type: '类型',
+        name: t('Template Name'),
+        type: t('Type'),
         enabled: {
-          label: '启用',
+          label: t('Enabled'),
           type: 'boolean',
           expression: 'entity.getEnabled() == :value'
         }
       },
-      list_display: [
-        'id',
-        'name',
-        'type',
-        'enabled',
-        'phase',
-        'createdAt'
-      ]
+      list_display: ['id', 'name', 'type', 'enabled', 'phase', 'createdAt']
     },
     detail: {
-      detail_display: [
-        'id',
-        'name',
-        'type',
-        'enabled',
-        'phase',
-        { property: 'description', type: 'text', full_width: true },
-        { property: 'dsl', type: 'text', full_width: true },
-        { property: 'fields', type: 'json', full_width: true },
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

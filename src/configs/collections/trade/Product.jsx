@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { orderByIdDesc, statusFilterLabel } from '../helpers'
 import ListAdmin from '@/components/EasyAdmin/ListAdmin'
 import FormAdmin from '@/components/EasyAdmin/FormAdmin'
@@ -40,27 +41,27 @@ const SpecificationManager = {
   },
   created() {
     if (!Array.isArray(this.form.specifications)) {
-      this.$set(this.form, 'specifications', [])
+      this.form.specifications = []
     }
   },
-  render(h) {
+  render() {
     const spec = specificationConfig.Specification
 
     if (!this.productId) {
       return (
         <div>
           <el-button
-            size={'medium'} type={'primary'} icon={'el-icon-plus'} plain
+            size={'default'} type={'primary'} icon={'el-icon-plus'} plain
             onClick={() => { this.form.specifications.push({}) }}
-          >增加</el-button>
+          >{t('Add')}</el-button>
           {this.form.specifications.map((item, index) => (
             <div key={index}>
-              <form-admin
-                value={this.form.specifications[index]}
-                onInput={(v) => { this.$set(this.form.specifications, index, v) }}
+              <FormAdmin
+                modelValue={this.form.specifications[index]}
+                {...{ 'onUpdate:modelValue': v => { this.form.specifications[index] = v } }}
                 entity-conf={'Specification'}
                 fields={this.inlineFields}
-                scopedSlots={{ action: () => <span /> }}
+                v-slots={{ action: () => <span /> }}
               />
               <p style={{ textAlign: 'right' }}>
                 <el-button
@@ -76,23 +77,23 @@ const SpecificationManager = {
 
     return (
       <div>
-        <list-admin
+        <ListAdmin
           key={this.refreshKey}
           entity-conf={this.specEntityConf}
           list-display={spec.list.list_display}
           list-filter={spec.list.list_filter}
           query={{ '@order': 'entity.sort|ASC, entity.id|DESC' }}
-          scopedSlots={{
+          v-slots={{
             topButton: () => (
               <el-button
-                size={'medium'} type={'primary'} icon={'el-icon-plus'} plain
+                size={'default'} type={'primary'} icon={'el-icon-plus'} plain
                 onClick={() => {
                   this.specId = null
                   this.specForm = { product: this.productId }
                   this.refreshKey++
                   this.dialogShow = true
                 }}
-              >新增</el-button>
+              >{t('New')}</el-button>
             ),
             'action:edit': ({ data }) => (
               <el-button
@@ -103,40 +104,40 @@ const SpecificationManager = {
                   this.refreshKey++
                   this.dialogShow = true
                 }}
-              >修改</el-button>
+              >{t('Edit')}</el-button>
             )
           }}
         />
 
         <el-dialog
-          title={this.specId ? '更新规格' : '新增规格'}
-          visible={this.dialogShow}
-          on={{
-            'update:visible': (v) => { this.dialogShow = v },
-            closed: () => { this.refreshKey++ }
+          title={this.specId ? t('Update Spec') : t('New Spec')}
+          modelValue={this.dialogShow}
+          {...{
+            'onUpdate:modelValue': v => { this.dialogShow = v },
+            onClosed: () => { this.refreshKey++ }
           }}
           width={'40%'}
         >
-          <form-admin
+          <FormAdmin
             key={this.refreshKey}
             id={this.specId}
-            value={this.specForm}
-            onInput={(v) => { this.specForm = v }}
+            modelValue={this.specForm}
+            {...{ 'onUpdate:modelValue': v => { this.specForm = v } }}
             entity-conf={this.specEntityConf}
             fields={spec.form.fields}
-            scopedSlots={{
+            v-slots={{
               action: ({ submit }) => (
                 <el-button
                   type={'primary'} icon={'el-icon-edit-outline'}
                   onClick={() => {
                     submit(() => {
-                      this.$message({ message: '保存成功', type: 'success' })
+                      this.$message({ message: t('Data saved successfully'), type: 'success' })
                       this.refreshKey++
                       this.dialogShow = false
                       this.specForm = { product: this.productId }
                     })
                   }}
-                >保存</el-button>
+                >{t('Save')}</el-button>
               )
             }}
           />
@@ -154,14 +155,14 @@ export default {
         { property: 'description', type: 'text', required: false },
         { property: 'status', type: 'select', default_value: 'active', type_options: {
           options: [
-            { value: 'active', label: '启用' },
-            { value: 'inactive', label: '停用' }
+            { value: 'active', label: t('Active') },
+            { value: 'inactive', label: t('Inactive') }
           ]
         }},
         { property: 'metadata', type: 'json', required: false },
         {
           property: 'specifications',
-          tab: '规格',
+          tab: t('Specifications'),
           component: SpecificationManager
         }
       ]
@@ -169,30 +170,13 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        name: '商品名称',
+        name: t('Product Name'),
         status: statusFilterLabel()
       },
-      list_display: [
-        'id',
-        'name',
-        'status',
-        'isDeleted',
-        'createdAt',
-        'updatedAt'
-      ]
+      list_display: ['id', 'name', 'status', 'isDeleted', 'createdAt', 'updatedAt']
     },
     detail: {
-      detail_display: [
-        'id',
-        'name',
-        'status',
-        'isDeleted',
-        { property: 'description', type: 'text', full_width: true },
-        { property: 'metadata', type: 'json', full_width: true },
-        'createdAt',
-        'updatedAt',
-        'specifications'
-      ]
+      detail_display: '__all__'
     }
   }
 }

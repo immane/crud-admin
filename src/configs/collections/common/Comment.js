@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 
 export default {
@@ -5,13 +6,12 @@ export default {
     form: {
       fields: [
         { property: 'body', type: 'text' },
-        'entityType',
-        'entityId',
+        'entityType', 'entityId',
         { property: 'status', type: 'select', default_value: 'pending', type_options: {
           options: [
-            { value: 'pending', label: '待审核' },
-            { value: 'approved', label: '已通过' },
-            { value: 'rejected', label: '已拒绝' }
+            { value: 'pending', label: t('Pending Review') },
+            { value: 'approved', label: t('Approved') },
+            { value: 'rejected', label: t('Rejected') }
           ]
         }},
         { property: 'parent', required: false }
@@ -20,36 +20,20 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        body: '评论内容',
+        body: t('Comment Body'),
         status: {
-          __label: '状态',
-          pending: '待审核',
-          approved: '已通过',
-          rejected: '已拒绝'
+          __label: t('Status'),
+          pending: t('Pending Review'),
+          approved: t('Approved'),
+          rejected: t('Rejected')
         }
       },
       list_display: [
-        'id',
-        'body',
-        'entityType',
-        'entityId',
-        'status',
-        'author',
-        'createdAt'
+        'id', 'body', 'entityType', 'entityId', 'status', 'author', 'createdAt'
       ]
     },
     detail: {
-      detail_display: [
-        'id',
-        'author',
-        'status',
-        { property: 'body', type: 'text', full_width: true },
-        'entityType',
-        'entityId',
-        'parent',
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

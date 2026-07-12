@@ -4,10 +4,10 @@
       v-model="form[field.property]"
       filterable
       clearable
-      placeholder="请选择"
+      :placeholder="$t('Please select')"
       v-bind="field.type_options"
       multiple
-      v-on="field.type_events"
+      v-on="field.type_events || {}"
     >
       <el-option
         v-for="item in options"
@@ -19,15 +19,13 @@
 
     <router-link
       v-if="field.creationUrl"
-      tag="a"
-      target="_blank"
       :to="{ path: field.creationUrl }"
     >
       <el-button
         type="success"
         icon="el-icon-plus"
         circle
-        size="mini"
+        size="small"
         style="margin: 0px 10px;"
       />
     </router-link>
@@ -60,6 +58,11 @@ export default {
     return {
       // m2o or o2o options
       options: []
+    }
+  },
+  created() {
+    if (!Array.isArray(this.form[this.field.property])) {
+      this.form[this.field.property] = []
     }
   }
 }

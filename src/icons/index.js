@@ -1,7 +1,4 @@
-import Vue from 'vue'
 import SvgIcon from '@/components/SvgIcon'
-
-Vue.component('svg-icon', SvgIcon)
 
 const svgModules = import.meta.glob('./svg/*.svg', {
   eager: true,
@@ -28,8 +25,11 @@ function injectSprite() {
   document.body.appendChild(svg)
 }
 
-if (document.body) {
-  injectSprite()
-} else {
-  document.addEventListener('DOMContentLoaded', injectSprite)
+export default function installIcons(app) {
+  app.component('svg-icon', SvgIcon)
+  if (document.body) {
+    injectSprite()
+  } else {
+    document.addEventListener('DOMContentLoaded', injectSprite)
+  }
 }

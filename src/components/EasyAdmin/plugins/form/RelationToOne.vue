@@ -5,10 +5,11 @@
       filterable
       clearable
       reserve-keyword
-      placeholder="请选择"
+      :placeholder="$t('Please select')"
       :remote-method="remoteSearch"
+      :loading="loading"
       v-bind="field.type_options"
-      v-on="field.type_events"
+      v-on="field.type_events || {}"
     >
       <el-option
         v-for="item in options"
@@ -20,15 +21,13 @@
 
     <router-link
       v-if="field.creationUrl"
-      tag="a"
-      target="_blank"
       :to="{ path: field.creationUrl }"
     >
       <el-button
         type="success"
         icon="el-icon-plus"
         circle
-        size="mini"
+        size="small"
         style="margin: 0px 10px;"
       />
     </router-link>
@@ -105,12 +104,23 @@ export default {
       this.entity = this.struct?.metadata?.targetEntity?.split('\\')?.pop()
     }
 
+    this.addSelectedOptions()
+
     if (this.entity && !this.field?.type_options?.remote) {
       this.fetchData(this.entity, this.field.relation_filter ?? {})
     }
   },
 
   methods: {
+    addSelectedOptions() {
+      const values = Array.isArray(this.form[this.field.property])
+        ? this.form[this.field.property]
+        : [this.form[this.field.property]]
+      this.options = values
+        .filter(value => value !== null && typeof value !== 'undefined' && value !== '')
+        .map(value => ({ value, label: String(value) }))
+    },
+
     async remoteSearch(query) {
       if (query !== '') {
         this.loading = true

@@ -1,7 +1,5 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-
-Vue.use(Router)
+import { createRouter, createWebHistory } from 'vue-router'
+import { t } from '@/i18n'
 
 /* Layout */
 import Layout from '@/layout'
@@ -53,7 +51,7 @@ export const constantRoutes = [
         name: 'Dashboard',
         component: () => import('@/views/dashboard/index'),
         meta: {
-          title: '控制台',
+          title: t('Dashboard'),
           icon: 'el-icon-s-home'
         }
       }
@@ -62,34 +60,51 @@ export const constantRoutes = [
 ]
 
 export const lastRoutes = [
-  // default admin route
   {
-    path: '',
+    path: '/:entityParam/create',
     component: Layout,
+    hidden: true,
     children: [
       {
-        path: `/:entityParam/create`,
+        path: '',
         name: `EasyAdminCreate`,
-        hidden: true,
         component: () => import('@/views/admin/form')
-      },
+      }
+    ]
+  },
+  {
+    path: '/:entityParam/:id/update',
+    component: Layout,
+    hidden: true,
+    children: [
       {
-        path: `/:entityParam/:id/update`,
+        path: '',
         name: `EasyAdminUpdate`,
-        hidden: true,
         component: () => import('@/views/admin/form')
-      },
+      }
+    ]
+  },
+  {
+    path: '/:entityParam/:id/detail',
+    component: Layout,
+    hidden: true,
+    children: [
       {
-        path: `/:entityParam/:id/detail`,
+        path: '',
         name: `EasyAdminDetail`,
-        hidden: true,
         component: () => import('@/views/admin/detail')
-      },
+      }
+    ]
+  },
+  {
+    path: '/:entityParam/list',
+    component: Layout,
+    hidden: true,
+    children: [
       {
-        path: `/:entityParam/list`,
+        path: '',
         name: `EasyAdminList`,
-        component: () => import('@/views/admin/list'),
-        hidden: true
+        component: () => import('@/views/admin/list')
       }
     ]
   }
@@ -101,31 +116,36 @@ export const lastRoutes = [
  */
 export const asyncRoutes = [
   ...admin.routes,
-  ...lastRoutes,
   // 404,page,must be placed at the end !!!
   {
-    path: '*',
+    path: '/:pathMatch(.*)*',
     redirect: '/404',
     hidden: true
   }
 ]
 
-const createRouter = () =>
-  new Router({
-    mode: 'history', // require service support
-    base: 'admin',
+const createAppRouter = () =>
+  createRouter({
+    history: createWebHistory(import.meta.env.BASE_URL),
     scrollBehavior: () => ({
       y: 0
     }),
-    routes: constantRoutes
+    routes: [...constantRoutes, ...lastRoutes]
   })
 
-const router = createRouter()
+const router = createAppRouter()
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
-  const newRouter = createRouter()
-  router.matcher = newRouter.matcher // reset router
+  const staticRouteNames = new Set()
+  const collectNames = routes => routes.forEach(route => {
+    if (route.name) staticRouteNames.add(route.name)
+    if (route.children) collectNames(route.children)
+  })
+  collectNames([...constantRoutes, ...lastRoutes])
+  router.getRoutes().forEach(route => {
+    if (route.name && !staticRouteNames.has(route.name)) router.removeRoute(route.name)
+  })
 }
 
 export default router

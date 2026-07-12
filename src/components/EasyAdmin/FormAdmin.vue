@@ -5,8 +5,8 @@
         <slot name="formTitle">
           <strong style="font-size: 20px;">
             <!-- Title slot here -->
-            {{ $router.currentRoute.meta.title }}
-            新增 / 修改
+            {{ $route.meta.title }}
+            {{ $t('New / Edit') }}
           </strong>
         </slot>
       </el-col>
@@ -27,7 +27,7 @@
       :model="form"
       :rules="rules"
       label-width="120px"
-      element-loading-text="加载中..."
+      element-loading-text="Loading..."
     >
       <el-tabs
         v-model="activeTab"
@@ -41,7 +41,6 @@
           <div
             v-for="field in properties"
             :key="field.property"
-            :set="currentStruct = structure[field.property]"
           >
             <template
               v-if="
@@ -55,11 +54,11 @@
                   (Object.keys(field).includes('field_options') &&
                     Object.keys(field.field_options).includes('label'))
                     ? field.field_options.label
-                    : (currentStruct ? currentStruct['translation']: field.property)
+                    : (structure[field.property] ? structure[field.property]['translation']: field.property)
                 "
                 :prop="field.property"
                 v-bind="field.field_options"
-                v-on="field.field_events"
+                v-on="field.field_events || {}"
               >
                 <!---------------
                 |  Fields slot  |
@@ -87,10 +86,10 @@
                     :name="field.property"
                     :form="form"
                     :value="form[field.property]"
-                    :struct="currentStruct"
+                    :struct="structure[field.property]"
                   >
                     <component
-                      :is="loadPlugin(field.type ? field.type : getMetadataType(currentStruct))"
+                      :is="loadPlugin(resolvePluginType(field, structure[field.property]))"
                       :em-prefix="em.prefix"
                       :form="form"
                       :field="field"
@@ -103,7 +102,7 @@
                 <template v-if="Object.keys(field).includes('help')">
                   <div class="help-text" style="display: flex;">
                     <div>
-                      <p class="el-icon-info" />
+                      <el-icon><el-icon-info /></el-icon>
                     </div>
                     <div>
                       <p v-html="field.help" />
@@ -118,8 +117,8 @@
 
       <el-form-item>
         <slot name="action" :form="form" :submit="onSubmit">
-          <el-button type="primary" icon="el-icon-edit-outline" @click="onSubmit()">保存</el-button>
-          <!--<el-button type="primary" @click="onSubmit()">保存并继续编辑</el-button>-->
+          <el-button type="primary" icon="el-icon-edit-outline" @click="onSubmit()">{{ $t('Save') }}</el-button>
+          <!--<el-button type="primary" @click="onSubmit()">Save and Continue Editing</el-button>-->
         </slot>
       </el-form-item>
     </el-form>
@@ -128,6 +127,8 @@
 </template>
 
 <script>
+import { defineAsyncComponent, markRaw, toRaw } from 'vue'
+import { t } from '@/i18n'
 import EntityManage from '@/utils/entity'
 import Tinymce from '@/components/Tinymce'
 import { createUiFeedback } from './ui/feedback'
@@ -137,7 +138,7 @@ const formPluginCache = {}
 
 const resolveFormPlugin = path => {
   if (!formPluginCache[path]) {
-    formPluginCache[path] = () => formPlugins[path]().then(module => module.default)
+    formPluginCache[path] = defineAsyncComponent(() => formPlugins[path]().then(module => module.default))
   }
   return formPluginCache[path]
 }
@@ -158,7 +159,7 @@ export default {
       type: Number,
       default: () => 0
     },
-    value: {
+    modelValue: {
       type: Object,
       default: () => { return {} }
     },
@@ -221,8 +222,8 @@ export default {
       rules: {},
 
       // tabs
-      tabs: new Set(['默认']),
-      activeTab: 0,
+      tabs: new Set([t('Default')]),
+      activeTab: '0',
 
       // translated fields
       properties: [],
@@ -237,8 +238,7 @@ export default {
         // TODO: Is here need cleaning blank values?
         // this.cleanBlankAttributes(this.form)
 
-        // Merge this.form => this.value
-        Object.assign(this.value, this.form)
+        this.$emit('update:modelValue', { ...this.modelValue, ...this.form })
       },
       deep: true
     }
@@ -263,7 +263,7 @@ export default {
           })
           this.plainFields.push(field)
         } else {
-          this.properties.push(field)
+          this.properties.push(field.component ? { ...field, component: markRaw(toRaw(field.component)) } : field)
           this.plainFields.push(field.property)
         }
       }
@@ -319,6 +319,7 @@ export default {
     loadPlugin(type) {
       const typeMapping = {
         'images': 'image',
+        'datetime_immutable': 'datetime',
         'ManyToOne': 'RelationToOne',
         'OneToOne': 'RelationToOne',
         'ManyToMany': 'RelationToMany',
@@ -332,13 +333,36 @@ export default {
       return resolveFormPlugin(path)
     },
 
+    resolvePluginType(field, currentStruct) {
+      // Select needs explicit options. Metadata alone must not turn a normal
+      // scalar into an empty select control.
+      if (field.type) return field.type
+
+      const type = currentStruct?.metadata?.type || ''
+      const normalized = String(type).replace(/[_-]/g, '').toLowerCase()
+      const relationTypes = {
+        manytoone: 'ManyToOne',
+        onetoone: 'OneToOne',
+        manytomany: 'ManyToMany',
+        onetomany: 'OneToMany'
+      }
+      if (relationTypes[normalized]) return relationTypes[normalized]
+
+      const supportedMetadataTypes = new Set([
+        'array', 'boolean', 'code', 'date', 'datetime',
+        'datetime_immutable', 'file', 'image', 'images', 'integer',
+        'json', 'text', 'textarea', 'transfer'
+      ])
+      return supportedMetadataTypes.has(type) ? type : 'input'
+    },
+
     getMetadataType(currentStruct) {
       return currentStruct?.metadata?.type
     },
 
     setDefaultData() {
       // default value process
-      const form = Object.assign({}, this.value)
+      const form = Object.assign({}, this.modelValue)
       for (const field of this.plainFields) {
         const property = this.properties.find(prop => field === prop.property)
         // All fields
@@ -410,7 +434,7 @@ export default {
     },
 
     onSubmit(success = (res) => {
-      this.uiFeedback().success('数据修改成功')
+      this.uiFeedback().success(this.$t('Data saved successfully'))
 
       // Router go back default
       // this.$router.replace({ name: `${this.em.name}List` })
@@ -431,7 +455,7 @@ export default {
               .catch(err => { this.uiFeedback().error(err.message) })
           }
         } else {
-          this.uiFeedback().warning('验证失败，请检查输入是否正确')
+          this.uiFeedback().warning(this.$t('Validation failed \u2014 please check your input'))
           return false
         }
       })

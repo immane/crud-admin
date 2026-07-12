@@ -1,10 +1,10 @@
 import { login, logout, getInfo } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, getRefreshToken, setRefreshToken, removeRefreshToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 
 const state = {
   token: getToken(),
-  refreshToken: '',
+  refreshToken: getRefreshToken(),
   name: '',
   avatar: '',
   introduction: '',
@@ -44,6 +44,11 @@ const actions = {
         commit('SET_TOKEN', token)
         commit('SET_REFRESH_TOKEN', data.refresh_token || '')
         setToken(token)
+        if (data.refresh_token) {
+          setRefreshToken(data.refresh_token)
+        } else {
+          removeRefreshToken()
+        }
         resolve()
       }).catch(error => {
         reject(error)
@@ -87,6 +92,7 @@ const actions = {
         commit('SET_REFRESH_TOKEN', '')
         commit('SET_ROLES', [])
         removeToken()
+        removeRefreshToken()
         resetRouter()
 
         // reset visited views and cached views
@@ -107,6 +113,7 @@ const actions = {
       commit('SET_REFRESH_TOKEN', '')
       commit('SET_ROLES', [])
       removeToken()
+      removeRefreshToken()
       resolve()
     })
   },
@@ -118,6 +125,7 @@ const actions = {
     commit('SET_TOKEN', token)
     commit('SET_REFRESH_TOKEN', '')
     setToken(token)
+    removeRefreshToken()
 
     const { roles } = await dispatch('getInfo')
 
@@ -127,7 +135,7 @@ const actions = {
     const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
 
     // dynamically add accessible routes
-    router.addRoutes(accessRoutes)
+    accessRoutes.forEach(route => router.addRoute(route))
 
     // reset visited views and cached views
     dispatch('tagsView/delAllViews', null, { root: true })

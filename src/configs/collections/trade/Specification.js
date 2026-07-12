@@ -1,3 +1,5 @@
+import { t } from '@/i18n'
+
 export default {
   Specification: {
     form: {
@@ -6,8 +8,8 @@ export default {
         'price',
         { property: 'status', type: 'select', default_value: 'active', type_options: {
           options: [
-            { value: 'active', label: '启用' },
-            { value: 'inactive', label: '停用' }
+            { value: 'active', label: t('Active') },
+            { value: 'inactive', label: t('Inactive') }
           ]
         }},
         { property: 'sort', default_value: 0 }
@@ -15,11 +17,11 @@ export default {
     },
     list: {
       list_filter: {
-        name: '规格名称',
+        name: t('Spec Name'),
         status: {
-          __label: '状态',
-          active: '启用',
-          inactive: '停用'
+          __label: t('Status'),
+          active: t('Active'),
+          inactive: t('Inactive')
         }
       },
       list_display: [
@@ -32,16 +34,7 @@ export default {
       ]
     },
     detail: {
-      detail_display: [
-        'id',
-        'name',
-        'price',
-        'status',
-        'sort',
-        'product',
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

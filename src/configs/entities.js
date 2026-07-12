@@ -1,4 +1,4 @@
-const entityCollections = import.meta.glob('./collections/**/*.js', { eager: true })
+const entityCollections = import.meta.glob('./collections/**/*.{js,jsx}', { eager: true })
 
 /**
  * You do not need `import entities from './entities/Entity'`

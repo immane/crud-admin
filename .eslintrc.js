@@ -1,8 +1,10 @@
 module.exports = {
   root: true,
+  parser: 'vue-eslint-parser',
   parserOptions: {
-    parser: 'babel-eslint',
-    sourceType: 'module'
+    parser: '@typescript-eslint/parser',
+    sourceType: 'module',
+    ecmaFeatures: { jsx: true }
   },
   env: {
     browser: true,
@@ -17,14 +19,16 @@ module.exports = {
     "vue/max-attributes-per-line": [2, {
       "singleline": 10,
       "multiline": {
-        "max": 1,
-        "allowFirstLine": false
+        "max": 1
       }
     }],
     "vue/singleline-html-element-content-newline": "off",
     "vue/multiline-html-element-content-newline":"off",
-    "vue/name-property-casing": ["error", "PascalCase"],
     "vue/no-v-html": "off",
+    "vue/multi-word-component-names": "off",
+    "vue/no-mutating-props": "off",
+    "vue/no-v-model-argument": "off",
+    "vue/no-v-for-template-key": "off",
     'accessor-pairs': 2,
     'arrow-spacing': [2, {
       'before': true,

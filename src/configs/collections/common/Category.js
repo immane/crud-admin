@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import axios from '@/utils/request'
 import { API_PREFIX, apiPath } from '@/api/prefix'
 
@@ -16,38 +17,20 @@ export default {
     list: {
       query: { '@order': 'entity.sortOrder|ASC, entity.id|DESC' },
       list_filter: {
-        name: '分类名称',
+        name: t('Category Name'),
         enabled: {
-          label: '启用',
+          label: t('Enabled'),
           type: 'boolean',
           expression: 'entity.getEnabled() == :value'
         },
         'parent.id': () => axios
           .get(apiPath(API_PREFIX, 'manage/categories'))
-          .then(res => Object.assign({ __label: '上级分类' }, ...res.data.map(v => ({ [v.id]: v.name }))))
+          .then(res => Object.assign({ __label: t('Parent Category') }, ...res.data.map(v => ({ [v.id]: v.name }))))
       },
-      list_display: [
-        'id',
-        'name',
-        'slug',
-        'parent',
-        'enabled',
-        'sortOrder',
-        'createdAt'
-      ]
+      list_display: ['id', 'name', 'slug', 'parent', 'enabled', 'sortOrder', 'createdAt']
     },
     detail: {
-      detail_display: [
-        'id',
-        'name',
-        'slug',
-        { property: 'description', type: 'text', full_width: true },
-        'parent',
-        'enabled',
-        'sortOrder',
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

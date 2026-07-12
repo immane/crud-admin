@@ -1,7 +1,7 @@
 <template>
   <div :style="{ display: 'flex', flexWrap: 'wrap' }">
-    <template v-for="(item, index) in visibleItems">
-      <el-tag :key="index" :style="{ margin: '2px' }">
+    <template v-for="(item, index) in visibleItems" :key="index">
+      <el-tag :style="{ margin: '2px' }">
         {{ item.__toString || item }}
       </el-tag>
     </template>
@@ -11,7 +11,7 @@
         <el-tag :style="{ margin: '2px' }">
           ...
         </el-tag>
-        <div slot="content">
+        <template #content>
           <div
             v-for="(item, index) in value"
             :key="index"
@@ -21,7 +21,7 @@
               {{ item.__toString || item }}
             </el-tag>
           </div>
-        </div>
+        </template>
       </el-tooltip>
     </template>
   </div>

@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 
 export default {
@@ -12,27 +13,13 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        name: '标签名称',
+        name: t('Tag Name'),
         slug: 'Slug'
       },
-      list_display: [
-        'id',
-        'name',
-        'slug',
-        'color',
-        'createdAt'
-      ]
+      list_display: ['id', 'name', 'slug', 'color', 'createdAt']
     },
     detail: {
-      detail_display: [
-        'id',
-        'name',
-        'slug',
-        'color',
-        'type',
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

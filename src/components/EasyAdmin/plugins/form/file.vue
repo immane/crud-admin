@@ -1,5 +1,6 @@
 <template>
   <el-upload
+    ref="upload"
     v-bind="field.type_options"
     :action="`${BASE_API}/upload?storage=qiniu`"
     :limit="1"
@@ -11,14 +12,17 @@
     list-type="file"
     :on-remove="(file, fileList) => form[field.property] = ''"
     :on-success="(res, file) => { form[field.property] = res.data[0] }"
-    v-on="field.type_events"
+    :on-exceed="handleExceed"
+    v-on="field.type_events || {}"
   >
-    <el-button size="small" type="primary">点击选择文件</el-button>
-    <div slot="tip" class="el-upload__tip">上传文件必须少于100MB</div>
+    <el-button size="small" type="primary">{{ $t('Select file') }}</el-button>
+    <template #tip><div class="el-upload__tip">{{ $t('File must be less than 100MB') }}</div></template>
   </el-upload>
 </template>
 
 <script>
+import SIP from '@/utils/simple-image-process'
+
 export default {
   props: {
     form: {
@@ -34,6 +38,20 @@ export default {
     return {
       // base api
       BASE_API: process.env.VITE_BASE_API
+    }
+  },
+  methods: {
+    getPicture(url) {
+      return SIP.getPicture(url)
+    },
+    handleExceed(files) {
+      this.form[this.field.property] = ''
+      const upload = this.$refs.upload
+      this.$nextTick(() => {
+        upload.clearFiles()
+        upload.handleStart(files[0])
+        upload.submit()
+      })
     }
   }
 }

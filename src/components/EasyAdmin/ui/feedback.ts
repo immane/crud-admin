@@ -1,4 +1,4 @@
-import { Message, Loading } from 'element-ui'
+import { ElLoading, ElMessage } from 'element-plus'
 
 export interface LoadingInstance {
   close: () => void
@@ -20,7 +20,7 @@ export interface UiFeedbackService {
 
 export function createUiFeedback(vm?: any): UiFeedbackService {
   const fallbackMessage = (type: 'success' | 'error' | 'warning', message: string) => {
-    Message({ message, type })
+    ElMessage({ message, type })
   }
 
   const fromVm = vm && vm.$message && vm.$loading
@@ -38,6 +38,6 @@ export function createUiFeedback(vm?: any): UiFeedbackService {
     success: message => fallbackMessage('success', message),
     error: message => fallbackMessage('error', message),
     warning: message => fallbackMessage('warning', message),
-    loading: options => Loading.service(options || {})
+    loading: options => ElLoading.service(options || {})
   }
 }
