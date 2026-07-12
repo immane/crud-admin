@@ -54,7 +54,7 @@ export const constantRoutes = [
         component: () => import('@/views/dashboard/index'),
         meta: {
           title: '控制台',
-          icon: 'dashboard'
+          icon: 'el-icon-s-home'
         }
       }
     ]
