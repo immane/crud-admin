@@ -72,6 +72,14 @@
       circle
       @click="filterGenerate(); fetchData();"
     />
+    <el-button
+      v-if="Object.keys(filters).length"
+      size="default"
+      icon="el-icon-refresh"
+      title="Reset search"
+      circle
+      @click="reset"
+    />
 
   </span>
 </template>
@@ -324,6 +332,14 @@ export default {
       }
       this.$emit('update:modelValue', { ...this.filterData })
       this.$emit('update:filter', filter)
+    },
+
+    reset() {
+      this.filterData = Object.fromEntries(
+        Object.entries(this.filters).map(([key, filter]) => [key, filter.default])
+      )
+      this.filterGenerate()
+      this.$emit('reset')
     },
 
     fetchData(resetPage = true) {

@@ -21,6 +21,7 @@
             :query="query"
             :fetch-data-func="fetchFilteredData"
             :list-filter="listFilter"
+            @reset="resetSearch"
           />
         </slot>
 
@@ -825,6 +826,12 @@ export default {
 
     fetchFilteredData(_searchFilter, resetPage = true) {
       if (resetPage) this.pager.page = 1
+      this.fetchData()
+    },
+
+    resetSearch() {
+      this.pager.page = 1
+      this.pager.limit = 20
       this.fetchData()
     },
 
