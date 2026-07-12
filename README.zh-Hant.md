@@ -44,6 +44,12 @@
 - **程式碼分割與建置最佳化** — Vite 驅動的 chunk 分割和 tree-shaking
 - **Vitest 單元測試** — 38 項元件和工具函數測試
 
+<p align="center">
+  <img src="docs/images/dashboard-sample.jpg" alt="Dashboard" width="32%" />
+  <img src="docs/images/list-sample.jpg" alt="List" width="32%" />
+  <img src="docs/images/detail-sample.jpg" alt="Detail" width="32%" />
+</p>
+
 ## 技術棧
 
 | 元件 | 技術 |

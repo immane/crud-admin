@@ -44,6 +44,12 @@
 - **Code Splitting & Build Optimization** — Vite-powered chunk splitting with tree-shaking
 - **Vitest Unit Testing** — 38 tests across components and utilities
 
+<p align="center">
+  <img src="docs/images/dashboard-sample.jpg" alt="Dashboard" width="32%" />
+  <img src="docs/images/list-sample.jpg" alt="List" width="32%" />
+  <img src="docs/images/detail-sample.jpg" alt="Detail" width="32%" />
+</p>
+
 ## Tech Stack
 
 | Component | Technology |

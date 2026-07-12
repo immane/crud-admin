@@ -44,6 +44,12 @@
 - **代码分割与构建优化** — Vite 驱动的 chunk 分割和 tree-shaking
 - **Vitest 单元测试** — 38 项组件和工具函数测试
 
+<p align="center">
+  <img src="docs/images/dashboard-sample.jpg" alt="Dashboard" width="32%" />
+  <img src="docs/images/list-sample.jpg" alt="List" width="32%" />
+  <img src="docs/images/detail-sample.jpg" alt="Detail" width="32%" />
+</p>
+
 ## 技术栈
 
 | 组件 | 技术 |
