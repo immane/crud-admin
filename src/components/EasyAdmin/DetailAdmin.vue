@@ -8,8 +8,8 @@
       </div>
       <div class="detail-admin__actions">
         <slot name="actions" :record="record" :refresh="fetchData">
-          <el-button icon="el-icon-arrow-left" @click="$router.go(-1)">{{ $t('easyAdmin.back') }}</el-button>
-          <el-button v-if="editable" type="primary" icon="el-icon-edit" @click="goToUpdate">{{ $t('easyAdmin.edit') }}</el-button>
+          <el-button icon="el-icon-arrow-left" @click="$router.go(-1)">{{ $t('Back') }}</el-button>
+          <el-button v-if="editable" type="primary" icon="el-icon-edit" @click="goToUpdate">{{ $t('Edit') }}</el-button>
         </slot>
       </div>
     </header>
@@ -98,7 +98,7 @@ export default {
             this.properties = Object.keys(structure).map(property => ({ property }))
           }
         })
-        .catch(error => createUiFeedback(this).error(error.message || this.$t('easyAdmin.loadFailed')))
+        .catch(error => createUiFeedback(this).error(error.message || this.$t('Failed to load record')))
         .finally(() => { this.loading = false })
     },
     getLabel(field) {

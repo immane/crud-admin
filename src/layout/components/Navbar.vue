@@ -3,7 +3,7 @@
     <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
 
     <div class="back">
-      <a class="back-link" @click="$router.go(-1)"><el-icon><el-icon-back /></el-icon> {{ $t('navbar.back') }}</a>
+      <a class="back-link" @click="$router.go(-1)"><el-icon><el-icon-back /></el-icon> {{ $t('Back') }}</a>
       <el-divider direction="vertical" />
     </div>
 
@@ -40,14 +40,14 @@
           <el-dropdown-menu class="user-dropdown">
           <router-link :to="{ name: 'Dashboard'}">
             <el-dropdown-item>
-              {{ $t('navbar.hello', name) }}
+              {{ $t('Hello, {0}', name) }}
             </el-dropdown-item>
           </router-link>
           <el-dropdown-item @click="clearCache">
-            <span style="display:block;">{{ $t('navbar.clearCache') }}</span>
+            <span style="display:block;">{{ $t('Clear Cache') }}</span>
           </el-dropdown-item>
           <el-dropdown-item divided @click="logout">
-            <span style="display:block;">{{ $t('navbar.logout') }}</span>
+            <span style="display:block;">{{ $t('Logout') }}</span>
           </el-dropdown-item>
           </el-dropdown-menu>
         </template>
@@ -88,7 +88,7 @@ export default {
     },
     async clearCache() {
       await this.$store.dispatch('entity/reset')
-      this.$message({ message: this.$t('navbar.cacheCleared'), type: 'success' })
+      this.$message({ message: this.$t('Cache cleared successfully'), type: 'success' })
     },
     async logout() {
       await this.$store.dispatch('user/logout')

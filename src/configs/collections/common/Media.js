@@ -16,8 +16,8 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        filename: t('entity.filename'),
-        mimeType: t('entity.mimeType')
+        filename: t('Filename'),
+        mimeType: t('MIME Type')
       },
       list_display: ['id', 'filename', 'originalFilename', 'mimeType', 'size', { property: 'path', type: 'image' }, 'createdAt']
     },

@@ -14,9 +14,9 @@ export default {
         { property: 'config', type: 'json', required: false },
         { property: 'conflictMode', type: 'select', default_value: 'stackable', type_options: {
           options: [
-            { value: 'stackable', label: t('entity.stackable') },
-            { value: 'exclusive', label: t('entity.exclusive') },
-            { value: 'priority', label: t('entity.byPriority') }
+            { value: 'stackable', label: t('Stackable') },
+            { value: 'exclusive', label: t('Exclusive') },
+            { value: 'priority', label: t('By Priority') }
           ]
         }}
       ]
@@ -24,10 +24,10 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        name: t('entity.promotionName'),
-        storeCode: t('entity.storeCode'),
+        name: t('Promotion Name'),
+        storeCode: t('Store Code'),
         enabled: {
-          label: t('entity.enabled'),
+          label: t('Enabled'),
           type: 'boolean',
           expression: 'entity.getEnabled() == :value'
         }

@@ -2,7 +2,7 @@
   <el-date-picker
     v-model="form[field.property]"
     type="date"
-    :placeholder="$t('form.selectDate')"
+    :placeholder="$t('Select date')"
     v-bind="field.type_options"
     value-format="yyyy-MM-dd"
     v-on="field.type_events || {}"

@@ -5,69 +5,69 @@ import Layout from '@/layout'
 export default [
   {
     path: '/product', name: 'ProductManage', component: Layout,
-    meta: { title: t('route.productManagement'), icon: 'el-icon-goods', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('Product Management'), icon: 'el-icon-goods', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Product', t('route.product'))
+      ...r('Product', t('Product'))
     ]
   },
 
   {
     path: '/order', name: 'OrderManage', component: Layout,
-    meta: { title: t('route.orderManagement'), icon: 'el-icon-tickets', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('Order Management'), icon: 'el-icon-tickets', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Order', t('route.order')),
-      ...r('Invoice', t('route.invoice')),
-      ...r('OrderItem', t('route.orderItem'))
+      ...r('Order', t('Order')),
+      ...r('Invoice', t('Invoice')),
+      ...r('OrderItem', t('Order Item'))
     ]
   },
 
   {
     path: '/promotion', name: 'PromotionManage', component: Layout,
-    meta: { title: t('route.promotionManagement'), icon: 'el-icon-s-promotion', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('Promotion Management'), icon: 'el-icon-s-promotion', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Promotion', t('route.promotion')),
-      ...r('PromotionTemplate', t('route.promotionTemplate'))
+      ...r('Promotion', t('Promotion')),
+      ...r('PromotionTemplate', t('Promotion Template'))
     ]
   },
 
   {
     path: '/content', name: 'ContentManage', component: Layout,
-    meta: { title: t('route.contentManagement'), icon: 'el-icon-notebook', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('Content Management'), icon: 'el-icon-notebook', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Content', t('route.content')),
-      ...r('Page', t('route.page')),
-      ...r('Comment', t('route.comment')),
-      ...r('Media', t('route.media'))
+      ...r('Content', t('Content')),
+      ...r('Page', t('Page')),
+      ...r('Comment', t('Comment')),
+      ...r('Media', t('Media'))
     ]
   },
 
   {
     path: '/wallet', name: 'WalletManage', component: Layout,
-    meta: { title: t('route.walletManagement'), icon: 'el-icon-wallet', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('Wallet Management'), icon: 'el-icon-wallet', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Wallet', t('route.wallet')),
-      ...r('WalletTransaction', t('route.transaction')),
-      ...r('WalletPaymentDeduction', t('route.paymentDeduction'))
+      ...r('Wallet', t('Wallet')),
+      ...r('WalletTransaction', t('Transaction')),
+      ...r('WalletPaymentDeduction', t('Payment Deduction'))
     ]
   },
 
   {
     path: '/user', name: 'UserManage', component: Layout,
-    meta: { title: t('route.userManagement'), icon: 'el-icon-user', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('User Management'), icon: 'el-icon-user', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('User', t('route.user')),
-      ...r('Profile', t('route.profile')),
-      ...r('WechatUser', t('route.wechatUser'))
+      ...r('User', t('User')),
+      ...r('Profile', t('Profile')),
+      ...r('WechatUser', t('Wechat User'))
     ]
   },
 
   {
     path: '/system-option', name: 'SystemOptionManage', component: Layout,
-    meta: { title: t('route.systemOptions'), icon: 'el-icon-setting', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('System Options'), icon: 'el-icon-setting', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Category', t('route.category')),
-      ...r('Tag', t('route.tag')),
-      ...r('Setting', t('route.setting'))
+      ...r('Category', t('Category')),
+      ...r('Tag', t('Tag')),
+      ...r('Setting', t('Setting'))
     ]
   }
 ]

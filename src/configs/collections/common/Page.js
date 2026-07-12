@@ -11,8 +11,8 @@ export default {
         { property: 'metaDescription', type: 'text', required: false },
         { property: 'status', type: 'select', default_value: 'draft', type_options: {
           options: [
-            { value: 'draft', label: t('dashboard.status.draft') },
-            { value: 'published', label: t('dashboard.status.published') }
+            { value: 'draft', label: t('Draft') },
+            { value: 'published', label: t('Published') }
           ]
         }}
       ]
@@ -20,11 +20,11 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        title: t('entity.title'),
+        title: t('Title'),
         status: {
-          __label: t('entity.status'),
-          draft: t('dashboard.status.draft'),
-          published: t('dashboard.status.published')
+          __label: t('Status'),
+          draft: t('Draft'),
+          published: t('Published')
         }
       },
       list_display: ['id', 'title', 'slug', 'status', 'publishedAt', 'createdAt']

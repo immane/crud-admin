@@ -5,7 +5,7 @@
       filterable
       clearable
       reserve-keyword
-      :placeholder="$t('form.pleaseSelect')"
+      :placeholder="$t('Please select')"
       :remote-method="remoteSearch"
       :loading="loading"
       v-bind="field.type_options"

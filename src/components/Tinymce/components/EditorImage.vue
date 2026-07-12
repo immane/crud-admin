@@ -1,7 +1,7 @@
 <template>
   <div class="upload-container">
     <el-button :style="{background:color,borderColor:color}" icon="el-icon-upload" size="small" type="primary" @click=" dialogVisible=true">
-      {{ $t('form.upload') }}
+      {{ $t('Upload') }}
     </el-button>
     <el-dialog v-model="dialogVisible">
       <el-upload
@@ -17,7 +17,7 @@
         list-type="picture"
       >
         <el-icon><el-icon-upload /></el-icon>
-        <div class="el-upload__text" v-html="$t('form.dragHere')"></div>
+        <div class="el-upload__text" v-html="$t('Drag images here or &lt;em&gt;click to upload&lt;/em&gt;')"></div>
       </el-upload>
       <el-button @click="dialogVisible = false">
         Cancel

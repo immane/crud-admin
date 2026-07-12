@@ -11,18 +11,18 @@
     >
       <template v-slot:extraAction="{ data }">
         <el-button size="small" @click="dialog.data = data.roles; dialog.pk = data.id; dialog.visible = true;">
-          {{ $t('entity.modifyRoles') }}
+          {{ $t('Modify Roles') }}
         </el-button>
       </template>
     </list-admin>
 
     <el-dialog
-      :title="$t('entity.modifyRoles')"
+      :title="$t('Modify Roles')"
       v-model="dialog.visible"
       width="40%"
     >
       <span>
-        <el-select v-model="dialog.data" multiple :placeholder="$t('entity.selectRoles')" style="width: 100%;">
+        <el-select v-model="dialog.data" multiple :placeholder="$t('Select roles')" style="width: 100%;">
           <el-option
             v-for="item in dialog.options"
             :key="item.value"
@@ -33,16 +33,16 @@
       </span>
       <template #footer>
         <span class="dialog-footer">
-        <el-button @click="dialog.visible = false">{{ $t('form.cancel') }}</el-button>
+        <el-button @click="dialog.visible = false">{{ $t('Cancel') }}</el-button>
         <el-button
           type="primary"
           @click="
             em.update(dialog.pk, { roles: dialog.data })
-              .then(res => $message( { type: 'success', message: $t('entity.rolesUpdated') } ) )
-              .catch(err => $message( { type: 'error', message: $t('entity.rolesUpdateFailed') } ) )
+              .then(res => $message( { type: 'success', message: $t('Roles updated successfully') } ) )
+              .catch(err => $message( { type: 'error', message: $t('Failed to update roles') } ) )
               .finally(() => { dialog.visible = false; componentRefresh++ } )
           "
-        >{{ $t('form.confirm') }}</el-button>
+        >{{ $t('Confirm') }}</el-button>
         </span>
       </template>
     </el-dialog>
@@ -71,9 +71,9 @@ export default {
         pk: null,
         data: null,
         options: [
-          { value: 'ROLE_USER', label: $t('entity.roleUser') },
-          { value: 'ROLE_SUPER_ADMIN', label: $t('entity.roleSuperAdmin') },
-          { value: 'ROLE_STAFF', label: $t('entity.roleStaff') }
+          { value: 'ROLE_USER', label: $t('User') },
+          { value: 'ROLE_SUPER_ADMIN', label: $t('Super Admin') },
+          { value: 'ROLE_STAFF', label: $t('Staff') }
         ]
       }
     }

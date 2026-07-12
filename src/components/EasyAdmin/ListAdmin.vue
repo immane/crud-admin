@@ -50,7 +50,7 @@
               @click="() => {
                 const loading = startLoading({
                   lock: true,
-                  text: t('easyAdmin.exportText'),
+                  text: t('Exporting data'),
                   spinner: 'el-icon-loading',
                   background: 'rgba(0, 0, 0, 0.7)'
                 })
@@ -101,7 +101,7 @@
                 })
               }"
             >
-               {{ $t('easyAdmin.export') }}
+               {{ $t('Export') }}
             </el-button>
           </template>
 
@@ -115,13 +115,13 @@
             icon="el-icon-plus"
             plain
             @click="() => {
-              dialog.title = t('easyAdmin.newRecord')
+              dialog.title = t('New Record')
               delete dialog.data.id
               dialog.refresh++
               dialog.show = true
             }"
           >
-             {{ $t('easyAdmin.new') }} {{ $route.meta.title }}
+             {{ $t('New') }} {{ $route.meta.title }}
           </el-button>
         </slot>
       </el-col>
@@ -216,7 +216,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column v-if="!disabledActions.includes('lines')" :label="$t('easyAdmin.actions')">
+        <el-table-column v-if="!disabledActions.includes('lines')" :label="$t('Actions')">
           <template #default="scope">
             <div class="easy-admin-actions">
               <component
@@ -240,7 +240,7 @@
                     plain
                     @click="$router.push({ name: `${em.name}Detail`, params: { id: scope.row.id } })"
                   >
-                    {{ $t('easyAdmin.details') }}
+                    {{ $t('Details') }}
                   </el-button>
                 </slot>
 
@@ -255,15 +255,15 @@
                     plain
                     @click="openEditDialog(scope.row.id)"
                   >
-                    {{ $t('easyAdmin.edit') }}
+                    {{ $t('Edit') }}
                   </el-button>
                 </slot>
 
               &nbsp;&nbsp;
 
                 <slot name="action:delete" :data="scope.row">
-                  <el-popconfirm v-if="!disabledActions.includes('delete')" :title="$t('easyAdmin.deleteConfirm')" @confirm="removeAction(scope.row.id)">
-                    <template #reference><el-button size="small" type="danger" icon="el-icon-delete" plain>{{ $t('easyAdmin.delete') }}</el-button></template>
+                  <el-popconfirm v-if="!disabledActions.includes('delete')" :title="$t('Delete this record?')" @confirm="removeAction(scope.row.id)">
+                    <template #reference><el-button size="small" type="danger" icon="el-icon-delete" plain>{{ $t('Delete') }}</el-button></template>
                   </el-popconfirm>
                 </slot>
               </slot>
@@ -305,7 +305,7 @@
       >
         <template #formTitle><span /></template>
         <template #action="{ submit }">
-          <el-button type="primary" icon="el-icon-edit-outline" @click="submit(closeEditDialog)">{{ $t('easyAdmin.save') }}</el-button>
+          <el-button type="primary" icon="el-icon-edit-outline" @click="submit(closeEditDialog)">{{ $t('Save') }}</el-button>
         </template>
       </form-admin>
     </el-dialog>
@@ -710,14 +710,14 @@ export default {
     },
 
     openEditDialog(id) {
-      this.dialog.title = this.$t('easyAdmin.editRecord')
+      this.dialog.title = this.$t('Edit Record')
       this.dialog.data.id = id
       this.dialog.refresh++
       this.dialog.show = true
     },
 
     closeEditDialog() {
-      this.notifySuccess(this.$t('easyAdmin.saved'))
+      this.notifySuccess(this.$t('Data saved successfully'))
       this.dialog.show = false
     },
 
@@ -808,7 +808,7 @@ export default {
     // Remove action
     removeAction(pk) {
       this.em.delete(pk).then(res => {
-        this.notifySuccess(this.$t('easyAdmin.deleted'))
+        this.notifySuccess(this.$t('Deleted successfully'))
         this.fetchData()
       })
     },

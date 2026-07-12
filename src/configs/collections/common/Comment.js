@@ -9,9 +9,9 @@ export default {
         'entityType', 'entityId',
         { property: 'status', type: 'select', default_value: 'pending', type_options: {
           options: [
-            { value: 'pending', label: t('entity.pendingReview') },
-            { value: 'approved', label: t('entity.approved') },
-            { value: 'rejected', label: t('entity.rejected') }
+            { value: 'pending', label: t('Pending Review') },
+            { value: 'approved', label: t('Approved') },
+            { value: 'rejected', label: t('Rejected') }
           ]
         }},
         { property: 'parent', required: false }
@@ -20,12 +20,12 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        body: t('entity.commentBody'),
+        body: t('Comment Body'),
         status: {
-          __label: t('entity.status'),
-          pending: t('entity.pendingReview'),
-          approved: t('entity.approved'),
-          rejected: t('entity.rejected')
+          __label: t('Status'),
+          pending: t('Pending Review'),
+          approved: t('Approved'),
+          rejected: t('Rejected')
         }
       },
       list_display: [

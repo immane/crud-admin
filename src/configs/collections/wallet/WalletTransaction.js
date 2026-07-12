@@ -12,19 +12,19 @@ export default {
       disabled_actions: ['new', 'edit', 'delete'],
       list_filter: {
         type: {
-          __label: t('entity.type'),
-          deposit: t('entity.deposit'),
-          withdrawal: t('entity.withdrawal'),
-          transfer: t('entity.transfer'),
-          fee: t('entity.fee'),
-          refund: t('entity.refund')
+          __label: t('Type'),
+          deposit: t('Deposit'),
+          withdrawal: t('Withdrawal'),
+          transfer: t('Transfer'),
+          fee: t('Fee'),
+          refund: t('Refund')
         },
         status: {
-          __label: t('entity.status'),
-          pending: t('entity.pending'),
-          completed: t('entity.completed'),
-          failed: t('entity.failed'),
-          reversed: t('entity.reversed')
+          __label: t('Status'),
+          pending: t('Pending'),
+          completed: t('Completed'),
+          failed: t('Failed'),
+          reversed: t('Reversed')
         }
       },
       list_display: [

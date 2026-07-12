@@ -43,7 +43,7 @@ export default {
   data() {
     return {
       fields: this.field?.type_options?.fields ??
-        [{ property: 'common', type: 'input', field_options: { label: $t('form.defaultField') }}]
+        [{ property: 'common', type: 'input', field_options: { label: $t('Default') }}]
     }
   },
   created() {

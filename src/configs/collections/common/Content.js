@@ -16,10 +16,10 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        title: t('entity.title'),
+        title: t('Title'),
         'category.id': () => axios
           .get(apiPath(API_PREFIX, 'manage/categories'))
-          .then(res => Object.assign({ __label: t('entity.category') }, ...res.data.map(v => ({ [v.id]: v.name }))))
+          .then(res => Object.assign({ __label: t('Category') }, ...res.data.map(v => ({ [v.id]: v.name }))))
       },
       list_display: ['id', 'title', 'category', 'tags', 'createdAt', 'updatedAt']
     },

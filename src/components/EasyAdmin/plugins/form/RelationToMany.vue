@@ -4,7 +4,7 @@
       v-model="form[field.property]"
       filterable
       clearable
-      :placeholder="$t('form.pleaseSelect')"
+      :placeholder="$t('Please select')"
       v-bind="field.type_options"
       multiple
       v-on="field.type_events || {}"

@@ -6,7 +6,7 @@
           <strong style="font-size: 20px;">
             <!-- Title slot here -->
             {{ $route.meta.title }}
-            {{ $t('easyAdmin.newEdit') }}
+            {{ $t('New / Edit') }}
           </strong>
         </slot>
       </el-col>
@@ -117,7 +117,7 @@
 
       <el-form-item>
         <slot name="action" :form="form" :submit="onSubmit">
-          <el-button type="primary" icon="el-icon-edit-outline" @click="onSubmit()">{{ $t('easyAdmin.save') }}</el-button>
+          <el-button type="primary" icon="el-icon-edit-outline" @click="onSubmit()">{{ $t('Save') }}</el-button>
           <!--<el-button type="primary" @click="onSubmit()">Save and Continue Editing</el-button>-->
         </slot>
       </el-form-item>
@@ -222,7 +222,7 @@ export default {
       rules: {},
 
       // tabs
-      tabs: new Set([t('easyAdmin.defaultTab')]),
+      tabs: new Set([t('Default')]),
       activeTab: '0',
 
       // translated fields
@@ -434,7 +434,7 @@ export default {
     },
 
     onSubmit(success = (res) => {
-      this.uiFeedback().success(this.$t('easyAdmin.saved'))
+      this.uiFeedback().success(this.$t('Data saved successfully'))
 
       // Router go back default
       // this.$router.replace({ name: `${this.em.name}List` })
@@ -455,7 +455,7 @@ export default {
               .catch(err => { this.uiFeedback().error(err.message) })
           }
         } else {
-          this.uiFeedback().warning(this.$t('easyAdmin.validationFailed'))
+          this.uiFeedback().warning(this.$t('Validation failed \u2014 please check your input'))
           return false
         }
       })

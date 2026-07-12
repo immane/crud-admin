@@ -13,15 +13,15 @@ export default {
       query: orderByIdDesc,
       list_filter: {
         status: {
-          __label: t('entity.status'),
-          draft: t('dashboard.status.draft'),
-          pending: t('dashboard.status.pending'),
-          confirmed: t('dashboard.status.confirmed'),
-          paid: t('dashboard.status.paid'),
-          fulfilled: t('dashboard.status.fulfilled'),
-          completed: t('dashboard.status.completed'),
-          cancelled: t('dashboard.status.cancelled'),
-          refunded: t('dashboard.status.refunded')
+          __label: t('Status'),
+          draft: t('Draft'),
+          pending: t('Pending'),
+          confirmed: t('Confirmed'),
+          paid: t('Paid'),
+          fulfilled: t('Fulfilled'),
+          completed: t('Completed'),
+          cancelled: t('Cancelled'),
+          refunded: t('Refunded')
         }
       },
       list_display: [

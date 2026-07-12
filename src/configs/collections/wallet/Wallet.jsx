@@ -9,8 +9,8 @@ export default {
         { property: 'currency', default_value: 'CNY' },
         { property: 'status', type: 'select', default_value: 'active', type_options: {
           options: [
-            { value: 'active', label: t('entity.active') },
-            { value: 'frozen', label: t('entity.frozen') }
+            { value: 'active', label: t('Active') },
+            { value: 'frozen', label: t('Frozen') }
           ]
         }},
         { property: 'label', required: false }
@@ -20,9 +20,9 @@ export default {
       query: orderByIdDesc,
       list_filter: {
         status: {
-          __label: t('entity.status'),
-          active: t('entity.active'),
-          frozen: t('entity.frozen')
+          __label: t('Status'),
+          active: t('Active'),
+          frozen: t('Frozen')
         }
       },
       list_display: [

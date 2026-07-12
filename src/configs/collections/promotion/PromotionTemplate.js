@@ -17,10 +17,10 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        name: t('entity.templateName'),
-        type: t('entity.type'),
+        name: t('Template Name'),
+        type: t('Type'),
         enabled: {
-          label: t('entity.enabled'),
+          label: t('Enabled'),
           type: 'boolean',
           expression: 'entity.getEnabled() == :value'
         }

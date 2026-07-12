@@ -12,19 +12,19 @@ export default {
       disabled_actions: ['new', 'edit', 'delete'],
       list_filter: {
         type: {
-          __label: t('entity.type'),
-          deduction: t('entity.deduction'),
-          reversal: t('entity.reversal'),
-          release: t('entity.release'),
-          refund: t('entity.refund')
+          __label: t('Type'),
+          deduction: t('Deduction'),
+          reversal: t('Reversal'),
+          release: t('Release'),
+          refund: t('Refund')
         },
         status: {
-          __label: t('entity.status'),
-          pending: t('entity.pending'),
-          applied: t('entity.applied'),
-          released: t('entity.released'),
-          refunded: t('entity.refunded'),
-          reversed: t('entity.reversed')
+          __label: t('Status'),
+          pending: t('Pending'),
+          applied: t('Applied'),
+          released: t('Released'),
+          refunded: t('Refunded'),
+          reversed: t('Reversed')
         }
       },
       list_display: [

@@ -8,8 +8,8 @@ export default {
         'price',
         { property: 'status', type: 'select', default_value: 'active', type_options: {
           options: [
-            { value: 'active', label: t('entity.active') },
-            { value: 'inactive', label: t('entity.inactive') }
+            { value: 'active', label: t('Active') },
+            { value: 'inactive', label: t('Inactive') }
           ]
         }},
         { property: 'sort', default_value: 0 }
@@ -17,11 +17,11 @@ export default {
     },
     list: {
       list_filter: {
-        name: t('entity.specName'),
+        name: t('Spec Name'),
         status: {
-          __label: t('entity.status'),
-          active: t('entity.active'),
-          inactive: t('entity.inactive')
+          __label: t('Status'),
+          active: t('Active'),
+          inactive: t('Inactive')
         }
       },
       list_display: [

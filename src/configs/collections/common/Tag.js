@@ -13,7 +13,7 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        name: t('entity.tagName'),
+        name: t('Tag Name'),
         slug: 'Slug'
       },
       list_display: ['id', 'name', 'slug', 'color', 'createdAt']

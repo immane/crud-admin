@@ -51,7 +51,7 @@ export const constantRoutes = [
         name: 'Dashboard',
         component: () => import('@/views/dashboard/index'),
         meta: {
-          title: t('route.dashboard'),
+          title: t('Dashboard'),
           icon: 'el-icon-s-home'
         }
       }

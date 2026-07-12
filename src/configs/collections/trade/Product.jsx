@@ -53,7 +53,7 @@ const SpecificationManager = {
           <el-button
             size={'default'} type={'primary'} icon={'el-icon-plus'} plain
             onClick={() => { this.form.specifications.push({}) }}
-          >{t('easyAdmin.add')}</el-button>
+          >{t('Add')}</el-button>
           {this.form.specifications.map((item, index) => (
             <div key={index}>
               <FormAdmin
@@ -93,7 +93,7 @@ const SpecificationManager = {
                   this.refreshKey++
                   this.dialogShow = true
                 }}
-              >{t('easyAdmin.new')}</el-button>
+              >{t('New')}</el-button>
             ),
             'action:edit': ({ data }) => (
               <el-button
@@ -104,13 +104,13 @@ const SpecificationManager = {
                   this.refreshKey++
                   this.dialogShow = true
                 }}
-              >{t('easyAdmin.edit')}</el-button>
+              >{t('Edit')}</el-button>
             )
           }}
         />
 
         <el-dialog
-          title={this.specId ? t('entity.updateSpec') : t('entity.newSpec')}
+          title={this.specId ? t('Update Spec') : t('New Spec')}
           modelValue={this.dialogShow}
           {...{
             'onUpdate:modelValue': v => { this.dialogShow = v },
@@ -131,13 +131,13 @@ const SpecificationManager = {
                   type={'primary'} icon={'el-icon-edit-outline'}
                   onClick={() => {
                     submit(() => {
-                      this.$message({ message: t('easyAdmin.saved'), type: 'success' })
+                      this.$message({ message: t('Data saved successfully'), type: 'success' })
                       this.refreshKey++
                       this.dialogShow = false
                       this.specForm = { product: this.productId }
                     })
                   }}
-                >{t('easyAdmin.save')}</el-button>
+                >{t('Save')}</el-button>
               )
             }}
           />
@@ -155,14 +155,14 @@ export default {
         { property: 'description', type: 'text', required: false },
         { property: 'status', type: 'select', default_value: 'active', type_options: {
           options: [
-            { value: 'active', label: t('entity.active') },
-            { value: 'inactive', label: t('entity.inactive') }
+            { value: 'active', label: t('Active') },
+            { value: 'inactive', label: t('Inactive') }
           ]
         }},
         { property: 'metadata', type: 'json', required: false },
         {
           property: 'specifications',
-          tab: t('entity.specifications'),
+          tab: t('Specifications'),
           component: SpecificationManager
         }
       ]
@@ -170,7 +170,7 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        name: t('entity.productName'),
+        name: t('Product Name'),
         status: statusFilterLabel()
       },
       list_display: ['id', 'name', 'status', 'isDeleted', 'createdAt', 'updatedAt']

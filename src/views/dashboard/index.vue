@@ -3,12 +3,12 @@
     <section class="dashboard__hero">
       <div>
         <p class="dashboard__eyebrow">OPERATIONS OVERVIEW</p>
-        <h1>{{ greeting }}, {{ name || $t('dashboard.admin') }}</h1>
-        <p class="dashboard__intro">{{ $t('dashboard.intro') }}</p>
+        <h1>{{ greeting }}, {{ name || $t('Admin') }}</h1>
+        <p class="dashboard__intro">{{ $t('Real-time business metrics, order processing, and system status.') }}</p>
       </div>
       <div class="dashboard__hero-actions">
-        <span class="dashboard__updated"><el-icon><el-icon-time /></el-icon> {{ $t('dashboard.updated', updatedAt) }}</span>
-        <el-button type="primary" icon="el-icon-refresh" :loading="loading" @click="loadDashboard">{{ $t('dashboard.refresh') }}</el-button>
+        <span class="dashboard__updated"><el-icon><el-icon-time /></el-icon> {{ $t('Updated {0}', updatedAt) }}</span>
+        <el-button type="primary" icon="el-icon-refresh" :loading="loading" @click="loadDashboard">{{ $t('Refresh') }}</el-button>
       </div>
     </section>
 
@@ -28,14 +28,14 @@
         <header class="panel__header">
           <div>
             <p class="panel__kicker">ORDER PULSE</p>
-            <h2>{{ $t('dashboard.recentOrderTrend') }}</h2>
+            <h2>{{ $t('Recent Order Amount Trend') }}</h2>
           </div>
-          <span class="panel__badge">{{ $t('dashboard.lastOrders', orderSeries.length) }}</span>
+          <span class="panel__badge">{{ $t('Last {0} orders', orderSeries.length) }}</span>
         </header>
         <div v-if="orderSeries.length" class="chart">
           <div class="chart__summary">
             <strong>{{ formatAmount(orderTotal) }}</strong>
-            <span>{{ $t('dashboard.currentSample') }}</span>
+            <span>{{ $t('Current sample total') }}</span>
           </div>
           <svg class="chart__svg" viewBox="0 0 560 190" preserveAspectRatio="none" role="img" aria-label="Recent order amount trend">
             <defs>
@@ -49,9 +49,9 @@
             <path :d="linePath" class="chart__line" />
             <circle v-for="(point, index) in chartPoints" :key="index" :cx="point.x" :cy="point.y" r="4" class="chart__point" />
           </svg>
-          <div class="chart__axis"><span>{{ $t('dashboard.earlier') }}</span><span>{{ $t('dashboard.now') }}</span></div>
+          <div class="chart__axis"><span>{{ $t('Earlier') }}</span><span>{{ $t('Now') }}</span></div>
         </div>
-        <div v-else class="panel__empty">{{ $t('dashboard.noOrderData') }}</div>
+        <div v-else class="panel__empty">{{ $t('No order amount data available for analysis') }}</div>
       </article>
 
       <article class="panel panel--weather" :class="weatherClass">
@@ -60,35 +60,35 @@
             <p class="panel__kicker">LOCAL WEATHER</p>
             <h2>{{ weather.location }}</h2>
           </div>
-          <button class="weather__locate" type="button" :title="$t('dashboard.getWeather')" @click="loadWeather(true)"><el-icon><el-icon-location-outline /></el-icon></button>
+          <button class="weather__locate" type="button" :title="$t('Get local weather')" @click="loadWeather(true)"><el-icon><el-icon-location-outline /></el-icon></button>
         </header>
         <div class="weather__body">
           <div class="weather__symbol"><el-icon><component :is="weather.icon" /></el-icon></div>
           <strong>{{ weather.temperature }}<sup>°</sup></strong>
-          <div><b>{{ weather.condition }}</b><span>{{ $t('dashboard.feelsLike', weather.apparentTemperature) }}</span></div>
+          <div><b>{{ weather.condition }}</b><span>{{ $t('Feels like {0}°', weather.apparentTemperature) }}</span></div>
         </div>
-        <footer class="weather__footer"><span>{{ $t('dashboard.wind', weather.windSpeed) }}</span><span>{{ weather.note }}</span></footer>
+        <footer class="weather__footer"><span>{{ $t('Wind {0} km/h', weather.windSpeed) }}</span><span>{{ weather.note }}</span></footer>
       </article>
     </section>
 
     <section class="dashboard__lower-grid">
       <article v-loading="loading" class="panel panel--orders">
         <header class="panel__header">
-          <div><p class="panel__kicker">LATEST ORDERS</p><h2>{{ $t('dashboard.recentOrders') }}</h2></div>
-          <router-link :to="{ name: 'OrderList' }">{{ $t('dashboard.viewAll') }} <el-icon><el-icon-arrow-right /></el-icon></router-link>
+          <div><p class="panel__kicker">LATEST ORDERS</p><h2>{{ $t('Recent Orders') }}</h2></div>
+          <router-link :to="{ name: 'OrderList' }">{{ $t('View all') }} <el-icon><el-icon-arrow-right /></el-icon></router-link>
         </header>
         <div v-if="recentOrders.length" class="order-list">
           <div v-for="order in recentOrders" :key="order.id" class="order-row">
-            <div class="order-row__identity"><span class="order-row__avatar">{{ orderInitial(order) }}</span><div><b>#{{ order.id }}</b><small>{{ order.user?.__toString || order.user?.username || order.uuid || $t('dashboard.guestOrder') }}</small></div></div>
+            <div class="order-row__identity"><span class="order-row__avatar">{{ orderInitial(order) }}</span><div><b>#{{ order.id }}</b><small>{{ order.user?.__toString || order.user?.username || order.uuid || $t('Guest order') }}</small></div></div>
             <span>{{ formatAmount(order.totalAmount) }}</span>
             <el-tag size="small" effect="plain" :type="statusType(order.status)">{{ statusLabel(order.status) }}</el-tag>
           </div>
         </div>
-        <div v-else class="panel__empty">{{ $t('dashboard.noOrders') }}</div>
+        <div v-else class="panel__empty">{{ $t('No order data') }}</div>
       </article>
 
       <article v-loading="loading" class="panel panel--activity">
-        <header class="panel__header"><div><p class="panel__kicker">SYSTEM ACTIVITY</p><h2>{{ $t('dashboard.walletActivity') }}</h2></div></header>
+        <header class="panel__header"><div><p class="panel__kicker">SYSTEM ACTIVITY</p><h2>{{ $t('Wallet & Business Activity') }}</h2></div></header>
         <div v-if="recentTransactions.length" class="activity-list">
           <div v-for="transaction in recentTransactions" :key="transaction.id" class="activity-row">
             <span class="activity-row__icon"><el-icon><component :is="transactionIcon(transaction.type)" /></el-icon></span>
@@ -96,7 +96,7 @@
             <span class="activity-row__amount" :class="{ 'activity-row__amount--negative': transaction.type === 'withdrawal' || transaction.type === 'fee' }">{{ transaction.amount == null ? '-' : formatAmount(transaction.amount) }}</span>
           </div>
         </div>
-        <div v-else class="panel__empty">{{ $t('dashboard.noTransactions') }}</div>
+        <div v-else class="panel__empty">{{ $t('No transaction data') }}</div>
       </article>
     </section>
   </main>
@@ -104,6 +104,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { t as $t } from '@/i18n'
 import EntityManage from '@/utils/entity'
 
 const entityManagers = {
@@ -114,19 +115,19 @@ const entityManagers = {
 }
 
 const weatherByCode = {
-  0: ['Clear', 'el-icon-sunny', 'weather--sunny'],
-  1: ['Partly Cloudy', 'el-icon-partly-cloudy', 'weather--cloudy'],
-  2: ['Cloudy', 'el-icon-cloudy', 'weather--cloudy'],
-  3: ['Overcast', 'el-icon-cloudy', 'weather--cloudy'],
-  45: ['Fog', 'el-icon-cloudy', 'weather--cloudy'],
-  48: ['Fog', 'el-icon-cloudy', 'weather--cloudy'],
-  51: ['Drizzle', 'el-icon-light-rain', 'weather--rainy'],
-  61: ['Light Rain', 'el-icon-light-rain', 'weather--rainy'],
-  63: ['Rain', 'el-icon-light-rain', 'weather--rainy'],
-  65: ['Heavy Rain', 'el-icon-heavy-rain', 'weather--rainy'],
-  71: ['Light Snow', 'el-icon-light-rain', 'weather--cloudy'],
-  80: ['Showers', 'el-icon-light-rain', 'weather--rainy'],
-  95: ['Thunderstorm', 'el-icon-lightning', 'weather--rainy']
+  0: [$t('Clear'), 'el-icon-sunny', 'weather--sunny'],
+  1: [$t('Partly Cloudy'), 'el-icon-partly-cloudy', 'weather--cloudy'],
+  2: [$t('Cloudy'), 'el-icon-cloudy', 'weather--cloudy'],
+  3: [$t('Overcast'), 'el-icon-cloudy', 'weather--cloudy'],
+  45: [$t('Fog'), 'el-icon-cloudy', 'weather--cloudy'],
+  48: [$t('Fog'), 'el-icon-cloudy', 'weather--cloudy'],
+  51: [$t('Drizzle'), 'el-icon-light-rain', 'weather--rainy'],
+  61: [$t('Light Rain'), 'el-icon-light-rain', 'weather--rainy'],
+  63: [$t('Rain'), 'el-icon-light-rain', 'weather--rainy'],
+  65: [$t('Heavy Rain'), 'el-icon-heavy-rain', 'weather--rainy'],
+  71: [$t('Light Snow'), 'el-icon-light-rain', 'weather--cloudy'],
+  80: [$t('Showers'), 'el-icon-light-rain', 'weather--rainy'],
+  95: [$t('Thunderstorm'), 'el-icon-lightning', 'weather--rainy']
 }
 
 export default {
@@ -138,7 +139,7 @@ export default {
       totals: { orders: 0, products: 0, users: 0, pending: 0 },
       recentOrders: [],
       recentTransactions: [],
-      weather: { location: 'Local Weather', temperature: '--', apparentTemperature: '--', windSpeed: '--', condition: 'Loading', icon: 'el-icon-cloudy', note: 'Geolocate for live weather', tone: 'weather--cloudy' }
+      weather: { location: this.$t('Local Weather'), temperature: '--', apparentTemperature: '--', windSpeed: '--', condition: this.$t('Loading'), icon: 'el-icon-cloudy', note: this.$t('Geolocate for live weather'), tone: 'weather--cloudy' }
     }
   },
   computed: {
@@ -151,10 +152,10 @@ export default {
     },
     metrics() {
       return [
-        { label: 'Total Orders', value: this.totals.orders, hint: 'All order records', icon: 'el-icon-s-order', tone: 'blue' },
-        { label: 'Pending Orders', value: this.totals.pending, hint: 'Recent pending items', icon: 'el-icon-timer', tone: 'amber' },
-        { label: 'Total Products', value: this.totals.products, hint: 'Current product catalog', icon: 'el-icon-goods', tone: 'green' },
-        { label: 'Total Users', value: this.totals.users, hint: 'Registered users', icon: 'el-icon-user', tone: 'violet' }
+        { label: this.$t('Total Orders'), value: this.totals.orders, hint: this.$t('All order records'), icon: 'el-icon-s-order', tone: 'blue' },
+        { label: this.$t('Pending Orders'), value: this.totals.pending, hint: this.$t('Recent pending items'), icon: 'el-icon-timer', tone: 'amber' },
+        { label: this.$t('Total Products'), value: this.totals.products, hint: this.$t('Current product catalog'), icon: 'el-icon-goods', tone: 'green' },
+        { label: this.$t('Total Users'), value: this.totals.users, hint: this.$t('Registered users'), icon: 'el-icon-user', tone: 'violet' }
       ]
     },
     orderSeries() {
@@ -212,10 +213,10 @@ export default {
       return Number(response.paginator?.totalCount ?? response.paginator?.total ?? response.data?.length ?? 0)
     },
     async loadWeather(forceLocation = false) {
-      const fallback = () => this.fetchWeather(39.9042, 116.4074, 'Beijing')
+      const fallback = () => this.fetchWeather(39.9042, 116.4074, this.$t('Beijing'))
       if (!navigator.geolocation) return fallback()
       navigator.geolocation.getCurrentPosition(
-        position => this.fetchWeather(position.coords.latitude, position.coords.longitude, 'Local Weather'),
+        position => this.fetchWeather(position.coords.latitude, position.coords.longitude, this.$t('Local Weather')),
         () => fallback(),
         { enableHighAccuracy: false, timeout: forceLocation ? 10000 : 4000, maximumAge: 1800000 }
       )
@@ -225,11 +226,11 @@ export default {
         const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m&wind_speed_unit=kmh`)
         const data = await response.json()
         const current = data.current
-        const [condition, icon, tone] = weatherByCode[current.weather_code] || ['Normal', 'el-icon-cloudy', 'weather--cloudy']
-        this.weather = { location, temperature: Math.round(current.temperature_2m), apparentTemperature: Math.round(current.apparent_temperature), windSpeed: Math.round(current.wind_speed_10m), condition, icon, note: 'Live data', tone }
+        const [condition, icon, tone] = weatherByCode[current.weather_code] || [$t('Normal'), 'el-icon-cloudy', 'weather--cloudy']
+        this.weather = { location, temperature: Math.round(current.temperature_2m), apparentTemperature: Math.round(current.apparent_temperature), windSpeed: Math.round(current.wind_speed_10m), condition, icon, note: this.$t('Live data'), tone }
       } catch (e) {
-        this.weather.note = 'Weather service unavailable'
-        this.weather.condition = 'Unavailable'
+        this.weather.note = this.$t('Weather service unavailable')
+        this.weather.condition = this.$t('Unavailable')
       }
     },
     formatAmount(value) {
@@ -242,13 +243,13 @@ export default {
       return String(source).slice(0, 1).toUpperCase()
     },
     statusLabel(status) {
-      return { draft: 'Draft', pending: 'Pending', confirmed: 'Confirmed', paid: 'Paid', fulfilled: 'Fulfilled', completed: 'Completed', cancelled: 'Cancelled', refunded: 'Refunded' }[status] || status || 'Unknown'
+      return { draft: this.$t('Draft'), pending: this.$t('Pending'), confirmed: this.$t('Confirmed'), paid: this.$t('Paid'), fulfilled: this.$t('Fulfilled'), completed: this.$t('Completed'), cancelled: this.$t('Cancelled'), refunded: this.$t('Refunded') }[status] || status || this.$t('Unknown')
     },
     statusType(status) {
       return ({ paid: 'success', completed: 'success', fulfilled: 'success', pending: 'warning', confirmed: 'warning', cancelled: 'info', refunded: 'danger' })[status] || 'info'
     },
     transactionLabel(type) {
-      return ({ deposit: 'Deposit', withdrawal: 'Withdrawal', transfer: 'Transfer', fee: 'Fee', refund: 'Refund' })[type] || type || 'Transaction'
+      return ({ deposit: this.$t('Deposit'), withdrawal: this.$t('Withdrawal'), transfer: this.$t('Transfer'), fee: this.$t('Fee'), refund: this.$t('Refund') })[type] || type || this.$t('Transaction')
     },
     transactionIcon(type) {
       return ({ deposit: 'el-icon-plus', withdrawal: 'el-icon-minus', transfer: 'el-icon-sort', fee: 'el-icon-coin', refund: 'el-icon-refresh-left' })[type] || 'el-icon-money'

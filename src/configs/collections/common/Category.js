@@ -17,15 +17,15 @@ export default {
     list: {
       query: { '@order': 'entity.sortOrder|ASC, entity.id|DESC' },
       list_filter: {
-        name: t('entity.categoryName'),
+        name: t('Category Name'),
         enabled: {
-          label: t('entity.enabled'),
+          label: t('Enabled'),
           type: 'boolean',
           expression: 'entity.getEnabled() == :value'
         },
         'parent.id': () => axios
           .get(apiPath(API_PREFIX, 'manage/categories'))
-          .then(res => Object.assign({ __label: t('entity.parentCategory') }, ...res.data.map(v => ({ [v.id]: v.name }))))
+          .then(res => Object.assign({ __label: t('Parent Category') }, ...res.data.map(v => ({ [v.id]: v.name }))))
       },
       list_display: ['id', 'name', 'slug', 'parent', 'enabled', 'sortOrder', 'createdAt']
     },

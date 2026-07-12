@@ -4,7 +4,7 @@ export default {
   Setting: {
     form: {
       fields: [
-        { property: 'key', field_options: { label: t('entity.key') }},
+        { property: 'key', field_options: { label: t('Key') }},
         'value', 'type', 'groupName',
         { property: 'label', required: false },
         { property: 'description', type: 'text', required: false },
@@ -14,8 +14,8 @@ export default {
     list: {
       query: { '@order': 'entity.groupName|ASC, entity.sortOrder|ASC, entity.id|DESC' },
       list_filter: {
-        key: t('entity.key'),
-        groupName: t('entity.group')
+        key: t('Key'),
+        groupName: t('Group')
       },
       list_display: ['id', 'key', 'value', 'type', 'groupName', 'label', 'sortOrder']
     },

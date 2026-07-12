@@ -8,7 +8,7 @@
         allow-create
         default-first-option
         clearable
-        :placeholder="$t('form.typeToAdd')"
+        :placeholder="$t('Type and press Enter to add')"
       >
         <el-option
           v-for="item in options"
@@ -34,7 +34,7 @@
           form[field.property].push({});
         "
       >
-        {{ $t('easyAdmin.add') }}
+        {{ $t('Add') }}
       </el-button>
 
       <div

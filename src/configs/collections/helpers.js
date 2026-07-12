@@ -5,11 +5,11 @@ export const orderByIdDesc = {
 }
 
 export const statusFilter = {
-  active: t('entity.active'),
-  inactive: t('entity.inactive')
+  active: t('Active'),
+  inactive: t('Inactive')
 }
 
 export const statusFilterLabel = (label = null) => ({
-  __label: label || t('entity.status'),
+  __label: label || t('Status'),
   ...statusFilter
 })

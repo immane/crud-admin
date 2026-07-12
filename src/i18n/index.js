@@ -18,14 +18,9 @@ const state = reactive({
 })
 
 function t(key, ...args) {
-  const keys = key.split('.')
-  let value = messages[state.locale]
-  for (const k of keys) {
-    if (value == null) break
-    value = value[k]
-  }
+  const value = messages[state.locale]?.[key]
   if (typeof value !== 'string') {
-    console.warn(`[i18n] Missing key: ${key} (${state.locale})`)
+    console.warn(`[i18n] Missing key: "${key}" (${state.locale})`)
     return key
   }
   if (args.length) {
