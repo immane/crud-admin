@@ -28,7 +28,7 @@ function exportExcelCsv(title, data, fileName) {
     return
   }
   const fileType = fileName.split('.')
-  const uri = new Blob(['\ufeff' + tables], {type: typeArray[fileType[1]]})
+  const uri = new Blob(['\ufeff' + tables], { type: typeArray[fileType[1]] })
   if (window.navigator && window.navigator.msSaveOrOpenBlob) {
     // for IE
     window.navigator.msSaveOrOpenBlob(tables, fileName)

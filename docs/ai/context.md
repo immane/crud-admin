@@ -1,7 +1,7 @@
 # AI Context
 
 > Vue Admin Skeleton — AI Assistant Context Document  
-> Last updated: 2026-07-03
+> Last updated: 2026-07-12
 
 ---
 
@@ -48,11 +48,11 @@ src/
 │   ├── ListAdmin.vue     # Dynamic list builder
 │   ├── SearchFilter.vue  # Dynamic filter builder
 │   ├── plugins/form/     # 17 field-type plugins
-│   └── plugins/list/     # Inline edit plugin
+│   └── plugins/list/     # 8 list-rendering plugins
 ├── configs/              # Declarative configs
 │   ├── routes.js         # Menu/route definitions
 │   ├── entities.js       # Auto-loader (import.meta.glob)
-│   └── collections/      # Entity schema definitions
+│   └── collections/      # Entity schema definitions (per bundle)
 ├── layout/               # Layout (Sidebar + Navbar + AppMain)
 ├── router/               # Vue Router + r()/g() generators
 ├── store/                # Vuex (auto-loads modules/)
@@ -76,9 +76,45 @@ src/
 
 **No boilerplate.** Define entity config → auto-generate list/form/routes.
 
-Config location: `src/configs/collections/common/index.js`  
+Config location: `src/configs/collections/{bundle}/{EntityName}.js` (per-entity files organized by bundle)  
 Route generation: `src/configs/routes.js` using `r()` helper  
 View reuse: `views/admin/list.vue` + `views/admin/form.vue` resolve config from `$route.params.entityParam`
+
+#### Entity Config File Structure
+
+```
+configs/collections/
+├── helpers.js                ← Shared constants (orderByIdDesc, statusFilterLabel)
+├── common/                   Category, Tag, Content, Comment, Page, Media, Setting
+├── trade/                    Product, Order, OrderItem, Specification
+├── identity/                 User, Profile
+├── promotion/                Promotion, PromotionTemplate
+├── payment/                  Invoice
+├── wechat/                   WechatUser
+└── wallet/                   Wallet, WalletTransaction, WalletPaymentDeduction
+```
+
+Each file exports a single entity config:
+```js
+export default {
+  EntityName: {
+    entity?: string | { name, prefix?, plural? },
+    form: { fields: [...] },
+    list: { query, list_filter, list_display, disabled_actions, ... }
+  }
+}
+```
+
+The auto-loader (`entities.js`) uses `import.meta.glob` to collect all `.js` files under `collections/`. Files at depth 2 (e.g., `trade/Product.js`) are treated as collections and merged via `Object.assign`. Files at depth 3+ would be treated as standalone entities.
+
+#### JSX Config Components
+
+Entity configs can embed custom Vue components in `form.fields` via the `component` property:
+```js
+{ property: 'specifications', tab: '规格', component: SpecificationManager }
+```
+
+This is used in `Product.js` to embed specification management (ListAdmin + create/edit dialog) directly inside the product form. The component must be a plain Vue component definition object and relies on lazy `import.meta.glob` or direct imports within the config module.
 
 ### 2. Vite Glob Dynamic Loading
 
@@ -86,8 +122,11 @@ View reuse: `views/admin/list.vue` + `views/admin/form.vue` resolve config from 
 // Store modules auto-registration
 const modulesFiles = import.meta.glob('./modules/**/*.js', { eager: true })
 
-// EasyAdmin plugin auto-discovery
+// EasyAdmin plugin auto-discovery (form fields)
 const formPlugins = import.meta.glob('./plugins/form/*.vue')
+
+// EasyAdmin plugin auto-discovery (list columns)
+const listPlugins = import.meta.glob('./plugins/list/*.vue')
 
 // Entity config auto-loading
 const entityCollections = import.meta.glob('./collections/**/*.js', { eager: true })
@@ -113,13 +152,69 @@ const entityCollections = import.meta.glob('./collections/**/*.js', { eager: tru
 
 ---
 
+## Plugin System
+
+### Form Plugins (`plugins/form/`)
+
+| Plugin File | Type Mapping | Render Component |
+|-------------|--------------|------------------|
+| `input.vue` | string (default) | `<el-input>` |
+| `textarea.vue` | text | `<el-input type="textarea">` |
+| `text.vue` | — | `<Tinymce>` (rich text) |
+| `boolean.vue` | boolean | `<el-checkbox>` |
+| `integer.vue` | integer | `<el-input-number>` |
+| `select.vue` | — | `<el-select>` |
+| `date.vue` | date | `<el-date-picker>` (yyyy-MM-dd) |
+| `datetime.vue` | datetime | `<el-date-picker>` (yyyy-MM-dd HH:mm:ss) |
+| `image.vue` | image | `<el-upload>` (single image, wall mode) |
+| `file.vue` | — | `<el-upload>` (single file, Qiniu) |
+| `code.vue` | — | `<PrismEditor>` (JS highlight) |
+| `json.vue` | — | `<jsoneditor>` (tree/code view, vanilla API) |
+| `json-custom.vue` | — | Nested `<FormAdmin>` (sub-object editor) |
+| `array.vue` | array | `<el-select multiple>` or nested `<FormAdmin>` |
+| `RelationToOne.vue` | ManyToOne, OneToOne | `<el-select>` (remote search) |
+| `RelationToMany.vue` | ManyToMany, OneToMany | `<el-select multiple>` (remote search) |
+| `transfer.vue` | — | `<el-transfer>` (shuttle box) |
+
+### List Plugins (`plugins/list/`)
+
+| Plugin File | Type Mapping | Render Component |
+|-------------|--------------|------------------|
+| `editable-plain.vue` | editable string/int/float/decimal | Inline edit |
+| `boolean.vue` | boolean | `<el-switch>` or `<el-tag>` |
+| `date.vue` | date | Formatted date with icon |
+| `datetime.vue` | datetime, datetime_immutable | Formatted datetime with icon |
+| `image.vue` | image | `<el-image>` (preview) |
+| `RelationToOne.vue` | ManyToOne, OneToOne | `__toString` display |
+| `RelationToMany.vue` | ManyToMany, OneToMany | `<el-tag>` list (max 5 + tooltip) |
+| `array.vue` | array | `<el-tag>` list |
+| `plain-text.vue` | fallback | Strip HTML plain text |
+
+List plugins are loaded dynamically via `import.meta.glob`, following the same pattern as form plugins. The `getListPluginType()` method resolves the plugin type from `field.type` or backend metadata, and `loadListPlugin()` returns the async component.
+
+---
+
 ## Quick Reference
 
 ### Adding a New CRUD Entity
 
-1. Add config in `src/configs/collections/common/index.js`
+1. Add config in `src/configs/collections/{bundle}/{EntityName}.js`:
+   ```js
+   export default {
+     EntityName: {
+       form: { fields: [...] },
+       list: { list_display: [...], list_filter: {...} }
+     }
+   }
+   ```
 2. Add `...r('EntityName', '中文名')` in `src/configs/routes.js`
 3. Done — no new page files needed
+
+### Adding a New List Plugin
+
+1. Create `src/components/EasyAdmin/plugins/list/{type}.vue` with props: `value`, `field`, `scope`, `em`, `struct`
+2. Add the type name to `getListPluginType()` in `ListAdmin.vue`
+3. Done — auto-discovered via `import.meta.glob`
 
 ### Environment Variables
 
@@ -143,6 +238,30 @@ npm run test:unit    # Unit tests
 
 ---
 
+## Known Patterns
+
+### Nested API Resources (e.g., Specifications under Products)
+
+For entities whose manage API is nested under another entity:
+
+```js
+entity: { name: 'Specification', prefix: `/api/v1/manage/products/${productId}` }
+```
+
+The productId comes from the parent `FormAdmin.id` prop. The entity config file itself holds only field definitions; the prefix is set at runtime in the parent component's `entityConf`.
+
+### JSON Editor
+
+The `json.vue` form plugin uses the vanilla `jsoneditor` library (not `vue-json-editor` wrapper). The CSS is imported directly; the JS is loaded via dynamic `<script>` from a Vite `?url` asset import. This avoids esbuild IIFE compatibility issues.
+
+### Dialog Detail
+
+- ListAdmin inline dialog opens/closes without a route change
+- `@closed="fetchData"` refreshes list data via API (no page navigation)
+- The `submit` callback in the dialog overrides the default success handler to close the dialog instead of calling `$router.go(-1)`
+
+---
+
 ## Related Documents
 
 | Document | Path |
@@ -152,3 +271,5 @@ npm run test:unit    # Unit tests
 | EasyAdmin Design | `docs/design/easyadmin-design.md` |
 | EasyAdmin Config Contract | `docs/design/easyadmin-config-contract.md` |
 | Migration Plan | `docs/plan/vue3-tsx-vite-migration.md` |
+
+(End of file - total 297 lines)
