@@ -34,13 +34,27 @@ export default {
     },
     editorModes() {
       return this.field.type_options?.modes || ['tree', 'code', 'form', 'text', 'view']
+    },
+    fieldValue() {
+      return this.form[this.field.property]
     }
   },
   watch: {
-    form: {
+    fieldValue: {
       immediate: true,
-      handler() {
-        this.syncFromForm()
+      handler(v) {
+        if (v != null) {
+          try {
+            this.internalValue = typeof v === 'string' ? JSON.parse(v) : v
+          } catch (e) {
+            this.internalValue = v
+          }
+        } else {
+          this.internalValue = {}
+        }
+        if (this.editor) {
+          this.editor.set(this.internalValue)
+        }
       }
     }
   },
@@ -74,21 +88,6 @@ export default {
         })
       }
       await loading
-    },
-    syncFromForm() {
-      const v = this.form[this.field.property]
-      if (v != null) {
-        try {
-          this.internalValue = typeof v === 'string' ? JSON.parse(v) : v
-        } catch (e) {
-          this.internalValue = v
-        }
-      } else {
-        this.internalValue = {}
-      }
-      if (this.editor) {
-        this.editor.set(this.internalValue)
-      }
     },
     createEditor() {
       const options = {

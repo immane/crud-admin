@@ -364,26 +364,29 @@ export default {
       this.em.retrieve(id).then(res => {
         const data = res.data
         const form = {}
+        const jsonFields = new Set(
+          this.properties
+            .filter(p => p.type === 'json')
+            .map(p => p.property)
+        )
 
-        // replace relation fields
         for (const key of this.plainFields) {
           if (Object.keys(data).includes(key)) {
             const value = data[key]
             if (value != null) {
-              if (typeof value === 'object' &&
+              if (jsonFields.has(key)) {
+                form[key] = value
+              } else if (typeof value === 'object' &&
                     Object.keys(value).includes('id')
               ) {
-                // ManyToOne or OneToOne
                 form[key] = value.id
               } else if (Array.isArray(value) && value.every(v => Object.keys(v).includes('id'))) {
-                // ManyToMany or OneToMany
                 try {
                   form[key] = value.map(v => v.id)
                 } catch (e) {
                   // nothing
                 }
               } else {
-                // Others
                 form[key] = value
               }
             }
