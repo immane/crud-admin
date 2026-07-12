@@ -439,26 +439,30 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
 }
 
 ::v-deep .easy-admin-dialog .el-dialog {
   display: flex;
   flex-direction: column;
-  min-height: 320px;
   max-height: 80vh;
   max-width: 1200px;
-  margin: 0 !important;
+  margin: 0 auto !important;
 }
 
 ::v-deep .easy-admin-dialog .el-dialog__header {
   flex-shrink: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #EBEEF5;
 }
 
 ::v-deep .easy-admin-dialog .el-dialog__body {
   min-height: 0;
-  overflow-y: auto;
-  flex: 1;
+  overflow: hidden auto;
+  padding: 8px 20px;
+}
+
+::v-deep .easy-admin-dialog .app-container {
+  padding: 0;
 }
 
 ::v-deep .easy-admin-dialog .el-dialog__footer {
