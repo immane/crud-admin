@@ -149,6 +149,14 @@
           }
         }
       }
+      .el-menu-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .el-menu-item .sub-el-icon {
+        margin: 0 !important;
+      }
     }
   }
 
