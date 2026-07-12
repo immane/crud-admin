@@ -3,8 +3,8 @@
     v-model="form[field.property]"
     class="transfer-field"
     filterable
-    :titles="['Available', 'Selected']"
-    filter-placeholder="Please select"
+    :titles="[$t('form.available'), $t('form.selected')]"
+    :filter-placeholder="$t('form.pleaseSelect')"
     :props="{
       key: 'value',
       label: 'label'

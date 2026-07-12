@@ -15,8 +15,8 @@
     :on-exceed="handleExceed"
     v-on="field.type_events || {}"
   >
-    <el-button size="small" type="primary">Select file</el-button>
-    <template #tip><div class="el-upload__tip">File must be less than 100MB</div></template>
+    <el-button size="small" type="primary">{{ $t('form.selectFile') }}</el-button>
+    <template #tip><div class="el-upload__tip">{{ $t('form.fileSizeLimit') }}</div></template>
   </el-upload>
 </template>
 

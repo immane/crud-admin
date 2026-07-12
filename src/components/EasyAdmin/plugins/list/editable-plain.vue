@@ -17,7 +17,7 @@
       />
     </template>
 
-    <div v-else title="Double-click to edit">
+    <div v-else :title="$t('easyAdmin.doubleClickEdit')">
       {{ scope.row[field.property] }}
     </div>
   </div>
@@ -70,11 +70,11 @@ export default {
     saveEdit() {
       this.em.update(this.scope.row.id, { [this.field.property]: this.editing.value })
         .then(() => {
-          this.$message.success('Property updated successfully')
+          this.$message.success(this.$t('easyAdmin.propertyUpdated'))
           this.scope.row[this.field.property] = this.editing.value
           this.cancelEdit()
         })
-        .catch(() => this.$message.error('Failed to update property'))
+        .catch(() => this.$message.error(this.$t('easyAdmin.propertyUpdateFailed')))
     }
   }
 }

@@ -3,12 +3,12 @@
     <section class="dashboard__hero">
       <div>
         <p class="dashboard__eyebrow">OPERATIONS OVERVIEW</p>
-        <h1>{{ greeting }}, {{ name || 'Admin' }}</h1>
-        <p class="dashboard__intro">Real-time business metrics, order processing, and system status.</p>
+        <h1>{{ greeting }}, {{ name || $t('dashboard.admin') }}</h1>
+        <p class="dashboard__intro">{{ $t('dashboard.intro') }}</p>
       </div>
       <div class="dashboard__hero-actions">
-        <span class="dashboard__updated"><el-icon><el-icon-time /></el-icon> Updated {{ updatedAt }}</span>
-        <el-button type="primary" icon="el-icon-refresh" :loading="loading" @click="loadDashboard">Refresh</el-button>
+        <span class="dashboard__updated"><el-icon><el-icon-time /></el-icon> {{ $t('dashboard.updated', updatedAt) }}</span>
+        <el-button type="primary" icon="el-icon-refresh" :loading="loading" @click="loadDashboard">{{ $t('dashboard.refresh') }}</el-button>
       </div>
     </section>
 
@@ -28,14 +28,14 @@
         <header class="panel__header">
           <div>
             <p class="panel__kicker">ORDER PULSE</p>
-            <h2>Recent Order Amount Trend</h2>
+            <h2>{{ $t('dashboard.recentOrderTrend') }}</h2>
           </div>
-          <span class="panel__badge">Last {{ orderSeries.length }} orders</span>
+          <span class="panel__badge">{{ $t('dashboard.lastOrders', orderSeries.length) }}</span>
         </header>
         <div v-if="orderSeries.length" class="chart">
           <div class="chart__summary">
             <strong>{{ formatAmount(orderTotal) }}</strong>
-            <span>Current sample total</span>
+            <span>{{ $t('dashboard.currentSample') }}</span>
           </div>
           <svg class="chart__svg" viewBox="0 0 560 190" preserveAspectRatio="none" role="img" aria-label="Recent order amount trend">
             <defs>
@@ -49,9 +49,9 @@
             <path :d="linePath" class="chart__line" />
             <circle v-for="(point, index) in chartPoints" :key="index" :cx="point.x" :cy="point.y" r="4" class="chart__point" />
           </svg>
-          <div class="chart__axis"><span>Earlier</span><span>Now</span></div>
+          <div class="chart__axis"><span>{{ $t('dashboard.earlier') }}</span><span>{{ $t('dashboard.now') }}</span></div>
         </div>
-        <div v-else class="panel__empty">No order amount data available for analysis</div>
+        <div v-else class="panel__empty">{{ $t('dashboard.noOrderData') }}</div>
       </article>
 
       <article class="panel panel--weather" :class="weatherClass">
@@ -60,35 +60,35 @@
             <p class="panel__kicker">LOCAL WEATHER</p>
             <h2>{{ weather.location }}</h2>
           </div>
-          <button class="weather__locate" type="button" title="Get local weather" @click="loadWeather(true)"><el-icon><el-icon-location-outline /></el-icon></button>
+          <button class="weather__locate" type="button" :title="$t('dashboard.getWeather')" @click="loadWeather(true)"><el-icon><el-icon-location-outline /></el-icon></button>
         </header>
         <div class="weather__body">
           <div class="weather__symbol"><el-icon><component :is="weather.icon" /></el-icon></div>
           <strong>{{ weather.temperature }}<sup>°</sup></strong>
-          <div><b>{{ weather.condition }}</b><span>Feels like {{ weather.apparentTemperature }}°</span></div>
+          <div><b>{{ weather.condition }}</b><span>{{ $t('dashboard.feelsLike', weather.apparentTemperature) }}</span></div>
         </div>
-        <footer class="weather__footer"><span>Wind {{ weather.windSpeed }} km/h</span><span>{{ weather.note }}</span></footer>
+        <footer class="weather__footer"><span>{{ $t('dashboard.wind', weather.windSpeed) }}</span><span>{{ weather.note }}</span></footer>
       </article>
     </section>
 
     <section class="dashboard__lower-grid">
       <article v-loading="loading" class="panel panel--orders">
         <header class="panel__header">
-          <div><p class="panel__kicker">LATEST ORDERS</p><h2>Recent Orders</h2></div>
-          <router-link :to="{ name: 'OrderList' }">View all <el-icon><el-icon-arrow-right /></el-icon></router-link>
+          <div><p class="panel__kicker">LATEST ORDERS</p><h2>{{ $t('dashboard.recentOrders') }}</h2></div>
+          <router-link :to="{ name: 'OrderList' }">{{ $t('dashboard.viewAll') }} <el-icon><el-icon-arrow-right /></el-icon></router-link>
         </header>
         <div v-if="recentOrders.length" class="order-list">
           <div v-for="order in recentOrders" :key="order.id" class="order-row">
-            <div class="order-row__identity"><span class="order-row__avatar">{{ orderInitial(order) }}</span><div><b>#{{ order.id }}</b><small>{{ order.user?.__toString || order.user?.username || order.uuid || 'Guest order' }}</small></div></div>
+            <div class="order-row__identity"><span class="order-row__avatar">{{ orderInitial(order) }}</span><div><b>#{{ order.id }}</b><small>{{ order.user?.__toString || order.user?.username || order.uuid || $t('dashboard.guestOrder') }}</small></div></div>
             <span>{{ formatAmount(order.totalAmount) }}</span>
             <el-tag size="small" effect="plain" :type="statusType(order.status)">{{ statusLabel(order.status) }}</el-tag>
           </div>
         </div>
-        <div v-else class="panel__empty">No order data</div>
+        <div v-else class="panel__empty">{{ $t('dashboard.noOrders') }}</div>
       </article>
 
       <article v-loading="loading" class="panel panel--activity">
-        <header class="panel__header"><div><p class="panel__kicker">SYSTEM ACTIVITY</p><h2>Wallet & Business Activity</h2></div></header>
+        <header class="panel__header"><div><p class="panel__kicker">SYSTEM ACTIVITY</p><h2>{{ $t('dashboard.walletActivity') }}</h2></div></header>
         <div v-if="recentTransactions.length" class="activity-list">
           <div v-for="transaction in recentTransactions" :key="transaction.id" class="activity-row">
             <span class="activity-row__icon"><el-icon><component :is="transactionIcon(transaction.type)" /></el-icon></span>
@@ -96,7 +96,7 @@
             <span class="activity-row__amount" :class="{ 'activity-row__amount--negative': transaction.type === 'withdrawal' || transaction.type === 'fee' }">{{ transaction.amount == null ? '-' : formatAmount(transaction.amount) }}</span>
           </div>
         </div>
-        <div v-else class="panel__empty">No transaction data</div>
+        <div v-else class="panel__empty">{{ $t('dashboard.noTransactions') }}</div>
       </article>
     </section>
   </main>

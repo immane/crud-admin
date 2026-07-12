@@ -8,7 +8,7 @@
       @change="onChange"
     />
     <el-tag v-else :type="value ? 'success' : 'danger'">
-      {{ value ? 'Yes' : 'No' }}
+      {{ value ? $t('form.yes') : $t('form.no') }}
     </el-tag>
   </span>
 </template>
@@ -27,7 +27,7 @@ export default {
       this.em.update(this.scope.row.id, {
         [this.field.property]: this.scope.row[this.field.property]
       }).then(() => {
-        this.$message.success('Property updated successfully')
+        this.$message.success(this.$t('easyAdmin.propertyUpdated'))
       })
     }
   }
