@@ -181,16 +181,16 @@ EasyAdmin is the heart of this project — a configuration-driven engine that **
 
 ```
 ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│  Entity Config    │     │  Backend API      │     │  Rendered UI      │
-│  (collections/)  │     │  /system/entities │     │                   │
-│                  │     │                   │     │  ┌─────────────┐  │
-│  fields: [...]   │────▶│  field types,     │────▶│  │ ListAdmin   │  │
-│  list_display    │     │  nullability,     │     │  │ (table)     │  │
-│  list_filter     │     │  relations        │     │  └─────────────┘  │
-│  detail_display  │     │                   │     │  ┌─────────────┐  │
-│                  │     │                   │     │  │ FormAdmin   │  │
-│                  │     │                   │     │  │ (form)       │  │
-│                  │     │                   │     │  └─────────────┘  │
+│  Entity Config   │     │ Backend API      │     │  Rendered UI     │
+│  (collections/)  │     │ /system/entities │     │                  │
+│                  │     │                  │     │  ┌────────────┐  │
+│  fields: [...]   │────▶│ field types,     │────▶│  │ ListAdmin  │  │
+│  list_display    │     │ nullability,     │     │  │ (table)    │  │
+│  list_filter     │     │ relations        │     │  └────────────┘  │
+│  detail_display  │     │                  │     │  ┌────────────┐  │
+│                  │     │                  │     │  │ FormAdmin  │  │
+│                  │     │                  │     │  │ (form)     │  │
+│                  │     │                  │     │  └────────────┘  │
 └──────────────────┘     └──────────────────┘     └──────────────────┘
 ```
 
@@ -214,7 +214,7 @@ export default {
         title: '标题',
         'category.id': () => axios
           .get('/api/v1/manage/categories')
-          .then(res => Object.assign({ __label: '分类' }, ...res.data.map(v => ({ [v.id]: v.name }))))
+          .then(res => Object.assign({ __label: 'Category' }, ...res.data.map(v => ({ [v.id]: v.name }))))
       },
       list_display: ['id', 'title', 'category', 'tags', 'createdAt']
     },
@@ -290,8 +290,12 @@ interface FieldOption {
 
 | Function | Behavior |
 |----------|----------|
-| `r(entity, title)` | Redirect routes — reuses `admin/list.vue`, `admin/form.vue`, `admin/detail.vue` |
-| `g(entity, title)` | Direct routes — expects custom view files per entity |
+| `r(entity, title)` | Redirect routes — reuses `admin/list.vue`, `admin/form.vue`, `admin/detail.vue` (recommended) |
+| `g(entity, title)` | Direct routes — expects custom view files per entity (reserved alternative) |
+
+> `r()` handles virtually all CRUD scenarios including nested sub-forms, JSX custom components,
+> relation search, detail fallback chains, and async filter functions. `g()` is kept as a backup
+> approach for cases where a fully independent page is warranted, but it is rarely needed in practice.
 
 ## API Integration
 

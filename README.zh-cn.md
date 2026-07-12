@@ -290,8 +290,10 @@ interface FieldOption {
 
 | 函数 | 行为 |
 |----------|----------|
-| `r(entity, title)` | 重定向路由 — 复用 `admin/list.vue`、`admin/form.vue`、`admin/detail.vue` |
-| `g(entity, title)` | 直接路由 — 期望每个实体有独立的视图文件 |
+| `r(entity, title)` | 重定向路由 — 复用 `admin/list.vue`、`admin/form.vue`、`admin/detail.vue`（推荐） |
+| `g(entity, title)` | 直接路由 — 期望每个实体有独立的视图文件（预留备选方案） |
+
+> `r()` 已可满足几乎所有 CRUD 场景，包括嵌套子表单、JSX 自定义组件、关联搜索、详情降级链和异步筛选函数。`g()` 保留为备选方案，用于需要完全独立页面的极端情况，实际项目中很少使用。
 
 ## API 集成
 
