@@ -68,10 +68,11 @@
       v-if="Object.keys(filters).length"
       size="default"
       icon="el-icon-search"
-      style="margin-right: 1em"
+      style="margin-right: -0.5em;"
       circle
       @click="filterGenerate(); fetchData();"
     />
+
     <el-button
       v-if="Object.keys(filters).length"
       size="default"
@@ -80,7 +81,6 @@
       circle
       @click="reset"
     />
-
   </span>
 </template>
 
