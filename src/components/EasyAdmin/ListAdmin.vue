@@ -128,21 +128,21 @@
     </el-row>
 
     <el-row>
-      <el-table
-        :key="refreshTable"
-        v-fit-columns
-        v-loading="loading"
-        :data="list"
-        element-loading-text="Loading..."
-        fit
-        lazy
-        stripe
-        highlight-current-row
-        v-bind="tableConf"
-        style="width: 100%"
-        v-on="tableEvent || {}"
-        @sort-change="changeSort"
-      >
+        <el-table
+          :key="refreshTable"
+          v-loading="loading"
+          :data="list"
+          element-loading-text="Loading..."
+          fit
+          lazy
+          stripe
+          highlight-current-row
+          v-bind="tableConf"
+          table-layout="auto"
+          style="width: 100%"
+          v-on="tableEvent || {}"
+          @sort-change="changeSort"
+        >
 
         <slot name="tableSelection" />
 
@@ -216,7 +216,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column v-if="!disabledActions.includes('lines')" :label="$t('Actions')">
+        <el-table-column v-if="!disabledActions.includes('lines')" :label="$t('Actions')" width="240" fixed="right">
           <template #default="scope">
             <div class="easy-admin-actions">
               <component
@@ -228,8 +228,6 @@
               />
 
               <slot name="extraAction" :data="scope.row" />
-
-            &emsp;
 
               <slot name="action" :data="scope.row">
                 <slot name="action:detail" :data="scope.row">
@@ -244,10 +242,7 @@
                   </el-button>
                 </slot>
 
-              &nbsp;&nbsp;
-
                 <slot name="action:edit" :data="scope.row">
-                  <!-- Popup dialog -->
                   <el-button
                     v-if="!disabledActions.includes('edit')"
                     size="small"
@@ -258,8 +253,6 @@
                     {{ $t('Edit') }}
                   </el-button>
                 </slot>
-
-              &nbsp;&nbsp;
 
                 <slot name="action:delete" :data="scope.row">
                   <el-popconfirm v-if="!disabledActions.includes('delete')" :title="$t('Delete this record?')" @confirm="removeAction(scope.row.id)">
