@@ -6,6 +6,8 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import enLocale from 'element-plus/es/locale/lang/en'
 import zhLocale from 'element-plus/es/locale/lang/zh-cn'
+import zhTwLocale from 'element-plus/es/locale/lang/zh-tw'
+import jaLocale from 'element-plus/es/locale/lang/ja'
 
 import '@/styles/index.scss' // global css
 
@@ -22,7 +24,7 @@ import '@/permission' // permission control
 import request from '@/utils/request'
 import $getValue from 'get-value'
 
-const localeMap = { en: enLocale, zh: zhLocale }
+const localeMap = { en: enLocale, zh: zhLocale, 'zh-Hant': zhTwLocale, ja: jaLocale }
 
 function detectLocale() {
   const stored = localStorage.getItem('app_locale')

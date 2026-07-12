@@ -69,7 +69,9 @@ export default {
       currentLocale: localStorage.getItem('app_locale') || (navigator.language.startsWith('zh') ? 'zh' : 'en'),
       locales: [
         { value: 'en', label: 'English' },
-        { value: 'zh', label: '中文' }
+        { value: 'zh', label: '中文 (简体)' },
+        { value: 'zh-Hant', label: '中文 (繁體)' },
+        { value: 'ja', label: '日本語' }
       ]
     }
   },

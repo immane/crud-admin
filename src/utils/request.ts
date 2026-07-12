@@ -5,6 +5,7 @@ import router from '@/router'
 import { getToken, getRefreshToken, setToken, setRefreshToken } from '@/utils/auth'
 import { AUTH_API_PREFIX, apiPath } from '@/api/prefix'
 import { ApiResponse } from '@/types/api'
+import { getLocale } from '@/i18n'
 
 const service: any = axios.create({
   baseURL: process.env.VITE_BASE_API,
@@ -77,12 +78,15 @@ const retryUnauthorizedRequest = async(error: AxiosError<any>) => {
 
 service.interceptors.request.use(
   (config: AxiosRequestConfig) => {
+    if (!config.headers) {
+      config.headers = {}
+    }
     if (store.getters.token) {
-      if (!config.headers) {
-        config.headers = {}
-      }
       config.headers.Authorization = `Bearer ${getToken()}`
     }
+    const locale = getLocale()
+    config.headers['Accept-Language'] = locale
+    config.params = { ...(config.params || {}), _locale: locale }
     return config
   },
   error => Promise.reject(error)

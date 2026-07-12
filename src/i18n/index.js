@@ -1,21 +1,25 @@
 import { reactive } from 'vue'
 import en from './en'
 import zh from './zh'
+import zhHant from './zh-Hant'
+import ja from './ja'
 
-const messages = { en, zh }
+const messages = { en, zh, 'zh-Hant': zhHant, ja }
 const STORAGE_KEY = 'app_locale'
 
 function detectLocale() {
   const stored = localStorage.getItem(STORAGE_KEY)
   if (stored && messages[stored]) return stored
   const nav = navigator.language || ''
-  if (nav.startsWith('zh')) return 'zh'
+  if (nav.startsWith('zh')) {
+    if (nav.includes('TW') || nav.includes('HK') || nav.includes('Hant')) return 'zh-Hant'
+    return 'zh'
+  }
+  if (nav.startsWith('ja')) return 'ja'
   return 'en'
 }
 
-const state = reactive({
-  locale: detectLocale()
-})
+const state = reactive({ locale: detectLocale() })
 
 function t(key, ...args) {
   const value = messages[state.locale]?.[key]
@@ -36,7 +40,11 @@ function setLocale(locale) {
   }
 }
 
-export { t, setLocale }
+function getLocale() {
+  return state.locale
+}
+
+export { t, setLocale, getLocale }
 
 export default {
   install(app) {
