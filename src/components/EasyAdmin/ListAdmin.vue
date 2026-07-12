@@ -664,7 +664,6 @@ export default {
       type: Function,
       default: (context, dataProcessor = {}) => {
         // Loading start
-        context.list = []
         context.loading = true
 
         const promise = [
@@ -770,7 +769,7 @@ export default {
                         return (
                             <el-button
                               type='primary' icon='el-icon-edit-outline'
-                              onclick={() => {
+                              onClick={() => {
                                 scope.submit(() => {
                                   this.$message({ message: '数据修改成功', type: 'success' })
                                   this.data.dialog.show = false
