@@ -26,6 +26,18 @@ export default {
         'phoneVerified',
         { property: 'roles', type: 'array' }
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'username',
+        'email',
+        'phone',
+        'phoneVerified',
+        { property: 'roles', type: 'array', full_width: true },
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

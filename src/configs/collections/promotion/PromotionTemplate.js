@@ -32,6 +32,20 @@ export default {
         'phase',
         'createdAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'name',
+        'type',
+        'enabled',
+        'phase',
+        { property: 'description', type: 'text', full_width: true },
+        { property: 'dsl', type: 'text', full_width: true },
+        { property: 'fields', type: 'json', full_width: true },
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

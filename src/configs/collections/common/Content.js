@@ -28,6 +28,20 @@ export default {
         'createdAt',
         'updatedAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'title',
+        'category',
+        'tags',
+        'author',
+        { property: 'body', type: 'text', full_width: true },
+        'status',
+        'publishedAt',
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

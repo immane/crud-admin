@@ -30,6 +30,22 @@ export default {
         { property: 'path', type: 'image' },
         'createdAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'filename',
+        'originalFilename',
+        'mimeType',
+        'size',
+        'width',
+        'height',
+        'alt',
+        'title',
+        { property: 'path', type: 'image', full_width: true },
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

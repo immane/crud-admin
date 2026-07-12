@@ -37,6 +37,19 @@ export default {
         'author',
         'createdAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'author',
+        'status',
+        { property: 'body', type: 'text', full_width: true },
+        'entityType',
+        'entityId',
+        'parent',
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

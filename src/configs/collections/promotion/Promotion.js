@@ -41,6 +41,22 @@ export default {
         'template',
         'createdAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'name',
+        'enabled',
+        { property: 'description', type: 'text', full_width: true },
+        'storeCode',
+        'startTime',
+        'endTime',
+        'conflictMode',
+        'template',
+        { property: 'config', type: 'json', full_width: true },
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

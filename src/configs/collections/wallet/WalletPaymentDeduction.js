@@ -36,6 +36,22 @@ export default {
         'referenceId',
         'createdAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'invoiceNo',
+        'amount',
+        'currency',
+        'type',
+        'status',
+        'wallet',
+        'referenceId',
+        'referenceType',
+        'metadata',
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

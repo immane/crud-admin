@@ -26,6 +26,24 @@ export default {
         'profit',
         'createdAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'order',
+        'product',
+        'specificationTitle',
+        'quantity',
+        'unitPrice',
+        'price',
+        'cost',
+        'profit',
+        { property: 'specSnapshot', type: 'json', full_width: true },
+        { property: 'productSnapshot', type: 'json', full_width: true },
+        { property: 'metadata', type: 'json', full_width: true },
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

@@ -22,6 +22,17 @@ export default {
         'color',
         'createdAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'name',
+        'slug',
+        'color',
+        'type',
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

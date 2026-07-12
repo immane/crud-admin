@@ -35,6 +35,21 @@ export default {
         'publishedAt',
         'createdAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'title',
+        'slug',
+        'status',
+        { property: 'body', type: 'text', full_width: true },
+        'metaTitle',
+        { property: 'metaDescription', type: 'text', full_width: true },
+        'author',
+        'publishedAt',
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

@@ -37,6 +37,23 @@ export default {
         'referenceId',
         'createdAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'uuid',
+        'amount',
+        'currency',
+        'type',
+        'status',
+        'fromWallet',
+        'toWallet',
+        'referenceId',
+        'referenceType',
+        'metadata',
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

@@ -30,6 +30,18 @@ export default {
         { property: 'sort', editable: true },
         'createdAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'name',
+        'price',
+        'status',
+        'sort',
+        'product',
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

@@ -35,6 +35,19 @@ export default {
         'sortOrder',
         'createdAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'name',
+        'slug',
+        { property: 'description', type: 'text', full_width: true },
+        'parent',
+        'enabled',
+        'sortOrder',
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

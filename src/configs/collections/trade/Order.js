@@ -34,6 +34,27 @@ export default {
         'paidAt',
         'createdAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'uuid',
+        'user',
+        'totalAmount',
+        'currency',
+        'status',
+        'paymentMethod',
+        'paidAt',
+        'cancelledAt',
+        'completedAt',
+        'refundedAt',
+        { property: 'notes', type: 'text', full_width: true },
+        { property: 'metadata', type: 'json', full_width: true },
+        'shippingAddress',
+        'billingAddress',
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

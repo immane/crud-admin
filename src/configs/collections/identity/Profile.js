@@ -39,6 +39,19 @@ export default {
         'joinedAt',
         'createdAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'user',
+        'nickname',
+        { property: 'avatar', type: 'image', full_width: true },
+        'level',
+        { property: 'metadata', type: 'json', full_width: true },
+        'joinedAt',
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

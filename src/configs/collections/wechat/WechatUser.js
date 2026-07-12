@@ -17,6 +17,23 @@ export default {
         'lastLoginAt',
         'createdAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'user',
+        'nickname',
+        'openid',
+        'unionid',
+        'appType',
+        'avatarUrl',
+        'country',
+        'province',
+        'city',
+        'lastLoginAt',
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

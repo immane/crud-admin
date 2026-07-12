@@ -180,6 +180,19 @@ export default {
         'createdAt',
         'updatedAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'name',
+        'status',
+        'isDeleted',
+        { property: 'description', type: 'text', full_width: true },
+        { property: 'metadata', type: 'json', full_width: true },
+        'createdAt',
+        'updatedAt',
+        'specifications'
+      ]
     }
   }
 }

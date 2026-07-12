@@ -17,6 +17,20 @@ export default {
         'createdAt',
         'updatedAt'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'invoiceNo',
+        'payer',
+        'amount',
+        'currency',
+        'status',
+        'order',
+        'metadata',
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }

@@ -28,6 +28,20 @@ export default {
         'label',
         'sortOrder'
       ]
+    },
+    detail: {
+      detail_display: [
+        'id',
+        'key',
+        'value',
+        'type',
+        'groupName',
+        'label',
+        { property: 'description', type: 'text', full_width: true },
+        'sortOrder',
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }
