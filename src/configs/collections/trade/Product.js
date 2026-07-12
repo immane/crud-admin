@@ -50,7 +50,7 @@ const SpecificationManager = {
       return (
         <div>
           <el-button
-            size={'medium'} type={'primary'} icon={'el-icon-plus'} plain
+            size={'default'} type={'primary'} icon={'el-icon-plus'} plain
             onClick={() => { this.form.specifications.push({}) }}
           >增加</el-button>
           {this.form.specifications.map((item, index) => (
@@ -85,7 +85,7 @@ const SpecificationManager = {
           v-slots={{
             topButton: () => (
               <el-button
-                size={'medium'} type={'primary'} icon={'el-icon-plus'} plain
+                size={'default'} type={'primary'} icon={'el-icon-plus'} plain
                 onClick={() => {
                   this.specId = null
                   this.specForm = { product: this.productId }

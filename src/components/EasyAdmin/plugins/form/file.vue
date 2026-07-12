@@ -11,7 +11,7 @@
     list-type="file"
     :on-remove="(file, fileList) => form[field.property] = ''"
     :on-success="(res, file) => { form[field.property] = res.data[0] }"
-    v-on="field.type_events"
+    v-on="field.type_events || {}"
   >
     <el-button size="small" type="primary">点击选择文件</el-button>
     <template #tip><div class="el-upload__tip">上传文件必须少于100MB</div></template>

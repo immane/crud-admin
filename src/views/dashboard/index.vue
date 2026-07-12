@@ -81,7 +81,7 @@
           <div v-for="order in recentOrders" :key="order.id" class="order-row">
             <div class="order-row__identity"><span class="order-row__avatar">{{ orderInitial(order) }}</span><div><b>#{{ order.id }}</b><small>{{ order.user?.__toString || order.user?.username || order.uuid || '访客订单' }}</small></div></div>
             <span>{{ formatAmount(order.totalAmount) }}</span>
-            <el-tag size="mini" effect="plain" :type="statusType(order.status)">{{ statusLabel(order.status) }}</el-tag>
+            <el-tag size="small" effect="plain" :type="statusType(order.status)">{{ statusLabel(order.status) }}</el-tag>
           </div>
         </div>
         <div v-else class="panel__empty">暂无订单数据</div>

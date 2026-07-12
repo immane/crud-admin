@@ -20,13 +20,13 @@ export const r = (entityName, title, meta = { title: title, icon: 'el-icon-caret
   },
   {
     path: `/dummy/${entityPath}/:id/update`,
-    redirect: `/${entityPath}/:id/update`,
+    redirect: to => `/${entityPath}/${to.params.id}/update`,
     name: `${entityName}Update`,
     hidden: true
   },
   {
     path: `/dummy/${entityPath}/:id/detail`,
-    redirect: `/${entityPath}/:id/detail`,
+    redirect: to => `/${entityPath}/${to.params.id}/detail`,
     name: `${entityName}Detail`,
     hidden: true
   },

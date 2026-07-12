@@ -45,6 +45,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent, markRaw, toRaw } from 'vue'
 import EntityManage from '@/utils/entity'
 import { createUiFeedback } from './ui/feedback'
 
@@ -54,10 +55,10 @@ const pluginCache = {}
 
 const resolvePlugin = path => {
   if (!pluginCache[path]) {
-    pluginCache[path] = () => {
+    pluginCache[path] = defineAsyncComponent(() => {
       const loader = detailPlugins[path] || listPlugins[path]
       return loader().then(module => module.default)
-    }
+    })
   }
   return pluginCache[path]
 }
@@ -82,7 +83,7 @@ export default {
   },
   created() {
     this.properties = (this.fields === '__all__' ? [] : this.fields).map(field =>
-      typeof field === 'string' ? { property: field } : field
+      typeof field === 'string' ? { property: field } : (field.component ? { ...field, component: markRaw(toRaw(field.component)) } : field)
     )
     this.fetchData()
   },

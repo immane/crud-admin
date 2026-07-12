@@ -59,7 +59,7 @@
                 "
                 :prop="field.property"
                 v-bind="field.field_options"
-                v-on="field.field_events"
+                v-on="field.field_events || {}"
               >
                 <!---------------
                 |  Fields slot  |
@@ -128,6 +128,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent, markRaw, toRaw } from 'vue'
 import EntityManage from '@/utils/entity'
 import Tinymce from '@/components/Tinymce'
 import { createUiFeedback } from './ui/feedback'
@@ -137,7 +138,7 @@ const formPluginCache = {}
 
 const resolveFormPlugin = path => {
   if (!formPluginCache[path]) {
-    formPluginCache[path] = () => formPlugins[path]().then(module => module.default)
+    formPluginCache[path] = defineAsyncComponent(() => formPlugins[path]().then(module => module.default))
   }
   return formPluginCache[path]
 }
@@ -262,7 +263,7 @@ export default {
           })
           this.plainFields.push(field)
         } else {
-          this.properties.push(field)
+          this.properties.push(field.component ? { ...field, component: markRaw(toRaw(field.component)) } : field)
           this.plainFields.push(field.property)
         }
       }

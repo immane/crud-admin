@@ -6,7 +6,7 @@
       clearable
       placeholder="请选择"
       v-bind="field.type_options"
-      v-on="field.type_events"
+      v-on="field.type_events || {}"
     >
       <el-option
         v-for="item in field.type_options.options"

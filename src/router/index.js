@@ -59,34 +59,51 @@ export const constantRoutes = [
 ]
 
 export const lastRoutes = [
-  // default admin route
   {
-    path: '',
+    path: '/:entityParam/create',
     component: Layout,
+    hidden: true,
     children: [
       {
-        path: `/:entityParam/create`,
+        path: '',
         name: `EasyAdminCreate`,
-        hidden: true,
         component: () => import('@/views/admin/form')
-      },
+      }
+    ]
+  },
+  {
+    path: '/:entityParam/:id/update',
+    component: Layout,
+    hidden: true,
+    children: [
       {
-        path: `/:entityParam/:id/update`,
+        path: '',
         name: `EasyAdminUpdate`,
-        hidden: true,
         component: () => import('@/views/admin/form')
-      },
+      }
+    ]
+  },
+  {
+    path: '/:entityParam/:id/detail',
+    component: Layout,
+    hidden: true,
+    children: [
       {
-        path: `/:entityParam/:id/detail`,
+        path: '',
         name: `EasyAdminDetail`,
-        hidden: true,
         component: () => import('@/views/admin/detail')
-      },
+      }
+    ]
+  },
+  {
+    path: '/:entityParam/list',
+    component: Layout,
+    hidden: true,
+    children: [
       {
-        path: `/:entityParam/list`,
+        path: '',
         name: `EasyAdminList`,
-        component: () => import('@/views/admin/list'),
-        hidden: true
+        component: () => import('@/views/admin/list')
       }
     ]
   }
@@ -98,7 +115,6 @@ export const lastRoutes = [
  */
 export const asyncRoutes = [
   ...admin.routes,
-  ...lastRoutes,
   // 404,page,must be placed at the end !!!
   {
     path: '/:pathMatch(.*)*',
@@ -113,7 +129,7 @@ const createAppRouter = () =>
     scrollBehavior: () => ({
       y: 0
     }),
-    routes: constantRoutes
+    routes: [...constantRoutes, ...lastRoutes]
   })
 
 const router = createAppRouter()
@@ -125,7 +141,7 @@ export function resetRouter() {
     if (route.name) staticRouteNames.add(route.name)
     if (route.children) collectNames(route.children)
   })
-  collectNames(constantRoutes)
+  collectNames([...constantRoutes, ...lastRoutes])
   router.getRoutes().forEach(route => {
     if (route.name && !staticRouteNames.has(route.name)) router.removeRoute(route.name)
   })

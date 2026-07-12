@@ -7,7 +7,7 @@
       placeholder="请选择"
       v-bind="field.type_options"
       multiple
-      v-on="field.type_events"
+      v-on="field.type_events || {}"
     >
       <el-option
         v-for="item in options"
@@ -27,7 +27,7 @@
         type="success"
         icon="el-icon-plus"
         circle
-        size="mini"
+        size="small"
         style="margin: 0px 10px;"
       />
     </router-link>

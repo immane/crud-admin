@@ -8,7 +8,7 @@
         <el-button
           v-if="lines.length > collapseLimit"
           type="text"
-          size="mini"
+          size="small"
           icon="el-icon-arrow-down"
           class="detail-json__toggle"
           @click="expanded = !expanded"

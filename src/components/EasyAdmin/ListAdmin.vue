@@ -43,7 +43,7 @@
               && config && config.list && config.list.export"
           >
             <el-button
-              size="medium"
+              size="default"
               type="primary"
               icon="el-icon-download"
               plain
@@ -110,7 +110,7 @@
           <!-- New action -->
           <el-button
             v-if="!disabledActions.includes('new')"
-            size="medium"
+            size="default"
             type="primary"
             icon="el-icon-plus"
             plain
@@ -140,7 +140,7 @@
         highlight-current-row
         v-bind="tableConf"
         style="width: 100%"
-        v-on="tableEvent"
+        v-on="tableEvent || {}"
         @sort-change="changeSort"
       >
 
@@ -158,7 +158,7 @@
           sortable
           :prop="field.property"
           v-bind="field.field_options"
-          v-on="field.field_events"
+          v-on="field.field_events || {}"
         >
           <template #default="scope">
 
@@ -353,6 +353,7 @@
 </style>
 
 <script lang="jsx">
+import { defineAsyncComponent, markRaw, toRaw } from 'vue'
 import EntityManage from '@/utils/entity'
 import { asyncRoutes } from '@/router'
 import SIP from '@/utils/simple-image-process'
@@ -366,7 +367,7 @@ const listPluginCache = {}
 
 const resolveListPlugin = (path) => {
   if (!listPluginCache[path]) {
-    listPluginCache[path] = () => listPlugins[path]().then(module => module.default)
+    listPluginCache[path] = defineAsyncComponent(() => listPlugins[path]().then(module => module.default))
   }
   return listPluginCache[path]
 }
@@ -580,7 +581,7 @@ export default {
 
   data() {
     return {
-      EditablePlain,
+      EditablePlain: markRaw(EditablePlain),
 
       // Entity manager and entity structure
       // sample: 'Category'
@@ -810,7 +811,7 @@ export default {
             property: field
           })
         } else {
-          this.properties.push(field)
+          this.properties.push(field.component ? { ...field, component: markRaw(toRaw(field.component)) } : field)
         }
       }
     },

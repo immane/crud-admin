@@ -21,21 +21,32 @@ const mockAxiosInstance = {
 }
 
 jest.mock('axios', () => ({
-  create: jest.fn(() => mockAxiosInstance)
+  default: { create: jest.fn(() => mockAxiosInstance) }
 }))
 
-jest.mock('element-ui', () => ({
-  Message: mockMessage
+jest.mock('element-plus', () => ({
+  ElMessage: mockMessage
 }))
 
 jest.mock('@/store', () => ({
-  getters: {
-    token: 'token-1'
+  default: {
+    getters: {
+      token: 'token-1'
+    },
+    dispatch: jest.fn(),
+    commit: jest.fn()
   }
 }))
 
 jest.mock('@/utils/auth', () => ({
-  getToken: jest.fn(() => 'token-1')
+  getToken: jest.fn(() => 'token-1'),
+  getRefreshToken: jest.fn(() => ''),
+  setToken: jest.fn(),
+  setRefreshToken: jest.fn()
+}))
+
+jest.mock('@/router', () => ({
+  default: { currentRoute: { value: { path: '/', fullPath: '/' } }, replace: jest.fn() }
 }))
 
 describe('utils/request.ts', () => {

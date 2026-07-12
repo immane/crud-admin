@@ -5,7 +5,7 @@
     placeholder="选择日期时间"
     v-bind="field.type_options"
     value-format="yyyy-MM-dd HH:mm:ss"
-    v-on="field.type_events"
+    v-on="field.type_events || {}"
   />
 </template>
 

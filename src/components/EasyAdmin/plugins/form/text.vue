@@ -4,7 +4,7 @@
     @update:model-value="form[field.property] = $event"
     :height="300"
     v-bind="field.type_options"
-    v-on="field.type_events"
+    v-on="field.type_events || {}"
   />
 </template>
 

@@ -16,7 +16,7 @@
         :type="v.type"
         :placeholder="`${v.label ? v.label : k}`"
         style="width: 150px;"
-        size="medium"
+        size="default"
         :value-format="{
           datetime: 'yyyy-MM-dd HH:mm:ss',
           date: 'yyyy-MM-dd',
@@ -31,7 +31,7 @@
         v-model="value[k]"
         :placeholder="`${v.label ? v.label : k}`"
         style="width: 150px;"
-        size="medium"
+        size="default"
         clearable
       >
         <template #prefix><i class="el-input__icon el-icon-search" /></template>
@@ -42,7 +42,7 @@
         v-else-if="v.type === 'boolean'"
         v-model="value[k]"
         :inactive-text="`${v.label ? v.label : k}`"
-        size="medium"
+        size="default"
       />
 
       <!-- Select -->
@@ -53,7 +53,7 @@
         clearable
         :placeholder="`${v.label ? v.label : k}`"
         style="width: 150px;"
-        size="medium"
+        size="default"
       >
         <el-option
           v-for="item in v.data"
@@ -66,7 +66,7 @@
 
     <el-button
       v-if="Object.keys(filters).length"
-      size="medium"
+      size="default"
       icon="el-icon-search"
       style="margin-right: 1em"
       circle
@@ -84,7 +84,7 @@ export default {
     // v-model
     value: {
       type: Object,
-      default: () => []
+      default: () => ({})
     },
 
     query: {

@@ -29,7 +29,7 @@ const isAuthRequest = (url?: string) => authPaths.some(path => url?.includes(pat
 const clearSession = async() => {
   await store.dispatch('user/resetToken')
   if (router.currentRoute.value.path !== '/login') {
-    router.replace({ path: '/login', query: { redirect: router.currentRoute.value.fullPath } })
+    router.replace({ path: '/login', query: { redirect: router.currentRoute.value.fullPath }})
   }
 }
 
