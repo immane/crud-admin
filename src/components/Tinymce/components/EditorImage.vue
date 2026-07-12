@@ -16,7 +16,7 @@
         action="https://httpbin.org/post"
         list-type="picture"
       >
-        <i class="el-icon-upload" />
+        <el-icon><el-icon-upload /></el-icon>
         <div class="el-upload__text">拖拉图片至此处 或<em>点击上传</em></div>
       </el-upload>
       <el-button @click="dialogVisible = false">

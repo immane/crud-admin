@@ -102,7 +102,7 @@
                 <template v-if="Object.keys(field).includes('help')">
                   <div class="help-text" style="display: flex;">
                     <div>
-                      <p class="el-icon-info" />
+                      <el-icon><el-icon-info /></el-icon>
                     </div>
                     <div>
                       <p v-html="field.help" />

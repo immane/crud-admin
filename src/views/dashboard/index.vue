@@ -7,14 +7,14 @@
         <p class="dashboard__intro">实时掌握业务规模、订单处理与系统运行状况。</p>
       </div>
       <div class="dashboard__hero-actions">
-        <span class="dashboard__updated"><i class="el-icon-time" /> 更新于 {{ updatedAt }}</span>
+        <span class="dashboard__updated"><el-icon><el-icon-time /></el-icon> 更新于 {{ updatedAt }}</span>
         <el-button type="primary" icon="el-icon-refresh" :loading="loading" @click="loadDashboard">刷新数据</el-button>
       </div>
     </section>
 
     <section v-loading="loading" class="dashboard__metrics">
       <article v-for="metric in metrics" :key="metric.label" class="metric-card" :class="`metric-card--${metric.tone}`">
-        <div class="metric-card__icon"><i :class="metric.icon" /></div>
+        <div class="metric-card__icon"><el-icon><component :is="metric.icon" /></el-icon></div>
         <div>
           <p>{{ metric.label }}</p>
           <strong>{{ metric.value }}</strong>
@@ -60,10 +60,10 @@
             <p class="panel__kicker">LOCAL WEATHER</p>
             <h2>{{ weather.location }}</h2>
           </div>
-          <button class="weather__locate" type="button" title="获取本地天气" @click="loadWeather(true)"><i class="el-icon-location-outline" /></button>
+          <button class="weather__locate" type="button" title="获取本地天气" @click="loadWeather(true)"><el-icon><el-icon-location-outline /></el-icon></button>
         </header>
         <div class="weather__body">
-          <div class="weather__symbol"><i :class="weather.icon" /></div>
+          <div class="weather__symbol"><el-icon><component :is="weather.icon" /></el-icon></div>
           <strong>{{ weather.temperature }}<sup>°</sup></strong>
           <div><b>{{ weather.condition }}</b><span>体感 {{ weather.apparentTemperature }}°</span></div>
         </div>
@@ -75,7 +75,7 @@
       <article v-loading="loading" class="panel panel--orders">
         <header class="panel__header">
           <div><p class="panel__kicker">LATEST ORDERS</p><h2>最近订单</h2></div>
-          <router-link :to="{ name: 'OrderList' }">查看全部 <i class="el-icon-arrow-right" /></router-link>
+          <router-link :to="{ name: 'OrderList' }">查看全部 <el-icon><el-icon-arrow-right /></el-icon></router-link>
         </header>
         <div v-if="recentOrders.length" class="order-list">
           <div v-for="order in recentOrders" :key="order.id" class="order-row">
@@ -91,7 +91,7 @@
         <header class="panel__header"><div><p class="panel__kicker">SYSTEM ACTIVITY</p><h2>资金与业务动态</h2></div></header>
         <div v-if="recentTransactions.length" class="activity-list">
           <div v-for="transaction in recentTransactions" :key="transaction.id" class="activity-row">
-            <span class="activity-row__icon"><i :class="transactionIcon(transaction.type)" /></span>
+            <span class="activity-row__icon"><el-icon><component :is="transactionIcon(transaction.type)" /></el-icon></span>
             <div><b>{{ transactionLabel(transaction.type) }}</b><small>{{ transaction.referenceId || transaction.uuid || `交易 #${transaction.id}` }}</small></div>
             <span class="activity-row__amount" :class="{ 'activity-row__amount--negative': transaction.type === 'withdrawal' || transaction.type === 'fee' }">{{ transaction.amount == null ? '-' : formatAmount(transaction.amount) }}</span>
           </div>

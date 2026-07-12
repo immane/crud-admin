@@ -1,6 +1,6 @@
 <template>
   <span v-if="value">
-    <i class="el-icon-time" />
+    <el-icon><el-icon-time /></el-icon>
     {{ formatDate(value) }}
   </span>
 </template>

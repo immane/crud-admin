@@ -1,23 +1,61 @@
-import { h } from 'vue'
+import {
+  ArrowLeft, ArrowRight, ArrowDown, Back,
+  CaretBottom, CaretRight,
+  Plus, Minus, Delete, Edit, EditPen,
+  View, Search, Download, Upload,
+  Refresh, RefreshLeft, Loading,
+  Clock, Timer, Location, InfoFilled,
+  HomeFilled, Goods, Document, Promotion,
+  Money, Coin, User, Setting,
+  Sunny, PartlyCloudy, Cloudy, Drizzling, Pouring, Lightning,
+  Sort
+} from '@element-plus/icons-vue'
 
-const legacyIconNames = [
-  'el-icon-arrow-left', 'el-icon-arrow-right', 'el-icon-arrow-down',
-  'el-icon-back', 'el-icon-caret-bottom', 'el-icon-caret-right',
-  'el-icon-plus', 'el-icon-minus', 'el-icon-delete', 'el-icon-edit',
-  'el-icon-edit-outline', 'el-icon-view', 'el-icon-search', 'el-icon-download',
-  'el-icon-upload', 'el-icon-refresh', 'el-icon-refresh-left', 'el-icon-loading',
-  'el-icon-time', 'el-icon-timer', 'el-icon-location-outline', 'el-icon-info',
-  'el-icon-s-home', 'el-icon-goods', 'el-icon-s-order', 'el-icon-s-promotion',
-  'el-icon-document', 'el-icon-money', 'el-icon-coin', 'el-icon-user',
-  'el-icon-setting', 'el-icon-sunny', 'el-icon-partly-cloudy', 'el-icon-cloudy',
-  'el-icon-light-rain', 'el-icon-heavy-rain', 'el-icon-lightning', 'el-icon-sort'
-]
+const iconMap = {
+  'el-icon-arrow-left': ArrowLeft,
+  'el-icon-arrow-right': ArrowRight,
+  'el-icon-arrow-down': ArrowDown,
+  'el-icon-back': Back,
+  'el-icon-caret-bottom': CaretBottom,
+  'el-icon-caret-right': CaretRight,
+  'el-icon-plus': Plus,
+  'el-icon-minus': Minus,
+  'el-icon-delete': Delete,
+  'el-icon-edit': Edit,
+  'el-icon-edit-outline': EditPen,
+  'el-icon-view': View,
+  'el-icon-search': Search,
+  'el-icon-download': Download,
+  'el-icon-upload': Upload,
+  'el-icon-refresh': Refresh,
+  'el-icon-refresh-left': RefreshLeft,
+  'el-icon-loading': Loading,
+  'el-icon-time': Clock,
+  'el-icon-timer': Timer,
+  'el-icon-location-outline': Location,
+  'el-icon-info': InfoFilled,
+  'el-icon-s-home': HomeFilled,
+  'el-icon-goods': Goods,
+  'el-icon-s-order': Document,
+  'el-icon-s-promotion': Promotion,
+  'el-icon-document': Document,
+  'el-icon-money': Money,
+  'el-icon-coin': Coin,
+  'el-icon-user': User,
+  'el-icon-setting': Setting,
+  'el-icon-sunny': Sunny,
+  'el-icon-partly-cloudy': PartlyCloudy,
+  'el-icon-cloudy': Cloudy,
+  'el-icon-light-rain': Drizzling,
+  'el-icon-heavy-rain': Pouring,
+  'el-icon-lightning': Lightning,
+  'el-icon-sort': Sort
+}
 
 export default function installLegacyIcons(app) {
-  legacyIconNames.forEach(name => {
-    app.component(name, {
-      name,
-      render: () => h('i', { class: name })
-    })
+  Object.entries(iconMap).forEach(([legacyName, component]) => {
+    if (component) {
+      app.component(legacyName, component)
+    }
   })
 }

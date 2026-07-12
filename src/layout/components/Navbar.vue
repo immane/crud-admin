@@ -3,7 +3,7 @@
     <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
 
     <div class="back">
-      <a class="back-link" @click="$router.go(-1)"><i class="el-icon-back" /> 返回</a>
+      <a class="back-link" @click="$router.go(-1)"><el-icon><el-icon-back /></el-icon> 返回</a>
       <el-divider direction="vertical" />
     </div>
 
@@ -14,7 +14,7 @@
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <img :src="avatar" class="user-avatar">
-          <i class="el-icon-caret-bottom" />
+          <el-icon><el-icon-caret-bottom /></el-icon>
         </div>
         <template #dropdown>
           <el-dropdown-menu class="user-dropdown">

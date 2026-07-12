@@ -19,7 +19,11 @@ export default {
 
     if (icon) {
       if (icon.includes('el-icon')) {
-        vnodes.push(h('i', { class: [icon, 'sub-el-icon'] }))
+        vnodes.push(
+          h('el-icon', { style: { marginRight: title ? '8px' : '0' } }, () => [
+            h(resolveComponent(icon))
+          ])
+        )
       } else {
         vnodes.push(h(resolveComponent('svg-icon'), { iconClass: icon }))
       }

@@ -34,7 +34,7 @@
         size="default"
         clearable
       >
-        <template #prefix><i class="el-input__icon el-icon-search" /></template>
+        <template #prefix><el-icon><el-icon-search /></el-icon></template>
       </el-input>
 
       <!-- Boolean -->
