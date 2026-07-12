@@ -1,7 +1,7 @@
 # AI Context
 
 > Vue Admin Skeleton — AI Assistant Context Document  
-> Last updated: 2026-07-12
+> Last updated: 2026-07-13
 
 ---
 
@@ -46,9 +46,11 @@ src/
 ├── components/EasyAdmin/  # ⭐ Core CRUD Engine
 │   ├── FormAdmin.vue     # Dynamic form builder
 │   ├── ListAdmin.vue     # Dynamic list builder
+│   ├── DetailAdmin.vue   # Configurable record detail page
 │   ├── SearchFilter.vue  # Dynamic filter builder
 │   ├── plugins/form/     # 17 field-type plugins
-│   └── plugins/list/     # 8 list-rendering plugins
+│   ├── plugins/list/     # 9 list-rendering plugins
+│   └── plugins/detail/   # Detail-only plugins (json, image)
 ├── configs/              # Declarative configs
 │   ├── routes.js         # Menu/route definitions
 │   ├── entities.js       # Auto-loader (import.meta.glob)
@@ -63,9 +65,9 @@ src/
 │   ├── entity.ts         # EntityManage CRUD class
 │   └── request.ts        # Axios JWT instance
 └── views/                # Page views
-    ├── admin/            # Generic CRUD (list + form)
+    ├── admin/            # Generic CRUD (list + form + detail)
     ├── login/            # Login page
-    └── dashboard/        # Dashboard
+    └── dashboard/        # Enterprise dashboard
 ```
 
 ---
@@ -78,7 +80,7 @@ src/
 
 Config location: `src/configs/collections/{bundle}/{EntityName}.js` (per-entity files organized by bundle)  
 Route generation: `src/configs/routes.js` using `r()` helper  
-View reuse: `views/admin/list.vue` + `views/admin/form.vue` resolve config from `$route.params.entityParam`
+View reuse: `views/admin/list.vue` + `views/admin/form.vue` + `views/admin/detail.vue` resolve config from `$route.params.entityParam`
 
 #### Entity Config File Structure
 
@@ -100,9 +102,13 @@ export default {
   EntityName: {
     entity?: string | { name, prefix?, plural? },
     form: { fields: [...] },
-    list: { query, list_filter, list_display, disabled_actions, ... }
+    list: { query, list_filter, list_display, disabled_actions, ... },
+    detail: { detail_display, disabled_actions, ... }
   }
 }
+```
+
+The `detail_display` falls back to `list.list_display` → `form.fields` → all API fields. Detail fields use the same `FieldOption` contract and list rendering plugins as `list_display`.
 ```
 
 The auto-loader (`entities.js`) uses `import.meta.glob` to collect all `.js` files under `collections/`. Files at depth 2 (e.g., `trade/Product.js`) are treated as collections and merged via `Object.assign`. Files at depth 3+ would be treated as standalone entities.
@@ -128,6 +134,9 @@ const formPlugins = import.meta.glob('./plugins/form/*.vue')
 // EasyAdmin plugin auto-discovery (list columns)
 const listPlugins = import.meta.glob('./plugins/list/*.vue')
 
+// EasyAdmin plugin auto-discovery (detail view)
+const detailPlugins = import.meta.glob('./plugins/detail/*.vue')
+
 // Entity config auto-loading
 const entityCollections = import.meta.glob('./collections/**/*.js', { eager: true })
 ```
@@ -135,8 +144,12 @@ const entityCollections = import.meta.glob('./collections/**/*.js', { eager: tru
 ### 3. JWT Bearer Token Authentication
 
 - Token stored in Cookie: `dream_studio_admin_token`
+- Refresh token stored in Cookie: `dream_studio_admin_refresh_token`
 - Request interceptor: `Authorization: Bearer {token}`
 - Login: `POST /api/auth/login { identifier, password }` → `{ access_token, refresh_token }`
+- Token refresh: `POST /api/auth/token/refresh { refresh_token }` → `{ access_token, refresh_token }` (rotates both)
+- Auto-refresh: Axios response interceptor catches 401, queues concurrent requests,
+  refreshes once, retries original requests. On failure → `clearSession()` → `/login`.
 
 ### 4. Dynamic Routing + Permission Filtering
 
@@ -192,6 +205,17 @@ const entityCollections = import.meta.glob('./collections/**/*.js', { eager: tru
 
 List plugins are loaded dynamically via `import.meta.glob`, following the same pattern as form plugins. The `getListPluginType()` method resolves the plugin type from `field.type` or backend metadata, and `loadListPlugin()` returns the async component.
 
+### Detail Plugins (`plugins/detail/`)
+
+DetailAdmin uses a fallback chain: `plugins/detail/` → `plugins/list/` → plain text. Detail-only plugins override list defaults where detail presentation differs.
+
+| Plugin File | Type Mapping | Render Component |
+|-------------|--------------|------------------|
+| `image.vue` | image | Full-width `<el-image>` with border, shadow, preview |
+| `json.vue` | json | `<pre>` with 2-space indent, syntax coloring, expand/collapse |
+
+Adding a new detail plugin: create `plugins/detail/{type}.vue` with the same props as list plugins (`value`, `field`, `scope`, `em`, `struct`). It auto-discover via `import.meta.glob` and takes priority over the list counterpart.
+
 ---
 
 ## Quick Reference
@@ -203,12 +227,19 @@ List plugins are loaded dynamically via `import.meta.glob`, following the same p
    export default {
      EntityName: {
        form: { fields: [...] },
-       list: { list_display: [...], list_filter: {...} }
+       list: { list_display: [...], list_filter: {...} },
+       detail: { detail_display: [...], disabled_actions: [...] }  // optional
      }
    }
    ```
 2. Add `...r('EntityName', '中文名')` in `src/configs/routes.js`
 3. Done — no new page files needed
+
+### Adding a New Detail Plugin
+
+1. Create `src/components/EasyAdmin/plugins/detail/{type}.vue` with props: `value`, `field`, `scope`, `em`, `struct`
+2. Add the type name to `getListPluginType()` in `DetailAdmin.vue` (if not already present)
+3. Done — priority over list plugins, auto-discovered via `import.meta.glob`
 
 ### Adding a New List Plugin
 
@@ -259,6 +290,25 @@ The `json.vue` form plugin uses the vanilla `jsoneditor` library (not `vue-json-
 - ListAdmin inline dialog opens/closes without a route change
 - `@closed="fetchData"` refreshes list data via API (no page navigation)
 - The `submit` callback in the dialog overrides the default success handler to close the dialog instead of calling `$router.go(-1)`
+
+### Auto Token Refresh
+
+- Axios interceptor catches HTTP 401 and business code 401 in `src/utils/request.ts`
+- Concurrent expired requests queue behind a single `refreshPromise` to avoid
+  refresh-token replay detection
+- Refresh endpoint: `POST /api/auth/token/refresh { refresh_token }`
+- On success: writes new access_token + rotated refresh_token to Vuex and cookies
+- On failure: `clearSession()` → `resetToken()` → redirect `/login`
+- Auth endpoints (`login`, `logout`, `token/refresh`) are excluded from the 401 retry
+
+### Dashboard
+
+- `src/views/dashboard/index.vue` fetches live data from `EntityManage` for
+  Order, Product, User, WalletTransaction
+- SVG sparkline chart derived from order amounts (no chart library dependency)
+- Browser geolocation + Open-Meteo API for local weather; falls back to Beijing
+- All API calls are `.catch(() => ...)` — dashboard remains functional even when
+  backend is unreachable
 
 ---
 
