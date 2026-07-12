@@ -104,12 +104,23 @@ export default {
       this.entity = this.struct?.metadata?.targetEntity?.split('\\')?.pop()
     }
 
+    this.addSelectedOptions()
+
     if (this.entity && !this.field?.type_options?.remote) {
       this.fetchData(this.entity, this.field.relation_filter ?? {})
     }
   },
 
   methods: {
+    addSelectedOptions() {
+      const values = Array.isArray(this.form[this.field.property])
+        ? this.form[this.field.property]
+        : [this.form[this.field.property]]
+      this.options = values
+        .filter(value => value !== null && typeof value !== 'undefined' && value !== '')
+        .map(value => ({ value, label: String(value) }))
+    },
+
     async remoteSearch(query) {
       if (query !== '') {
         this.loading = true

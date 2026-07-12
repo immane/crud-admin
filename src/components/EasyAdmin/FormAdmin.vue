@@ -90,7 +90,7 @@
                     :struct="currentStruct"
                   >
                     <component
-                      :is="loadPlugin(field.type ? field.type : getMetadataType(currentStruct))"
+                      :is="loadPlugin(resolvePluginType(field, currentStruct))"
                       :em-prefix="em.prefix"
                       :form="form"
                       :field="field"
@@ -319,6 +319,7 @@ export default {
     loadPlugin(type) {
       const typeMapping = {
         'images': 'image',
+        'datetime_immutable': 'datetime',
         'ManyToOne': 'RelationToOne',
         'OneToOne': 'RelationToOne',
         'ManyToMany': 'RelationToMany',
@@ -330,6 +331,29 @@ export default {
         ? `./plugins/form/${targetType}.vue`
         : './plugins/form/input.vue'
       return resolveFormPlugin(path)
+    },
+
+    resolvePluginType(field, currentStruct) {
+      // Select needs explicit options. Metadata alone must not turn a normal
+      // scalar into an empty select control.
+      if (field.type) return field.type
+
+      const type = currentStruct?.metadata?.type || ''
+      const normalized = String(type).replace(/[_-]/g, '').toLowerCase()
+      const relationTypes = {
+        manytoone: 'ManyToOne',
+        onetoone: 'OneToOne',
+        manytomany: 'ManyToMany',
+        onetomany: 'OneToMany'
+      }
+      if (relationTypes[normalized]) return relationTypes[normalized]
+
+      const supportedMetadataTypes = new Set([
+        'array', 'boolean', 'code', 'date', 'datetime',
+        'datetime_immutable', 'file', 'image', 'images', 'integer',
+        'json', 'text', 'textarea', 'transfer'
+      ])
+      return supportedMetadataTypes.has(type) ? type : 'input'
     },
 
     getMetadataType(currentStruct) {

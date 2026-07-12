@@ -19,8 +19,6 @@
 
     <router-link
       v-if="field.creationUrl"
-      tag="a"
-      target="_blank"
       :to="{ path: field.creationUrl }"
     >
       <el-button
