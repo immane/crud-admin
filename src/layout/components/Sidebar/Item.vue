@@ -22,9 +22,10 @@ export default {
       if (icon) {
         if (icon.includes('el-icon')) {
           vnodes.push(
-            h('span', { class: 'sub-el-icon' }, [
-              h(resolveComponent(icon))
-            ])
+            h(resolveComponent(icon), {
+              class: 'sub-el-icon',
+              style: { width: '14px', height: '14px', verticalAlign: 'middle', flexShrink: '0' }
+            })
           )
         } else {
           vnodes.push(h(resolveComponent('svg-icon'), { iconClass: icon }))
@@ -42,17 +43,10 @@ export default {
 
 <style scoped>
 .sub-el-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: 14px;
   height: 14px;
   margin-right: 5px;
   vertical-align: middle;
   flex-shrink: 0;
-}
-.sub-el-icon :deep(svg) {
-  width: 14px;
-  height: 14px;
 }
 </style>
