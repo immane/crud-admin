@@ -858,37 +858,44 @@ export default {
   margin-left: 0;
 }
 
-::v-deep .easy-admin-dialog {
+::v-deep(.el-overlay-dialog:has(.easy-admin-dialog)) {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-::v-deep .easy-admin-dialog .el-dialog {
+::v-deep(.easy-admin-dialog) {
   display: flex;
   flex-direction: column;
+  width: min(80vw, 1200px) !important;
   max-height: 80vh;
-  max-width: 1200px;
-  margin: 0 auto !important;
+  margin: auto !important;
 }
 
-::v-deep .easy-admin-dialog .el-dialog__header {
+::v-deep(.easy-admin-dialog .el-dialog__header) {
   flex-shrink: 0;
-  padding-bottom: 8px;
+  margin-right: 0;
+  padding: 20px 24px 14px;
   border-bottom: 1px solid #EBEEF5;
 }
 
-::v-deep .easy-admin-dialog .el-dialog__body {
-  min-height: 0;
-  overflow: hidden auto;
-  padding: 8px 20px;
+::v-deep(.easy-admin-dialog .el-dialog__title) {
+  display: block;
+  padding-right: 32px;
 }
 
-::v-deep .easy-admin-dialog .app-container {
+::v-deep(.easy-admin-dialog .el-dialog__body) {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+::v-deep(.easy-admin-dialog .app-container) {
   padding: 0;
 }
 
-::v-deep .easy-admin-dialog .el-dialog__footer {
+::v-deep(.easy-admin-dialog .el-dialog__footer) {
   flex-shrink: 0;
 }
 </style>
