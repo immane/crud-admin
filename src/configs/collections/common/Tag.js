@@ -12,7 +12,7 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        name: '标签名称',
+        name: 'Tag Name',
         slug: 'Slug'
       },
       list_display: [

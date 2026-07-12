@@ -6,7 +6,7 @@
           <strong style="font-size: 20px;">
             <!-- Title slot here -->
             {{ $route.meta.title }}
-            新增 / 修改
+            New / Edit
           </strong>
         </slot>
       </el-col>
@@ -27,7 +27,7 @@
       :model="form"
       :rules="rules"
       label-width="120px"
-      element-loading-text="加载中..."
+      element-loading-text="Loading..."
     >
       <el-tabs
         v-model="activeTab"
@@ -117,8 +117,8 @@
 
       <el-form-item>
         <slot name="action" :form="form" :submit="onSubmit">
-          <el-button type="primary" icon="el-icon-edit-outline" @click="onSubmit()">保存</el-button>
-          <!--<el-button type="primary" @click="onSubmit()">保存并继续编辑</el-button>-->
+          <el-button type="primary" icon="el-icon-edit-outline" @click="onSubmit()">Save</el-button>
+          <!--<el-button type="primary" @click="onSubmit()">Save and Continue Editing</el-button>-->
         </slot>
       </el-form-item>
     </el-form>
@@ -221,7 +221,7 @@ export default {
       rules: {},
 
       // tabs
-      tabs: new Set(['默认']),
+      tabs: new Set(['Default']),
       activeTab: '0',
 
       // translated fields
@@ -433,7 +433,7 @@ export default {
     },
 
     onSubmit(success = (res) => {
-      this.uiFeedback().success('数据修改成功')
+      this.uiFeedback().success('Data saved successfully')
 
       // Router go back default
       // this.$router.replace({ name: `${this.em.name}List` })
@@ -454,7 +454,7 @@ export default {
               .catch(err => { this.uiFeedback().error(err.message) })
           }
         } else {
-          this.uiFeedback().warning('验证失败，请检查输入是否正确')
+          this.uiFeedback().warning('Validation failed — please check your input')
           return false
         }
       })

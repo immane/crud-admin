@@ -2,7 +2,7 @@
   <el-date-picker
     v-model="form[field.property]"
     type="date"
-    placeholder="选择日期"
+    placeholder="Select date"
     v-bind="field.type_options"
     value-format="yyyy-MM-dd"
     v-on="field.type_events || {}"

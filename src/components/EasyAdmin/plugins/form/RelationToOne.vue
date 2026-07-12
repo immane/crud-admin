@@ -5,7 +5,7 @@
       filterable
       clearable
       reserve-keyword
-      placeholder="请选择"
+      placeholder="Please select"
       :remote-method="remoteSearch"
       :loading="loading"
       v-bind="field.type_options"

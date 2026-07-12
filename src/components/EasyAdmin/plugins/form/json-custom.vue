@@ -43,7 +43,7 @@ export default {
   data() {
     return {
       fields: this.field?.type_options?.fields ??
-        [{ property: 'common', type: 'input', field_options: { label: '默认' }}]
+        [{ property: 'common', type: 'input', field_options: { label: 'Default' }}]
     }
   },
   created() {

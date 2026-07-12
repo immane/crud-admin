@@ -3,7 +3,7 @@
     <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
 
     <div class="back">
-      <a class="back-link" @click="$router.go(-1)"><el-icon><el-icon-back /></el-icon> 返回</a>
+      <a class="back-link" @click="$router.go(-1)"><el-icon><el-icon-back /></el-icon> Back</a>
       <el-divider direction="vertical" />
     </div>
 
@@ -20,14 +20,14 @@
           <el-dropdown-menu class="user-dropdown">
           <router-link :to="{ name: 'Dashboard'}">
             <el-dropdown-item>
-              您好，{{ name }}
+              Hello, {{ name }}
             </el-dropdown-item>
           </router-link>
           <el-dropdown-item @click="clearCache">
-            <span style="display:block;">清空缓存</span>
+            <span style="display:block;">Clear Cache</span>
           </el-dropdown-item>
           <el-dropdown-item divided @click="logout">
-            <span style="display:block;">登出</span>
+            <span style="display:block;">Logout</span>
           </el-dropdown-item>
           </el-dropdown-menu>
         </template>
@@ -60,7 +60,7 @@ export default {
     async clearCache() {
       await this.$store.dispatch('entity/reset')
       this.$message({
-        message: '已成功清空缓存',
+        message: 'Cache cleared successfully',
         type: 'success'
       })
     },

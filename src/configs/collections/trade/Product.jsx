@@ -52,7 +52,7 @@ const SpecificationManager = {
           <el-button
             size={'default'} type={'primary'} icon={'el-icon-plus'} plain
             onClick={() => { this.form.specifications.push({}) }}
-          >增加</el-button>
+          >Add</el-button>
           {this.form.specifications.map((item, index) => (
             <div key={index}>
               <FormAdmin
@@ -92,7 +92,7 @@ const SpecificationManager = {
                   this.refreshKey++
                   this.dialogShow = true
                 }}
-              >新增</el-button>
+              >New</el-button>
             ),
             'action:edit': ({ data }) => (
               <el-button
@@ -103,13 +103,13 @@ const SpecificationManager = {
                   this.refreshKey++
                   this.dialogShow = true
                 }}
-              >修改</el-button>
+              >Edit</el-button>
             )
           }}
         />
 
         <el-dialog
-          title={this.specId ? '更新规格' : '新增规格'}
+          title={this.specId ? 'Update Spec' : 'New Spec'}
           modelValue={this.dialogShow}
           {...{
             'onUpdate:modelValue': v => { this.dialogShow = v },
@@ -130,13 +130,13 @@ const SpecificationManager = {
                   type={'primary'} icon={'el-icon-edit-outline'}
                   onClick={() => {
                     submit(() => {
-                      this.$message({ message: '保存成功', type: 'success' })
+                      this.$message({ message: 'Saved successfully', type: 'success' })
                       this.refreshKey++
                       this.dialogShow = false
                       this.specForm = { product: this.productId }
                     })
                   }}
-                >保存</el-button>
+                >Save</el-button>
               )
             }}
           />
@@ -154,14 +154,14 @@ export default {
         { property: 'description', type: 'text', required: false },
         { property: 'status', type: 'select', default_value: 'active', type_options: {
           options: [
-            { value: 'active', label: '启用' },
-            { value: 'inactive', label: '停用' }
+            { value: 'active', label: 'Active' },
+            { value: 'inactive', label: 'Inactive' }
           ]
         }},
         { property: 'metadata', type: 'json', required: false },
         {
           property: 'specifications',
-          tab: '规格',
+          tab: 'Specifications',
           component: SpecificationManager
         }
       ]
@@ -169,7 +169,7 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        name: '商品名称',
+        name: 'Product Name',
         status: statusFilterLabel()
       },
       list_display: [

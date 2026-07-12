@@ -3,12 +3,12 @@
     <section class="dashboard__hero">
       <div>
         <p class="dashboard__eyebrow">OPERATIONS OVERVIEW</p>
-        <h1>{{ greeting }}，{{ name || '管理员' }}</h1>
-        <p class="dashboard__intro">实时掌握业务规模、订单处理与系统运行状况。</p>
+        <h1>{{ greeting }}, {{ name || 'Admin' }}</h1>
+        <p class="dashboard__intro">Real-time business metrics, order processing, and system status.</p>
       </div>
       <div class="dashboard__hero-actions">
-        <span class="dashboard__updated"><el-icon><el-icon-time /></el-icon> 更新于 {{ updatedAt }}</span>
-        <el-button type="primary" icon="el-icon-refresh" :loading="loading" @click="loadDashboard">刷新数据</el-button>
+        <span class="dashboard__updated"><el-icon><el-icon-time /></el-icon> Updated {{ updatedAt }}</span>
+        <el-button type="primary" icon="el-icon-refresh" :loading="loading" @click="loadDashboard">Refresh</el-button>
       </div>
     </section>
 
@@ -28,16 +28,16 @@
         <header class="panel__header">
           <div>
             <p class="panel__kicker">ORDER PULSE</p>
-            <h2>近期订单金额走势</h2>
+            <h2>Recent Order Amount Trend</h2>
           </div>
-          <span class="panel__badge">最近 {{ orderSeries.length }} 笔</span>
+          <span class="panel__badge">Last {{ orderSeries.length }} orders</span>
         </header>
         <div v-if="orderSeries.length" class="chart">
           <div class="chart__summary">
             <strong>{{ formatAmount(orderTotal) }}</strong>
-            <span>当前样本订单总额</span>
+            <span>Current sample total</span>
           </div>
-          <svg class="chart__svg" viewBox="0 0 560 190" preserveAspectRatio="none" role="img" aria-label="近期订单金额走势">
+          <svg class="chart__svg" viewBox="0 0 560 190" preserveAspectRatio="none" role="img" aria-label="Recent order amount trend">
             <defs>
               <linearGradient id="orderArea" x1="0" x2="0" y1="0" y2="1">
                 <stop offset="0%" stop-color="#39a47a" stop-opacity=".34" />
@@ -49,9 +49,9 @@
             <path :d="linePath" class="chart__line" />
             <circle v-for="(point, index) in chartPoints" :key="index" :cx="point.x" :cy="point.y" r="4" class="chart__point" />
           </svg>
-          <div class="chart__axis"><span>较早</span><span>当前</span></div>
+          <div class="chart__axis"><span>Earlier</span><span>Now</span></div>
         </div>
-        <div v-else class="panel__empty">暂无可用于分析的订单金额数据</div>
+        <div v-else class="panel__empty">No order amount data available for analysis</div>
       </article>
 
       <article class="panel panel--weather" :class="weatherClass">
@@ -60,43 +60,43 @@
             <p class="panel__kicker">LOCAL WEATHER</p>
             <h2>{{ weather.location }}</h2>
           </div>
-          <button class="weather__locate" type="button" title="获取本地天气" @click="loadWeather(true)"><el-icon><el-icon-location-outline /></el-icon></button>
+          <button class="weather__locate" type="button" title="Get local weather" @click="loadWeather(true)"><el-icon><el-icon-location-outline /></el-icon></button>
         </header>
         <div class="weather__body">
           <div class="weather__symbol"><el-icon><component :is="weather.icon" /></el-icon></div>
           <strong>{{ weather.temperature }}<sup>°</sup></strong>
-          <div><b>{{ weather.condition }}</b><span>体感 {{ weather.apparentTemperature }}°</span></div>
+          <div><b>{{ weather.condition }}</b><span>Feels like {{ weather.apparentTemperature }}°</span></div>
         </div>
-        <footer class="weather__footer"><span>风速 {{ weather.windSpeed }} km/h</span><span>{{ weather.note }}</span></footer>
+        <footer class="weather__footer"><span>Wind {{ weather.windSpeed }} km/h</span><span>{{ weather.note }}</span></footer>
       </article>
     </section>
 
     <section class="dashboard__lower-grid">
       <article v-loading="loading" class="panel panel--orders">
         <header class="panel__header">
-          <div><p class="panel__kicker">LATEST ORDERS</p><h2>最近订单</h2></div>
-          <router-link :to="{ name: 'OrderList' }">查看全部 <el-icon><el-icon-arrow-right /></el-icon></router-link>
+          <div><p class="panel__kicker">LATEST ORDERS</p><h2>Recent Orders</h2></div>
+          <router-link :to="{ name: 'OrderList' }">View all <el-icon><el-icon-arrow-right /></el-icon></router-link>
         </header>
         <div v-if="recentOrders.length" class="order-list">
           <div v-for="order in recentOrders" :key="order.id" class="order-row">
-            <div class="order-row__identity"><span class="order-row__avatar">{{ orderInitial(order) }}</span><div><b>#{{ order.id }}</b><small>{{ order.user?.__toString || order.user?.username || order.uuid || '访客订单' }}</small></div></div>
+            <div class="order-row__identity"><span class="order-row__avatar">{{ orderInitial(order) }}</span><div><b>#{{ order.id }}</b><small>{{ order.user?.__toString || order.user?.username || order.uuid || 'Guest order' }}</small></div></div>
             <span>{{ formatAmount(order.totalAmount) }}</span>
             <el-tag size="small" effect="plain" :type="statusType(order.status)">{{ statusLabel(order.status) }}</el-tag>
           </div>
         </div>
-        <div v-else class="panel__empty">暂无订单数据</div>
+        <div v-else class="panel__empty">No order data</div>
       </article>
 
       <article v-loading="loading" class="panel panel--activity">
-        <header class="panel__header"><div><p class="panel__kicker">SYSTEM ACTIVITY</p><h2>资金与业务动态</h2></div></header>
+        <header class="panel__header"><div><p class="panel__kicker">SYSTEM ACTIVITY</p><h2>Wallet & Business Activity</h2></div></header>
         <div v-if="recentTransactions.length" class="activity-list">
           <div v-for="transaction in recentTransactions" :key="transaction.id" class="activity-row">
             <span class="activity-row__icon"><el-icon><component :is="transactionIcon(transaction.type)" /></el-icon></span>
-            <div><b>{{ transactionLabel(transaction.type) }}</b><small>{{ transaction.referenceId || transaction.uuid || `交易 #${transaction.id}` }}</small></div>
+            <div><b>{{ transactionLabel(transaction.type) }}</b><small>{{ transaction.referenceId || transaction.uuid || `Transaction #${transaction.id}` }}</small></div>
             <span class="activity-row__amount" :class="{ 'activity-row__amount--negative': transaction.type === 'withdrawal' || transaction.type === 'fee' }">{{ transaction.amount == null ? '-' : formatAmount(transaction.amount) }}</span>
           </div>
         </div>
-        <div v-else class="panel__empty">暂无资金流水数据</div>
+        <div v-else class="panel__empty">No transaction data</div>
       </article>
     </section>
   </main>
@@ -114,19 +114,19 @@ const entityManagers = {
 }
 
 const weatherByCode = {
-  0: ['晴朗', 'el-icon-sunny', 'weather--sunny'],
-  1: ['少云', 'el-icon-partly-cloudy', 'weather--cloudy'],
-  2: ['多云', 'el-icon-cloudy', 'weather--cloudy'],
-  3: ['阴天', 'el-icon-cloudy', 'weather--cloudy'],
-  45: ['雾', 'el-icon-cloudy', 'weather--cloudy'],
-  48: ['雾', 'el-icon-cloudy', 'weather--cloudy'],
-  51: ['毛毛雨', 'el-icon-light-rain', 'weather--rainy'],
-  61: ['小雨', 'el-icon-light-rain', 'weather--rainy'],
-  63: ['降雨', 'el-icon-light-rain', 'weather--rainy'],
-  65: ['大雨', 'el-icon-heavy-rain', 'weather--rainy'],
-  71: ['小雪', 'el-icon-light-rain', 'weather--cloudy'],
-  80: ['阵雨', 'el-icon-light-rain', 'weather--rainy'],
-  95: ['雷暴', 'el-icon-lightning', 'weather--rainy']
+  0: ['Clear', 'el-icon-sunny', 'weather--sunny'],
+  1: ['Partly Cloudy', 'el-icon-partly-cloudy', 'weather--cloudy'],
+  2: ['Cloudy', 'el-icon-cloudy', 'weather--cloudy'],
+  3: ['Overcast', 'el-icon-cloudy', 'weather--cloudy'],
+  45: ['Fog', 'el-icon-cloudy', 'weather--cloudy'],
+  48: ['Fog', 'el-icon-cloudy', 'weather--cloudy'],
+  51: ['Drizzle', 'el-icon-light-rain', 'weather--rainy'],
+  61: ['Light Rain', 'el-icon-light-rain', 'weather--rainy'],
+  63: ['Rain', 'el-icon-light-rain', 'weather--rainy'],
+  65: ['Heavy Rain', 'el-icon-heavy-rain', 'weather--rainy'],
+  71: ['Light Snow', 'el-icon-light-rain', 'weather--cloudy'],
+  80: ['Showers', 'el-icon-light-rain', 'weather--rainy'],
+  95: ['Thunderstorm', 'el-icon-lightning', 'weather--rainy']
 }
 
 export default {
@@ -138,23 +138,23 @@ export default {
       totals: { orders: 0, products: 0, users: 0, pending: 0 },
       recentOrders: [],
       recentTransactions: [],
-      weather: { location: '本地天气', temperature: '--', apparentTemperature: '--', windSpeed: '--', condition: '获取中', icon: 'el-icon-cloudy', note: '定位后获取实时天气', tone: 'weather--cloudy' }
+      weather: { location: 'Local Weather', temperature: '--', apparentTemperature: '--', windSpeed: '--', condition: 'Loading', icon: 'el-icon-cloudy', note: 'Geolocate for live weather', tone: 'weather--cloudy' }
     }
   },
   computed: {
     ...mapGetters(['name']),
     greeting() {
       const hour = new Date().getHours()
-      if (hour < 12) return '上午好'
-      if (hour < 18) return '下午好'
-      return '晚上好'
+      if (hour < 12) return 'Good morning'
+      if (hour < 18) return 'Good afternoon'
+      return 'Good evening'
     },
     metrics() {
       return [
-        { label: '订单总量', value: this.totals.orders, hint: '全部订单记录', icon: 'el-icon-s-order', tone: 'blue' },
-        { label: '待处理订单', value: this.totals.pending, hint: '最近订单中的待办', icon: 'el-icon-timer', tone: 'amber' },
-        { label: '商品数量', value: this.totals.products, hint: '当前商品目录', icon: 'el-icon-goods', tone: 'green' },
-        { label: '用户规模', value: this.totals.users, hint: '已注册用户', icon: 'el-icon-user', tone: 'violet' }
+        { label: 'Total Orders', value: this.totals.orders, hint: 'All order records', icon: 'el-icon-s-order', tone: 'blue' },
+        { label: 'Pending Orders', value: this.totals.pending, hint: 'Recent pending items', icon: 'el-icon-timer', tone: 'amber' },
+        { label: 'Total Products', value: this.totals.products, hint: 'Current product catalog', icon: 'el-icon-goods', tone: 'green' },
+        { label: 'Total Users', value: this.totals.users, hint: 'Registered users', icon: 'el-icon-user', tone: 'violet' }
       ]
     },
     orderSeries() {
@@ -212,10 +212,10 @@ export default {
       return Number(response.paginator?.totalCount ?? response.paginator?.total ?? response.data?.length ?? 0)
     },
     async loadWeather(forceLocation = false) {
-      const fallback = () => this.fetchWeather(39.9042, 116.4074, '北京')
+      const fallback = () => this.fetchWeather(39.9042, 116.4074, 'Beijing')
       if (!navigator.geolocation) return fallback()
       navigator.geolocation.getCurrentPosition(
-        position => this.fetchWeather(position.coords.latitude, position.coords.longitude, '本地天气'),
+        position => this.fetchWeather(position.coords.latitude, position.coords.longitude, 'Local Weather'),
         () => fallback(),
         { enableHighAccuracy: false, timeout: forceLocation ? 10000 : 4000, maximumAge: 1800000 }
       )
@@ -225,11 +225,11 @@ export default {
         const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m&wind_speed_unit=kmh`)
         const data = await response.json()
         const current = data.current
-        const [condition, icon, tone] = weatherByCode[current.weather_code] || ['天气正常', 'el-icon-cloudy', 'weather--cloudy']
-        this.weather = { location, temperature: Math.round(current.temperature_2m), apparentTemperature: Math.round(current.apparent_temperature), windSpeed: Math.round(current.wind_speed_10m), condition, icon, note: '实时数据', tone }
+        const [condition, icon, tone] = weatherByCode[current.weather_code] || ['Normal', 'el-icon-cloudy', 'weather--cloudy']
+        this.weather = { location, temperature: Math.round(current.temperature_2m), apparentTemperature: Math.round(current.apparent_temperature), windSpeed: Math.round(current.wind_speed_10m), condition, icon, note: 'Live data', tone }
       } catch (e) {
-        this.weather.note = '天气服务暂不可用'
-        this.weather.condition = '暂不可用'
+        this.weather.note = 'Weather service unavailable'
+        this.weather.condition = 'Unavailable'
       }
     },
     formatAmount(value) {
@@ -242,13 +242,13 @@ export default {
       return String(source).slice(0, 1).toUpperCase()
     },
     statusLabel(status) {
-      return { draft: '草稿', pending: '待处理', confirmed: '已确认', paid: '已支付', fulfilled: '已发货', completed: '已完成', cancelled: '已取消', refunded: '已退款' }[status] || status || '未知'
+      return { draft: 'Draft', pending: 'Pending', confirmed: 'Confirmed', paid: 'Paid', fulfilled: 'Fulfilled', completed: 'Completed', cancelled: 'Cancelled', refunded: 'Refunded' }[status] || status || 'Unknown'
     },
     statusType(status) {
       return ({ paid: 'success', completed: 'success', fulfilled: 'success', pending: 'warning', confirmed: 'warning', cancelled: 'info', refunded: 'danger' })[status] || 'info'
     },
     transactionLabel(type) {
-      return ({ deposit: '账户充值', withdrawal: '账户提现', transfer: '余额转账', fee: '服务费扣除', refund: '退款入账' })[type] || type || '资金变动'
+      return ({ deposit: 'Deposit', withdrawal: 'Withdrawal', transfer: 'Transfer', fee: 'Fee', refund: 'Refund' })[type] || type || 'Transaction'
     },
     transactionIcon(type) {
       return ({ deposit: 'el-icon-plus', withdrawal: 'el-icon-minus', transfer: 'el-icon-sort', fee: 'el-icon-coin', refund: 'el-icon-refresh-left' })[type] || 'el-icon-money'

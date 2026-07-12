@@ -15,10 +15,10 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        title: '标题',
+        title: 'Title',
         'category.id': () => axios
           .get(apiPath(API_PREFIX, 'manage/categories'))
-          .then(res => Object.assign({ __label: '分类' }, ...res.data.map(v => ({ [v.id]: v.name }))))
+          .then(res => Object.assign({ __label: 'Category' }, ...res.data.map(v => ({ [v.id]: v.name }))))
       },
       list_display: [
         'id',

@@ -17,7 +17,7 @@
       />
     </template>
 
-    <div v-else title="双击修改属性">
+    <div v-else title="Double-click to edit">
       {{ scope.row[field.property] }}
     </div>
   </div>
@@ -70,11 +70,11 @@ export default {
     saveEdit() {
       this.em.update(this.scope.row.id, { [this.field.property]: this.editing.value })
         .then(() => {
-          this.$message.success('修改属性成功')
+          this.$message.success('Property updated successfully')
           this.scope.row[this.field.property] = this.editing.value
           this.cancelEdit()
         })
-        .catch(() => this.$message.error('修改属性失败'))
+        .catch(() => this.$message.error('Failed to update property'))
     }
   }
 }

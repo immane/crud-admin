@@ -6,8 +6,8 @@ export default {
         'price',
         { property: 'status', type: 'select', default_value: 'active', type_options: {
           options: [
-            { value: 'active', label: '启用' },
-            { value: 'inactive', label: '停用' }
+            { value: 'active', label: 'Active' },
+            { value: 'inactive', label: 'Inactive' }
           ]
         }},
         { property: 'sort', default_value: 0 }
@@ -15,11 +15,11 @@ export default {
     },
     list: {
       list_filter: {
-        name: '规格名称',
+        name: 'Spec Name',
         status: {
-          __label: '状态',
-          active: '启用',
-          inactive: '停用'
+          __label: 'Status',
+          active: 'Active',
+          inactive: 'Inactive'
         }
       },
       list_display: [

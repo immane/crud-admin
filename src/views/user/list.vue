@@ -11,18 +11,18 @@
     >
       <template v-slot:extraAction="{ data }">
         <el-button size="small" @click="dialog.data = data.roles; dialog.pk = data.id; dialog.visible = true;">
-          修改权限
+          Modify Roles
         </el-button>
       </template>
     </list-admin>
 
     <el-dialog
-      title="修改权限"
+      title="Modify Roles"
       v-model="dialog.visible"
       width="40%"
     >
       <span>
-        <el-select v-model="dialog.data" multiple placeholder="请选择权限" style="width: 100%;">
+        <el-select v-model="dialog.data" multiple placeholder="Select roles" style="width: 100%;">
           <el-option
             v-for="item in dialog.options"
             :key="item.value"
@@ -33,16 +33,16 @@
       </span>
       <template #footer>
         <span class="dialog-footer">
-        <el-button @click="dialog.visible = false">取消</el-button>
+        <el-button @click="dialog.visible = false">Cancel</el-button>
         <el-button
           type="primary"
           @click="
             em.update(dialog.pk, { roles: dialog.data })
-              .then(res => $message( { type: 'success', message: '权限修改成功' } ) )
-              .catch(err => $message( { type: 'error', message: '权限修改失败' } ) )
+              .then(res => $message( { type: 'success', message: 'Roles updated successfully' } ) )
+              .catch(err => $message( { type: 'error', message: 'Failed to update roles' } ) )
               .finally(() => { dialog.visible = false; componentRefresh++ } )
           "
-        >确认</el-button>
+        >Confirm</el-button>
         </span>
       </template>
     </el-dialog>
@@ -71,9 +71,9 @@ export default {
         pk: null,
         data: null,
         options: [
-          { value: 'ROLE_USER', label: '用户' },
-          { value: 'ROLE_SUPER_ADMIN', label: '超级管理员' },
-          { value: 'ROLE_STAFF', label: '店员' }
+          { value: 'ROLE_USER', label: 'User' },
+          { value: 'ROLE_SUPER_ADMIN', label: 'Super Admin' },
+          { value: 'ROLE_STAFF', label: 'Staff' }
         ]
       }
     }

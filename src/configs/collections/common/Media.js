@@ -18,8 +18,8 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        filename: '文件名',
-        mimeType: 'MIME 类型'
+        filename: 'Filename',
+        mimeType: 'MIME Type'
       },
       list_display: [
         'id',

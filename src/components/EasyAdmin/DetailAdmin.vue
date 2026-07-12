@@ -1,5 +1,5 @@
 <template>
-  <section v-loading="loading" class="detail-admin" element-loading-text="加载中...">
+  <section v-loading="loading" class="detail-admin" element-loading-text="Loading...">
     <header class="detail-admin__header">
       <div>
         <p class="detail-admin__eyebrow">RECORD DETAIL</p>
@@ -8,8 +8,8 @@
       </div>
       <div class="detail-admin__actions">
         <slot name="actions" :record="record" :refresh="fetchData">
-          <el-button icon="el-icon-arrow-left" @click="$router.go(-1)">返回</el-button>
-          <el-button v-if="editable" type="primary" icon="el-icon-edit" @click="goToUpdate">编辑</el-button>
+          <el-button icon="el-icon-arrow-left" @click="$router.go(-1)">Back</el-button>
+          <el-button v-if="editable" type="primary" icon="el-icon-edit" @click="goToUpdate">Edit</el-button>
         </slot>
       </div>
     </header>
@@ -98,7 +98,7 @@ export default {
             this.properties = Object.keys(structure).map(property => ({ property }))
           }
         })
-        .catch(error => createUiFeedback(this).error(error.message || '记录加载失败'))
+        .catch(error => createUiFeedback(this).error(error.message || 'Failed to load record'))
         .finally(() => { this.loading = false })
     },
     getLabel(field) {

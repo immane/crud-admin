@@ -2,7 +2,7 @@ export default {
   Setting: {
     form: {
       fields: [
-        { property: 'key', field_options: { label: '键名' }},
+        { property: 'key', field_options: { label: 'Key' }},
         'value',
         'type',
         'groupName',
@@ -16,8 +16,8 @@ export default {
         '@order': 'entity.groupName|ASC, entity.sortOrder|ASC, entity.id|DESC'
       },
       list_filter: {
-        key: '键名',
-        groupName: '分组'
+        key: 'Key',
+        groupName: 'Group'
       },
       list_display: [
         'id',

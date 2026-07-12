@@ -9,9 +9,9 @@ export default {
         'entityId',
         { property: 'status', type: 'select', default_value: 'pending', type_options: {
           options: [
-            { value: 'pending', label: '待审核' },
-            { value: 'approved', label: '已通过' },
-            { value: 'rejected', label: '已拒绝' }
+            { value: 'pending', label: 'Pending Review' },
+            { value: 'approved', label: 'Approved' },
+            { value: 'rejected', label: 'Rejected' }
           ]
         }},
         { property: 'parent', required: false }
@@ -20,12 +20,12 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        body: '评论内容',
+        body: 'Comment Body',
         status: {
-          __label: '状态',
-          pending: '待审核',
-          approved: '已通过',
-          rejected: '已拒绝'
+          __label: 'Status',
+          pending: 'Pending Review',
+          approved: 'Approved',
+          rejected: 'Rejected'
         }
       },
       list_display: [

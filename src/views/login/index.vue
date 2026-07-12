@@ -7,20 +7,20 @@
         </svg>
       </div>
       <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-        <h4><span>{{ title }}</span><br>管理平台</h4>
-        <p>欢迎，登陆</p>
+        <h4><span>{{ title }}</span><br>Admin Panel</h4>
+        <p>Welcome, sign in</p>
         <div class="floating-label">
           <input
             id="email"
             ref="username"
             v-model="loginForm.username"
-            placeholder="用户名"
+            placeholder="Username"
             name="username"
             type="text"
             tabindex="1"
             auto-complete="on"
           >
-          <label for="email">用户名:</label>
+          <label for="email">Username:</label>
           <div class="icon">
             <svg enable-background="new 0 0 100 100" version="1.1" viewBox="0 0 100 100" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
               <g transform="translate(0 -952.36)">
@@ -38,13 +38,13 @@
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
-            placeholder="密码"
+            placeholder="Password"
             name="password"
             tabindex="2"
             auto-complete="on"
             @keyup.enter="handleLogin"
           >
-          <label for="password">密码:</label>
+          <label for="password">Password:</label>
           <div class="icon">
 
             <svg enable-background="new 0 0 24 24" version="1.1" viewBox="0 0 24 24" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
@@ -56,8 +56,8 @@
           </div>
 
         </div>
-        <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.prevent="handleLogin">登陆</el-button>
-        <a href="https://codepen.io/elujambio/pen/yjwzGP" class="discrete" target="_blank">Version 1.0</a>
+        <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.prevent="handleLogin">Sign In</el-button>
+        <a href="https://codepen.io/elujambio/pen/yjwzGP" class="discrete" target="_blank">Version 0.8.2</a>
       </el-form>
     </div>
   </div>
@@ -70,16 +70,16 @@ import setting from '@/settings'
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
+      const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+        callback(new Error('Please enter the correct username'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error('The password cannot be less than 6 digits'))
       } else {
         callback()
       }

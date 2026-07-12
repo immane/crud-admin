@@ -4,7 +4,7 @@ export default {
   User: {
     form: {
       fields: [
-        { property: 'username', field_options: { label: '用户名' }},
+        { property: 'username', field_options: { label: 'Username' }},
         { property: 'email', field_options: { label: 'Email' }},
         { property: 'phone', required: false },
         { property: 'phoneVerified', type: 'boolean', required: false },
@@ -14,9 +14,9 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        username: '用户名',
+        username: 'Username',
         email: 'Email',
-        phone: '手机号'
+        phone: 'Phone'
       },
       list_display: [
         'id',

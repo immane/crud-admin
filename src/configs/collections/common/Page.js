@@ -11,8 +11,8 @@ export default {
         { property: 'metaDescription', type: 'text', required: false },
         { property: 'status', type: 'select', default_value: 'draft', type_options: {
           options: [
-            { value: 'draft', label: '草稿' },
-            { value: 'published', label: '已发布' }
+            { value: 'draft', label: 'Draft' },
+            { value: 'published', label: 'Published' }
           ]
         }}
       ]
@@ -20,11 +20,11 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        title: '标题',
+        title: 'Title',
         status: {
-          __label: '状态',
-          draft: '草稿',
-          published: '已发布'
+          __label: 'Status',
+          draft: 'Draft',
+          published: 'Published'
         }
       },
       list_display: [

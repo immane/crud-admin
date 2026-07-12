@@ -8,8 +8,8 @@ export default {
         { property: 'currency', default_value: 'CNY' },
         { property: 'status', type: 'select', default_value: 'active', type_options: {
           options: [
-            { value: 'active', label: '启用' },
-            { value: 'frozen', label: '冻结' }
+            { value: 'active', label: 'Active' },
+            { value: 'frozen', label: 'Frozen' }
           ]
         }},
         { property: 'label', required: false }
@@ -19,9 +19,9 @@ export default {
       query: orderByIdDesc,
       list_filter: {
         status: {
-          __label: '状态',
-          active: '启用',
-          frozen: '冻结'
+          __label: 'Status',
+          active: 'Active',
+          frozen: 'Frozen'
         }
       },
       list_display: [

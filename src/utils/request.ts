@@ -36,13 +36,13 @@ const clearSession = async() => {
 const refreshAccessToken = () => {
   if (!refreshPromise) {
     const refreshToken = getRefreshToken()
-    if (!refreshToken) return Promise.reject(new Error('登录已过期，请重新登录'))
+    if (!refreshToken) return Promise.reject(new Error('Session expired, please login again'))
 
     refreshPromise = refreshService.post(apiPath(AUTH_API_PREFIX, 'token/refresh'), { refresh_token: refreshToken })
       .then(response => {
         const body = response.data
         const data = typeof body.code === 'undefined' ? body : body.data
-        if (!data?.access_token) throw new Error(body.message || '刷新登录状态失败')
+        if (!data?.access_token) throw new Error(body.message || 'Failed to refresh session')
 
         store.commit('user/SET_TOKEN', data.access_token)
         setToken(data.access_token)

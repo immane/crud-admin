@@ -4,7 +4,7 @@
       v-model="form[field.property]"
       filterable
       clearable
-      placeholder="请选择"
+      placeholder="Please select"
       v-bind="field.type_options"
       v-on="field.type_events || {}"
     >

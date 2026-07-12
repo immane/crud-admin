@@ -16,10 +16,10 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        name: '模板名称',
-        type: '类型',
+        name: 'Template Name',
+        type: 'Type',
         enabled: {
-          label: '启用',
+          label: 'Enabled',
           type: 'boolean',
           expression: 'entity.getEnabled() == :value'
         }

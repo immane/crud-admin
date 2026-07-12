@@ -15,8 +15,8 @@
     :on-exceed="handleExceed"
     v-on="field.type_events || {}"
   >
-    <el-button size="small" type="primary">点击选择文件</el-button>
-    <template #tip><div class="el-upload__tip">上传文件必须少于100MB</div></template>
+    <el-button size="small" type="primary">Select file</el-button>
+    <template #tip><div class="el-upload__tip">File must be less than 100MB</div></template>
   </el-upload>
 </template>
 

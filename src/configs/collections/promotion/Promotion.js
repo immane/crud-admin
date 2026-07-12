@@ -13,9 +13,9 @@ export default {
         { property: 'config', type: 'json', required: false },
         { property: 'conflictMode', type: 'select', default_value: 'stackable', type_options: {
           options: [
-            { value: 'stackable', label: '可叠加' },
-            { value: 'exclusive', label: '互斥' },
-            { value: 'priority', label: '按优先级' }
+            { value: 'stackable', label: 'Stackable' },
+            { value: 'exclusive', label: 'Exclusive' },
+            { value: 'priority', label: 'By Priority' }
           ]
         }}
       ]
@@ -23,10 +23,10 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        name: '活动名称',
-        storeCode: '门店编码',
+        name: 'Promotion Name',
+        storeCode: 'Store Code',
         enabled: {
-          label: '启用',
+          label: 'Enabled',
           type: 'boolean',
           expression: 'entity.getEnabled() == :value'
         }

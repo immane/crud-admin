@@ -50,7 +50,7 @@
               @click="() => {
                 const loading = startLoading({
                   lock: true,
-                  text: '数据导出中',
+                  text: 'Exporting data',
                   spinner: 'el-icon-loading',
                   background: 'rgba(0, 0, 0, 0.7)'
                 })
@@ -101,7 +101,7 @@
                 })
               }"
             >
-              导出
+               Export
             </el-button>
           </template>
 
@@ -115,13 +115,13 @@
             icon="el-icon-plus"
             plain
             @click="() => {
-              dialog.title = '新增记录'
+              dialog.title = 'New Record'
               delete dialog.data.id
               dialog.refresh++
               dialog.show = true
             }"
           >
-            新增{{ $route.meta.title }}
+             New {{ $route.meta.title }}
           </el-button>
         </slot>
       </el-col>
@@ -133,7 +133,7 @@
         v-fit-columns
         v-loading="loading"
         :data="list"
-        element-loading-text="加载中..."
+        element-loading-text="Loading..."
         fit
         lazy
         stripe
@@ -216,7 +216,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column v-if="!disabledActions.includes('lines')" label="操作">
+        <el-table-column v-if="!disabledActions.includes('lines')" label="Actions">
           <template #default="scope">
             <div class="easy-admin-actions">
               <component
@@ -240,7 +240,7 @@
                     plain
                     @click="$router.push({ name: `${em.name}Detail`, params: { id: scope.row.id } })"
                   >
-                    详情
+                    Details
                   </el-button>
                 </slot>
 
@@ -255,15 +255,15 @@
                     plain
                     @click="openEditDialog(scope.row.id)"
                   >
-                    修改
+                    Edit
                   </el-button>
                 </slot>
 
               &nbsp;&nbsp;
 
                 <slot name="action:delete" :data="scope.row">
-                  <el-popconfirm v-if="!disabledActions.includes('delete')" title="确定删除当前记录？" @confirm="removeAction(scope.row.id)">
-                    <template #reference><el-button size="small" type="danger" icon="el-icon-delete" plain>删除</el-button></template>
+                  <el-popconfirm v-if="!disabledActions.includes('delete')" title="Delete this record?" @confirm="removeAction(scope.row.id)">
+                    <template #reference><el-button size="small" type="danger" icon="el-icon-delete" plain>Delete</el-button></template>
                   </el-popconfirm>
                 </slot>
               </slot>
@@ -305,7 +305,7 @@
       >
         <template #formTitle><span /></template>
         <template #action="{ submit }">
-          <el-button type="primary" icon="el-icon-edit-outline" @click="submit(closeEditDialog)">保存</el-button>
+          <el-button type="primary" icon="el-icon-edit-outline" @click="submit(closeEditDialog)">Save</el-button>
         </template>
       </form-admin>
     </el-dialog>
@@ -388,7 +388,7 @@ export default {
          *    },
          *    label: {
          *      'id': 'ID',
-         *      'name': '名称'
+         *      'name': 'Name'
          *    }
          *  }
          */
@@ -709,14 +709,14 @@ export default {
     },
 
     openEditDialog(id) {
-      this.dialog.title = '修改记录'
+      this.dialog.title = 'Edit Record'
       this.dialog.data.id = id
       this.dialog.refresh++
       this.dialog.show = true
     },
 
     closeEditDialog() {
-      this.notifySuccess('数据修改成功')
+      this.notifySuccess('Data saved successfully')
       this.dialog.show = false
     },
 
@@ -807,7 +807,7 @@ export default {
     // Remove action
     removeAction(pk) {
       this.em.delete(pk).then(res => {
-        this.notifySuccess('删除成功')
+        this.notifySuccess('Deleted successfully')
         this.fetchData()
       })
     },

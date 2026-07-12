@@ -3,11 +3,11 @@ export const orderByIdDesc = {
 }
 
 export const statusFilter = {
-  active: '启用',
-  inactive: '停用'
+  active: 'Active',
+  inactive: 'Inactive'
 }
 
-export const statusFilterLabel = (label = '状态') => ({
+export const statusFilterLabel = (label = 'Status') => ({
   __label: label,
   ...statusFilter
 })

@@ -8,11 +8,11 @@ export default {
         { property: 'avatar', type: 'image', required: false },
         { property: 'level', type: 'select', default_value: 'bronze', type_options: {
           options: [
-            { value: 'bronze', label: '青铜' },
-            { value: 'silver', label: '白银' },
-            { value: 'gold', label: '黄金' },
-            { value: 'platinum', label: '铂金' },
-            { value: 'diamond', label: '钻石' }
+            { value: 'bronze', label: 'Bronze' },
+            { value: 'silver', label: 'Silver' },
+            { value: 'gold', label: 'Gold' },
+            { value: 'platinum', label: 'Platinum' },
+            { value: 'diamond', label: 'Diamond' }
           ]
         }},
         { property: 'metadata', type: 'json', required: false }
@@ -21,14 +21,14 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        nickname: '昵称',
+        nickname: 'Nickname',
         level: {
-          __label: '等级',
-          bronze: '青铜',
-          silver: '白银',
-          gold: '黄金',
-          platinum: '铂金',
-          diamond: '钻石'
+          __label: 'Level',
+          bronze: 'Bronze',
+          silver: 'Silver',
+          gold: 'Gold',
+          platinum: 'Platinum',
+          diamond: 'Diamond'
         }
       },
       list_display: [

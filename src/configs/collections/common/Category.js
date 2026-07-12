@@ -16,15 +16,15 @@ export default {
     list: {
       query: { '@order': 'entity.sortOrder|ASC, entity.id|DESC' },
       list_filter: {
-        name: '分类名称',
+        name: 'Category Name',
         enabled: {
-          label: '启用',
+          label: 'Enabled',
           type: 'boolean',
           expression: 'entity.getEnabled() == :value'
         },
         'parent.id': () => axios
           .get(apiPath(API_PREFIX, 'manage/categories'))
-          .then(res => Object.assign({ __label: '上级分类' }, ...res.data.map(v => ({ [v.id]: v.name }))))
+          .then(res => Object.assign({ __label: 'Parent Category' }, ...res.data.map(v => ({ [v.id]: v.name }))))
       },
       list_display: [
         'id',

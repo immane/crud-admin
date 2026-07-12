@@ -8,7 +8,7 @@
       @change="onChange"
     />
     <el-tag v-else :type="value ? 'success' : 'danger'">
-      {{ value ? '是' : '否' }}
+      {{ value ? 'Yes' : 'No' }}
     </el-tag>
   </span>
 </template>
@@ -27,7 +27,7 @@ export default {
       this.em.update(this.scope.row.id, {
         [this.field.property]: this.scope.row[this.field.property]
       }).then(() => {
-        this.$message.success('修改属性成功')
+        this.$message.success('Property updated successfully')
       })
     }
   }
