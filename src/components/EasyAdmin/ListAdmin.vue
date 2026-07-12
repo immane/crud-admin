@@ -269,8 +269,8 @@
     <el-row v-if="!disabledActions.includes('pager')">
       <div class="block">
         <el-pagination
-          v-model:current-page="pager.page"
-          v-model:page-size="pager.limit"
+          :current-page="pager.page"
+          :page-size="pager.limit"
           :page-sizes="[20, 50, 100, 300]"
           layout="total, sizes, prev, pager, next, jumper"
           :total="pagerTotal"
@@ -610,29 +610,17 @@ export default {
       deep: true
     },
     listFilterData: {
-      handler(value) {
-        if (this._syncing) return
-        const query = {}
-        for (const key of Object.keys(value)) {
-          if (value[key] != null && value[key] !== '') query[key] = value[key]
-        }
-        this._syncing = true
-        this.$router.replace({ query }).finally(() => { this._syncing = false })
-      },
+      handler() { this.syncToUrl() },
       deep: true
-    },
-    '$route.query': {
-      handler(query) {
-        if (this._syncing) return
-        if (Object.keys(query).length) {
-          this._syncing = true
-          this.listFilterData = { ...query }
-          this.$nextTick(() => { this._syncing = false })
-        }
-      }
     }
   },
 
+  mounted() {
+    window.addEventListener('popstate', this.onPopState)
+  },
+  beforeUnmount() {
+    window.removeEventListener('popstate', this.onPopState)
+  },
   async created() {
     // Process router convert
     this.routeProcess()
@@ -640,9 +628,9 @@ export default {
     // Process entity and structure properties
     this.propertieProcess()
 
-    // Restore filter from URL query params
+    // Restore filter and pager from URL query params
     if (Object.keys(this.$route.query).length) {
-      this.listFilterData = { ...this.$route.query }
+      this.applyQueryParams(this.$route.query)
     }
 
     // Initialize the reusable edit dialog data.
@@ -662,8 +650,62 @@ export default {
   },
 
   methods: {
+    buildQueryParams() {
+      const query = {}
+      for (const key of Object.keys(this.listFilterData)) {
+        if (this.listFilterData[key] != null && this.listFilterData[key] !== '') {
+          query[key] = this.listFilterData[key]
+        }
+      }
+      if (this.pager.page !== 1) query.page = String(this.pager.page)
+      if (this.pager.limit !== 20) query.limit = String(this.pager.limit)
+      return query
+    },
+    syncToUrl() {
+      clearTimeout(this._syncTimer)
+      this._syncTimer = setTimeout(() => {
+        const query = {}
+        const page = Number(this.pager.page)
+        const limit = Number(this.pager.limit)
+        for (const key of Object.keys(this.listFilterData)) {
+          if (this.listFilterData[key] != null && this.listFilterData[key] !== '') {
+            query[key] = this.listFilterData[key]
+          }
+        }
+        if (page !== 1) query.page = String(page)
+        if (limit !== 20) query.limit = String(limit)
+        const qs = Object.keys(query).length
+          ? '?' + Object.entries(query).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&')
+          : ''
+        const url = window.location.pathname + qs + window.location.hash
+        window.history.replaceState(null, '', url)
+      }, 50)
+    },
+    buildQueryParams() { return {} },
+    applyQueryParams(query) {
+      const filterData = {}
+      for (const key of Object.keys(query)) {
+        if (key === 'page') {
+          this.pager.page = Number(query[key]) || 1
+        } else if (key === 'limit') {
+          this.pager.limit = Number(query[key]) || 20
+        } else {
+          filterData[key] = query[key]
+        }
+      }
+      this.listFilterData = filterData
+    },
     uiFeedback() {
       return createUiFeedback(this)
+    },
+
+    onPopState() {
+      const params = new URLSearchParams(window.location.search)
+      const query = Object.fromEntries(params)
+      if (Object.keys(query).length) {
+        this.applyQueryParams(query)
+        this.fetchFilteredData()
+      }
     },
 
     htmlStrip(text) {
@@ -815,12 +857,13 @@ export default {
     handleSizeChange(val) {
       this.pager.limit = val
       this.pager.page = 1
+      this.syncToUrl()
       this.fetchData()
     },
 
-    // Pager page changed
     handleCurrentChange(val) {
       this.pager.page = val
+      this.syncToUrl()
       this.fetchData()
     },
 
