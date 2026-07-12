@@ -226,7 +226,7 @@ export default {
     /**
      * Fetch base data, like entity structure and validations
      */
-    this.fetchData()
+    this.fetchData(false)
   },
 
   methods: {
@@ -326,9 +326,9 @@ export default {
       this.$emit('update:filter', filter)
     },
 
-    fetchData() {
+    fetchData(resetPage = true) {
       // data process callback
-      this.fetchDataFunc(this)
+      this.fetchDataFunc(this, resetPage)
     }
   }
 }

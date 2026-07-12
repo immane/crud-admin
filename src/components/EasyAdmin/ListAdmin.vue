@@ -15,6 +15,7 @@
         <!-- Top filter or searcher slot-->
         <slot name="filter">
           <search-filter
+            ref="searchFilter"
             v-model="listFilterData"
             v-model:filter="filter"
             :query="query"
@@ -612,14 +613,20 @@ export default {
     listFilterData: {
       handler() { this.syncToUrl() },
       deep: true
+    },
+    '$route.query': {
+      handler(query) {
+        this.applyQueryParams(query)
+        this.$nextTick(() => {
+          this.$refs.searchFilter?.filterGenerate()
+          this.fetchData()
+        })
+      }
     }
   },
 
-  mounted() {
-    window.addEventListener('popstate', this.onPopState)
-  },
   beforeUnmount() {
-    window.removeEventListener('popstate', this.onPopState)
+    clearTimeout(this._syncTimer)
   },
   async created() {
     // Process router convert
@@ -664,48 +671,32 @@ export default {
     syncToUrl() {
       clearTimeout(this._syncTimer)
       this._syncTimer = setTimeout(() => {
-        const query = {}
-        const page = Number(this.pager.page)
-        const limit = Number(this.pager.limit)
-        for (const key of Object.keys(this.listFilterData)) {
-          if (this.listFilterData[key] != null && this.listFilterData[key] !== '') {
-            query[key] = this.listFilterData[key]
-          }
+        const qs = new URLSearchParams(this.buildQueryParams()).toString()
+        const normalizedUrl = qs
+          ? `${window.location.pathname}?${qs}${window.location.hash}`
+          : window.location.pathname + window.location.hash
+        if (normalizedUrl !== window.location.pathname + window.location.search + window.location.hash) {
+          window.history.replaceState(null, '', normalizedUrl)
         }
-        if (page !== 1) query.page = String(page)
-        if (limit !== 20) query.limit = String(limit)
-        const qs = Object.keys(query).length
-          ? '?' + Object.entries(query).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&')
-          : ''
-        const url = window.location.pathname + qs + window.location.hash
-        window.history.replaceState(null, '', url)
       }, 50)
     },
-    buildQueryParams() { return {} },
     applyQueryParams(query) {
       const filterData = {}
       for (const key of Object.keys(query)) {
         if (key === 'page') {
-          this.pager.page = Number(query[key]) || 1
+          this.pager.page = Math.max(1, Number(query[key]) || 1)
         } else if (key === 'limit') {
-          this.pager.limit = Number(query[key]) || 20
+          this.pager.limit = Math.max(1, Number(query[key]) || 20)
         } else {
           filterData[key] = query[key]
         }
       }
+      if (!Object.hasOwn(query, 'page')) this.pager.page = 1
+      if (!Object.hasOwn(query, 'limit')) this.pager.limit = 20
       this.listFilterData = filterData
     },
     uiFeedback() {
       return createUiFeedback(this)
-    },
-
-    onPopState() {
-      const params = new URLSearchParams(window.location.search)
-      const query = Object.fromEntries(params)
-      if (Object.keys(query).length) {
-        this.applyQueryParams(query)
-        this.fetchFilteredData()
-      }
     },
 
     htmlStrip(text) {
@@ -832,8 +823,8 @@ export default {
       this.dataProcessor(this)
     },
 
-    fetchFilteredData() {
-      this.pager.page = 1
+    fetchFilteredData(_searchFilter, resetPage = true) {
+      if (resetPage) this.pager.page = 1
       this.fetchData()
     },
 
