@@ -10,7 +10,7 @@
   <br><br>
 </p>
 
-> English: [README.md](README.md)
+> English: [README.md](README.md) · 繁體中文: [README.zh-Hant.md](README.zh-Hant.md) · 日本語: [README.ja.md](README.ja.md)
 
 > 后端： [crud-skeleton](https://github.com/immane/crud-skeleton) — 基于 Symfony 8.1 的 API，含动态查询引擎和模块化架构
 
@@ -18,6 +18,7 @@
 
 - [功能特色](#功能特色)
 - [技术栈](#技术栈)
+- [国际化](#国际化)
 - [项目结构](#项目结构)
 - [快速开始](#快速开始)
 - [配置](#配置)
@@ -33,6 +34,7 @@
 - **配置驱动 CRUD 引擎（EasyAdmin）** — 在配置中声明实体，即可自动获得完整的列表/表单/详情/路由
 - **17+ 种即插即用表单字段** — 文本输入、文本域、下拉选择、开关、数字、日期、图片、文件、JSON、富文本、关联选择器、穿梭框等
 - **带降级链的详情视图** — `detail/` → `list/` → 纯文本插件逐字段类型降级
+- **国际化（i18n）** — 英文、简体中文、繁体中文、日文；浏览器语言自动检测；导航栏语言切换器；`Accept-Language` 请求头和 `_locale` 参数自动注入 API 请求
 - **JWT 认证** — Bearer token 登录，自动刷新 token 轮换，Cookie 持久化，并发请求排队
 - **基于角色的权限控制** — 通过 Vuex + Vue Router 4 按用户角色过滤动态路由
 - **实体自省** — 查询后端 `/system/entities` 自动推断字段类型、可空性和关联关系
@@ -58,6 +60,19 @@
 | 类型 | TypeScript 6.0 |
 | 后端 | [crud-skeleton](https://github.com/immane/crud-skeleton) (Symfony 8.1) |
 
+## 国际化
+
+系统首次加载时检测浏览器语言，并通过 `localStorage` 持久化选择。导航栏中的下拉菜单可随时切换语言——切换时会清除实体缓存并刷新页面。
+
+| 语言 | 代码 | Element Plus | API Header |
+|--------|------|-------------|------------|
+| English（默认） | `en` | en | `Accept-Language: en`, `_locale=en` |
+| 中文 (简体) | `zh` | zh-cn | `Accept-Language: zh`, `_locale=zh` |
+| 中文 (繁體) | `zh-Hant` | zh-tw | `Accept-Language: zh-Hant`, `_locale=zh-Hant` |
+| 日本語 | `ja` | ja | `Accept-Language: ja`, `_locale=ja` |
+
+翻译键直接使用英文字符串（扁平格式），如 `$t('New / Edit')`。添加新语言只需新建 `src/i18n/{代码}.js` 文件并在导航栏下拉菜单中增加一项。
+
 ## 项目结构
 
 ```text
@@ -78,6 +93,8 @@
 │   │   ├── routes.js                # 菜单/路由定义
 │   │   ├── entities.js              # 自动加载器（import.meta.glob）
 │   │   └── collections/             # 实体 Schema（7 个包，22 个实体）
+│   ├── i18n/                        # 语言文件（en、zh、zh-Hant、ja）
+│   │   └── index.js                 # i18n 插件 + 浏览器语言检测
 │   ├── icons/                       # SVG 雪碧图 + 旧图标兼容映射
 │   ├── layout/                      # 侧边栏 + 导航栏 + 主内容区
 │   ├── router/                      # Vue Router 4 + r()/g() 生成器
@@ -199,6 +216,8 @@ EasyAdmin 是本项目的核心——一个**配置驱动引擎**，能够根据
 在 `src/configs/collections/common/Content.js` 中：
 
 ```js
+import { t } from '@/i18n'
+
 export default {
   Content: {
     form: {
@@ -211,10 +230,10 @@ export default {
     list: {
       query: { '@order': 'entity.id|DESC' },
       list_filter: {
-        title: '标题',
+        title: t('Title'),
         'category.id': () => axios
           .get('/api/v1/manage/categories')
-          .then(res => Object.assign({ __label: '分类' }, ...res.data.map(v => ({ [v.id]: v.name }))))
+          .then(res => Object.assign({ __label: t('Category') }, ...res.data.map(v => ({ [v.id]: v.name }))))
       },
       list_display: ['id', 'title', 'category', 'tags', 'createdAt']
     },
@@ -231,14 +250,15 @@ export default {
 
 ```js
 import { r } from '@/router/generator'
+import { t } from '@/i18n'
 {
   path: '/content', component: Layout,
-  meta: { title: '内容管理', icon: 'el-icon-notebook' },
-  children: [...r('Content', '内容')]
+  meta: { title: t('Content Management'), icon: 'el-icon-notebook' },
+  children: [...r('Content', t('Content'))]
 }
 ```
 
-**仅此而已** — 你已拥有完整的列表页、表单页和详情页。
+**仅此而已** — 你已拥有自动翻译的完整列表页、表单页和详情页。
 
 ### 字段类型插件
 
@@ -301,7 +321,7 @@ interface FieldOption {
 
 - **Base URL**：来自环境变量的 `VITE_BASE_API`
 - **超时时间**：30 秒
-- **请求拦截器**：注入 `Authorization: Bearer <token>` 请求头
+- **请求拦截器**：注入 `Authorization: Bearer <token>` 请求头、`Accept-Language` 请求头和 `_locale` 查询参数
 - **响应拦截器**：遇到 401 自动刷新 token；将并发失败的请求排队到单次刷新之后
 
 ### API 响应格式

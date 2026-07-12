@@ -10,7 +10,7 @@
   <br><br>
 </p>
 
-> Chinese (Simplified): [README.zh-cn.md](README.zh-cn.md)
+> Chinese (Simplified): [README.zh-cn.md](README.zh-cn.md) · Chinese (Traditional): [README.zh-Hant.md](README.zh-Hant.md) · Japanese: [README.ja.md](README.ja.md)
 
 > Backend: [crud-skeleton](https://github.com/immane/crud-skeleton) — Symfony 8.1 API with dynamic query engine and modular architecture
 
@@ -18,6 +18,7 @@
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
+- [Internationalization](#internationalization)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
 - [Configuration](#configuration)
@@ -33,6 +34,7 @@
 - **Configuration-Driven CRUD Engine (EasyAdmin)** — Declare entities in config; get full list/form/detail/routes for free
 - **17+ Pluggable Form Fields** — input, textarea, select, boolean, integer, date, datetime, image, file, JSON, rich text, relation pickers, transfer, and more
 - **Detail View with Fallback Chain** — `detail/` → `list/` → plain text plugins per field type
+- **Internationalization (i18n)** — English, Simplified Chinese, Traditional Chinese, Japanese; browser language detection; locale toggle in navbar; `Accept-Language` header and `_locale` param injected into API requests
 - **JWT Authentication** — Bearer-token login with automatic refresh token rotation, cookie persistence, and concurrent-request queuing
 - **Role-Based Access Control** — Dynamic routes filtered by user roles via Vuex + Vue Router 4
 - **Entity Introspection** — Queries backend `/system/entities` to infer field types, nullability, and relationships
@@ -58,6 +60,19 @@
 | Types | TypeScript 6.0 |
 | Backend | [crud-skeleton](https://github.com/immane/crud-skeleton) (Symfony 8.1) |
 
+## Internationalization
+
+The app detects the browser language on first load and persists the choice via `localStorage`. A dropdown in the navbar allows switching at any time — this clears the entity cache and reloads the page.
+
+| Locale | Code | Element Plus | API Header |
+|--------|------|-------------|------------|
+| English (default) | `en` | en | `Accept-Language: en`, `_locale=en` |
+| 中文 (简体) | `zh` | zh-cn | `Accept-Language: zh`, `_locale=zh` |
+| 中文 (繁體) | `zh-Hant` | zh-tw | `Accept-Language: zh-Hant`, `_locale=zh-Hant` |
+| 日本語 | `ja` | ja | `Accept-Language: ja`, `_locale=ja` |
+
+Translation keys use the English string directly (flat format), e.g. `$t('New / Edit')`. Adding a new language requires only a new `src/i18n/{code}.js` file and an entry in the navbar dropdown.
+
 ## Project Structure
 
 ```text
@@ -78,6 +93,8 @@
 │   │   ├── routes.js                # Menu / route definitions
 │   │   ├── entities.js              # Auto-loader (import.meta.glob)
 │   │   └── collections/             # Entity schemas (7 bundles, 22 entities)
+│   ├── i18n/                        # Locale files (en, zh, zh-Hant, ja)
+│   │   └── index.js                 # i18n plugin + browser detection
 │   ├── icons/                       # SVG sprite + legacy icon compat map
 │   ├── layout/                      # Sidebar + Navbar + AppMain
 │   ├── router/                      # Vue Router 4 + r()/g() generators
@@ -199,6 +216,8 @@ EasyAdmin is the heart of this project — a configuration-driven engine that **
 In `src/configs/collections/common/Content.js`:
 
 ```js
+import { t } from '@/i18n'
+
 export default {
   Content: {
     form: {
@@ -211,10 +230,10 @@ export default {
     list: {
       query: { '@order': 'entity.id|DESC' },
       list_filter: {
-        title: '标题',
+        title: t('Title'),
         'category.id': () => axios
           .get('/api/v1/manage/categories')
-          .then(res => Object.assign({ __label: 'Category' }, ...res.data.map(v => ({ [v.id]: v.name }))))
+          .then(res => Object.assign({ __label: t('Category') }, ...res.data.map(v => ({ [v.id]: v.name }))))
       },
       list_display: ['id', 'title', 'category', 'tags', 'createdAt']
     },
@@ -231,14 +250,15 @@ In `src/configs/routes.js`:
 
 ```js
 import { r } from '@/router/generator'
+import { t } from '@/i18n'
 {
   path: '/content', component: Layout,
-  meta: { title: '内容管理', icon: 'el-icon-notebook' },
-  children: [...r('Content', '内容')]
+  meta: { title: t('Content Management'), icon: 'el-icon-notebook' },
+  children: [...r('Content', t('Content'))]
 }
 ```
 
-**That's it** — you have fully functional list, form, and detail pages.
+**That's it** — you have fully functional list, form, and detail pages, automatically translated.
 
 ### Field Type Plugins
 
@@ -303,7 +323,7 @@ interface FieldOption {
 
 - **Base URL**: `VITE_BASE_API` from environment
 - **Timeout**: 30 seconds
-- **Request Interceptor**: Injects `Authorization: Bearer <token>` header
+- **Request Interceptor**: Injects `Authorization: Bearer <token>` header, `Accept-Language` header and `_locale` query parameter
 - **Response Interceptor**: Auto-refreshes token on 401; queues concurrent failed requests behind a single refresh
 
 ### API Response Format
