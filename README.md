@@ -417,6 +417,5 @@ MIT
 
 This project is based on the excellent work of:
 
-- [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) by [PanJiaChen](https://github.com/PanJiaChen) — the original admin template
-- [vue-admin-template](https://github.com/PanJiaChen/vue-admin-template) — the simplified base template
+- [vue-admin-template](https://github.com/PanJiaChen/vue-admin-template) — the Vue 2 base (no longer actively maintained)
 - [Element UI](https://element.eleme.io/) — the original UI component library

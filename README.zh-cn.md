@@ -415,6 +415,5 @@ MIT
 
 本项目基于以下优秀项目构建：
 
-- [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) by [PanJiaChen](https://github.com/PanJiaChen) — 原始后台模板
-- [vue-admin-template](https://github.com/PanJiaChen/vue-admin-template) — 简化版基础模板
+- [vue-admin-template](https://github.com/PanJiaChen/vue-admin-template) — Vue 2 基础模板（已停止维护）
 - [Element UI](https://element.eleme.io/) — 原始 UI 组件库
