@@ -30,7 +30,26 @@ export default {
       ]
     },
     detail: {
-      detail_display: '__all__'
+      detail_display: [
+        'id',
+        'uuid',
+        'user',
+        'totalAmount',
+        'currency',
+        'status',
+        'paymentMethod',
+        'paidAt',
+        'cancelledAt',
+        'completedAt',
+        'refundedAt',
+        { property: 'items', full_width: true },
+        { property: 'notes', type: 'text', full_width: true },
+        { property: 'metadata', type: 'json', full_width: true },
+        'shippingAddress',
+        'billingAddress',
+        'createdAt',
+        'updatedAt'
+      ]
     }
   }
 }
