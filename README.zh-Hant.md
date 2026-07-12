@@ -14,6 +14,16 @@
 
 > 後端： [crud-skeleton](https://github.com/immane/crud-skeleton) — 基於 Symfony 8.1 的 API，含動態查詢引擎和模組化架構
 
+## 介面展示
+
+<p align="center">
+  <img src="docs/images/dashboard-sample.jpg" alt="Dashboard" width="32%" />
+  <img src="docs/images/list-sample.jpg" alt="List" width="32%" />
+  <img src="docs/images/detail-sample.jpg" alt="Detail" width="32%" />
+  <br>
+  <em>儀表板 · 列表視圖 · 記錄詳情</em>
+</p>
+
 ## 目錄
 
 - [功能特色](#功能特色)
@@ -44,11 +54,6 @@
 - **程式碼分割與建置最佳化** — Vite 驅動的 chunk 分割和 tree-shaking
 - **Vitest 單元測試** — 38 項元件和工具函數測試
 
-<p align="center">
-  <img src="docs/images/dashboard-sample.jpg" alt="Dashboard" width="32%" />
-  <img src="docs/images/list-sample.jpg" alt="List" width="32%" />
-  <img src="docs/images/detail-sample.jpg" alt="Detail" width="32%" />
-</p>
 
 ## 技術棧
 

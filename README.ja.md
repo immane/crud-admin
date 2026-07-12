@@ -14,6 +14,16 @@
 
 > バックエンド： [crud-skeleton](https://github.com/immane/crud-skeleton) — Symfony 8.1 API、動的クエリエンジン、モジュラーアーキテクチャ
 
+## スクリーンショット
+
+<p align="center">
+  <img src="docs/images/dashboard-sample.jpg" alt="Dashboard" width="32%" />
+  <img src="docs/images/list-sample.jpg" alt="List" width="32%" />
+  <img src="docs/images/detail-sample.jpg" alt="Detail" width="32%" />
+  <br>
+  <em>ダッシュボード · 一覧ビュー · 詳細ビュー</em>
+</p>
+
 ## 目次
 
 - [機能](#機能)
@@ -44,11 +54,6 @@
 - **コード分割とビルド最適化** — Vite によるチャンク分割とツリーシェイキング
 - **Vitest ユニットテスト** — 38 のコンポーネントおよびユーティリティテスト
 
-<p align="center">
-  <img src="docs/images/dashboard-sample.jpg" alt="Dashboard" width="32%" />
-  <img src="docs/images/list-sample.jpg" alt="List" width="32%" />
-  <img src="docs/images/detail-sample.jpg" alt="Detail" width="32%" />
-</p>
 
 ## 技術スタック
 

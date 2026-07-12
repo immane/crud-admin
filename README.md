@@ -14,6 +14,16 @@
 
 > Backend: [crud-skeleton](https://github.com/immane/crud-skeleton) — Symfony 8.1 API with dynamic query engine and modular architecture
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/images/dashboard-sample.jpg" alt="Dashboard" width="32%" />
+  <img src="docs/images/list-sample.jpg" alt="List" width="32%" />
+  <img src="docs/images/detail-sample.jpg" alt="Detail" width="32%" />
+  <br>
+  <em>Dashboard · List View · Record Detail</em>
+</p>
+
 ## Table of Contents
 
 - [Features](#features)
@@ -44,11 +54,6 @@
 - **Code Splitting & Build Optimization** — Vite-powered chunk splitting with tree-shaking
 - **Vitest Unit Testing** — 38 tests across components and utilities
 
-<p align="center">
-  <img src="docs/images/dashboard-sample.jpg" alt="Dashboard" width="32%" />
-  <img src="docs/images/list-sample.jpg" alt="List" width="32%" />
-  <img src="docs/images/detail-sample.jpg" alt="Detail" width="32%" />
-</p>
 
 ## Tech Stack
 
