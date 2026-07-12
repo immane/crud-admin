@@ -52,7 +52,7 @@
               @click="() => {
                 const loading = startLoading({
                   lock: true,
-                  text: t('Exporting data'),
+                  text: $t('Exporting data'),
                   spinner: 'el-icon-loading',
                   background: 'rgba(0, 0, 0, 0.7)'
                 })
@@ -117,7 +117,7 @@
             icon="el-icon-plus"
             plain
             @click="() => {
-              dialog.title = t('New Record')
+              dialog.title = $t('New Record')
               delete dialog.data.id
               dialog.refresh++
               dialog.show = true
@@ -309,7 +309,6 @@
 
 <script>
 import { defineAsyncComponent, markRaw, toRaw } from 'vue'
-import { t } from '@/i18n'
 import EntityManage from '@/utils/entity'
 import { asyncRoutes } from '@/router'
 import SIP from '@/utils/simple-image-process'
