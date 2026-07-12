@@ -9,7 +9,7 @@
       v-on="field.type_events || {}"
     >
       <el-option
-        v-for="item in field.type_options.options"
+        v-for="item in field.type_options?.options || []"
         :key="item.value"
         :label="item.label"
         :value="item.value"

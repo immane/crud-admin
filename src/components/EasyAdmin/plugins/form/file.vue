@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import SIP from '@/utils/simple-image-process'
+
 export default {
   props: {
     form: {
@@ -34,6 +36,11 @@ export default {
     return {
       // base api
       BASE_API: process.env.VITE_BASE_API
+    }
+  },
+  methods: {
+    getPicture(url) {
+      return SIP.getPicture(url)
     }
   }
 }

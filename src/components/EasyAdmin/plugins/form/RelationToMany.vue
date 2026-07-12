@@ -61,6 +61,11 @@ export default {
       // m2o or o2o options
       options: []
     }
+  },
+  created() {
+    if (!Array.isArray(this.form[this.field.property])) {
+      this.form[this.field.property] = []
+    }
   }
 }
 </script>

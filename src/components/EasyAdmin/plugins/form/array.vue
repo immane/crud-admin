@@ -114,6 +114,10 @@ export default {
       options: this.field?.type_options?.options ?? []
     }
   },
-  created() {}
+  created() {
+    if (!Array.isArray(this.form[this.field.property])) {
+      this.form[this.field.property] = []
+    }
+  }
 }
 </script>
