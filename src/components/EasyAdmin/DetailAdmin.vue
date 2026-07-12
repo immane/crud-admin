@@ -56,7 +56,7 @@ const resolvePlugin = path => {
   if (!pluginCache[path]) {
     pluginCache[path] = () => {
       const loader = detailPlugins[path] || listPlugins[path]
-      return loader ? loader().then(module => module.default) : null
+      return loader().then(module => module.default)
     }
   }
   return pluginCache[path]
@@ -117,7 +117,9 @@ export default {
         ManyToMany: 'RelationToMany', OneToMany: 'RelationToMany', datetime_immutable: 'datetime'
       }
       const resolvedType = typeMapping[type] || type
-      return resolvePlugin(`./plugins/detail/${resolvedType}.vue`) || resolvePlugin(`./plugins/list/${resolvedType}.vue`)
+      const detailPath = `./plugins/detail/${resolvedType}.vue`
+      const listPath = `./plugins/list/${resolvedType}.vue`
+      return detailPlugins[detailPath] ? resolvePlugin(detailPath) : resolvePlugin(listPath)
     },
     extractField(data, property) {
       return property.split('.').reduce((value, key) => value != null ? value[key] : null, data)
