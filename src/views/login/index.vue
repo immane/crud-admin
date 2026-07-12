@@ -57,7 +57,7 @@
 
         </div>
         <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.prevent="handleLogin">{{ $t('Sign In') }}</el-button>
-        <a href="https://codepen.io/elujambio/pen/yjwzGP" class="discrete" target="_blank">Version 0.8.2</a>
+        <a href="https://codepen.io/elujambio/pen/yjwzGP" class="discrete" target="_blank">Version 0.9.0</a>
       </el-form>
     </div>
   </div>
