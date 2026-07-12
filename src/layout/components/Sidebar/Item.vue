@@ -22,9 +22,9 @@ export default {
       if (icon) {
         if (icon.includes('el-icon')) {
           vnodes.push(
-            h(resolveComponent(icon), {
-              style: { width: '1em', height: '1em', marginRight: title ? '6px' : '0', verticalAlign: 'middle', fill: 'currentColor' }
-            })
+            h('span', { class: 'sub-el-icon' }, [
+              h(resolveComponent(icon))
+            ])
           )
         } else {
           vnodes.push(h(resolveComponent('svg-icon'), { iconClass: icon }))
@@ -32,10 +32,27 @@ export default {
       }
 
       if (title) {
-        vnodes.push(h('span', { class: 'menu-item-title' }, title))
+        vnodes.push(h('span', null, title))
       }
       return vnodes
     }
   }
 }
 </script>
+
+<style scoped>
+.sub-el-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-right: 5px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.sub-el-icon :deep(svg) {
+  width: 14px;
+  height: 14px;
+}
+</style>
