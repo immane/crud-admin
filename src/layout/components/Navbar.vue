@@ -16,19 +16,21 @@
           <img :src="avatar" class="user-avatar">
           <i class="el-icon-caret-bottom" />
         </div>
-        <el-dropdown-menu slot="dropdown" class="user-dropdown">
+        <template #dropdown>
+          <el-dropdown-menu class="user-dropdown">
           <router-link :to="{ name: 'Dashboard'}">
             <el-dropdown-item>
               您好，{{ name }}
             </el-dropdown-item>
           </router-link>
-          <el-dropdown-item @click.native="clearCache">
+          <el-dropdown-item @click="clearCache">
             <span style="display:block;">清空缓存</span>
           </el-dropdown-item>
-          <el-dropdown-item divided @click.native="logout">
+          <el-dropdown-item divided @click="logout">
             <span style="display:block;">登出</span>
           </el-dropdown-item>
-        </el-dropdown-menu>
+          </el-dropdown-menu>
+        </template>
       </el-dropdown>
     </div>
   </div>

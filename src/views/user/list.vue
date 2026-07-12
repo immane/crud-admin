@@ -18,7 +18,7 @@
 
     <el-dialog
       title="修改权限"
-      :visible.sync="dialog.visible"
+      v-model="dialog.visible"
       width="40%"
     >
       <span>
@@ -31,7 +31,8 @@
           />
         </el-select>
       </span>
-      <span slot="footer" class="dialog-footer">
+      <template #footer>
+        <span class="dialog-footer">
         <el-button @click="dialog.visible = false">取消</el-button>
         <el-button
           type="primary"
@@ -42,7 +43,8 @@
               .finally(() => { dialog.visible = false; componentRefresh++ } )
           "
         >确认</el-button>
-      </span>
+        </span>
+      </template>
     </el-dialog>
   </div>
 </template>

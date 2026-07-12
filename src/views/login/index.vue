@@ -56,7 +56,7 @@
           </div>
 
         </div>
-        <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登陆</el-button>
+        <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.prevent="handleLogin">登陆</el-button>
         <a href="https://codepen.io/elujambio/pen/yjwzGP" class="discrete" target="_blank">Version 1.0</a>
       </el-form>
     </div>
