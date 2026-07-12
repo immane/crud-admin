@@ -12,7 +12,7 @@ export default [
 
   {
     path: '/order', name: 'OrderManage', component: Layout,
-    meta: { title: '订单管理', icon: 'el-icon-s-order', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: '订单管理', icon: 'el-icon-tickets', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
       ...r('Order', '订单'),
       ...r('Invoice', '发票'),
@@ -31,7 +31,7 @@ export default [
 
   {
     path: '/content', name: 'ContentManage', component: Layout,
-    meta: { title: '内容管理', icon: 'el-icon-document', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: '内容管理', icon: 'el-icon-notebook', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
       ...r('Content', '内容'),
       ...r('Page', '页面'),
@@ -42,7 +42,7 @@ export default [
 
   {
     path: '/wallet', name: 'WalletManage', component: Layout,
-    meta: { title: '钱包管理', icon: 'el-icon-money', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: '钱包管理', icon: 'el-icon-wallet', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
       ...r('Wallet', '钱包'),
       ...r('WalletTransaction', '交易记录'),
