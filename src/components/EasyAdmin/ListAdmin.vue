@@ -253,12 +253,7 @@
                     size="small"
                     icon="el-icon-edit"
                     plain
-                    @click="() => {
-                      dialog.title = '修改记录'
-                      dialog.data.id = scope.row.id
-                      dialog.refresh++
-                      dialog.show = true
-                    }"
+                    @click="openEditDialog(scope.row.id)"
                   >
                     修改
                   </el-button>
@@ -292,26 +287,32 @@
       </div>
     </el-row>
 
-    <template>
-      <el-dialog
-        v-model="dialog.show"
-        class="easy-admin-dialog"
-        width="80%"
-        :title="dialog.title"
-        top="0"
-        @closed="fetchData"
+    <el-dialog
+      v-model="dialog.show"
+      class="easy-admin-dialog"
+      width="80%"
+      :title="dialog.title"
+      top="0"
+      @closed="fetchData"
+    >
+      <form-admin
+        v-if="dialog.show"
+        :key="dialog.refresh"
+        :id="dialog.data.id"
+        :entity-conf="dialog.data.entityConf"
+        :fields="dialog.data.fields"
+        :config="dialog.data.config"
       >
-        <component
-          :is="dialog.component"
-          :key="dialog.refresh"
-          :data="dialog.data"
-        />
-      </el-dialog>
-    </template>
+        <template #formTitle><span /></template>
+        <template #action="{ submit }">
+          <el-button type="primary" icon="el-icon-edit-outline" @click="submit(closeEditDialog)">保存</el-button>
+        </template>
+      </form-admin>
+    </el-dialog>
   </div>
 </template>
 
-<script lang="jsx">
+<script>
 import { defineAsyncComponent, markRaw, toRaw } from 'vue'
 import EntityManage from '@/utils/entity'
 import { asyncRoutes } from '@/router'
@@ -333,7 +334,7 @@ const resolveListPlugin = (path) => {
 
 export default {
   name: 'ListAdmin',
-  components: { SearchFilter },
+  components: { FormAdmin, SearchFilter },
 
   props: {
     /**
@@ -585,47 +586,8 @@ export default {
       dialog: {
         title: 'Dialog',
         show: false,
-        component: null,
         refresh: 0,
-        data: {},
-
-        defaultComponents: {
-          formEdit: {
-            components: { FormAdmin },
-            props: ['data'],
-            data() {
-              return {
-                submit: null
-              }
-            },
-            render(h) {
-              return (
-                <FormAdmin
-                  id={this.data?.id}
-                  entity-conf={this.data?.entityConf}
-                  fields={this.data?.fields}
-                  config={this.data?.config}
-
-                  v-slots={{
-                    formTitle: () => <span />,
-                    action: ({ submit }) => (
-                      <el-button
-                        type='primary' icon='el-icon-edit-outline'
-                        onClick={() => {
-                          submit(() => {
-                            this.$message({ message: '数据修改成功', type: 'success' })
-                            this.data.onSaved()
-                          })
-                        }}>
-                        保存
-                      </el-button>
-                    )
-                  }}
-                />
-              )
-            }
-          }
-        }
+        data: {}
       },
 
       // Other
@@ -663,14 +625,13 @@ export default {
     // Process entity and structure properties
     this.propertieProcess()
 
-    // Load dialog component
+    // Initialize the reusable edit dialog data.
     this.loadDialogComponent(
       {
         entityConf: this.entityConf,
         fields: this.config?.form.fields,
         config: this.config
-      },
-      this.dialog.defaultComponents.formEdit
+      }
     )
 
     /**
@@ -742,16 +703,21 @@ export default {
       return resolveListPlugin(path)
     },
 
-    loadDialogComponent(data, component = null) {
-      if (component) {
-        this.dialog.component = markRaw(component)
-      }
+    loadDialogComponent(data) {
       this.dialog.data = data
-      data.onSaved = () => {
-        this.dialog.show = false
-        this.fetchData()
-      }
       this.dialog.refresh++
+    },
+
+    openEditDialog(id) {
+      this.dialog.title = '修改记录'
+      this.dialog.data.id = id
+      this.dialog.refresh++
+      this.dialog.show = true
+    },
+
+    closeEditDialog() {
+      this.notifySuccess('数据修改成功')
+      this.dialog.show = false
     },
 
     // Get picture

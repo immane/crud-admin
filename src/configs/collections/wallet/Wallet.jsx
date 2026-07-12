@@ -32,7 +32,7 @@ export default {
           property: 'balance',
           component: {
             props: ['data'],
-            render(h) {
+            render() {
               return (<span>$ {(this.data / 100).toFixed(2)}</span>)
             }
           }
@@ -51,7 +51,7 @@ export default {
           property: 'balance',
           component: {
             props: ['data'],
-            render(h) {
+            render() {
               return (<span style='font-size: 28px; font-weight: 700; color: #2d5aa0;'>$ {(this.data / 100).toFixed(2)}</span>)
             }
           }
