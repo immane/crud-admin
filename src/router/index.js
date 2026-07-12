@@ -54,7 +54,7 @@ export const constantRoutes = [
         component: () => import('@/views/dashboard/index'),
         meta: {
           title: '控制台',
-          icon: 'dashboard'
+          icon: 'el-icon-s-home'
         }
       }
     ]
@@ -78,6 +78,12 @@ export const lastRoutes = [
         name: `EasyAdminUpdate`,
         hidden: true,
         component: () => import('@/views/admin/form')
+      },
+      {
+        path: `/:entityParam/:id/detail`,
+        name: `EasyAdminDetail`,
+        hidden: true,
+        component: () => import('@/views/admin/detail')
       },
       {
         path: `/:entityParam/list`,

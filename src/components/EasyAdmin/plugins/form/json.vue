@@ -1,95 +1,111 @@
 <template>
   <div class="json-editor-field">
-    <div class="json-editor-toolbar">
-      <el-button size="mini" plain @click="formatJson">格式化</el-button>
-      <span v-if="error" class="json-editor-error">{{ error }}</span>
-    </div>
-    <prism-editor
-      v-model="editorText"
-      class="json-editor"
-      :highlight="highlighter"
-      line-numbers
-      v-bind="field.type_options"
-      v-on="field.type_events"
-      @input="handleInput"
-    />
+    <div ref="container" class="jsoneditor-container" />
   </div>
 </template>
 
 <script>
-import { PrismEditor } from 'vue-prism-editor'
-import 'vue-prism-editor/dist/prismeditor.min.css'
+import 'vue-json-editor/assets/jsoneditor.css'
+import jsoneditorUrl from 'vue-json-editor/assets/jsoneditor.min.js?url'
 
-import { highlight, languages } from 'prismjs/components/prism-core'
-import 'prismjs/components/prism-json'
-import 'prismjs/themes/prism-tomorrow.css'
+let JSONEditor = null
+let loading = null
 
 export default {
-  components: { PrismEditor },
   props: {
     form: {
       type: Object,
-      default: () => { return {} }
+      default: () => ({})
     },
     field: {
       type: Object,
-      default: () => { return {} }
+      default: () => ({})
     }
   },
   data() {
     return {
-      editorText: '',
-      error: ''
+      editor: null,
+      internalValue: null
+    }
+  },
+  computed: {
+    editorMode() {
+      return this.field.type_options?.mode || 'code'
+    },
+    editorModes() {
+      return this.field.type_options?.modes || ['tree', 'code', 'form', 'text', 'view']
+    },
+    fieldValue() {
+      return this.form[this.field.property]
     }
   },
   watch: {
-    'field.property': {
+    fieldValue: {
       immediate: true,
-      handler() {
-        this.editorText = this.stringifyValue(this.form[this.field.property])
+      handler(v) {
+        if (v != null) {
+          try {
+            this.internalValue = typeof v === 'string' ? JSON.parse(v) : v
+          } catch (e) {
+            this.internalValue = v
+          }
+        } else {
+          this.internalValue = {}
+        }
+        if (this.editor) {
+          this.editor.set(this.internalValue)
+        }
       }
     }
   },
-  created() {
-    this.editorText = this.stringifyValue(this.form[this.field.property])
+  async mounted() {
+    await this.ensureJsonEditor()
+    this.createEditor()
+  },
+  beforeDestroy() {
+    if (this.editor) {
+      this.editor.destroy()
+      this.editor = null
+    }
   },
   methods: {
-    highlighter(code) {
-      return highlight(code, languages.json)
+    async ensureJsonEditor() {
+      if (JSONEditor) return
+      if (typeof window !== 'undefined' && window.JSONEditor) {
+        JSONEditor = window.JSONEditor
+        return
+      }
+      if (!loading) {
+        loading = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = jsoneditorUrl
+          script.onload = () => {
+            JSONEditor = window.JSONEditor
+            resolve()
+          }
+          script.onerror = reject
+          document.head.appendChild(script)
+        })
+      }
+      await loading
     },
-
-    stringifyValue(value) {
-      if (typeof value === 'string') {
-        try {
-          return JSON.stringify(JSON.parse(value), null, 2)
-        } catch (error) {
-          return value
+    createEditor() {
+      const options = {
+        mode: this.editorMode,
+        modes: this.editorModes,
+        onChange: () => {
+          try {
+            const json = this.editor.get()
+            this.internalValue = json
+            this.$set(this.form, this.field.property, json)
+          } catch (e) {
+            // invalid JSON, keep existing value
+          }
         }
       }
-      if (value === undefined) return '{}'
-      return JSON.stringify(value, null, 2)
-    },
-
-    handleInput(value) {
-      this.error = ''
-
-      try {
-        const parsed = value.trim() ? JSON.parse(value) : null
-        this.$set(this.form, this.field.property, parsed)
-      } catch (error) {
-        this.error = error.message
-      }
-    },
-
-    formatJson() {
-      try {
-        const parsed = this.editorText.trim() ? JSON.parse(this.editorText) : null
-        this.editorText = JSON.stringify(parsed, null, 2)
-        this.$set(this.form, this.field.property, parsed)
-        this.error = ''
-      } catch (error) {
-        this.error = error.message
-      }
+      this.$nextTick(() => {
+        this.editor = new JSONEditor(this.$refs.container, options, this.internalValue)
+      })
     }
   }
 }
@@ -99,34 +115,20 @@ export default {
 .json-editor-field {
   width: 100%;
 }
-
-.json-editor-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
-.json-editor-error {
-  color: #f56c6c;
-  font-size: 12px;
-}
-
-.json-editor {
+.jsoneditor-container {
   min-height: 220px;
   max-height: 520px;
-  overflow: auto;
+}
+.json-editor-field ::v-deep .jsoneditor {
   border: 1px solid #dcdfe6;
   border-radius: 4px;
-  background: #2d2d2d;
-  color: #ccc;
-  font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
-  font-size: 13px;
-  line-height: 1.5;
-  padding: 8px;
 }
-
-.json-editor ::v-deep .prism-editor__textarea:focus {
-  outline: none;
+.json-editor-field ::v-deep .jsoneditor-outer {
+  min-height: 220px;
+  max-height: 520px;
+}
+.json-editor-field ::v-deep .ace_editor {
+  min-height: 220px;
+  max-height: 520px;
 }
 </style>

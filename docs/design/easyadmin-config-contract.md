@@ -55,6 +55,9 @@ interface EntityConfig {
 
   /** List config */
   list?: ListConfig
+
+  /** Detail config */
+  detail?: DetailConfig
 }
 ```
 
@@ -215,7 +218,7 @@ interface ListConfig {
 
   /**
    * Hide default actions
-   * Available: 'new' | 'edit' | 'delete' | 'lines' | 'pager' | 'export'
+   * Available: 'new' | 'detail' | 'edit' | 'delete' | 'lines' | 'pager' | 'export'
    */
   disabled_actions?: string[]
 
@@ -232,6 +235,26 @@ interface ListConfig {
   }
 }
 ```
+
+---
+
+## 6.1 DetailConfig
+
+```typescript
+interface DetailConfig {
+  /** Detail fields. Defaults to list.list_display, then form.fields, then all API fields. */
+  detail_display?: FieldConfig[] | '__all__'
+
+  /** Alias for detail_display. */
+  fields?: FieldConfig[] | '__all__'
+
+  /** Hide detail page actions: 'edit'. */
+  disabled_actions?: string[]
+}
+```
+
+Detail fields use the same `FieldOption` contract and list rendering plugins as `list_display`.
+Set `span: 2` or `full_width: true` on a field to occupy the full detail row.
 
 ---
 

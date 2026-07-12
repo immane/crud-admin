@@ -265,6 +265,10 @@ export default {
     .mce-fullscreen {
       z-index: 10000;
     }
+    .mce-tinymce {
+      width: auto !important;
+      box-sizing: border-box;
+    }
   }
 }
 

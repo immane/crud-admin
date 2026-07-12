@@ -187,24 +187,9 @@
 
               <!-- Normal fields -->
               <div v-else>
-
-                <!-- Dummy -->
                 <template v-if="false" />
 
-                <!-- System (have metadata) -->
-
-                <!-- String / Integer / Float / Decimal -->
-                <template
-                  v-else-if="
-                    (field.property != 'id' && field.type != 'image') && (
-                      field.type == 'string' || checkMetadataType(structure[field.property], 'string')
-                      || field.type == 'integer' || checkMetadataType(structure[field.property], 'integer')
-                      || field.type == 'float' || checkMetadataType(structure[field.property], 'float')
-                      || field.type == 'decimal' || checkMetadataType(structure[field.property], 'decimal')
-                    )
-                      && field.editable
-                  "
-                >
+                <template v-else-if="isEditableField(field, structure[field.property])">
                   <component
                     :is="EditablePlain"
                     :em="em"
@@ -214,133 +199,18 @@
                   />
                 </template>
 
-                <!-- Boolean -->
-                <template
-                  v-else-if="
-                    field.type == 'boolean' ||
-                      checkMetadataType(structure[field.property], 'boolean')
-                  "
-                >
-                  <el-switch
-                    v-if="field.editable"
-                    v-model="scope.row[field.property]"
-                    active-color="#67C23A"
-                    inactive-color="#F56C6C"
-                    size="medium"
-                    @change="() => {
-                      em.update(scope.row.id, {[field.property]: scope.row[field.property]})
-                        .then(() => notifySuccess('修改属性成功'))
-                    }"
+                <template v-else-if="getListPluginType(field, structure[field.property], extractFields(scope.row, field.property))">
+                  <component
+                    :is="loadListPlugin(getListPluginType(field, structure[field.property], extractFields(scope.row, field.property)))"
+                    :value="extractFields(scope.row, field.property)"
+                    :field="field"
+                    :scope="scope"
+                    :em="em"
+                    :struct="structure[field.property]"
                   />
-
-                  <el-tag
-                    v-else
-                    :type="scope.row[field.property] | boolFilter"
-                  >
-                    {{ scope.row[field.property] | boolDisplay }}
-                  </el-tag>
                 </template>
 
-                <!-- Date -->
-                <span
-                  v-else-if="
-                    field.type == 'date' ||
-                      (checkMetadataType(structure[field.property], 'date')
-                        && scope.row[field.property])
-                  "
-                >
-                  <i class="el-icon-time" />
-                  {{ new Date(extractFields(scope.row, field.property)) | dateFormat('YYYY-MM-DD') }}
-                </span>
-
-                <!-- DateTime -->
-                <span
-                  v-else-if="
-                    field.type == 'datetime' ||
-                      (checkMetadataType(structure[field.property], 'datetime')
-                        && scope.row[field.property])
-                  "
-                >
-                  <i class="el-icon-time" />
-                  {{ new Date(extractFields(scope.row, field.property)) | dateFormat('YYYY-MM-DD HH:mm:ss') }}
-                </span>
-
-                <!-- Relatived -->
-                <span
-                  v-else-if="
-                    checkMetadataType(structure[field.property], 'ManyToOne')
-                      || checkMetadataType(structure[field.property], 'OneToOne')
-                  "
-                >
-                  {{ scope.row[field.property] ? scope.row[field.property].__toString : '' }}
-                </span>
-
-                <div
-                  v-else-if="
-                    checkMetadataType(structure[field.property], 'ManyToMany')
-                      || checkMetadataType(structure[field.property], 'OneToMany')
-                      || Array.isArray(scope.row[field.property])
-                  "
-                  :style="{ display: 'flex', flexWrap: 'wrap' }"
-                >
-                  <template
-                    v-for="(relationField, relationIndex) in scope.row[field.property].slice(0, 5)"
-                  >
-                    <el-tag
-                      :key="relationIndex"
-                      :style="{ margin: '2px' }"
-                    >
-                      {{ Object.keys(relationField).includes('__toString') ? relationField.__toString : '' }}
-                    </el-tag>
-                  </template>
-
-                  <template
-                    v-if="scope.row[field.property].length > 5"
-                  >
-                    <el-tooltip
-                      placement="bottom"
-                      effect="light"
-                    >
-                      <el-tag
-                        :key="relationIndex"
-                        :style="{ margin: '2px' }"
-                      >
-                        ...
-                      </el-tag>
-
-                      <div slot="content">
-                        <div
-                          v-for="(relationField, relationIndex) in scope.row[field.property]"
-                          :key="relationIndex"
-                          style="max-width: 50vw; overflow-y: scroll; display: flex; flex-wrap: wrap;"
-                        >
-                          <el-tag
-                            :style="{ margin: '2px' }"
-                          >
-                            {{ Object.keys(relationField).includes('__toString') ? relationField.__toString : '' }}
-                          </el-tag>
-                        </div>
-                      </div>
-                    </el-tooltip>
-                  </template>
-                </div>
-
-                <!-- Custom (do not have metadata) -->
-
-                <!-- Image -->
-                <span
-                  v-else-if="field.type == 'image'"
-                >
-                  <el-image
-                    style="width: 50px; height: 50px; border: 3px white solid; box-shadow: 1px 1px 5px #ddd;"
-                    :src="getPicture(scope.row[field.property])"
-                    :preview-src-list="[getPicture(scope.row[field.property])]"
-                  />
-                </span>
-
-                <!-- Others -->
                 <span v-else>
-                  <!-- Relation fields or others -->
                   {{ extractFields(scope.row, field.property) | htmlStrip }}
                 </span>
               </div>
@@ -363,6 +233,20 @@
             &emsp;
 
             <slot name="action" :data="scope.row">
+              <slot name="action:detail" :data="scope.row">
+                <el-button
+                  v-if="config && !disabledActions.includes('detail')"
+                  size="small"
+                  icon="el-icon-view"
+                  plain
+                  @click="$router.push({ name: `${em.name}Detail`, params: { id: scope.row.id } })"
+                >
+                  详情
+                </el-button>
+              </slot>
+
+              &nbsp;&nbsp;
+
               <slot name="action:edit" :data="scope.row">
                 <!-- Popup dialog -->
                 <el-button
@@ -437,28 +321,36 @@
 
 ::v-deep .easy-admin-dialog {
   display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+::v-deep .easy-admin-dialog .el-dialog {
+  display: flex;
   flex-direction: column;
-  max-height: 85vh;
+  max-height: 80vh;
   max-width: 1200px;
   margin: 0 auto !important;
 }
 
 ::v-deep .easy-admin-dialog .el-dialog__header {
   flex-shrink: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #EBEEF5;
 }
 
 ::v-deep .easy-admin-dialog .el-dialog__body {
-  overflow-y: auto;
-  flex: 1;
+  min-height: 0;
+  overflow: hidden auto;
+  padding: 8px 20px;
 }
-</style>
 
-<style>
-.el-dialog__wrapper {
-  display: flex;
-  align-items: center !important;
-  justify-content: center !important;
-  overflow: hidden !important;
+::v-deep .easy-admin-dialog .app-container {
+  padding: 0;
+}
+
+::v-deep .easy-admin-dialog .el-dialog__footer {
+  flex-shrink: 0;
 }
 </style>
 
@@ -470,7 +362,16 @@ import SearchFilter from './SearchFilter.vue'
 import FormAdmin from './FormAdmin.vue'
 import { createUiFeedback } from './ui/feedback'
 import EditablePlain from './plugins/list/editable-plain.vue'
-import exportExcelCsv from '@/utils/exportExcelCsv'
+
+const listPlugins = import.meta.glob('./plugins/list/*.vue')
+const listPluginCache = {}
+
+const resolveListPlugin = (path) => {
+  if (!listPluginCache[path]) {
+    listPluginCache[path] = () => listPlugins[path]().then(module => module.default)
+  }
+  return listPluginCache[path]
+}
 
 export default {
   name: 'ListAdmin',
@@ -645,7 +546,7 @@ export default {
     },
 
     // Disable default actions
-    // sample: ['new', 'edit', 'delete', 'lines', 'pager']
+    // sample: ['new', 'detail', 'edit', 'delete', 'lines', 'pager']
     disabledActions: {
       type: Array,
       default: () => []
@@ -656,7 +557,6 @@ export default {
       type: Function,
       default: (context, dataProcessor = {}) => {
         // Loading start
-        context.list = []
         context.loading = true
 
         const promise = [
@@ -760,16 +660,16 @@ export default {
                       formTitle: () => { return <span/> },
                       action: scope => {
                         return (
-                            <el-button
-                              type='primary' icon='el-icon-edit-outline'
-                              onclick={() => {
-                                scope.submit(() => {
-                                  this.$message({ message: '数据修改成功', type: 'success' })
-                                  this.data.dialog.show = false
-                                })
-                              }}>
+                          <el-button
+                            type='primary' icon='el-icon-edit-outline'
+                            onClick={() => {
+                              scope.submit(() => {
+                                this.$message({ message: '数据修改成功', type: 'success' })
+                                this.data.dialog.show = false
+                              })
+                            }}>
                               保存
-                            </el-button>
+                          </el-button>
                         )
                       }
                     }
@@ -854,6 +754,41 @@ export default {
     /* Check if metadata presented */
     checkMetadataType(currentStruct, type) {
       return currentStruct && Object.keys(currentStruct).includes('metadata') && currentStruct.metadata.type === type
+    },
+
+    isEditableField(field, struct) {
+      if (field.property === 'id') return false
+      if (field.type === 'image') return false
+      if (!field.editable) return false
+      const editableTypes = ['string', 'integer', 'float', 'decimal']
+      if (field.type && editableTypes.includes(field.type)) return true
+      if (!field.type && struct?.metadata?.type && editableTypes.includes(struct.metadata.type)) return true
+      return false
+    },
+
+    getListPluginType(field, struct, value) {
+      const type = field.type || struct?.metadata?.type
+      if (!type) {
+        if (Array.isArray(value)) return 'RelationToMany'
+        return null
+      }
+      if (['boolean', 'date', 'datetime', 'datetime_immutable', 'image', 'array'].includes(type)) return type
+      if (['ManyToOne', 'OneToOne'].includes(type)) return 'RelationToOne'
+      if (['ManyToMany', 'OneToMany'].includes(type)) return 'RelationToMany'
+      return null
+    },
+
+    loadListPlugin(type) {
+      const typeMapping = {
+        'ManyToOne': 'RelationToOne',
+        'OneToOne': 'RelationToOne',
+        'ManyToMany': 'RelationToMany',
+        'OneToMany': 'RelationToMany',
+        'datetime_immutable': 'datetime'
+      }
+      const targetType = typeMapping[type] || type
+      const path = `./plugins/list/${targetType}.vue`
+      return resolveListPlugin(path)
     },
 
     loadDialogComponent(data, component = null) {

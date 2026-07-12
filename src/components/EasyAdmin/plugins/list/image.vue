@@ -1,0 +1,28 @@
+<template>
+  <span>
+    <el-image
+      style="width: 50px; height: 50px; border: 3px white solid; box-shadow: 1px 1px 5px #ddd;"
+      :src="imageUrl"
+      :preview-src-list="[imageUrl]"
+    />
+  </span>
+</template>
+
+<script>
+import SIP from '@/utils/simple-image-process'
+
+export default {
+  props: {
+    value: { type: [String, Number, Boolean, Object, Array], default: null },
+    field: { type: Object, default: () => ({}) },
+    scope: { type: Object, default: () => ({}) },
+    em: { type: Object, default: () => ({}) },
+    struct: { type: Object, default: () => ({}) }
+  },
+  computed: {
+    imageUrl() {
+      return SIP.getPicture(this.value)
+    }
+  }
+}
+</script>
