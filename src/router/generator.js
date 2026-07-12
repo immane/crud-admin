@@ -25,6 +25,12 @@ export const r = (entityName, title, meta = { title: title, icon: 'el-icon-caret
     hidden: true
   },
   {
+    path: `/dummy/${entityPath}/:id/detail`,
+    redirect: `/${entityPath}/:id/detail`,
+    name: `${entityName}Detail`,
+    hidden: true
+  },
+  {
     path: `/dummy/${entityPath}/list`,
     redirect: `/${entityPath}/list`,
     name: `${entityName}List`,
@@ -37,6 +43,7 @@ export const g = (entityName, title, meta = { title: title, icon: 'el-icon-caret
   const entityPath = inflect.dasherize(inflect.underscore(entityName))
   const formComponent = viewComponents[`../views/${entityPath}/form.vue`]
   const listComponent = viewComponents[`../views/${entityPath}/list.vue`]
+  const detailComponent = viewComponents[`../views/${entityPath}/detail.vue`] || (() => import('../views/admin/detail.vue'))
   return [{
     path: `/${entityPath}/create`,
     name: `${entityName}Create`,
@@ -48,6 +55,13 @@ export const g = (entityName, title, meta = { title: title, icon: 'el-icon-caret
     name: `${entityName}Update`,
     hidden: true,
     component: formComponent
+  },
+  {
+    path: `/${entityPath}/:id/detail`,
+    name: `${entityName}Detail`,
+    hidden: true,
+    component: detailComponent,
+    props: { entityParam: entityPath }
   },
   {
     path: `/${entityPath}/list`,

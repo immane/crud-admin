@@ -233,6 +233,20 @@
             &emsp;
 
             <slot name="action" :data="scope.row">
+              <slot name="action:detail" :data="scope.row">
+                <el-button
+                  v-if="config && !disabledActions.includes('detail')"
+                  size="small"
+                  icon="el-icon-view"
+                  plain
+                  @click="$router.push({ name: `${em.name}Detail`, params: { id: scope.row.id } })"
+                >
+                  详情
+                </el-button>
+              </slot>
+
+              &nbsp;&nbsp;
+
               <slot name="action:edit" :data="scope.row">
                 <!-- Popup dialog -->
                 <el-button
@@ -532,7 +546,7 @@ export default {
     },
 
     // Disable default actions
-    // sample: ['new', 'edit', 'delete', 'lines', 'pager']
+    // sample: ['new', 'detail', 'edit', 'delete', 'lines', 'pager']
     disabledActions: {
       type: Array,
       default: () => []
@@ -646,16 +660,16 @@ export default {
                       formTitle: () => { return <span/> },
                       action: scope => {
                         return (
-                            <el-button
-                              type='primary' icon='el-icon-edit-outline'
-                              onClick={() => {
-                                scope.submit(() => {
-                                  this.$message({ message: '数据修改成功', type: 'success' })
-                                  this.data.dialog.show = false
-                                })
-                              }}>
+                          <el-button
+                            type='primary' icon='el-icon-edit-outline'
+                            onClick={() => {
+                              scope.submit(() => {
+                                this.$message({ message: '数据修改成功', type: 'success' })
+                                this.data.dialog.show = false
+                              })
+                            }}>
                               保存
-                            </el-button>
+                          </el-button>
                         )
                       }
                     }

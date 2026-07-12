@@ -80,6 +80,12 @@ export const lastRoutes = [
         component: () => import('@/views/admin/form')
       },
       {
+        path: `/:entityParam/:id/detail`,
+        name: `EasyAdminDetail`,
+        hidden: true,
+        component: () => import('@/views/admin/detail')
+      },
+      {
         path: `/:entityParam/list`,
         name: `EasyAdminList`,
         component: () => import('@/views/admin/list'),
