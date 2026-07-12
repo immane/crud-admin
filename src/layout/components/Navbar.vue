@@ -11,6 +11,11 @@
 
     <div class="right-menu">
 
+      <div class="locale-toggle" @click="toggleLocale">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="locale-icon"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"></path></svg>
+        <span class="locale-label">{{ localeLabel }}</span>
+      </div>
+
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <img :src="avatar" class="user-avatar">
@@ -38,17 +43,32 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { setLocale } from '@/i18n'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 
 export default {
   components: { Breadcrumb, Hamburger },
+  data() {
+    return {
+      currentLocale: localStorage.getItem('app_locale') || (navigator.language.startsWith('zh') ? 'zh' : 'en')
+    }
+  },
   computed: {
-    ...mapGetters(['sidebar', 'avatar', 'name'])
+    ...mapGetters(['sidebar', 'avatar', 'name']),
+    localeLabel() {
+      return this.currentLocale === 'zh' ? 'EN' : '中文'
+    }
   },
   methods: {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
+    },
+    toggleLocale() {
+      const next = this.currentLocale === 'zh' ? 'en' : 'zh'
+      setLocale(next)
+      this.currentLocale = next
+      window.location.reload()
     },
     async clearCache() {
       await this.$store.dispatch('entity/reset')
@@ -72,7 +92,7 @@ export default {
     &:hover { background: rgba(0, 0, 0, .025) }
   }
   .breadcrumb-container { float: left; }
-  .right-menu { float: right; height: 100%; line-height: 50px;
+  .right-menu { float: right; height: 100%; line-height: 50px; display: flex; align-items: center;
     &:focus { outline: none; }
     .right-menu-item { display: inline-block; padding: 0 8px; height: 100%; font-size: 18px; color: #5a5e66; vertical-align: text-bottom;
       &.hover-effect { cursor: pointer; transition: background .3s;
@@ -87,4 +107,9 @@ export default {
     }
   }
 }
+.locale-toggle { display: flex; align-items: center; gap: 4px; margin-right: 18px; padding: 0 6px; cursor: pointer; border-radius: 4px; transition: background .3s;
+  &:hover { background: rgba(0,0,0,.04); }
+}
+.locale-icon { width: 18px; height: 18px; fill: #5a5e66; }
+.locale-label { font-size: 12px; color: #5a5e66; font-weight: 500; user-select: none; }
 </style>
