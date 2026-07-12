@@ -60,8 +60,6 @@ export default defineConfig(({ mode }) => {
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
       alias: {
         '@': resolve('src')
-        ,
-        vue: '@vue/compat'
       }
     },
     server: {

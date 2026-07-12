@@ -14,7 +14,7 @@
     v-on="field.type_events"
   >
     <el-button size="small" type="primary">点击选择文件</el-button>
-    <div slot="tip" class="el-upload__tip">上传文件必须少于100MB</div>
+    <template #tip><div class="el-upload__tip">上传文件必须少于100MB</div></template>
   </el-upload>
 </template>
 

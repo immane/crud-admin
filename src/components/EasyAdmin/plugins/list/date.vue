@@ -1,7 +1,7 @@
 <template>
   <span v-if="value">
     <i class="el-icon-time" />
-    {{ new Date(value) | dateFormat('YYYY-MM-DD') }}
+    {{ formatDate(value) }}
   </span>
 </template>
 
@@ -13,6 +13,13 @@ export default {
     scope: { type: Object, default: () => ({}) },
     em: { type: Object, default: () => ({}) },
     struct: { type: Object, default: () => ({}) }
+  },
+  methods: {
+    formatDate(value) {
+      const date = new Date(value)
+      if (Number.isNaN(date.getTime())) return ''
+      return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-')
+    }
   }
 }
 </script>

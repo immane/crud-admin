@@ -5,7 +5,7 @@
         <slot name="formTitle">
           <strong style="font-size: 20px;">
             <!-- Title slot here -->
-            {{ $router.currentRoute.meta.title }}
+            {{ $route.meta.title }}
             新增 / 修改
           </strong>
         </slot>
@@ -158,7 +158,7 @@ export default {
       type: Number,
       default: () => 0
     },
-    value: {
+    modelValue: {
       type: Object,
       default: () => { return {} }
     },
@@ -237,8 +237,7 @@ export default {
         // TODO: Is here need cleaning blank values?
         // this.cleanBlankAttributes(this.form)
 
-        // Merge this.form => this.value
-        Object.assign(this.value, this.form)
+        this.$emit('update:modelValue', { ...this.modelValue, ...this.form })
       },
       deep: true
     }
@@ -338,7 +337,7 @@ export default {
 
     setDefaultData() {
       // default value process
-      const form = Object.assign({}, this.value)
+      const form = Object.assign({}, this.modelValue)
       for (const field of this.plainFields) {
         const property = this.properties.find(prop => field === prop.property)
         // All fields

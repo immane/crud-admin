@@ -58,7 +58,7 @@ export default {
   async mounted() {
     this.createEditor()
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.editor) {
       this.editor.destroy()
       this.editor = null
@@ -73,7 +73,7 @@ export default {
           try {
             const json = this.editor.get()
             this.internalValue = json
-            this.$set(this.form, this.field.property, json)
+            this.form[this.field.property] = json
           } catch (e) {
             // invalid JSON, keep existing value
           }

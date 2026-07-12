@@ -17,7 +17,6 @@
     },
     "main": "background.js",
     "dependencies": {
-        "@vue/compat": "^3.5.13",
         "axios": "0.21.1",
         "core-js": "3.6.5",
         "element-plus": "^2.9.7",

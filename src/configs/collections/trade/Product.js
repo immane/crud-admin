@@ -40,10 +40,10 @@ const SpecificationManager = {
   },
   created() {
     if (!Array.isArray(this.form.specifications)) {
-      this.$set(this.form, 'specifications', [])
+      this.form.specifications = []
     }
   },
-  render(h) {
+  render() {
     const spec = specificationConfig.Specification
 
     if (!this.productId) {
@@ -55,12 +55,12 @@ const SpecificationManager = {
           >增加</el-button>
           {this.form.specifications.map((item, index) => (
             <div key={index}>
-              <form-admin
-                value={this.form.specifications[index]}
-                onInput={(v) => { this.$set(this.form.specifications, index, v) }}
+              <FormAdmin
+                modelValue={this.form.specifications[index]}
+                {...{ 'onUpdate:modelValue': v => { this.form.specifications[index] = v } }}
                 entity-conf={'Specification'}
                 fields={this.inlineFields}
-                scopedSlots={{ action: () => <span /> }}
+                v-slots={{ action: () => <span /> }}
               />
               <p style={{ textAlign: 'right' }}>
                 <el-button
@@ -76,13 +76,13 @@ const SpecificationManager = {
 
     return (
       <div>
-        <list-admin
+        <ListAdmin
           key={this.refreshKey}
           entity-conf={this.specEntityConf}
           list-display={spec.list.list_display}
           list-filter={spec.list.list_filter}
           query={{ '@order': 'entity.sort|ASC, entity.id|DESC' }}
-          scopedSlots={{
+          v-slots={{
             topButton: () => (
               <el-button
                 size={'medium'} type={'primary'} icon={'el-icon-plus'} plain
@@ -110,21 +110,21 @@ const SpecificationManager = {
 
         <el-dialog
           title={this.specId ? '更新规格' : '新增规格'}
-          visible={this.dialogShow}
-          on={{
-            'update:visible': (v) => { this.dialogShow = v },
-            closed: () => { this.refreshKey++ }
+          modelValue={this.dialogShow}
+          {...{
+            'onUpdate:modelValue': v => { this.dialogShow = v },
+            onClosed: () => { this.refreshKey++ }
           }}
           width={'40%'}
         >
-          <form-admin
+          <FormAdmin
             key={this.refreshKey}
             id={this.specId}
-            value={this.specForm}
-            onInput={(v) => { this.specForm = v }}
+            modelValue={this.specForm}
+            {...{ 'onUpdate:modelValue': v => { this.specForm = v } }}
             entity-conf={this.specEntityConf}
             fields={spec.form.fields}
-            scopedSlots={{
+            v-slots={{
               action: ({ submit }) => (
                 <el-button
                   type={'primary'} icon={'el-icon-edit-outline'}

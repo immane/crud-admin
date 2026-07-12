@@ -1,4 +1,4 @@
-import { configureCompat, createApp } from 'vue'
+import { createApp } from 'vue'
 
 import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 
@@ -12,15 +12,14 @@ import App from './App'
 import store from './store'
 import router from './router'
 
-import '@/icons' // icon
+import installIcons from '@/icons'
 import '@/permission' // permission control
 
 import request from '@/utils/request'
 import $getValue from 'get-value'
 
-configureCompat({ MODE: 2 })
-
 const app = createApp(App)
+installIcons(app)
 app.config.globalProperties.$getValue = $getValue
 app.config.globalProperties.axios = request
 app.directive('fit-columns', { mounted: () => {} })

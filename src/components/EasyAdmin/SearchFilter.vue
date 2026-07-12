@@ -34,7 +34,7 @@
         size="medium"
         clearable
       >
-        <i slot="prefix" class="el-input__icon el-icon-search" />
+        <template #prefix><i class="el-input__icon el-icon-search" /></template>
       </el-input>
 
       <!-- Boolean -->
@@ -273,13 +273,7 @@ export default {
           filter[key] = field
         }
 
-        // ///////////////////////////////////////////////////////
-        // Set default value
-        // DO NOT USE non-responsive set value
-        // this.value[key] = filter[key]['default']
-        //
-        // Responsive set
-        this.$set(this.value, key, filter[key]['default'])
+        this.value[key] = filter[key]['default']
       }
 
       for (const key in this.listFilter) {

@@ -17,7 +17,7 @@
           <search-filter
             v-model="listFilterData"
             :query="query"
-            :filter.sync="filter"
+            v-model:filter="filter"
             :fetch-data-func="fetchFilteredData"
             :list-filter="listFilter"
           />
@@ -121,7 +121,7 @@
               dialog.show = true
             }"
           >
-            新增{{ $router.currentRoute.meta.title }}
+            新增{{ $route.meta.title }}
           </el-button>
         </slot>
       </el-col>
@@ -160,9 +160,7 @@
           v-bind="field.field_options"
           v-on="field.field_events"
         >
-          <template
-            slot-scope="scope"
-          >
+          <template #default="scope">
 
             <!---------------
             |  Fields slot  |
@@ -211,7 +209,7 @@
                 </template>
 
                 <span v-else>
-                  {{ extractFields(scope.row, field.property) | htmlStrip }}
+                  {{ htmlStrip(extractFields(scope.row, field.property)) }}
                 </span>
               </div>
             </slot>
@@ -219,7 +217,7 @@
         </el-table-column>
 
         <el-table-column v-if="!disabledActions.includes('lines')" label="操作">
-          <template slot-scope="scope">
+          <template #default="scope">
             <component
               :is="action.component"
               v-for="action in actions.filter(action => action.position === 'list')"
@@ -268,8 +266,8 @@
               &nbsp;&nbsp;
 
               <slot name="action:delete" :data="scope.row">
-                <el-popconfirm v-if="!disabledActions.includes('delete')" title="确定删除当前记录？" @onConfirm="removeAction(scope.row.id)">
-                  <el-button slot="reference" size="small" type="danger" icon="el-icon-delete" plain>删除</el-button>
+                <el-popconfirm v-if="!disabledActions.includes('delete')" title="确定删除当前记录？" @confirm="removeAction(scope.row.id)">
+                  <template #reference><el-button size="small" type="danger" icon="el-icon-delete" plain>删除</el-button></template>
                 </el-popconfirm>
               </slot>
             </slot>
@@ -281,9 +279,9 @@
     <el-row v-if="!disabledActions.includes('pager')">
       <div class="block">
         <el-pagination
-          :current-page.sync="pager.page"
+          v-model:current-page="pager.page"
           :page-sizes="[20, 50, 100, 300]"
-          :page-size="pager.limit"
+          v-model:page-size="pager.limit"
           layout="total, sizes, prev, pager, next, jumper"
           :total="pagerTotal"
           @size-change="handleSizeChange"
@@ -297,7 +295,7 @@
         class="easy-admin-dialog"
         width="80%"
         :title="dialog.title"
-        :visible.sync="dialog.show"
+        v-model="dialog.show"
         top="0"
         @closed="fetchData"
       >
@@ -377,12 +375,6 @@ export default {
   name: 'ListAdmin',
   components: { SearchFilter },
 
-  filters: {
-    boolFilter(status) { return { false: 'danger', true: 'success' }[status] },
-    boolDisplay(status) { return { false: '否', true: '是' }[status] },
-    htmlStrip(text) { return text ? String(text).replace(/<[^>]*>/g, '') : '' }
-  },
-
   props: {
     /**
      * Main config
@@ -414,8 +406,7 @@ export default {
       default: () => {}
     },
 
-    // v-model
-    value: {
+    modelValue: {
       type: Array,
       default: () => []
     },
@@ -649,30 +640,26 @@ export default {
             },
             render(h) {
               return (
-                <form-admin
+                <FormAdmin
                   id={this.data?.id}
                   entity-conf={this.data?.entityConf}
                   fields={this.data?.fields}
                   config={this.data?.config}
 
-                  { ... {
-                    scopedSlots: {
-                      formTitle: () => { return <span/> },
-                      action: scope => {
-                        return (
-                          <el-button
-                            type='primary' icon='el-icon-edit-outline'
-                            onClick={() => {
-                              scope.submit(() => {
-                                this.$message({ message: '数据修改成功', type: 'success' })
-                                this.data.dialog.show = false
-                              })
-                            }}>
-                              保存
-                          </el-button>
-                        )
-                      }
-                    }
+                  v-slots={{
+                    formTitle: () => <span />,
+                    action: ({ submit }) => (
+                      <el-button
+                        type='primary' icon='el-icon-edit-outline'
+                        onClick={() => {
+                          submit(() => {
+                            this.$message({ message: '数据修改成功', type: 'success' })
+                            this.data.dialog.show = false
+                          })
+                        }}>
+                        保存
+                      </el-button>
+                    )
                   }}
                 />
               )
@@ -694,7 +681,7 @@ export default {
   },
 
   watch: {
-    value: {
+    modelValue: {
       handler: function(value) {
         this.list = value
         // this.refreshTable++
@@ -703,7 +690,7 @@ export default {
     },
     list: {
       handler: function(value) {
-        this.$emit('input', value)
+        this.$emit('update:modelValue', value)
       },
       deep: true
     }
@@ -736,6 +723,10 @@ export default {
   methods: {
     uiFeedback() {
       return createUiFeedback(this)
+    },
+
+    htmlStrip(text) {
+      return text ? String(text).replace(/<[^>]*>/g, '') : ''
     },
 
     startLoading(options = {}) {
