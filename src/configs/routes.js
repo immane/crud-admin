@@ -3,7 +3,7 @@ import Layout from '@/layout'
 
 export default [
   {
-    path: '/catalog', name: 'CatalogManage', component: Layout,
+    path: '/product', name: 'ProductManage', component: Layout,
     meta: { title: '商品管理', icon: 'el-icon-goods', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
       ...r('Product', '商品')
@@ -15,7 +15,17 @@ export default [
     meta: { title: '订单管理', icon: 'el-icon-s-order', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
       ...r('Order', '订单'),
-      ...r('Invoice', '发票')
+      ...r('Invoice', '发票'),
+      ...r('OrderItem', '订单明细')
+    ]
+  },
+
+  {
+    path: '/promotion', name: 'PromotionManage', component: Layout,
+    meta: { title: '促销管理', icon: 'el-icon-s-promotion', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    children: [
+      ...r('Promotion', '促销活动'),
+      ...r('PromotionTemplate', '促销模板')
     ]
   },
 
@@ -35,7 +45,8 @@ export default [
     meta: { title: '钱包管理', icon: 'el-icon-money', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
       ...r('Wallet', '钱包'),
-      ...r('WalletTransaction', '交易记录')
+      ...r('WalletTransaction', '交易记录'),
+      ...r('WalletPaymentDeduction', '支付扣款')
     ]
   },
 
@@ -44,6 +55,7 @@ export default [
     meta: { title: '用户管理', icon: 'el-icon-user', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
       ...r('User', '用户'),
+      ...r('Profile', '用户资料'),
       ...r('WechatUser', '微信用户')
     ]
   },
