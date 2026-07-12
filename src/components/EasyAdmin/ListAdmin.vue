@@ -437,10 +437,18 @@
 
 ::v-deep .easy-admin-dialog {
   display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+::v-deep .easy-admin-dialog .el-dialog {
+  display: flex;
   flex-direction: column;
-  max-height: 85vh;
+  min-height: 320px;
+  max-height: 80vh;
   max-width: 1200px;
-  margin: 0 auto !important;
+  margin: 0 !important;
 }
 
 ::v-deep .easy-admin-dialog .el-dialog__header {
@@ -448,17 +456,13 @@
 }
 
 ::v-deep .easy-admin-dialog .el-dialog__body {
+  min-height: 0;
   overflow-y: auto;
   flex: 1;
 }
-</style>
 
-<style>
-.el-dialog__wrapper {
-  display: flex;
-  align-items: center !important;
-  justify-content: center !important;
-  overflow: hidden !important;
+::v-deep .easy-admin-dialog .el-dialog__footer {
+  flex-shrink: 0;
 }
 </style>
 
