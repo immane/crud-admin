@@ -41,7 +41,6 @@
           <div
             v-for="field in properties"
             :key="field.property"
-            :set="currentStruct = structure[field.property]"
           >
             <template
               v-if="
@@ -55,7 +54,7 @@
                   (Object.keys(field).includes('field_options') &&
                     Object.keys(field.field_options).includes('label'))
                     ? field.field_options.label
-                    : (currentStruct ? currentStruct['translation']: field.property)
+                    : (structure[field.property] ? structure[field.property]['translation']: field.property)
                 "
                 :prop="field.property"
                 v-bind="field.field_options"
@@ -87,10 +86,10 @@
                     :name="field.property"
                     :form="form"
                     :value="form[field.property]"
-                    :struct="currentStruct"
+                    :struct="structure[field.property]"
                   >
                     <component
-                      :is="loadPlugin(resolvePluginType(field, currentStruct))"
+                      :is="loadPlugin(resolvePluginType(field, structure[field.property]))"
                       :em-prefix="em.prefix"
                       :form="form"
                       :field="field"
