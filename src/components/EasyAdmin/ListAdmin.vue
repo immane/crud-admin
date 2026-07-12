@@ -15,11 +15,13 @@
         <!-- Top filter or searcher slot-->
         <slot name="filter">
           <search-filter
+            ref="searchFilter"
             v-model="listFilterData"
             v-model:filter="filter"
             :query="query"
             :fetch-data-func="fetchFilteredData"
             :list-filter="listFilter"
+            @reset="resetSearch"
           />
         </slot>
 
@@ -269,8 +271,8 @@
     <el-row v-if="!disabledActions.includes('pager')">
       <div class="block">
         <el-pagination
-          v-model:current-page="pager.page"
-          v-model:page-size="pager.limit"
+          :current-page="pager.page"
+          :page-size="pager.limit"
           :page-sizes="[20, 50, 100, 300]"
           layout="total, sizes, prev, pager, next, jumper"
           :total="pagerTotal"
@@ -600,7 +602,6 @@ export default {
     modelValue: {
       handler: function(value) {
         this.list = value
-        // this.refreshTable++
       },
       deep: true
     },
@@ -609,15 +610,36 @@ export default {
         this.$emit('update:modelValue', value)
       },
       deep: true
+    },
+    listFilterData: {
+      handler() { this.syncToUrl() },
+      deep: true
+    },
+    '$route.query': {
+      handler(query) {
+        this.applyQueryParams(query)
+        this.$nextTick(() => {
+          this.$refs.searchFilter?.filterGenerate()
+          this.fetchData()
+        })
+      }
     }
   },
 
+  beforeUnmount() {
+    clearTimeout(this._syncTimer)
+  },
   async created() {
     // Process router convert
     this.routeProcess()
 
     // Process entity and structure properties
     this.propertieProcess()
+
+    // Restore filter and pager from URL query params
+    if (Object.keys(this.$route.query).length) {
+      this.applyQueryParams(this.$route.query)
+    }
 
     // Initialize the reusable edit dialog data.
     this.loadDialogComponent(
@@ -636,6 +658,44 @@ export default {
   },
 
   methods: {
+    buildQueryParams() {
+      const query = {}
+      for (const key of Object.keys(this.listFilterData)) {
+        if (this.listFilterData[key] != null && this.listFilterData[key] !== '') {
+          query[key] = this.listFilterData[key]
+        }
+      }
+      if (this.pager.page !== 1) query.page = String(this.pager.page)
+      if (this.pager.limit !== 20) query.limit = String(this.pager.limit)
+      return query
+    },
+    syncToUrl() {
+      clearTimeout(this._syncTimer)
+      this._syncTimer = setTimeout(() => {
+        const qs = new URLSearchParams(this.buildQueryParams()).toString()
+        const normalizedUrl = qs
+          ? `${window.location.pathname}?${qs}${window.location.hash}`
+          : window.location.pathname + window.location.hash
+        if (normalizedUrl !== window.location.pathname + window.location.search + window.location.hash) {
+          window.history.replaceState(null, '', normalizedUrl)
+        }
+      }, 50)
+    },
+    applyQueryParams(query) {
+      const filterData = {}
+      for (const key of Object.keys(query)) {
+        if (key === 'page') {
+          this.pager.page = Math.max(1, Number(query[key]) || 1)
+        } else if (key === 'limit') {
+          this.pager.limit = Math.max(1, Number(query[key]) || 20)
+        } else {
+          filterData[key] = query[key]
+        }
+      }
+      if (!Object.hasOwn(query, 'page')) this.pager.page = 1
+      if (!Object.hasOwn(query, 'limit')) this.pager.limit = 20
+      this.listFilterData = filterData
+    },
     uiFeedback() {
       return createUiFeedback(this)
     },
@@ -764,8 +824,14 @@ export default {
       this.dataProcessor(this)
     },
 
-    fetchFilteredData() {
+    fetchFilteredData(_searchFilter, resetPage = true) {
+      if (resetPage) this.pager.page = 1
+      this.fetchData()
+    },
+
+    resetSearch() {
       this.pager.page = 1
+      this.pager.limit = 20
       this.fetchData()
     },
 
@@ -789,12 +855,13 @@ export default {
     handleSizeChange(val) {
       this.pager.limit = val
       this.pager.page = 1
+      this.syncToUrl()
       this.fetchData()
     },
 
-    // Pager page changed
     handleCurrentChange(val) {
       this.pager.page = val
+      this.syncToUrl()
       this.fetchData()
     },
 

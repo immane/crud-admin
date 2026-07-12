@@ -56,6 +56,8 @@ src/
 │   ├── routes.js         # Menu/route definitions
 │   ├── entities.js       # Auto-loader (import.meta.glob)
 │   └── collections/      # Entity schema definitions (per bundle)
+├── i18n/                        # Locale files (en, zh, zh-Hant, ja)
+│   └── index.js                 # i18n plugin + browser detection
 ├── icons/                # SVG icons (sprite + legacy compat map)
 │   ├── index.js          # installIcons: SVGO sprite + global svg-icon component
 │   ├── legacy-icons.js   # installLegacyIcons: el-icon-* → @element-plus/icons-vue
@@ -378,6 +380,30 @@ The `json.vue` form plugin uses the vanilla `jsoneditor` library directly from n
 - `@closed="fetchData"` refreshes list data via API after dialog close.
 - `v-model` replaces the old `.sync` modifier for Vue 3.
 
+### URL Search Params Sync
+
+`ListAdmin` syncs search filter state and pagination to the browser URL using `history.replaceState`:
+
+- `ListAdmin.syncToUrl()` — debounced (50ms) function that reads `listFilterData`, `pager.page`, and `pager.limit`, builds a query string, and replaces the current URL.
+- Called from `listFilterData` deep watcher (filter changes) and `handleCurrentChange` / `handleSizeChange` (pagination changes).
+- `ListAdmin.created()` reads `$route.query` to restore filters (`listFilterData`) and pager (`page`, `limit`) on page load.
+- `window.addEventListener('popstate', ...)` handles browser back/forward navigation, re-applying query params.
+
+### Internationalization — Flat Keys
+
+The i18n system uses **flat English strings as translation keys** instead of nested dot notation:
+
+```js
+// Instead of: $t('easyAdmin.newEdit')
+// Use:        $t('New / Edit')
+```
+
+- Detected locale is persisted in `localStorage`. Navbar dropdown allows switching (clears entity cache, reloads page).
+- Locale is injected into every Axios request via `Accept-Language` header and `_locale` query parameter.
+- Supported: `en` (default), `zh`, `zh-Hant`, `ja`. Element Plus locale syncs automatically.
+- `routes.js` and all entity configs use `import { t } from '@/i18n'` to translate titles and labels.
+- Adding a new language: create `src/i18n/{code}.js`, register in `i18n/index.js`, add to Navbar dropdown.
+
 ### Auto Token Refresh
 
 - Axios interceptor catches HTTP 401 and business code 401 in `src/utils/request.ts`
@@ -408,6 +434,11 @@ The `json.vue` form plugin uses the vanilla `jsoneditor` library directly from n
 | EasyAdmin Design | `docs/design/easyadmin-design.md` |
 | EasyAdmin Config Contract | `docs/design/easyadmin-config-contract.md` |
 | Migration Plan | `docs/plan/vue3-tsx-vite-migration.md` |
+| AI Context (this file) | `docs/ai/context.md` |
+| README (English) | `README.md` |
+| README (简体中文) | `README.zh-cn.md` |
+| README (繁體中文) | `README.zh-Hant.md` |
+| README (日本語) | `README.ja.md` |
 
 ## Migration Notes (Vue 2 → Vue 3)
 

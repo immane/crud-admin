@@ -1,9 +1,10 @@
 <template>
   <div :style="{ display: 'flex', flexWrap: 'wrap' }">
     <template v-for="(item, index) in visibleItems" :key="index">
-      <el-tag :style="{ margin: '2px' }">
-        {{ item.__toString || '' }}
-      </el-tag>
+      <router-link v-if="detailRoute(item)" :to="detailRoute(item)">
+        <el-tag :style="{ margin: '2px' }">{{ item.__toString || '' }}</el-tag>
+      </router-link>
+      <el-tag v-else :style="{ margin: '2px' }">{{ item.__toString || '' }}</el-tag>
     </template>
 
     <template v-if="overflowCount > 0">
@@ -17,9 +18,10 @@
             :key="index"
             style="max-width: 50vw; overflow-y: scroll; display: flex; flex-wrap: wrap;"
           >
-            <el-tag :style="{ margin: '2px' }">
-              {{ item.__toString || '' }}
-            </el-tag>
+            <router-link v-if="detailRoute(item)" :to="detailRoute(item)">
+              <el-tag :style="{ margin: '2px' }">{{ item.__toString || '' }}</el-tag>
+            </router-link>
+            <el-tag v-else :style="{ margin: '2px' }">{{ item.__toString || '' }}</el-tag>
           </div>
         </template>
       </el-tooltip>
@@ -44,6 +46,17 @@ export default {
     overflowCount() {
       if (!Array.isArray(this.value)) return 0
       return Math.max(0, this.value.length - 5)
+    },
+    targetEntity() {
+      return this.field?.type_options?.entity_name?.split('\\').pop()
+        || this.struct?.metadata?.targetEntity?.split('\\').pop()
+    }
+  },
+  methods: {
+    detailRoute(item) {
+      if (item?.id == null || !this.targetEntity) return null
+      const name = `${this.targetEntity}Detail`
+      return this.$router.hasRoute(name) ? { name, params: { id: item.id } } : null
     }
   }
 }

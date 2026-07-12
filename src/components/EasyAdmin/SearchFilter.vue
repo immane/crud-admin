@@ -68,11 +68,19 @@
       v-if="Object.keys(filters).length"
       size="default"
       icon="el-icon-search"
-      style="margin-right: 1em"
+      style="margin-right: -0.5em;"
       circle
       @click="filterGenerate(); fetchData();"
     />
 
+    <el-button
+      v-if="Object.keys(filters).length"
+      size="default"
+      icon="el-icon-refresh"
+      title="Reset search"
+      circle
+      @click="reset"
+    />
   </span>
 </template>
 
@@ -211,13 +219,22 @@ export default {
     // Process filter
     await this.filterProcess()
 
+    // Restore any values already present in modelValue (from URL / parent)
+    if (this.modelValue) {
+      for (const key of Object.keys(this.modelValue)) {
+        if (this.modelValue[key] != null && this.modelValue[key] !== '') {
+          this.filterData[key] = this.modelValue[key]
+        }
+      }
+    }
+
     // Generate filter
     this.filterGenerate()
 
     /**
      * Fetch base data, like entity structure and validations
      */
-    this.fetchData()
+    this.fetchData(false)
   },
 
   methods: {
@@ -317,9 +334,17 @@ export default {
       this.$emit('update:filter', filter)
     },
 
-    fetchData() {
+    reset() {
+      this.filterData = Object.fromEntries(
+        Object.entries(this.filters).map(([key, filter]) => [key, filter.default])
+      )
+      this.filterGenerate()
+      this.$emit('reset')
+    },
+
+    fetchData(resetPage = true) {
       // data process callback
-      this.fetchDataFunc(this)
+      this.fetchDataFunc(this, resetPage)
     }
   }
 }

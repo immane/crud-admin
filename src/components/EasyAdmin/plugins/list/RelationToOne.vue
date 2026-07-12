@@ -1,5 +1,6 @@
 <template>
-  <span>{{ displayValue }}</span>
+  <router-link class="el-link" v-if="detailRoute" :to="detailRoute">{{ displayValue }}</router-link>
+  <span v-else>{{ displayValue }}</span>
 </template>
 
 <script>
@@ -17,7 +18,22 @@ export default {
         return this.value.__toString
       }
       return ''
+    },
+    targetEntity() {
+      return this.field?.type_options?.entity_name?.split('\\').pop()
+        || this.struct?.metadata?.targetEntity?.split('\\').pop()
+    },
+    detailRoute() {
+      if (this.value?.id == null || !this.targetEntity) return null
+      const name = `${this.targetEntity}Detail`
+      return this.$router.hasRoute(name) ? { name, params: { id: this.value.id } } : null
     }
   }
 }
 </script>
+
+<style scoped>
+el-link {
+  color: #409eff;
+}
+</style>
