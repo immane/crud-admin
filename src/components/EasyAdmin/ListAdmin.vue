@@ -16,8 +16,8 @@
         <slot name="filter">
           <search-filter
             v-model="listFilterData"
-            :query="query"
             v-model:filter="filter"
+            :query="query"
             :fetch-data-func="fetchFilteredData"
             :list-filter="listFilter"
           />
@@ -218,59 +218,61 @@
 
         <el-table-column v-if="!disabledActions.includes('lines')" label="操作">
           <template #default="scope">
-            <component
-              :is="action.component"
-              v-for="action in actions.filter(action => action.position === 'list')"
-              :key="action.name"
-              :record="scope.row"
-              :refresh="fetchData"
-            />
+            <div class="easy-admin-actions">
+              <component
+                :is="action.component"
+                v-for="action in actions.filter(action => action.position === 'list')"
+                :key="action.name"
+                :record="scope.row"
+                :refresh="fetchData"
+              />
 
-            <slot name="extraAction" :data="scope.row" />
+              <slot name="extraAction" :data="scope.row" />
 
             &emsp;
 
-            <slot name="action" :data="scope.row">
-              <slot name="action:detail" :data="scope.row">
-                <el-button
-                  v-if="config && !disabledActions.includes('detail')"
-                  size="small"
-                  icon="el-icon-view"
-                  plain
-                  @click="$router.push({ name: `${em.name}Detail`, params: { id: scope.row.id } })"
-                >
-                  详情
-                </el-button>
-              </slot>
+              <slot name="action" :data="scope.row">
+                <slot name="action:detail" :data="scope.row">
+                  <el-button
+                    v-if="config && !disabledActions.includes('detail')"
+                    size="small"
+                    icon="el-icon-view"
+                    plain
+                    @click="$router.push({ name: `${em.name}Detail`, params: { id: scope.row.id } })"
+                  >
+                    详情
+                  </el-button>
+                </slot>
 
               &nbsp;&nbsp;
 
-              <slot name="action:edit" :data="scope.row">
-                <!-- Popup dialog -->
-                <el-button
-                  v-if="!disabledActions.includes('edit')"
-                  size="small"
-                  icon="el-icon-edit"
-                  plain
-                  @click="() => {
-                    dialog.title = '修改记录'
-                    dialog.data.id = scope.row.id
-                    dialog.refresh++
-                    dialog.show = true
-                  }"
-                >
-                  修改
-                </el-button>
-              </slot>
+                <slot name="action:edit" :data="scope.row">
+                  <!-- Popup dialog -->
+                  <el-button
+                    v-if="!disabledActions.includes('edit')"
+                    size="small"
+                    icon="el-icon-edit"
+                    plain
+                    @click="() => {
+                      dialog.title = '修改记录'
+                      dialog.data.id = scope.row.id
+                      dialog.refresh++
+                      dialog.show = true
+                    }"
+                  >
+                    修改
+                  </el-button>
+                </slot>
 
               &nbsp;&nbsp;
 
-              <slot name="action:delete" :data="scope.row">
-                <el-popconfirm v-if="!disabledActions.includes('delete')" title="确定删除当前记录？" @confirm="removeAction(scope.row.id)">
-                  <template #reference><el-button size="small" type="danger" icon="el-icon-delete" plain>删除</el-button></template>
-                </el-popconfirm>
+                <slot name="action:delete" :data="scope.row">
+                  <el-popconfirm v-if="!disabledActions.includes('delete')" title="确定删除当前记录？" @confirm="removeAction(scope.row.id)">
+                    <template #reference><el-button size="small" type="danger" icon="el-icon-delete" plain>删除</el-button></template>
+                  </el-popconfirm>
+                </slot>
               </slot>
-            </slot>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -280,8 +282,8 @@
       <div class="block">
         <el-pagination
           v-model:current-page="pager.page"
-          :page-sizes="[20, 50, 100, 300]"
           v-model:page-size="pager.limit"
+          :page-sizes="[20, 50, 100, 300]"
           layout="total, sizes, prev, pager, next, jumper"
           :total="pagerTotal"
           @size-change="handleSizeChange"
@@ -292,10 +294,10 @@
 
     <template>
       <el-dialog
+        v-model="dialog.show"
         class="easy-admin-dialog"
         width="80%"
         :title="dialog.title"
-        v-model="dialog.show"
         top="0"
         @closed="fetchData"
       >
@@ -308,49 +310,6 @@
     </template>
   </div>
 </template>
-
-<style scoped>
-.el-row {
-    margin-bottom: 1rem;
-}
-.el-table td, .el-table th {
-    padding: 8px 0;
-}
-
-::v-deep .easy-admin-dialog {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-::v-deep .easy-admin-dialog .el-dialog {
-  display: flex;
-  flex-direction: column;
-  max-height: 80vh;
-  max-width: 1200px;
-  margin: 0 auto !important;
-}
-
-::v-deep .easy-admin-dialog .el-dialog__header {
-  flex-shrink: 0;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #EBEEF5;
-}
-
-::v-deep .easy-admin-dialog .el-dialog__body {
-  min-height: 0;
-  overflow: hidden auto;
-  padding: 8px 20px;
-}
-
-::v-deep .easy-admin-dialog .app-container {
-  padding: 0;
-}
-
-::v-deep .easy-admin-dialog .el-dialog__footer {
-  flex-shrink: 0;
-}
-</style>
 
 <script lang="jsx">
 import { defineAsyncComponent, markRaw, toRaw } from 'vue'
@@ -655,7 +614,7 @@ export default {
                         onClick={() => {
                           submit(() => {
                             this.$message({ message: '数据修改成功', type: 'success' })
-                            this.data.dialog.show = false
+                            this.data.onSaved()
                           })
                         }}>
                         保存
@@ -785,10 +744,13 @@ export default {
 
     loadDialogComponent(data, component = null) {
       if (component) {
-        this.dialog.component = component
+        this.dialog.component = markRaw(component)
       }
       this.dialog.data = data
-      data.dialog = this.dialog
+      data.onSaved = () => {
+        this.dialog.show = false
+        this.fetchData()
+      }
       this.dialog.refresh++
     },
 
@@ -909,3 +871,58 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.el-row {
+    margin-bottom: 1rem;
+}
+.el-table td, .el-table th {
+    padding: 8px 0;
+}
+
+.easy-admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: max-content;
+  white-space: nowrap;
+}
+
+.easy-admin-actions :deep(.el-button + .el-button) {
+  margin-left: 0;
+}
+
+::v-deep .easy-admin-dialog {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+::v-deep .easy-admin-dialog .el-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  max-width: 1200px;
+  margin: 0 auto !important;
+}
+
+::v-deep .easy-admin-dialog .el-dialog__header {
+  flex-shrink: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #EBEEF5;
+}
+
+::v-deep .easy-admin-dialog .el-dialog__body {
+  min-height: 0;
+  overflow: hidden auto;
+  padding: 8px 20px;
+}
+
+::v-deep .easy-admin-dialog .app-container {
+  padding: 0;
+}
+
+::v-deep .easy-admin-dialog .el-dialog__footer {
+  flex-shrink: 0;
+}
+</style>

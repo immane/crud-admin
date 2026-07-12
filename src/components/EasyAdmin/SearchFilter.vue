@@ -5,14 +5,14 @@
       <div v-if="Object.keys(v).includes('component')">
         <component
           :is="v.component"
-          v-model="value[k]"
+          v-model="filterData[k]"
         />
       </div>
 
       <!-- Datetime -->
       <el-date-picker
         v-if="v.type === 'datetime' || v.type === 'date' || v.type === 'time'"
-        v-model="value[k]"
+        v-model="filterData[k]"
         :type="v.type"
         :placeholder="`${v.label ? v.label : k}`"
         style="width: 150px;"
@@ -28,7 +28,7 @@
       <!-- Input -->
       <el-input
         v-else-if="v.type === 'input'"
-        v-model="value[k]"
+        v-model="filterData[k]"
         :placeholder="`${v.label ? v.label : k}`"
         style="width: 150px;"
         size="default"
@@ -40,7 +40,7 @@
       <!-- Boolean -->
       <el-switch
         v-else-if="v.type === 'boolean'"
-        v-model="value[k]"
+        v-model="filterData[k]"
         :inactive-text="`${v.label ? v.label : k}`"
         size="default"
       />
@@ -48,7 +48,7 @@
       <!-- Select -->
       <el-select
         v-else
-        v-model="value[k]"
+        v-model="filterData[k]"
         filterable
         clearable
         :placeholder="`${v.label ? v.label : k}`"
@@ -82,7 +82,7 @@ export default {
 
   props: {
     // v-model
-    value: {
+    modelValue: {
       type: Object,
       default: () => ({})
     },
@@ -193,15 +193,15 @@ export default {
       list: [],
 
       // Translated filter config
-      filters: {}
+      filters: {},
+      filterData: {}
     }
   },
 
   watch: {
-    value: {
+    modelValue: {
       handler: function(value) {
-        this.list = value
-        // this.refreshTable++
+        this.filterData = { ...value }
       },
       deep: true
     }
@@ -273,7 +273,7 @@ export default {
           filter[key] = field
         }
 
-        this.value[key] = filter[key]['default']
+        this.filterData[key] = filter[key]['default']
       }
 
       for (const key in this.listFilter) {
@@ -302,8 +302,8 @@ export default {
         filter['@filter'] = this.query['@filter']
       }
 
-      for (const key in this.value) {
-        const value = this.value[key]
+      for (const key in this.filterData) {
+        const value = this.filterData[key]
         if (value) {
           const expression = this.filters[key].expression.replaceAll(':value', value)
           if (filter['@filter']) {
@@ -313,6 +313,7 @@ export default {
           }
         }
       }
+      this.$emit('update:modelValue', { ...this.filterData })
       this.$emit('update:filter', filter)
     },
 

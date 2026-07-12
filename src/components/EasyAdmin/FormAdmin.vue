@@ -223,7 +223,7 @@ export default {
 
       // tabs
       tabs: new Set(['默认']),
-      activeTab: 0,
+      activeTab: '0',
 
       // translated fields
       properties: [],
