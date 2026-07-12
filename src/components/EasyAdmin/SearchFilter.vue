@@ -211,6 +211,15 @@ export default {
     // Process filter
     await this.filterProcess()
 
+    // Restore any values already present in modelValue (from URL / parent)
+    if (this.modelValue) {
+      for (const key of Object.keys(this.modelValue)) {
+        if (this.modelValue[key] != null && this.modelValue[key] !== '') {
+          this.filterData[key] = this.modelValue[key]
+        }
+      }
+    }
+
     // Generate filter
     this.filterGenerate()
 

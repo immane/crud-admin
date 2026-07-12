@@ -600,7 +600,6 @@ export default {
     modelValue: {
       handler: function(value) {
         this.list = value
-        // this.refreshTable++
       },
       deep: true
     },
@@ -609,6 +608,28 @@ export default {
         this.$emit('update:modelValue', value)
       },
       deep: true
+    },
+    listFilterData: {
+      handler(value) {
+        if (this._syncing) return
+        const query = {}
+        for (const key of Object.keys(value)) {
+          if (value[key] != null && value[key] !== '') query[key] = value[key]
+        }
+        this._syncing = true
+        this.$router.replace({ query }).finally(() => { this._syncing = false })
+      },
+      deep: true
+    },
+    '$route.query': {
+      handler(query) {
+        if (this._syncing) return
+        if (Object.keys(query).length) {
+          this._syncing = true
+          this.listFilterData = { ...query }
+          this.$nextTick(() => { this._syncing = false })
+        }
+      }
     }
   },
 
@@ -618,6 +639,11 @@ export default {
 
     // Process entity and structure properties
     this.propertieProcess()
+
+    // Restore filter from URL query params
+    if (Object.keys(this.$route.query).length) {
+      this.listFilterData = { ...this.$route.query }
+    }
 
     // Initialize the reusable edit dialog data.
     this.loadDialogComponent(
