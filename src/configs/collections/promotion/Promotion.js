@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 
 export default {
@@ -13,9 +14,9 @@ export default {
         { property: 'config', type: 'json', required: false },
         { property: 'conflictMode', type: 'select', default_value: 'stackable', type_options: {
           options: [
-            { value: 'stackable', label: 'Stackable' },
-            { value: 'exclusive', label: 'Exclusive' },
-            { value: 'priority', label: 'By Priority' }
+            { value: 'stackable', label: t('entity.stackable') },
+            { value: 'exclusive', label: t('entity.exclusive') },
+            { value: 'priority', label: t('entity.byPriority') }
           ]
         }}
       ]
@@ -23,40 +24,18 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        name: 'Promotion Name',
-        storeCode: 'Store Code',
+        name: t('entity.promotionName'),
+        storeCode: t('entity.storeCode'),
         enabled: {
-          label: 'Enabled',
+          label: t('entity.enabled'),
           type: 'boolean',
           expression: 'entity.getEnabled() == :value'
         }
       },
-      list_display: [
-        'id',
-        'name',
-        'enabled',
-        'startTime',
-        'endTime',
-        'conflictMode',
-        'template',
-        'createdAt'
-      ]
+      list_display: ['id', 'name', 'enabled', 'startTime', 'endTime', 'conflictMode', 'template', 'createdAt']
     },
     detail: {
-      detail_display: [
-        'id',
-        'name',
-        'enabled',
-        { property: 'description', type: 'text', full_width: true },
-        'storeCode',
-        'startTime',
-        'endTime',
-        'conflictMode',
-        'template',
-        { property: 'config', type: 'json', full_width: true },
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { orderByIdDesc, statusFilterLabel } from '../helpers'
 import ListAdmin from '@/components/EasyAdmin/ListAdmin'
 import FormAdmin from '@/components/EasyAdmin/FormAdmin'
@@ -52,7 +53,7 @@ const SpecificationManager = {
           <el-button
             size={'default'} type={'primary'} icon={'el-icon-plus'} plain
             onClick={() => { this.form.specifications.push({}) }}
-          >Add</el-button>
+          >{t('easyAdmin.add')}</el-button>
           {this.form.specifications.map((item, index) => (
             <div key={index}>
               <FormAdmin
@@ -92,7 +93,7 @@ const SpecificationManager = {
                   this.refreshKey++
                   this.dialogShow = true
                 }}
-              >New</el-button>
+              >{t('easyAdmin.new')}</el-button>
             ),
             'action:edit': ({ data }) => (
               <el-button
@@ -103,13 +104,13 @@ const SpecificationManager = {
                   this.refreshKey++
                   this.dialogShow = true
                 }}
-              >Edit</el-button>
+              >{t('easyAdmin.edit')}</el-button>
             )
           }}
         />
 
         <el-dialog
-          title={this.specId ? 'Update Spec' : 'New Spec'}
+          title={this.specId ? t('entity.updateSpec') : t('entity.newSpec')}
           modelValue={this.dialogShow}
           {...{
             'onUpdate:modelValue': v => { this.dialogShow = v },
@@ -130,13 +131,13 @@ const SpecificationManager = {
                   type={'primary'} icon={'el-icon-edit-outline'}
                   onClick={() => {
                     submit(() => {
-                      this.$message({ message: 'Saved successfully', type: 'success' })
+                      this.$message({ message: t('easyAdmin.saved'), type: 'success' })
                       this.refreshKey++
                       this.dialogShow = false
                       this.specForm = { product: this.productId }
                     })
                   }}
-                >Save</el-button>
+                >{t('easyAdmin.save')}</el-button>
               )
             }}
           />
@@ -154,14 +155,14 @@ export default {
         { property: 'description', type: 'text', required: false },
         { property: 'status', type: 'select', default_value: 'active', type_options: {
           options: [
-            { value: 'active', label: 'Active' },
-            { value: 'inactive', label: 'Inactive' }
+            { value: 'active', label: t('entity.active') },
+            { value: 'inactive', label: t('entity.inactive') }
           ]
         }},
         { property: 'metadata', type: 'json', required: false },
         {
           property: 'specifications',
-          tab: 'Specifications',
+          tab: t('entity.specifications'),
           component: SpecificationManager
         }
       ]
@@ -169,30 +170,13 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        name: 'Product Name',
+        name: t('entity.productName'),
         status: statusFilterLabel()
       },
-      list_display: [
-        'id',
-        'name',
-        'status',
-        'isDeleted',
-        'createdAt',
-        'updatedAt'
-      ]
+      list_display: ['id', 'name', 'status', 'isDeleted', 'createdAt', 'updatedAt']
     },
     detail: {
-      detail_display: [
-        'id',
-        'name',
-        'status',
-        'isDeleted',
-        { property: 'description', type: 'text', full_width: true },
-        { property: 'metadata', type: 'json', full_width: true },
-        'createdAt',
-        'updatedAt',
-        'specifications'
-      ]
+      detail_display: '__all__'
     }
   }
 }

@@ -50,7 +50,7 @@
               @click="() => {
                 const loading = startLoading({
                   lock: true,
-                  text: 'Exporting data',
+                  text: t('easyAdmin.exportText'),
                   spinner: 'el-icon-loading',
                   background: 'rgba(0, 0, 0, 0.7)'
                 })
@@ -101,7 +101,7 @@
                 })
               }"
             >
-               Export
+               {{ $t('easyAdmin.export') }}
             </el-button>
           </template>
 
@@ -115,13 +115,13 @@
             icon="el-icon-plus"
             plain
             @click="() => {
-              dialog.title = 'New Record'
+              dialog.title = t('easyAdmin.newRecord')
               delete dialog.data.id
               dialog.refresh++
               dialog.show = true
             }"
           >
-             New {{ $route.meta.title }}
+             {{ $t('easyAdmin.new') }} {{ $route.meta.title }}
           </el-button>
         </slot>
       </el-col>
@@ -216,7 +216,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column v-if="!disabledActions.includes('lines')" label="Actions">
+        <el-table-column v-if="!disabledActions.includes('lines')" :label="$t('easyAdmin.actions')">
           <template #default="scope">
             <div class="easy-admin-actions">
               <component
@@ -240,7 +240,7 @@
                     plain
                     @click="$router.push({ name: `${em.name}Detail`, params: { id: scope.row.id } })"
                   >
-                    Details
+                    {{ $t('easyAdmin.details') }}
                   </el-button>
                 </slot>
 
@@ -255,15 +255,15 @@
                     plain
                     @click="openEditDialog(scope.row.id)"
                   >
-                    Edit
+                    {{ $t('easyAdmin.edit') }}
                   </el-button>
                 </slot>
 
               &nbsp;&nbsp;
 
                 <slot name="action:delete" :data="scope.row">
-                  <el-popconfirm v-if="!disabledActions.includes('delete')" title="Delete this record?" @confirm="removeAction(scope.row.id)">
-                    <template #reference><el-button size="small" type="danger" icon="el-icon-delete" plain>Delete</el-button></template>
+                  <el-popconfirm v-if="!disabledActions.includes('delete')" :title="$t('easyAdmin.deleteConfirm')" @confirm="removeAction(scope.row.id)">
+                    <template #reference><el-button size="small" type="danger" icon="el-icon-delete" plain>{{ $t('easyAdmin.delete') }}</el-button></template>
                   </el-popconfirm>
                 </slot>
               </slot>
@@ -305,7 +305,7 @@
       >
         <template #formTitle><span /></template>
         <template #action="{ submit }">
-          <el-button type="primary" icon="el-icon-edit-outline" @click="submit(closeEditDialog)">Save</el-button>
+          <el-button type="primary" icon="el-icon-edit-outline" @click="submit(closeEditDialog)">{{ $t('easyAdmin.save') }}</el-button>
         </template>
       </form-admin>
     </el-dialog>
@@ -314,6 +314,7 @@
 
 <script>
 import { defineAsyncComponent, markRaw, toRaw } from 'vue'
+import { t } from '@/i18n'
 import EntityManage from '@/utils/entity'
 import { asyncRoutes } from '@/router'
 import SIP from '@/utils/simple-image-process'
@@ -709,14 +710,14 @@ export default {
     },
 
     openEditDialog(id) {
-      this.dialog.title = 'Edit Record'
+      this.dialog.title = this.$t('easyAdmin.editRecord')
       this.dialog.data.id = id
       this.dialog.refresh++
       this.dialog.show = true
     },
 
     closeEditDialog() {
-      this.notifySuccess('Data saved successfully')
+      this.notifySuccess(this.$t('easyAdmin.saved'))
       this.dialog.show = false
     },
 
@@ -807,7 +808,7 @@ export default {
     // Remove action
     removeAction(pk) {
       this.em.delete(pk).then(res => {
-        this.notifySuccess('Deleted successfully')
+        this.notifySuccess(this.$t('easyAdmin.deleted'))
         this.fetchData()
       })
     },

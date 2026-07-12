@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 
 export default {
@@ -12,50 +13,24 @@ export default {
       query: orderByIdDesc,
       list_filter: {
         status: {
-          __label: 'Status',
-          draft: 'Draft',
-          pending: 'Pending',
-          confirmed: 'Confirmed',
-          paid: 'Paid',
-          fulfilled: 'Fulfilled',
-          completed: 'Completed',
-          cancelled: 'Cancelled',
-          refunded: 'Refunded'
+          __label: t('entity.status'),
+          draft: t('dashboard.status.draft'),
+          pending: t('dashboard.status.pending'),
+          confirmed: t('dashboard.status.confirmed'),
+          paid: t('dashboard.status.paid'),
+          fulfilled: t('dashboard.status.fulfilled'),
+          completed: t('dashboard.status.completed'),
+          cancelled: t('dashboard.status.cancelled'),
+          refunded: t('dashboard.status.refunded')
         }
       },
       list_display: [
-        'id',
-        'uuid',
-        'user',
-        'totalAmount',
-        'currency',
-        'status',
-        'paymentMethod',
-        'paidAt',
-        'createdAt'
+        'id', 'uuid', 'user', 'totalAmount', 'currency',
+        'status', 'paymentMethod', 'paidAt', 'createdAt'
       ]
     },
     detail: {
-      detail_display: [
-        'id',
-        'uuid',
-        'user',
-        'totalAmount',
-        'currency',
-        'status',
-        'paymentMethod',
-        'paidAt',
-        'cancelledAt',
-        'completedAt',
-        'refundedAt',
-        { property: 'items', full_width: true },
-        { property: 'notes', type: 'text', full_width: true },
-        { property: 'metadata', type: 'json', full_width: true },
-        'shippingAddress',
-        'billingAddress',
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 
 export default {
@@ -8,8 +9,8 @@ export default {
         { property: 'currency', default_value: 'CNY' },
         { property: 'status', type: 'select', default_value: 'active', type_options: {
           options: [
-            { value: 'active', label: 'Active' },
-            { value: 'frozen', label: 'Frozen' }
+            { value: 'active', label: t('entity.active') },
+            { value: 'frozen', label: t('entity.frozen') }
           ]
         }},
         { property: 'label', required: false }
@@ -19,15 +20,13 @@ export default {
       query: orderByIdDesc,
       list_filter: {
         status: {
-          __label: 'Status',
-          active: 'Active',
-          frozen: 'Frozen'
+          __label: t('entity.status'),
+          active: t('entity.active'),
+          frozen: t('entity.frozen')
         }
       },
       list_display: [
-        'id',
-        'user',
-        'currency',
+        'id', 'user', 'currency',
         {
           property: 'balance',
           component: {
@@ -37,31 +36,11 @@ export default {
             }
           }
         },
-        'status',
-        'version',
-        'label'
+        'status', 'version', 'label'
       ]
     },
     detail: {
-      detail_display: [
-        'id',
-        'user',
-        'currency',
-        {
-          property: 'balance',
-          component: {
-            props: ['data'],
-            render() {
-              return (<span style='font-size: 28px; font-weight: 700; color: #2d5aa0;'>$ {(this.data / 100).toFixed(2)}</span>)
-            }
-          }
-        },
-        'status',
-        'version',
-        'label',
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

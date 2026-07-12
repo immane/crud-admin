@@ -1,18 +1,18 @@
+import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 
 export default {
   Page: {
     form: {
       fields: [
-        'title',
-        'slug',
+        'title', 'slug',
         { property: 'body', type: 'text' },
         { property: 'metaTitle', required: false },
         { property: 'metaDescription', type: 'text', required: false },
         { property: 'status', type: 'select', default_value: 'draft', type_options: {
           options: [
-            { value: 'draft', label: 'Draft' },
-            { value: 'published', label: 'Published' }
+            { value: 'draft', label: t('dashboard.status.draft') },
+            { value: 'published', label: t('dashboard.status.published') }
           ]
         }}
       ]
@@ -20,36 +20,17 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        title: 'Title',
+        title: t('entity.title'),
         status: {
-          __label: 'Status',
-          draft: 'Draft',
-          published: 'Published'
+          __label: t('entity.status'),
+          draft: t('dashboard.status.draft'),
+          published: t('dashboard.status.published')
         }
       },
-      list_display: [
-        'id',
-        'title',
-        'slug',
-        'status',
-        'publishedAt',
-        'createdAt'
-      ]
+      list_display: ['id', 'title', 'slug', 'status', 'publishedAt', 'createdAt']
     },
     detail: {
-      detail_display: [
-        'id',
-        'title',
-        'slug',
-        'status',
-        { property: 'body', type: 'text', full_width: true },
-        'metaTitle',
-        { property: 'metaDescription', type: 'text', full_width: true },
-        'author',
-        'publishedAt',
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

@@ -1,13 +1,11 @@
+import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 
 export default {
   Media: {
     form: {
       fields: [
-        'filename',
-        'originalFilename',
-        'mimeType',
-        'size',
+        'filename', 'originalFilename', 'mimeType', 'size',
         { property: 'path', type: 'image' },
         { property: 'alt', required: false },
         { property: 'title', required: false },
@@ -18,34 +16,13 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        filename: 'Filename',
-        mimeType: 'MIME Type'
+        filename: t('entity.filename'),
+        mimeType: t('entity.mimeType')
       },
-      list_display: [
-        'id',
-        'filename',
-        'originalFilename',
-        'mimeType',
-        'size',
-        { property: 'path', type: 'image' },
-        'createdAt'
-      ]
+      list_display: ['id', 'filename', 'originalFilename', 'mimeType', 'size', { property: 'path', type: 'image' }, 'createdAt']
     },
     detail: {
-      detail_display: [
-        'id',
-        'filename',
-        'originalFilename',
-        'mimeType',
-        'size',
-        'width',
-        'height',
-        'alt',
-        'title',
-        { property: 'path', type: 'image', full_width: true },
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

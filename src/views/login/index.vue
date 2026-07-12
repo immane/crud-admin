@@ -7,8 +7,8 @@
         </svg>
       </div>
       <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-        <h4><span>{{ title }}</span><br>Admin Panel</h4>
-        <p>Welcome, sign in</p>
+        <h4><span>{{ title }}</span><br>{{ $t('login.adminPanel') }}</h4>
+        <p>{{ $t('login.welcome') }}</p>
         <div class="floating-label">
           <input
             id="email"
@@ -20,7 +20,7 @@
             tabindex="1"
             auto-complete="on"
           >
-          <label for="email">Username:</label>
+          <label for="email">{{ $t('login.username') }}:</label>
           <div class="icon">
             <svg enable-background="new 0 0 100 100" version="1.1" viewBox="0 0 100 100" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
               <g transform="translate(0 -952.36)">
@@ -44,7 +44,7 @@
             auto-complete="on"
             @keyup.enter="handleLogin"
           >
-          <label for="password">Password:</label>
+          <label for="password">{{ $t('login.password') }}:</label>
           <div class="icon">
 
             <svg enable-background="new 0 0 24 24" version="1.1" viewBox="0 0 24 24" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
@@ -56,7 +56,7 @@
           </div>
 
         </div>
-        <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.prevent="handleLogin">Sign In</el-button>
+        <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.prevent="handleLogin">{{ $t('login.signIn') }}</el-button>
         <a href="https://codepen.io/elujambio/pen/yjwzGP" class="discrete" target="_blank">Version 0.8.2</a>
       </el-form>
     </div>

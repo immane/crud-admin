@@ -1,47 +1,26 @@
+import { t } from '@/i18n'
+
 export default {
   Setting: {
     form: {
       fields: [
-        { property: 'key', field_options: { label: 'Key' }},
-        'value',
-        'type',
-        'groupName',
+        { property: 'key', field_options: { label: t('entity.key') }},
+        'value', 'type', 'groupName',
         { property: 'label', required: false },
         { property: 'description', type: 'text', required: false },
         { property: 'sortOrder', required: false, default_value: 0 }
       ]
     },
     list: {
-      query: {
-        '@order': 'entity.groupName|ASC, entity.sortOrder|ASC, entity.id|DESC'
-      },
+      query: { '@order': 'entity.groupName|ASC, entity.sortOrder|ASC, entity.id|DESC' },
       list_filter: {
-        key: 'Key',
-        groupName: 'Group'
+        key: t('entity.key'),
+        groupName: t('entity.group')
       },
-      list_display: [
-        'id',
-        'key',
-        'value',
-        'type',
-        'groupName',
-        'label',
-        'sortOrder'
-      ]
+      list_display: ['id', 'key', 'value', 'type', 'groupName', 'label', 'sortOrder']
     },
     detail: {
-      detail_display: [
-        'id',
-        'key',
-        'value',
-        'type',
-        'groupName',
-        'label',
-        { property: 'description', type: 'text', full_width: true },
-        'sortOrder',
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

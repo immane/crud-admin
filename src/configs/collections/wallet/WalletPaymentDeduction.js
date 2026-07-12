@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 
 export default {
@@ -11,47 +12,28 @@ export default {
       disabled_actions: ['new', 'edit', 'delete'],
       list_filter: {
         type: {
-          __label: 'Type',
-          deduction: 'Deduction',
-          reversal: 'Reversal',
-          release: 'Release',
-          refund: 'Refund'
+          __label: t('entity.type'),
+          deduction: t('entity.deduction'),
+          reversal: t('entity.reversal'),
+          release: t('entity.release'),
+          refund: t('entity.refund')
         },
         status: {
-          __label: 'Status',
-          pending: 'Pending',
-          applied: 'Applied',
-          released: 'Released',
-          refunded: 'Refunded',
-          reversed: 'Reversed'
+          __label: t('entity.status'),
+          pending: t('entity.pending'),
+          applied: t('entity.applied'),
+          released: t('entity.released'),
+          refunded: t('entity.refunded'),
+          reversed: t('entity.reversed')
         }
       },
       list_display: [
-        'id',
-        'invoiceNo',
-        'amount',
-        'type',
-        'status',
-        'wallet',
-        'referenceId',
-        'createdAt'
+        'id', 'invoiceNo', 'amount', 'type', 'status',
+        'wallet', 'referenceId', 'createdAt'
       ]
     },
     detail: {
-      detail_display: [
-        'id',
-        'invoiceNo',
-        'amount',
-        'currency',
-        'type',
-        'status',
-        'wallet',
-        'referenceId',
-        'referenceType',
-        'metadata',
-        'createdAt',
-        'updatedAt'
-      ]
+      detail_display: '__all__'
     }
   }
 }

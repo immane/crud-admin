@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { t } from '@/i18n'
 
 /* Layout */
 import Layout from '@/layout'
@@ -50,7 +51,7 @@ export const constantRoutes = [
         name: 'Dashboard',
         component: () => import('@/views/dashboard/index'),
         meta: {
-          title: 'Dashboard',
+          title: t('route.dashboard'),
           icon: 'el-icon-s-home'
         }
       }

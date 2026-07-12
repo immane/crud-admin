@@ -1,13 +1,15 @@
+import { t } from '@/i18n'
+
 export const orderByIdDesc = {
   '@order': 'entity.id|DESC'
 }
 
 export const statusFilter = {
-  active: 'Active',
-  inactive: 'Inactive'
+  active: t('entity.active'),
+  inactive: t('entity.inactive')
 }
 
-export const statusFilterLabel = (label = 'Status') => ({
-  __label: label,
+export const statusFilterLabel = (label = null) => ({
+  __label: label || t('entity.status'),
   ...statusFilter
 })

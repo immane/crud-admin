@@ -6,7 +6,7 @@
           <strong style="font-size: 20px;">
             <!-- Title slot here -->
             {{ $route.meta.title }}
-            New / Edit
+            {{ $t('easyAdmin.newEdit') }}
           </strong>
         </slot>
       </el-col>
@@ -117,7 +117,7 @@
 
       <el-form-item>
         <slot name="action" :form="form" :submit="onSubmit">
-          <el-button type="primary" icon="el-icon-edit-outline" @click="onSubmit()">Save</el-button>
+          <el-button type="primary" icon="el-icon-edit-outline" @click="onSubmit()">{{ $t('easyAdmin.save') }}</el-button>
           <!--<el-button type="primary" @click="onSubmit()">Save and Continue Editing</el-button>-->
         </slot>
       </el-form-item>
@@ -128,6 +128,7 @@
 
 <script>
 import { defineAsyncComponent, markRaw, toRaw } from 'vue'
+import { t } from '@/i18n'
 import EntityManage from '@/utils/entity'
 import Tinymce from '@/components/Tinymce'
 import { createUiFeedback } from './ui/feedback'
@@ -221,7 +222,7 @@ export default {
       rules: {},
 
       // tabs
-      tabs: new Set(['Default']),
+      tabs: new Set([t('easyAdmin.defaultTab')]),
       activeTab: '0',
 
       // translated fields
@@ -433,7 +434,7 @@ export default {
     },
 
     onSubmit(success = (res) => {
-      this.uiFeedback().success('Data saved successfully')
+      this.uiFeedback().success(this.$t('easyAdmin.saved'))
 
       // Router go back default
       // this.$router.replace({ name: `${this.em.name}List` })
@@ -454,7 +455,7 @@ export default {
               .catch(err => { this.uiFeedback().error(err.message) })
           }
         } else {
-          this.uiFeedback().warning('Validation failed — please check your input')
+          this.uiFeedback().warning(this.$t('easyAdmin.validationFailed'))
           return false
         }
       })
