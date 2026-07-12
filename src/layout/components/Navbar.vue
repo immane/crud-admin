@@ -82,8 +82,9 @@ export default {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
-    switchLocale(locale) {
+    async switchLocale(locale) {
       if (locale === this.currentLocale) return
+      await this.$store.dispatch('entity/reset')
       setLocale(locale)
       this.currentLocale = locale
       window.location.reload()
