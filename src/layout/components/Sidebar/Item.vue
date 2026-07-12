@@ -22,9 +22,9 @@ export default {
       if (icon) {
         if (icon.includes('el-icon')) {
           vnodes.push(
-            h('el-icon', { style: { marginRight: title ? '8px' : '0' } }, () => [
-              h(resolveComponent(icon))
-            ])
+            h(resolveComponent(icon), {
+              style: { width: '1em', height: '1em', marginRight: title ? '6px' : '0', verticalAlign: 'middle', fill: 'currentColor' }
+            })
           )
         } else {
           vnodes.push(h(resolveComponent('svg-icon'), { iconClass: icon }))
