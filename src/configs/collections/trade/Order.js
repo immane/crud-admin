@@ -48,6 +48,7 @@ export default {
         'cancelledAt',
         'completedAt',
         'refundedAt',
+        { property: 'items', full_width: true },
         { property: 'notes', type: 'text', full_width: true },
         { property: 'metadata', type: 'json', full_width: true },
         'shippingAddress',
