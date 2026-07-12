@@ -1,8 +1,10 @@
 <template>
   <el-upload
+    ref="upload"
     v-bind="field.type_options"
     :action="`${BASE_API}/upload`"
-    :limit="field.type === 'image' ? 1 : 0"
+    :limit="field.type === 'image' ? 1 : undefined"
+    :accept="field.type_options?.accept || 'image/*'"
     :file-list="
       form[field.property]
         ? ( field.type === 'image'
@@ -25,6 +27,7 @@
         form[field.property] = [...form[field.property], ...res.data]
       }
     }"
+    :on-exceed="handleExceed"
     v-on="field.type_events || {}"
   >
     <el-button size="small" type="primary">点击选择媒体/文件</el-button>
@@ -53,7 +56,16 @@ export default {
   },
   methods: {
     // Get picture
-    getPicture(url) { return SIP.getPicture(url) }
+    getPicture(url) { return SIP.getPicture(url) },
+    handleExceed(files) {
+      this.form[this.field.property] = ''
+      const upload = this.$refs.upload
+      this.$nextTick(() => {
+        upload.clearFiles()
+        upload.handleStart(files[0])
+        upload.submit()
+      })
+    }
   }
 }
 </script>

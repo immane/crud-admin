@@ -1,5 +1,6 @@
 <template>
   <el-upload
+    ref="upload"
     v-bind="field.type_options"
     :action="`${BASE_API}/upload?storage=qiniu`"
     :limit="1"
@@ -11,6 +12,7 @@
     list-type="file"
     :on-remove="(file, fileList) => form[field.property] = ''"
     :on-success="(res, file) => { form[field.property] = res.data[0] }"
+    :on-exceed="handleExceed"
     v-on="field.type_events || {}"
   >
     <el-button size="small" type="primary">点击选择文件</el-button>
@@ -41,6 +43,15 @@ export default {
   methods: {
     getPicture(url) {
       return SIP.getPicture(url)
+    },
+    handleExceed(files) {
+      this.form[this.field.property] = ''
+      const upload = this.$refs.upload
+      this.$nextTick(() => {
+        upload.clearFiles()
+        upload.handleStart(files[0])
+        upload.submit()
+      })
     }
   }
 }
