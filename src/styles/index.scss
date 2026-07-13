@@ -20,6 +20,8 @@ label {
 html {
   height: 100%;
   box-sizing: border-box;
+
+  overscroll-behavior: none;
 }
 
 #app {

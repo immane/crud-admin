@@ -55,7 +55,7 @@ export default {
     height: {
       type: [Number, String],
       required: false,
-      default: 360
+      default: 300
     },
     width: {
       type: [Number, String],
