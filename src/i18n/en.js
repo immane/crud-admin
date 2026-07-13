@@ -112,6 +112,8 @@ export default {
   'Category': 'Category',
   'Tag': 'Tag',
   'Setting': 'Setting',
+  'Picture': 'Picture',
+  'Specification': 'Specification',
 
   // EasyAdmin CRUD
   'New Record': 'New Record',
@@ -194,6 +196,10 @@ export default {
   'Tag Name': 'Tag Name',
   'Filename': 'Filename',
   'MIME Type': 'MIME Type',
+  'Image': 'Image',
+  'Metadata': 'Metadata',
+  'Price': 'Price',
+  'Sort': 'Sort',
   'Title': 'Title',
   'Product Name': 'Product Name',
   'Specifications': 'Specifications',

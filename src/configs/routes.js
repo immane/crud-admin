@@ -37,7 +37,8 @@ export default [
       ...r('Content', t('Content')),
       ...r('Page', t('Page')),
       ...r('Comment', t('Comment')),
-      ...r('Media', t('Media'))
+      ...r('Media', t('Media')),
+      ...r('Picture', t('Picture'))
     ]
   },
 

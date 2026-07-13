@@ -3,7 +3,7 @@
     <el-button :style="{background:color,borderColor:color}" icon="el-icon-upload" size="small" type="primary" @click=" dialogVisible=true">
       {{ $t('Upload') }}
     </el-button>
-    <el-dialog v-model="dialogVisible">
+    <el-dialog v-model="dialogVisible" class="el-upload-popup" append-to-body align-center>
       <el-upload
         drag
         :multiple="true"
@@ -12,8 +12,10 @@
         :on-remove="handleRemove"
         :on-success="handleSuccess"
         :before-upload="beforeUpload"
+        :data="uploadData"
+        :headers="uploadHeaders"
         class="editor-slide-upload"
-        action="https://httpbin.org/post"
+        :action="uploadAction"
         list-type="picture"
       >
         <el-icon><el-icon-upload /></el-icon>
@@ -30,7 +32,7 @@
 </template>
 
 <script>
-// import { getToken } from 'api/qiniu'
+import { getUploadData, getUploadHeaders, getUploadUrl, resolveUploadPath } from '@/utils/upload'
 
 export default {
   name: 'EditorSlideUpload',
@@ -45,6 +47,17 @@ export default {
       dialogVisible: false,
       listObj: {},
       fileList: []
+    }
+  },
+  computed: {
+    uploadAction() {
+      return getUploadUrl()
+    },
+    uploadData() {
+      return getUploadData()
+    },
+    uploadHeaders() {
+      return getUploadHeaders()
     }
   },
   methods: {
@@ -67,7 +80,7 @@ export default {
       const objKeyArr = Object.keys(this.listObj)
       for (let i = 0, len = objKeyArr.length; i < len; i++) {
         if (this.listObj[objKeyArr[i]].uid === uid) {
-          this.listObj[objKeyArr[i]].url = response.files.file
+          this.listObj[objKeyArr[i]].url = resolveUploadPath(response)
           this.listObj[objKeyArr[i]].hasSuccess = true
           return
         }
@@ -102,9 +115,26 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+:deep(.el-overlay-dialog:has(.el-upload-popup)) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:deep(.el-upload-popup) {
+  width: min(680px, calc(100vw - 32px)) !important;
+  max-height: calc(100vh - 32px);
+  margin: auto !important;
+}
+
+:deep(.el-upload-popup .el-dialog__body) {
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+}
+
 .editor-slide-upload {
   margin-bottom: 20px;
-  ::v-deep .el-upload--picture-card {
+  :deep(.el-upload--picture-card) {
     width: 100%;
   }
 }

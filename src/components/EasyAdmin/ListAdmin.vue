@@ -285,13 +285,13 @@
     <el-dialog
       v-model="dialog.show"
       class="easy-admin-dialog"
-      width="80%"
+      width="1040px"
       :title="dialog.title"
-      top="0"
       @closed="fetchData"
     >
       <form-admin
         v-if="dialog.show"
+        ref="dialogForm"
         :key="dialog.refresh"
         :id="dialog.data.id"
         :entity-conf="dialog.data.entityConf"
@@ -299,10 +299,17 @@
         :config="dialog.data.config"
       >
         <template #formTitle><span /></template>
-        <template #action="{ submit }">
-          <el-button type="primary" icon="el-icon-edit-outline" @click="submit(closeEditDialog)">{{ $t('Save') }}</el-button>
-        </template>
+        <template #action><span /></template>
       </form-admin>
+      <template #footer>
+        <el-button
+          type="primary"
+          icon="el-icon-edit-outline"
+          @click="$refs.dialogForm?.onSubmit(closeEditDialog)"
+        >
+          {{ $t('Save') }}
+        </el-button>
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -918,44 +925,138 @@ export default {
   margin-left: 0;
 }
 
-::v-deep(.el-overlay-dialog:has(.easy-admin-dialog)) {
+:deep(.el-overlay-dialog:has(.easy-admin-dialog)) {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-::v-deep(.easy-admin-dialog) {
+:deep(.easy-admin-dialog) {
   display: flex;
   flex-direction: column;
-  width: min(80vw, 1200px) !important;
-  max-height: 80vh;
+  width: min(86vw, 1040px) !important;
+  max-height: min(88vh, 900px);
   margin: auto !important;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(31, 45, 61, 0.22);
 }
 
-::v-deep(.easy-admin-dialog .el-dialog__header) {
+:deep(.easy-admin-dialog .el-dialog__header) {
   flex-shrink: 0;
   margin-right: 0;
-  padding: 20px 24px 14px;
-  border-bottom: 1px solid #EBEEF5;
+  padding: 20px 56px 20px 28px;
+  border-bottom: 1px solid #e7edf4;
 }
 
-::v-deep(.easy-admin-dialog .el-dialog__title) {
+:deep(.easy-admin-dialog .el-dialog__title) {
   display: block;
-  padding-right: 32px;
+  color: #1f2d3d;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 28px;
+  letter-spacing: -0.01em;
 }
 
-::v-deep(.easy-admin-dialog .el-dialog__body) {
+:deep(.easy-admin-dialog .el-dialog__headerbtn) {
+  top: 18px;
+  right: 20px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+:deep(.easy-admin-dialog .el-dialog__headerbtn:hover) {
+  background: #edf2f7;
+}
+
+:deep(.easy-admin-dialog .el-dialog__close) {
+  color: #667085;
+  font-size: 18px;
+}
+
+:deep(.easy-admin-dialog .el-dialog__body) {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  padding: 20px 24px;
-}
-
-::v-deep(.easy-admin-dialog .app-container) {
   padding: 0;
+  background: #fff;
 }
 
-::v-deep(.easy-admin-dialog .el-dialog__footer) {
+:deep(.easy-admin-dialog .app-container) {
+  padding: 28px;
+}
+
+:deep(.easy-admin-dialog .app-container > .el-row:first-child) {
+  display: none;
+}
+
+:deep(.easy-admin-dialog .el-form-item) {
+  margin-bottom: 22px;
+}
+
+:deep(.easy-admin-dialog .el-form-item__label) {
+  color: #344054;
+  font-weight: 600;
+}
+
+:deep(.easy-admin-dialog .el-dialog__footer) {
+  position: relative;
+  z-index: 10;
   flex-shrink: 0;
+  padding: 16px 28px;
+  background: #fff;
+  border-top: 1px solid #e7edf4;
+}
+
+:deep(.easy-admin-dialog .el-dialog__footer .el-button) {
+  min-width: 104px;
+  height: 38px;
+  font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  :deep(.easy-admin-dialog) {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 24px);
+    border-radius: 10px;
+  }
+
+  :deep(.easy-admin-dialog .el-dialog__header) {
+    padding: 16px 52px 16px 20px;
+  }
+
+  :deep(.easy-admin-dialog .app-container) {
+    padding: 20px 16px;
+  }
+
+  :deep(.easy-admin-dialog .el-form-item) {
+    margin-bottom: 18px;
+  }
+
+  :deep(.easy-admin-dialog .el-form-item__label) {
+    float: none;
+    display: block;
+    width: auto !important;
+    height: auto;
+    margin-bottom: 6px;
+    line-height: 20px;
+    text-align: left;
+  }
+
+  :deep(.easy-admin-dialog .el-form-item__content) {
+    margin-left: 0 !important;
+  }
+
+  :deep(.easy-admin-dialog .el-dialog__footer) {
+    padding: 14px 16px;
+  }
+
+  :deep(.easy-admin-dialog .el-dialog__footer .el-button) {
+    width: 100%;
+  }
 }
 </style>

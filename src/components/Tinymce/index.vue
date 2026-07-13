@@ -17,6 +17,7 @@ import plugins from './plugins'
 import toolbar from './toolbar'
 import load from './dynamicLoadScript'
 import axios from '@/utils/request'
+import { getUploadData, getUploadUrl, resolveUploadPath } from '@/utils/upload'
 
 // why use this cdn, detail see https://github.com/PanJiaChen/tinymce-all-in-one
 const tinymceSources = [
@@ -191,9 +192,10 @@ export default {
               progress(0)
               const formData = new FormData()
               formData.append('file', blobInfo.blob())
+              formData.append('storage', getUploadData().storage)
               axios({
                 method: 'post',
-                url: `${process.env.VITE_BASE_API}/upload`,
+                url: getUploadUrl(),
                 data: formData,
                 headers: {
                   'Content-Type': 'multipart/form-data'
@@ -201,33 +203,18 @@ export default {
               }).then(
                 res => {
                   progress(100)
-                  success(
-                    `${process.env.VITE_BASE_API}/uploads/images/${res.data[0]}`
-                  )
+                  const path = resolveUploadPath(res)
+                  if (!path) {
+                    failure('Upload response did not contain a file path')
+                    return
+                  }
+                  success(path)
                 }
-              )
-            },
-
-            ipfs: async(blobInfo, success, failure, progress) => {
-              const { create } = require('ipfs-http-client')
-              const IPFS_GATEWAY = 'infura-ipfs.io'
-              const client = create(`https://${IPFS_GATEWAY}:5001/api/v0`)
-
-              progress(0)
-              try {
-                const added = await client.add(blobInfo.blob())
-                console.log('IPFS added', added)
-                const url = `https://${IPFS_GATEWAY}/ipfs/${added.path}`
-                console.log('Uploaded file url', url)
-                progress(100)
-                success(url)
-              } catch (error) {
-                console.log('Error uploading file: ', error)
-              }
+              ).catch(error => failure(error.message || 'Image upload failed'))
             }
           }
 
-          upload_handlers['ipfs'](blobInfo, success, failure, progress)
+          upload_handlers.server(blobInfo, success, failure, progress)
         }
       })
     },
@@ -266,7 +253,6 @@ export default {
       z-index: 10000;
     }
     .mce-tinymce {
-      width: auto !important;
       box-sizing: border-box;
     }
   }
