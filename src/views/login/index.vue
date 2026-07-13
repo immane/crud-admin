@@ -57,7 +57,7 @@
 
         </div>
         <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.prevent="handleLogin">{{ $t('Sign In') }}</el-button>
-        <a href="https://codepen.io/elujambio/pen/yjwzGP" class="discrete" target="_blank">Version 0.9.0</a>
+        <a href="#" class="discrete">Version {{ appVersion }}</a>
       </el-form>
     </div>
   </div>
@@ -66,6 +66,7 @@
 <script>
 import { validUsername } from '@/utils/validate'
 import setting from '@/settings'
+import { version } from '@/../package.json'
 
 export default {
   name: 'Login',
@@ -86,6 +87,7 @@ export default {
     }
     return {
       title: setting.title,
+      appVersion: version,
       loginForm: {
         username: 'user@example.com',
         password: ''
