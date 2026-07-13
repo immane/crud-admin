@@ -1,7 +1,7 @@
 # AI Context
 
 > Vue Admin Skeleton — AI Assistant Context Document  
-> Last updated: 2026-07-13
+> Last updated: 2026-07-14
 
 ---
 
@@ -227,8 +227,8 @@ const entityCollections = import.meta.glob('./collections/**/*.{js,jsx}', { eage
 | `date.vue` | date | Formatted date with icon |
 | `datetime.vue` | datetime, datetime_immutable | Formatted datetime with icon |
 | `image.vue` | image | `<el-image>` (preview) |
-| `RelationToOne.vue` | ManyToOne, OneToOne | `__toString` display |
-| `RelationToMany.vue` | ManyToMany, OneToMany | `<el-tag>` list (max 5 + tooltip) |
+| `RelationToOne.vue` | ManyToOne, OneToOne | `__toString` display, `<router-link>` to detail page if route exists |
+| `RelationToMany.vue` | ManyToMany, OneToMany | `<el-tag>` list (max 5 + tooltip), each linked to detail page if route exists |
 | `array.vue` | array | `<el-tag>` list |
 | `plain-text.vue` | fallback | Strip HTML plain text |
 
@@ -384,10 +384,32 @@ The `json.vue` form plugin uses the vanilla `jsoneditor` library directly from n
 
 `ListAdmin` syncs search filter state and pagination to the browser URL using `history.replaceState`:
 
-- `ListAdmin.syncToUrl()` — debounced (50ms) function that reads `listFilterData`, `pager.page`, and `pager.limit`, builds a query string, and replaces the current URL.
+- `ListAdmin.syncToUrl()` — debounced (50ms) function that reads `listFilterData`, `pager.page`, and `pager.limit`, builds a query string via `buildQueryParams()` + `URLSearchParams`, and replaces the current URL (no-op if unchanged).
 - Called from `listFilterData` deep watcher (filter changes) and `handleCurrentChange` / `handleSizeChange` (pagination changes).
 - `ListAdmin.created()` reads `$route.query` to restore filters (`listFilterData`) and pager (`page`, `limit`) on page load.
-- `window.addEventListener('popstate', ...)` handles browser back/forward navigation, re-applying query params.
+- `$route.query` watcher replaces the old `popstate` listener: browser back/forward navigation triggers the watcher, which calls `applyQueryParams()` → regenerates filter expressions → fetches data.
+
+`applyQueryParams(query)` separates `page`/`limit` into `pager` and the rest into `listFilterData`. Missing `page`/`limit` query params reset to defaults (1 and 20).
+
+### Search Reset Button
+
+`SearchFilter` provides a reset button (refresh icon) alongside the search button, visible when any filter is configured:
+
+- `SearchFilter.reset()` restores each filter to its configured `__default` value, calls `filterGenerate()` to rebuild the backend filter expression, then emits `'reset'`.
+- `ListAdmin.resetSearch()` (listens for `@reset` on `<search-filter>`) resets `pager.page` to 1 and `pager.limit` to 20, then calls `fetchData()`. The URL sync fires automatically via the `listFilterData` watcher.
+- Initial data load (`created()`) passes `resetPage = false` to avoid overwriting URL-restored pagination.
+
+### Relation Detail Links
+
+`RelationToOne` and `RelationToMany` list plugins render `<router-link>` to the target entity's detail page when the route exists:
+
+- The target entity name is resolved from `field.type_options.entity_name` (config-level) or `struct.metadata.targetEntity` (backend metadata), taking the last segment of the fully qualified class name.
+- `this.$router.hasRoute(\`${targetEntity}Detail\`)` checks whether the detail route is registered; if not, fall back to plain text/tag rendering.
+- Links are rendered only when the related object has a non-null `id`.
+
+### Template `t()` vs `$t()` Pitfall
+
+In Vue 3 Options API components, the module-level `import { t } from '@/i18n'` must ONLY be used in `<script>` setup context or non-template JS. Template `@click` handlers and inline arrow functions are compiled to `_ctx.*` lookups, which only resolve `$t` (registered via `app.config.globalProperties`). Using the imported `t()` inside template expressions causes `_ctx.t is not a function` at runtime.
 
 ### Internationalization — Flat Keys
 
