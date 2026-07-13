@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-row>
+    <el-row class="list-view-top">
       <el-col :span="4">
         <slot name="title">
           <strong style="font-size: 20px;">
@@ -269,7 +269,7 @@
     </el-row>
 
     <el-row v-if="!disabledActions.includes('pager')">
-      <div class="block">
+      <div class="pager block">
         <el-pagination
           :current-page="pager.page"
           :page-size="pager.limit"
@@ -945,7 +945,7 @@ export default {
 :deep(.easy-admin-dialog .el-dialog__header) {
   flex-shrink: 0;
   margin-right: 0;
-  padding: 20px 56px 20px 28px;
+  /* padding: 20px 56px 20px 28px; */
   border-bottom: 1px solid #e7edf4;
 }
 
@@ -1007,7 +1007,7 @@ export default {
   position: relative;
   z-index: 10;
   flex-shrink: 0;
-  padding: 16px 28px;
+  /* padding: 16px 28px; */
   background: #fff;
   border-top: 1px solid #e7edf4;
 }

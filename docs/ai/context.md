@@ -72,10 +72,11 @@ src/
 ├── utils/                # Utilities
 │   ├── auth.js           # Cookie token management
 │   ├── entity.ts         # EntityManage CRUD class
-│   └── request.ts        # Axios JWT instance
+│   ├── request.ts        # Axios JWT instance
+│   └── upload.js         # Unified upload (host resolution, headers, path normalisation)
 └── views/                # Page views
     ├── admin/            # Generic CRUD (list + form + detail)
-    ├── login/            # Login page
+    ├── login/            # Login page (dynamic version from package.json)
     └── dashboard/        # Enterprise dashboard
 ```
 
@@ -96,7 +97,7 @@ View reuse: `views/admin/list.vue` + `views/admin/form.vue` + `views/admin/detai
 ```
 configs/collections/
 ├── helpers.js                ← Shared constants (orderByIdDesc, statusFilterLabel)
-├── common/                   Category, Tag, Content, Comment, Page, Media, Setting
+├── common/                   Category, Tag, Content, Comment, Page, Media, Picture, Setting
 ├── trade/                    Product, Order, OrderItem, Specification
 ├── identity/                 User, Profile
 ├── promotion/                Promotion, PromotionTemplate
@@ -129,7 +130,7 @@ Entity configs can embed custom Vue components in `form.fields` via the `compone
 { property: 'specifications', tab: '规格', component: SpecificationManager }
 ```
 
-This is used in `Product.js` to embed specification management (ListAdmin + create/edit dialog) directly inside the product form. The component must be a plain Vue component definition object and relies on lazy `import.meta.glob` or direct imports within the config module.
+This is used in `Product.jsx` to embed specification management (ListAdmin + create/edit dialog with nested FormAdmin) directly inside the product form. The component must be a Vue component definition object and relies on direct imports within the config module. It walks `$parent` to find the `FormAdmin` instance for the `productId`.
 
 ### 2. Vite Glob Dynamic Loading
 
@@ -160,7 +161,7 @@ const resolveListPlugin = path => {
 // EasyAdmin plugin auto-discovery (detail view)
 const detailPlugins = import.meta.glob('./plugins/detail/*.vue')
 
-// Entity config auto-loading (supports .js and .jsx)
+// Entity config auto-loading (supports .js and .jsx; .ts/.tsx available as target)
 const entityCollections = import.meta.glob('./collections/**/*.{js,jsx}', { eager: true })
 ```
 
@@ -209,7 +210,7 @@ const entityCollections = import.meta.glob('./collections/**/*.{js,jsx}', { eage
 | `date.vue` | date | `<el-date-picker>` (yyyy-MM-dd) |
 | `datetime.vue` | datetime | `<el-date-picker>` (yyyy-MM-dd HH:mm:ss) |
 | `image.vue` | image | `<el-upload>` (single image, wall mode) |
-| `file.vue` | — | `<el-upload>` (single file, Qiniu) |
+| `file.vue` | — | `<el-upload>` (single file, configurable storage driver) |
 | `code.vue` | — | `<el-input type="textarea">` (no syntax highlight) |
 | `json.vue` | — | `<jsoneditor>` (tree/code view, direct npm import, no Vue wrapper) |
 | `json-custom.vue` | — | Nested `<FormAdmin>` (sub-object editor) |
@@ -281,10 +282,11 @@ Adding a new detail plugin: create `plugins/detail/{type}.vue` with the same pro
 | Variable | Description |
 |----------|-------------|
 | `VITE_BASE_API` | API base path |
-| `VITE_PROXY_TARGET` | Dev proxy target (dev only) |
+| `VITE_PROXY_TARGET` | Dev proxy target (dev only; also injected at runtime for upload fallback) |
 | `VITE_API_PREFIX` | Business API prefix (default `/api/v1`) |
 | `VITE_AUTH_API_PREFIX` | Auth API prefix (default `/api/auth`) |
 | `VITE_SYSTEM_API_PREFIX` | System API prefix (default `/system`) |
+| `MEDIA_STORAGE_DEFAULT` | Default upload storage driver (`local` or `qiniu`, default `local`) |
 
 ### Common Commands
 
@@ -375,7 +377,10 @@ The `json.vue` form plugin uses the vanilla `jsoneditor` library directly from n
 - ListAdmin edit dialog uses a template-level `<form-admin>` component (no JSX
   indirection). The dialog mounts `FormAdmin` directly when `dialog.show` is true,
   with `v-if="dialog.show"` to force remount on each open.
-- The `submit` callback in the dialog's action slot calls `closeEditDialog()` which
+- The Save button lives in `<template #footer>` on `<el-dialog>`, outside the
+  scrollable form body, so it remains fixed at the bottom. It triggers
+  `$refs.dialogForm.onSubmit(closeEditDialog)`.
+- The `submit` callback in the dialog's footer calls `closeEditDialog()` which
   shows a success message and closes the dialog.
 - `@closed="fetchData"` refreshes list data via API after dialog close.
 - `v-model` replaces the old `.sync` modifier for Vue 3.
@@ -424,6 +429,7 @@ The i18n system uses **flat English strings as translation keys** instead of nes
 - Locale is injected into every Axios request via `Accept-Language` header and `_locale` query parameter.
 - Supported: `en` (default), `zh`, `zh-Hant`, `ja`. Element Plus locale syncs automatically.
 - `routes.js` and all entity configs use `import { t } from '@/i18n'` to translate titles and labels.
+- Entity names such as `Picture`, `Specification` and field labels like `Image`, `Metadata`, `Price`, `Sort` are available as i18n keys across all 4 locales.
 - Adding a new language: create `src/i18n/{code}.js`, register in `i18n/index.js`, add to Navbar dropdown.
 
 ### Auto Token Refresh
@@ -444,6 +450,67 @@ The i18n system uses **flat English strings as translation keys** instead of nes
 - Browser geolocation + Open-Meteo API for local weather; falls back to Beijing
 - All API calls are `.catch(() => ...)` — dashboard remains functional even when
   backend is unreachable
+
+### Unified Upload System
+
+All file/image uploads go through `src/utils/upload.js`, which provides a single entry point for:
+
+- **Host resolution**: `resolveUploadHost()` checks `VITE_BASE_API` → `window.location.origin` → `VITE_PROXY_TARGET`. Browser uploads always use same-origin to avoid CORS preflight failures.
+- **Upload endpoint**: `POST /api/v1/manage/media/upload` with `file` (multipart) and `storage` (form field, defaults to `MEDIA_STORAGE_DEFAULT`).
+- **Auth headers**: `getUploadHeaders()` attaches `Authorization: Bearer {token}` from the auth cookie.
+- **Path normalisation**: `resolveUploadPath(response)` extracts `data.path` from the response object and converts it to a full URL via `getPictureUrl()`.
+- **Image display**: `getPictureUrl(name)` returns absolute URLs as-is, prepends the upload host for `/uploads/...` paths, and falls back to `/uploads/images/{name}` for bare filenames.
+- **`simple-image-process.js`**: `getPicture()` now delegates to `getPictureUrl()` from the upload utility.
+
+Components using the unified system:
+- `plugins/form/image.vue` — `el-upload` with computed `uploadAction`, `uploadData`, `uploadHeaders`.
+- `plugins/form/file.vue` — same pattern as image; default `storage` from `MEDIA_STORAGE_DEFAULT`, overridable via `field.type_options.storage`.
+- `Tinymce/index.vue` — `images_upload_handler` uses the server endpoint (IPFS handler removed).
+- `Tinymce/components/EditorImage.vue` — editor image upload popup uses the same utilities; dialog uses `align-center` and `append-to-body` for proper vertical centering.
+
+Upload success response format:
+```json
+{
+  "data": { "id": 1, "path": "/uploads/202607/photo.jpg", "storage": "local", ... },
+  "code": 0, "message": "SUCCESS"
+}
+```
+
+After a successful upload, image and file plugins call `validateField()` on the parent `FormAdmin` ref to clear any `required` validation errors.
+
+### Edit / Add Dialog Styling
+
+The shared `ListAdmin` edit dialog has the following refinements:
+
+- Save button lives in `<template #footer>` of `el-dialog` — outside the scrollable form body — so it remains fixed at the bottom.
+- The dialog uses `class="easy-admin-dialog"` with:
+  - Responsive width: `min(86vw, 1040px)`, max height `min(88vh, 900px)`.
+  - 12px border-radius, subtle box-shadow.
+  - Header: lighter background, refined title typography, rounded close button hover.
+  - Body: zero padding on dialog body; padding lives on `.app-container` (28px).
+  - The form title row (`.app-container > .el-row:first-child`) is hidden inside the dialog.
+  - Form labels: darker text, 600 weight.
+- `el-dialog` acts as a flex column container so header/body/footer stack naturally.
+- `v-if="dialog.show"` on `<form-admin>` forces a fresh mount each open.
+- `ref="dialogForm"` on `<form-admin>` allows the footer button to call `onSubmit(closeEditDialog)`.
+
+### Image Preview (Teleport & z-index)
+
+Image previews rendered by `<el-image>` in list and detail plugins were being obscured by fixed table columns and dialogs because they lived inside the parent stacking context. The fix:
+
+- Both `plugins/list/image.vue` and `plugins/detail/image.vue` use `preview-teleported` on `<el-image>`, which mounts the preview overlay to `<body>`.
+- Global style rule: `.el-image-viewer__wrapper { z-index: 3000 !important; }` ensures the teleported overlay sits above all page content.
+- The `z-index` prop on the `<el-image>` components themselves is set high as a fallback.
+
+### Dynamic App Version
+
+The login page reads the version number from `package.json` at build time via Vite's built-in JSON import:
+
+```js
+import { version } from '@/../package.json'
+```
+
+The version string is exposed to the template as `appVersion` and rendered as `Version {{ appVersion }}`. Update `package.json` → `"version"` to change the displayed version.
 
 ---
 
@@ -477,5 +544,5 @@ The i18n system uses **flat English strings as translation keys** instead of nes
 - **Testing**: Jest 27 replaced by Vitest 2.1. `jest.config.js` removed. Tests migrated
   to `@vue/test-utils@2`, `createLocalVue` removed, components use `global.plugins`.
 - **Proxy**: Vite config proxies `/api`, `/system`, `/upload`, `/uploads` to backend in dev.
-- **Process.env**: `process.env.VITE_*` references are defined via `vite.config.ts`
+- **Process.env**: `process.env.VITE_*`, `VITE_PROXY_TARGET`, and `MEDIA_STORAGE_DEFAULT` references are defined via `vite.config.ts`
   (define plugin) for backward compatibility.
