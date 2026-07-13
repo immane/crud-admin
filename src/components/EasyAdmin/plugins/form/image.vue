@@ -2,7 +2,9 @@
   <el-upload
     ref="upload"
     v-bind="field.type_options"
-    :action="`${BASE_API}/upload`"
+    :action="uploadAction"
+    :data="uploadData"
+    :headers="uploadHeaders"
     :limit="field.type === 'image' ? 1 : undefined"
     :accept="field.type_options?.accept || 'image/*'"
     :file-list="
@@ -18,16 +20,9 @@
       if(field.type === 'image') form[field.property] = ''
       else form[field.property] = fileList.map(photo => photo.name)
     }"
-    :on-success="(res, file) => {
-      if(field.type === 'image') {
-        form[field.property] = res.data[0]
-      }
-      else {
-        if(!Object.keys(form).includes(field.property) || !Array.isArray(form[field.property])) form[field.property] = []
-        form[field.property] = [...form[field.property], ...res.data]
-      }
-    }"
+    :on-success="handleSuccess"
     :on-exceed="handleExceed"
+    :on-error="handleError"
     v-on="field.type_events || {}"
   >
     <el-button size="small" type="primary">{{ $t('Select media/file') }}</el-button>
@@ -36,6 +31,7 @@
 </template>
 
 <script>
+import { getUploadData, getUploadHeaders, getUploadUrl, resolveUploadPath } from '@/utils/upload'
 import SIP from '@/utils/simple-image-process'
 export default {
   props: {
@@ -48,15 +44,43 @@ export default {
       default: () => { return {} }
     }
   },
-  data() {
-    return {
-      // base api
-      BASE_API: process.env.VITE_BASE_API
+  computed: {
+    uploadAction() {
+      return getUploadUrl()
+    },
+    uploadData() {
+      return { ...getUploadData(this.field.type_options?.storage), ...(this.field.type_options?.data || {}) }
+    },
+    uploadHeaders() {
+      return { ...(this.field.type_options?.headers || {}), ...getUploadHeaders() }
     }
   },
   methods: {
-    // Get picture
     getPicture(url) { return SIP.getPicture(url) },
+    handleSuccess(response) {
+      const path = resolveUploadPath(response)
+      if (!path) return
+      if (this.field.type === 'image') {
+        this.form[this.field.property] = path
+      } else {
+        if (!Array.isArray(this.form[this.field.property])) this.form[this.field.property] = []
+        this.form[this.field.property] = [...this.form[this.field.property], path]
+      }
+      this.validateField()
+    },
+    validateField() {
+      let parent = this.$parent
+      while (parent) {
+        if (parent.$refs?.form?.validateField) {
+          this.$nextTick(() => parent.$refs.form.validateField(this.field.property))
+          return
+        }
+        parent = parent.$parent
+      }
+    },
+    handleError(error) {
+      this.$message.error(error.message || 'Upload failed')
+    },
     handleExceed(files) {
       this.form[this.field.property] = ''
       const upload = this.$refs.upload

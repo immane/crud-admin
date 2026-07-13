@@ -2,7 +2,8 @@
   <tinymce
     :model-value="form[field.property]"
     @update:model-value="form[field.property] = $event"
-    :height="300"
+    :height="350"
+    width="100%"
     v-bind="field.type_options"
     v-on="field.type_events || {}"
   />

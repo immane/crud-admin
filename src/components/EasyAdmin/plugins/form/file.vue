@@ -2,7 +2,9 @@
   <el-upload
     ref="upload"
     v-bind="field.type_options"
-    :action="`${BASE_API}/upload?storage=qiniu`"
+    :action="uploadAction"
+    :data="uploadData"
+    :headers="uploadHeaders"
     :limit="1"
     :file-list="
       form[field.property]
@@ -11,8 +13,9 @@
     "
     list-type="file"
     :on-remove="(file, fileList) => form[field.property] = ''"
-    :on-success="(res, file) => { form[field.property] = res.data[0] }"
+    :on-success="handleSuccess"
     :on-exceed="handleExceed"
+    :on-error="handleError"
     v-on="field.type_events || {}"
   >
     <el-button size="small" type="primary">{{ $t('Select file') }}</el-button>
@@ -21,6 +24,7 @@
 </template>
 
 <script>
+import { getUploadData, getUploadHeaders, getUploadUrl, resolveUploadPath } from '@/utils/upload'
 import SIP from '@/utils/simple-image-process'
 
 export default {
@@ -34,15 +38,34 @@ export default {
       default: () => { return {} }
     }
   },
-  data() {
-    return {
-      // base api
-      BASE_API: process.env.VITE_BASE_API
+  computed: {
+    uploadAction() {
+      return getUploadUrl()
+    },
+    uploadData() {
+      return { ...getUploadData(this.field.type_options?.storage), ...(this.field.type_options?.data || {}) }
+    },
+    uploadHeaders() {
+      return { ...(this.field.type_options?.headers || {}), ...getUploadHeaders() }
     }
   },
   methods: {
     getPicture(url) {
       return SIP.getPicture(url)
+    },
+    handleSuccess(response) {
+      this.form[this.field.property] = resolveUploadPath(response) || ''
+      let parent = this.$parent
+      while (parent) {
+        if (parent.$refs?.form?.validateField) {
+          this.$nextTick(() => parent.$refs.form.validateField(this.field.property))
+          return
+        }
+        parent = parent.$parent
+      }
+    },
+    handleError(error) {
+      this.$message.error(error.message || 'Upload failed')
     },
     handleExceed(files) {
       this.form[this.field.property] = ''

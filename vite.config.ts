@@ -49,6 +49,8 @@ export default defineConfig(({ mode }) => {
     base: mode === 'development' ? '/' : '/admin/',
     define: {
       'process.env.VITE_BASE_API': JSON.stringify(env.VITE_BASE_API || ''),
+      'process.env.VITE_PROXY_TARGET': JSON.stringify(env.VITE_PROXY_TARGET || ''),
+      'process.env.MEDIA_STORAGE_DEFAULT': JSON.stringify(env.MEDIA_STORAGE_DEFAULT || 'local'),
       'process.env.VITE_API_PREFIX': JSON.stringify(env.VITE_API_PREFIX || '/api/v1'),
       'process.env.VITE_AUTH_API_PREFIX': JSON.stringify(env.VITE_AUTH_API_PREFIX || '/api/auth'),
       'process.env.VITE_SYSTEM_API_PREFIX': JSON.stringify(env.VITE_SYSTEM_API_PREFIX || '/system'),

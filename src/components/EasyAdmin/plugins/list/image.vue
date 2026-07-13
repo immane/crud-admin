@@ -1,9 +1,13 @@
 <template>
   <span>
     <el-image
-      style="width: 50px; height: 50px; border: 3px white solid; box-shadow: 1px 1px 5px #ddd;"
+      class="image"
       :src="imageUrl"
+      fit="cover"
+      lazy="true"
       :preview-src-list="[imageUrl]"
+      preview-teleported
+      :z-index="3000"
     />
   </span>
 </template>
@@ -26,3 +30,12 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.image {
+  width: 50px;
+  height: 50px;
+  border: 3px white solid;
+  box-shadow: 1px 1px 5px #ddd;
+}
+</style>

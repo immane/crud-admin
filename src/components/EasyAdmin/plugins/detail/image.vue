@@ -4,6 +4,8 @@
       style="width: 100%; height: 100%; border: 3px white solid; box-shadow: 1px 1px 5px #ddd;"
       :src="imageUrl"
       :preview-src-list="[imageUrl]"
+      preview-teleported
+      :z-index="3000"
     />
   </span>
 </template>
