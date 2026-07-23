@@ -206,6 +206,7 @@ const entityCollections = import.meta.glob('./collections/**/*.{js,jsx}', { eage
 | `text.vue` | — | `<Tinymce>` (rich text) |
 | `boolean.vue` | boolean | `<el-checkbox>` |
 | `integer.vue` | integer | `<el-input-number>` |
+| `currency.vue` | currency | `<el-input-number>` + currency code (yuan input, cents storage) |
 | `select.vue` | — | `<el-select>` |
 | `date.vue` | date | `<el-date-picker>` (yyyy-MM-dd) |
 | `datetime.vue` | datetime | `<el-date-picker>` (yyyy-MM-dd HH:mm:ss) |
@@ -225,6 +226,7 @@ const entityCollections = import.meta.glob('./collections/**/*.{js,jsx}', { eage
 |-------------|--------------|------------------|
 | `editable-plain.vue` | editable string/int/float/decimal | Inline edit |
 | `boolean.vue` | boolean | `<el-switch>` or `<el-tag>` |
+| `currency.vue` | currency | Formatted currency (Intl.NumberFormat, narrowSymbol) |
 | `date.vue` | date | Formatted date with icon |
 | `datetime.vue` | datetime, datetime_immutable | Formatted datetime with icon |
 | `image.vue` | image | `<el-image>` (preview) |

@@ -210,6 +210,7 @@ interface FieldOption {
 | `select` | `<el-select>` 靜態選項 | 預定義選項 |
 | `boolean` | `<el-checkbox>` | 布林標誌 |
 | `integer` | `<el-input-number>` | 整數 |
+| `currency` | `<el-input-number>` + 貨幣代碼 | 貨幣金額（以最小單位整數儲存） |
 | `date` | `<el-date-picker>` (yyyy-MM-dd) | 日期 |
 | `datetime` | `<el-date-picker>` (yyyy-MM-dd HH:mm:ss) | 日期 + 時間 |
 | `image` | `<el-upload>` 單圖上傳 | 圖片上傳 |
@@ -242,6 +243,30 @@ interface FieldOption {
 ```
 
 內建行號、語法醒目提示、括號配對、目前行醒目提示、復原/重做和 Tab 縮排。
+
+#### Currency 選項
+
+`currency` 欄位類型以整數儲存（如分），並以格式化貨幣形式顯示。輸入為十進制單位（如元）；儲存值為輸入值乘以 `multiplier`。
+
+```js
+{
+  property: 'amount',
+  type: 'currency',
+  type_options: {
+    multiplier: 100,    // 顯示時除以該值；預設：100
+    currency: 'CNY'     // ISO 4217 貨幣代碼；預設：'CNY'
+  }
+}
+```
+
+顯示使用 `Intl.NumberFormat`，根據目前語言使用 `narrowSymbol`。例如：
+- `CNY` → `¥12,345.00`（zh-CN）、`¥12,345.00`（en-US）
+- `USD` → `$123.45`
+- `EUR` → `€123.45`
+
+其他 `type_options` 將透傳至 `<el-input-number>`。例如 `{ min: 0, max: 999999 }`。
+
+在列表/詳情檢視中，值以貨幣符號格式化顯示。在表單中，使用者輸入十進制金額，旁邊顯示貨幣代碼標籤。
 
 ### 5.2 標籤與國際化
 
@@ -475,7 +500,7 @@ list_display: [
 ]
 ```
 
-可用的清單外掛類型：`boolean`、`date`、`datetime`、`image`、`array`、`RelationToOne`、`RelationToMany`、`editable-plain`（字串/數字可編輯）、`plain-text`（回退）。
+可用的清單外掛類型：`boolean`、`currency`、`date`、`datetime`、`image`、`array`、`RelationToOne`、`RelationToMany`、`editable-plain`（字串/數字可編輯）、`plain-text`（回退）。
 
 ### 8.2 `list_filter` — 三種風格
 
@@ -888,6 +913,7 @@ export default {
 |---|---|
 | 文字 | `input`、`text`、`textarea`、`code` |
 | 數字 | `integer` |
+| 貨幣 | `currency` |
 | 布林 | `boolean` |
 | 日期/時間 | `date`、`datetime` |
 | 媒體 | `image`、`file` |

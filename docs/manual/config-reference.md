@@ -210,6 +210,7 @@ interface FieldOption {
 | `select` | `<el-select>` with static options | Pre-defined choices |
 | `boolean` | `<el-checkbox>` | True/false flags |
 | `integer` | `<el-input-number>` | Whole numbers |
+| `currency` | `<el-input-number>` + currency code | Monetary values (stored as integer cents) |
 | `date` | `<el-date-picker>` (yyyy-MM-dd) | Dates |
 | `datetime` | `<el-date-picker>` (yyyy-MM-dd HH:mm:ss) | Date + time |
 | `image` | `<el-upload>` single-image wall mode | Image upload |
@@ -242,6 +243,30 @@ The `code` field type uses CodeMirror 6 and fills the available form width by de
 ```
 
 It includes line numbers, syntax highlighting, bracket matching, active-line highlighting, undo/redo, and Tab indentation.
+
+#### Currency Options
+
+The `currency` field type stores values as integers (e.g. cents) and displays them as formatted currency. Input is in decimal units (e.g. yuan); storage is integer multiplied by `multiplier`.
+
+```js
+{
+  property: 'amount',
+  type: 'currency',
+  type_options: {
+    multiplier: 100,    // divide by this for display; default: 100
+    currency: 'CNY'     // ISO 4217 currency code; default: 'CNY'
+  }
+}
+```
+
+Display uses `Intl.NumberFormat` with `narrowSymbol` per the active locale. For example:
+- `CNY` → `¥12,345.00` (zh-CN), `¥12,345.00` (en-US)
+- `USD` → `$123.45`
+- `EUR` → `€123.45`
+
+Additional `type_options` are passed through to `<el-input-number>`. For example, `{ min: 0, max: 999999 }`.
+
+In list/detail views, values are formatted with the currency symbol. In forms, users input decimal amounts alongside the currency code label.
 
 ### 5.2 Labels & i18n
 
@@ -475,7 +500,7 @@ list_display: [
 ]
 ```
 
-Available list plugin types: `boolean`, `date`, `datetime`, `image`, `array`, `RelationToOne`, `RelationToMany`, `editable-plain` (string/int editable), `plain-text` (fallback).
+Available list plugin types: `boolean`, `currency`, `date`, `datetime`, `image`, `array`, `RelationToOne`, `RelationToMany`, `editable-plain` (string/int editable), `plain-text` (fallback).
 
 ### 8.2 `list_filter` — Three Styles
 
@@ -888,6 +913,7 @@ export default {
 |---|---|
 | Text | `input`, `text`, `textarea`, `code` |
 | Numeric | `integer` |
+| Monetary | `currency` |
 | Boolean | `boolean` |
 | Date/Time | `date`, `datetime` |
 | Media | `image`, `file` |

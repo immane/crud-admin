@@ -210,6 +210,7 @@ interface FieldOption {
 | `select` | `<el-select>` 静的オプション | 定義済みオプション |
 | `boolean` | `<el-checkbox>` | 真偽値フラグ |
 | `integer` | `<el-input-number>` | 整数 |
+| `currency` | `<el-input-number>` + 通貨コード | 金額（最小単位の整数で保存） |
 | `date` | `<el-date-picker>` (yyyy-MM-dd) | 日付 |
 | `datetime` | `<el-date-picker>` (yyyy-MM-dd HH:mm:ss) | 日付 + 時刻 |
 | `image` | `<el-upload>` 単一画像アップロード | 画像アップロード |
@@ -242,6 +243,30 @@ interface FieldOption {
 ```
 
 行番号、シンタックスハイライト、括弧の対応付け、アクティブ行のハイライト、元に戻す/やり直し、Tab インデントを備えています。
+
+#### Currency オプション
+
+`currency` フィールド型は値を整数（例：セント）で保存し、フォーマットされた通貨として表示します。入力は小数単位（例：円）、保存は入力値 × `multiplier` です。
+
+```js
+{
+  property: 'amount',
+  type: 'currency',
+  type_options: {
+    multiplier: 100,    // 表示時にこの値で除算；デフォルト：100
+    currency: 'CNY'     // ISO 4217 通貨コード；デフォルト：'CNY'
+  }
+}
+```
+
+表示には現在のロケールに応じた `Intl.NumberFormat` の `narrowSymbol` を使用します。例：
+- `CNY` → `¥12,345.00`（zh-CN）、`¥12,345.00`（en-US）
+- `USD` → `$123.45`
+- `EUR` → `€123.45`
+
+その他の `type_options` は `<el-input-number>` に渡されます。例：`{ min: 0, max: 999999 }`。
+
+リスト/詳細ビューでは、値は通貨記号でフォーマットされます。フォームでは、ユーザーは通貨コードラベルとともに小数金額を入力します。
 
 ### 5.2 ラベルと国際化
 
@@ -475,7 +500,7 @@ list_display: [
 ]
 ```
 
-利用可能な一覧プラグインタイプ：`boolean`、`date`、`datetime`、`image`、`array`、`RelationToOne`、`RelationToMany`、`editable-plain`（文字列/数値の編集可能）、`plain-text`（フォールバック）。
+利用可能な一覧プラグインタイプ：`boolean`、`currency`、`date`、`datetime`、`image`、`array`、`RelationToOne`、`RelationToMany`、`editable-plain`（文字列/数値の編集可能）、`plain-text`（フォールバック）。
 
 ### 8.2 `list_filter`（検索フィルター） — 3 つのスタイル
 
@@ -888,6 +913,7 @@ export default {
 |---|---|
 | テキスト | `input`、`text`、`textarea`、`code` |
 | 数値 | `integer` |
+| 通貨 | `currency` |
 | 真偽値 | `boolean` |
 | 日付/時刻 | `date`、`datetime` |
 | メディア | `image`、`file` |
