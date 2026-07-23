@@ -5,7 +5,10 @@ export default {
   WalletTransaction: {
     entity: { name: 'WalletTransaction', plural: 'transactions' },
     form: {
-      fields: '__all__'
+      fields: [
+        { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
+        '__all__'
+      ]
     },
     list: {
       query: orderByIdDesc,
@@ -28,12 +31,15 @@ export default {
         }
       },
       list_display: [
-        'id', 'uuid', 'amount', 'type', 'status',
+        'id', 'uuid', { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }}, 'type', 'status',
         'fromWallet', 'toWallet', 'referenceId', 'createdAt'
       ]
     },
     detail: {
-      detail_display: '__all__'
+      detail_display: [
+        { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
+        '__all__'
+      ]
     }
   }
 }

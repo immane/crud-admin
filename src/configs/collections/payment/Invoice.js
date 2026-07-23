@@ -3,7 +3,10 @@ import { orderByIdDesc } from '../helpers'
 export default {
   Invoice: {
     form: {
-      fields: '__all__'
+      fields: [
+        { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
+        '__all__'
+      ]
     },
     list: {
       query: orderByIdDesc,
@@ -11,7 +14,7 @@ export default {
       list_display: [
         'id',
         'payer',
-        'amount',
+        { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
         'currency',
         'status',
         'createdAt',
@@ -20,16 +23,8 @@ export default {
     },
     detail: {
       detail_display: [
-        'id',
-        'invoiceNo',
-        'payer',
-        'amount',
-        'currency',
-        'status',
-        'order',
-        'metadata',
-        'createdAt',
-        'updatedAt'
+        { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
+        '__all__'
       ]
     }
   }
