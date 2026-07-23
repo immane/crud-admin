@@ -39,7 +39,7 @@
 
     &.has-logo {
       .el-scrollbar {
-        height: calc(100% - 50px);
+        height: calc(100% - 56px);
       }
     }
 
@@ -66,22 +66,29 @@
       border: none;
       height: 100%;
       width: 100% !important;
+      background: transparent !important;
+    }
+
+    .el-menu-item.is-active {
+      color: $menuActiveText !important;
+      background: linear-gradient(90deg, #3269b4, #285796) !important;
+      box-shadow: 0 8px 18px rgba(7, 25, 55, .24);
     }
 
     // menu hover
     .submenu-title-noDropdown,
-    .el-submenu__title {
+    .el-sub-menu__title {
       &:hover {
         background-color: $menuHover !important;
       }
     }
 
-    .is-active>.el-submenu__title {
+    .is-active>.el-sub-menu__title {
       color: $subMenuActiveText !important;
     }
 
-    & .nest-menu .el-submenu>.el-submenu__title,
-    & .el-submenu .el-menu-item {
+    & .nest-menu .el-sub-menu>.el-sub-menu__title,
+    & .el-sub-menu .el-menu-item {
       min-width: $sideBarWidth !important;
       background-color: $subMenuBg !important;
 
@@ -89,11 +96,19 @@
         background-color: $subMenuHover !important;
       }
     }
+
+    & .el-sub-menu .el-menu-item.is-active {
+      color: $menuActiveText !important;
+      background: linear-gradient(90deg, #3269b4, #285796) !important;
+      box-shadow: inset 3px 0 0 #8cb8ff;
+    }
   }
 
   .hideSidebar {
     .sidebar-container {
       width: 54px !important;
+
+      .el-menu { padding: 0; }
     }
 
     .main-container {
@@ -118,10 +133,10 @@
       }
     }
 
-    .el-submenu {
+    .el-sub-menu {
       overflow: hidden;
 
-      &>.el-submenu__title {
+      &>.el-sub-menu__title {
         padding: 0 !important;
 
         .svg-icon {
@@ -133,15 +148,15 @@
           margin: 0 !important;
         }
 
-        .el-submenu__icon-arrow {
+        .el-sub-menu__icon-arrow {
           display: none;
         }
       }
     }
 
     .el-menu--collapse {
-      .el-submenu {
-        &>.el-submenu__title {
+      .el-sub-menu {
+        &>.el-sub-menu__title {
           justify-content: center;
           &>span {
             height: 0;
@@ -153,6 +168,7 @@
         }
       }
       .el-menu-item {
+        padding: 0 !important;
         justify-content: center;
       }
       .sub-el-icon {
@@ -161,7 +177,7 @@
     }
   }
 
-  .el-menu--collapse .el-menu .el-submenu {
+  .el-menu--collapse .el-menu .el-sub-menu {
     min-width: $sideBarWidth !important;
   }
 
@@ -206,7 +222,7 @@
     }
   }
 
-  .nest-menu .el-submenu>.el-submenu__title,
+  .nest-menu .el-sub-menu>.el-sub-menu__title,
   .el-menu-item {
     &:hover {
       // you can use $subMenuHover
