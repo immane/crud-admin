@@ -1,187 +1,166 @@
 <template>
   <div>
-    <el-row class="list-view-top">
-      <el-col :span="4">
+    <div class="easy-admin-toolbar">
+      <div class="easy-admin-toolbar__title">
         <slot name="title">
-          <strong style="font-size: 20px;">
-            <!-- Title slot here -->
+          <strong>
             <slot name="titleText">
               {{ titleText }}
             </slot>
           </strong>
         </slot>
-      </el-col>
-      <el-col :span="20" align="right">
-        <!-- Top filter or searcher slot-->
-        <slot name="filter">
-          <search-filter
-            ref="searchFilter"
-            v-model="listFilterData"
-            v-model:filter="filter"
-            :query="query"
-            :fetch-data-func="fetchFilteredData"
-            :list-filter="listFilter"
-            @reset="resetSearch"
-          />
-        </slot>
-
-        &emsp;
-
-        <!-- Top button slot, actions here -->
-        <slot name="extraTopButton">
-          <component
-            :is="action.component"
-            v-for="action in actions.filter(action => action.position === 'top')"
-            :key="action.name"
-            style="margin-right: .5em"
-            :refresh="fetchData"
-          />
-        </slot>
-        &emsp;
-        <template v-if="hasBatchDelete">
-          <span class="easy-admin-selection-count">
-            {{ $t('{0} records selected', selectedRecords.length) }}
-          </span>
-          <el-popconfirm
-            :title="$t('Delete {0} selected records?', selectedRecords.length)"
-            @confirm="removeSelected"
-          >
-            <template #reference>
-              <el-button
-                size="default"
-                type="danger"
-                icon="el-icon-delete"
-                plain
-                :disabled="!selectedRecords.length"
-                :loading="batchDeleting"
-              >
-                {{ $t('Batch Delete') }}
-              </el-button>
-            </template>
-          </el-popconfirm>
-          &emsp;
-        </template>
-        <template v-if="hasBatchEdit">
-          <el-button
-            size="default"
-            type="primary"
-            icon="el-icon-edit"
-            plain
-            :disabled="!selectedRecords.length"
-            @click="openBatchEditDialog"
-          >
-            {{ $t('Batch Edit') }}
-          </el-button>
-          &emsp;
-        </template>
-        <slot name="topButton">
-          <!-- Export action -->
-          <template
-            v-if="!disabledActions.includes('export')
-              && config && config.list && config.list.export"
-          >
-            <el-button
-              size="default"
-              type="primary"
-              icon="el-icon-download"
-              plain
-              @click="() => {
-                const loading = startLoading({
-                  lock: true,
-                  text: $t('Exporting data'),
-                  spinner: 'el-icon-loading',
-                  background: 'rgba(0, 0, 0, 0.7)'
-                })
-
-                // default config
-                const exportConf = config.list.export
-                const confQuery = config.list.query
-                let query = {}, label = {}, listQuery = {}
-                if(exportConf) {
-                  if(exportConf.hasOwnProperty('query'))
-                    query = exportConf.query
-                  if(exportConf.hasOwnProperty('label'))
-                    label = exportConf.label
-                }
-                if(confQuery) {
-                  listQuery = confQuery
-                }
-
-                // Use current filter
-                query = Object.assign({}, listQuery, filter, query)
-
-                em.list(query).then(res => {
-                  loading.close()
-                  let keys = []
-                  res.data.forEach(datum => {
-                    keys = Object.keys(datum)
-                    keys.forEach(key => {
-                      const value = datum[key]
-                      if(typeof datum[key] === 'object' && datum[key] !== null) {
-                        datum[key] = datum[key].hasOwnProperty('__toString')
-                          ? datum[key].__toString : '[Object]'
-                      }
-                      else if(Array.isArray(datum[key])) {
-                        datum[key] = '[Array]'
-                      }
-                    })
-                  })
-
-                  const data = res.data
-                  if(label
-                    && Object.keys(label).length === 0
-                    && Object.getPrototypeOf(label) === Object.prototype
-                  ) {
-                    keys.forEach(v => { label[v] = v } )
-                  }
-
-                  exportExcelCsv(label, data, `export-${em.name}.csv`)
-                })
-              }"
+      </div>
+      <div class="easy-admin-toolbar__body">
+        <div class="easy-admin-toolbar__search">
+          <slot name="filter">
+            <search-filter
+              ref="searchFilter"
+              v-model="listFilterData"
+              v-model:filter="filter"
+              :query="query"
+              :fetch-data-func="fetchFilteredData"
+              :list-filter="listFilter"
+              @reset="resetSearch"
+            />
+          </slot>
+        </div>
+        <div class="easy-admin-toolbar__actions">
+          <slot name="extraTopButton">
+            <component
+              :is="action.component"
+              v-for="action in actions.filter(action => action.position === 'top')"
+              :key="action.name"
+              :refresh="fetchData"
+            />
+          </slot>
+          <template v-if="selectedRecords.length && (hasBatchDelete || hasBatchEdit)">
+            <span class="easy-admin-selection-count">{{ $t('{0} records selected', selectedRecords.length) }}</span>
+            <el-popconfirm
+              v-if="hasBatchDelete"
+              :title="$t('Delete {0} selected records?', selectedRecords.length)"
+              @confirm="removeSelected"
             >
-               {{ $t('Export') }}
+              <template #reference>
+                <el-button
+                  size="default"
+                  type="danger"
+                  icon="el-icon-delete"
+                  plain
+                  :loading="batchDeleting"
+                >
+                  {{ $t('Batch Delete') }}
+                </el-button>
+              </template>
+            </el-popconfirm>
+            <el-button v-if="hasBatchEdit" size="default" type="primary" icon="el-icon-edit" plain @click="openBatchEditDialog">
+              {{ $t('Batch Edit') }}
             </el-button>
           </template>
+          <slot name="topButton">
+            <div class="easy-admin-toolbar__default-actions">
+              <template
+                v-if="!disabledActions.includes('export')
+                  && config && config.list && config.list.export"
+              >
+                <el-button
+                  size="default"
+                  type="primary"
+                  icon="el-icon-download"
+                  plain
+                  @click="() => {
+                    const loading = startLoading({
+                      lock: true,
+                      text: $t('Exporting data'),
+                      spinner: 'el-icon-loading',
+                      background: 'rgba(0, 0, 0, 0.7)'
+                    })
 
-          &emsp;
+                    // default config
+                    const exportConf = config.list.export
+                    const confQuery = config.list.query
+                    let query = {}, label = {}, listQuery = {}
+                    if(exportConf) {
+                      if(exportConf.hasOwnProperty('query'))
+                        query = exportConf.query
+                      if(exportConf.hasOwnProperty('label'))
+                        label = exportConf.label
+                    }
+                    if(confQuery) {
+                      listQuery = confQuery
+                    }
 
-          <!-- New action -->
-          <el-button
-            v-if="!disabledActions.includes('new')"
-            size="default"
-            type="primary"
-            icon="el-icon-plus"
-            plain
-            @click="() => {
-              dialog.title = $t('New Record')
-              delete dialog.data.id
-              dialog.refresh++
-              dialog.show = true
-            }"
-          >
-             {{ $t('New') }} {{ $route.meta.title }}
-          </el-button>
-        </slot>
-      </el-col>
-    </el-row>
+                    // Use current filter
+                    query = Object.assign({}, listQuery, filter, query)
+
+                    em.list(query).then(res => {
+                      loading.close()
+                      let keys = []
+                      res.data.forEach(datum => {
+                        keys = Object.keys(datum)
+                        keys.forEach(key => {
+                          const value = datum[key]
+                          if(typeof datum[key] === 'object' && datum[key] !== null) {
+                            datum[key] = datum[key].hasOwnProperty('__toString')
+                              ? datum[key].__toString : '[Object]'
+                          }
+                          else if(Array.isArray(datum[key])) {
+                            datum[key] = '[Array]'
+                          }
+                        })
+                      })
+
+                      const data = res.data
+                      if(label
+                        && Object.keys(label).length === 0
+                        && Object.getPrototypeOf(label) === Object.prototype
+                      ) {
+                        keys.forEach(v => { label[v] = v } )
+                      }
+
+                      exportExcelCsv(label, data, `export-${em.name}.csv`)
+                    })
+                  }"
+                >
+                  {{ $t('Export') }}
+                </el-button>
+              </template>
+              <el-button
+                v-if="!disabledActions.includes('new')"
+                size="default"
+                type="primary"
+                icon="el-icon-plus"
+                @click="() => {
+                  dialog.title = $t('New Record')
+                  delete dialog.data.id
+                  dialog.refresh++
+                  dialog.show = true
+                }"
+              >
+                {{ $t('New') }} {{ $route.meta.title }}
+              </el-button>
+            </div>
+          </slot>
+        </div>
+      </div>
+    </div>
 
     <el-row>
-        <el-table
-          :key="refreshTable"
-          v-loading="loading"
-          :data="list"
-          element-loading-text="Loading..."
-          fit
-          lazy
-          stripe
-          highlight-current-row
-          v-bind="tableConf"
-          table-layout="auto"
-          style="width: 100%"
-          v-on="tableEvent || {}"
-          @sort-change="changeSort"
-          @selection-change="handleSelectionChange"
-        >
+      <el-table
+        :key="refreshTable"
+        v-loading="loading"
+        :data="list"
+        element-loading-text="Loading..."
+        fit
+        lazy
+        stripe
+        highlight-current-row
+        v-bind="tableConf"
+        table-layout="auto"
+        style="width: 100%"
+        v-on="tableEvent || {}"
+        @sort-change="changeSort"
+        @selection-change="handleSelectionChange"
+      >
 
         <slot name="tableSelection" />
 
@@ -330,9 +309,9 @@
     >
       <form-admin
         v-if="dialog.show"
+        :id="dialog.data.id"
         ref="dialogForm"
         :key="dialog.refresh"
-        :id="dialog.data.id"
         :entity-conf="dialog.data.entityConf"
         :fields="dialog.data.fields"
         :config="dialog.data.config"
@@ -699,9 +678,9 @@ export default {
       return !this.disabledActions.includes('delete') && !this.disabledActions.includes('batch_delete')
     },
     hasBatchEdit() {
-      return !this.disabledActions.includes('edit')
-        && !this.disabledActions.includes('batch_edit')
-        && this.config?.form?.batch_edit?.fields?.length
+      return !this.disabledActions.includes('edit') &&
+        !this.disabledActions.includes('batch_edit') &&
+        this.config?.form?.batch_edit?.fields?.length
     },
     resolvedBatchFields() {
       const fields = this.config?.form?.batch_edit?.fields
@@ -1134,6 +1113,58 @@ export default {
     padding: 8px 0;
 }
 
+.easy-admin-toolbar {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border: 1px solid #e7edf4;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.easy-admin-toolbar__title {
+  flex: 0 0 auto;
+  color: #1f2d3d;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 32px;
+  white-space: nowrap;
+}
+
+.easy-admin-toolbar__body {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.easy-admin-toolbar__search {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.easy-admin-toolbar__actions,
+.easy-admin-toolbar__default-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.easy-admin-toolbar__actions {
+  flex: 0 0 auto;
+  justify-content: flex-end;
+}
+
+.easy-admin-toolbar__actions :deep(.el-button + .el-button),
+.easy-admin-toolbar__default-actions :deep(.el-button + .el-button) {
+  margin-left: 0;
+}
+
 .easy-admin-actions {
   display: flex;
   align-items: center;
@@ -1147,9 +1178,13 @@ export default {
 }
 
 .easy-admin-selection-count {
-  margin-right: 8px;
-  color: #667085;
-  font-size: 14px;
+  padding: 0 10px;
+  border-radius: 999px;
+  color: #175cd3;
+  background: #eff8ff;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 32px;
 }
 
 :deep(.el-overlay-dialog:has(.easy-admin-dialog)) {
@@ -1246,6 +1281,25 @@ export default {
 }
 
 @media (max-width: 767px) {
+  .easy-admin-toolbar,
+  .easy-admin-toolbar__body {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .easy-admin-toolbar {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .easy-admin-toolbar__title {
+    padding-top: 0;
+  }
+
+  .easy-admin-toolbar__actions {
+    justify-content: flex-start;
+  }
+
   :deep(.easy-admin-dialog) {
     width: calc(100vw - 24px) !important;
     max-height: calc(100vh - 24px);
