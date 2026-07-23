@@ -1,8 +1,8 @@
 {
-    "name": "vue-admin-skeleton",
-    "version": "0.9.1",
-    "description": "A vue admin template with Element UI & axios & iconfont & permission control & lint",
-    "author": "Rin <immane@163.com>",
+    "name": "crud-admin",
+    "version": "0.9.2 beta",
+    "description": "A configuration-driven enterprise admin framework and reference frontend for crud-skeleton, supporting metadata-driven CRUD, complex reporting, dynamic query DSLs, and domain-specific interfaces.",
+    "author": "Lam K. <immane@163.com>",
     "scripts": {
         "test:unit": "vitest run",
         "test": "vitest run",

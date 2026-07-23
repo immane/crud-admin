@@ -65,8 +65,8 @@ export default {
     }
   }
   .drawer-bg {
-    background: #000;
-    opacity: 0.3;
+    background: #0b1730;
+    opacity: 0.48;
     width: 100%;
     top: 0;
     height: 100%;
@@ -81,6 +81,7 @@ export default {
     z-index: 9;
     width: calc(100% - #{$sideBarWidth});
     transition: width 0.28s;
+    height: 56px;
   }
 
   .hideSidebar .fixed-header {

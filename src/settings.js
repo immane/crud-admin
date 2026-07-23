@@ -1,6 +1,6 @@
 export default {
 
-  title: 'Vue admin skeleton',
+  title: 'Crud admin skeleton',
 
   /**
    * @type {boolean} true | false

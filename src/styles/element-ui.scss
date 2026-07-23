@@ -5,6 +5,44 @@
   font-weight: 400 !important;
 }
 
+.el-button {
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.el-input__wrapper,
+.el-textarea__inner,
+.el-select__wrapper,
+.el-date-editor.el-input__wrapper,
+.el-input-number {
+  border-radius: 8px;
+}
+
+.el-table {
+  --el-table-header-bg-color: #f8fafc;
+  --el-table-header-text-color: #667085;
+  --el-table-border-color: #e7edf4;
+  --el-table-row-hover-bg-color: #f8fbff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.el-table th.el-table__cell {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.el-pagination {
+  --el-pagination-button-bg-color: #fff;
+  --el-pagination-hover-color: #2563eb;
+}
+
+.el-dialog,
+.el-message-box {
+  border-radius: 14px;
+}
+
 // to fixed https://github.com/ElemeFE/element/issues/2461
 .el-dialog {
   transform: none;

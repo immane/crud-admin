@@ -71,7 +71,7 @@ import { version } from '@/../package.json'
 export default {
   name: 'Login',
   data() {
-      const validateUsername = (rule, value, callback) => {
+    const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
         callback(new Error('Please enter the correct username'))
       } else {
@@ -346,5 +346,107 @@ $displacement:  3px;
     width:  auto;
     margin:  20px;
   }
+}
+
+/* Keep the login screen aligned with the admin shell's palette and spacing. */
+.login-container {
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  background-position: center;
+  isolation: isolate;
+
+  &::before {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    content: '';
+    background: linear-gradient(125deg, rgba(11, 27, 53, .84), rgba(31, 75, 138, .54));
+  }
+}
+
+.session {
+  width: min(100%, 760px);
+  min-height: 460px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 18px;
+  box-shadow: 0 24px 70px rgba(7, 20, 43, .34);
+}
+
+.left {
+  width: 286px;
+  background-position: center;
+
+  &::after {
+    position: absolute;
+    inset: 0;
+    content: '';
+    background: linear-gradient(160deg, rgba(28, 80, 149, .62), rgba(12, 31, 61, .82));
+  }
+
+  svg { position: relative; z-index: 1; }
+}
+
+.login-form {
+  width: 474px !important;
+  min-height: 460px;
+  padding: 54px 48px 30px !important;
+  background: rgba(255, 255, 255, .98) !important;
+
+  h4 {
+    margin-bottom: 12px !important;
+    color: #667085 !important;
+    font-size: 26px !important;
+
+    span { color: #172b4d !important; }
+  }
+
+  p {
+    max-width: none !important;
+    margin-bottom: 32px !important;
+    color: #667085 !important;
+  }
+
+  :deep(.el-button) {
+    height: 44px;
+    margin: 16px 0 0 !important;
+    border-radius: 9px;
+    background: #2563eb;
+    box-shadow: 0 10px 18px rgba(37, 99, 235, .22);
+
+    &:hover { background: #1d4ed8; transform: none; }
+  }
+}
+
+.floating-label {
+  margin-bottom: 16px;
+
+  input {
+    height: 58px;
+    border-bottom-color: #d9e1ec;
+    color: #1d2939;
+
+    &:focus { border-bottom-color: #2563eb; box-shadow: 0 3px 9px -8px rgba(37, 99, 235, .8); }
+  }
+
+  .icon svg {
+    opacity: .28;
+    path { fill: #52709d; }
+  }
+}
+
+a.discrete {
+  margin-top: 22px;
+  color: #98a2b3;
+  font-size: 12px;
+}
+
+@media (max-width: 720px) {
+  .login-container { padding: 16px; }
+  .session { width: min(100%, 430px); min-height: 0; }
+  .left { display: none; }
+  .login-form { width: 100% !important; min-height: 0; padding: 42px 30px 28px !important; }
 }
 </style>

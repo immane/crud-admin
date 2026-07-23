@@ -7,14 +7,17 @@
 
 body {
   height: 100%;
+  margin: 0;
+  color: #1d2939;
+  background: #f4f7fb;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+  font-family: Inter, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
 }
 
 label {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 html {
@@ -64,5 +67,11 @@ div:focus {
 
 // main-container global css
 .app-container {
-  padding: 20px;
+  padding: 28px;
+}
+
+@media (max-width: 767px) {
+  .app-container {
+    padding: 16px;
+  }
 }
