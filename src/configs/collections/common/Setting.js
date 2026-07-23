@@ -5,7 +5,9 @@ export default {
     form: {
       fields: [
         { property: 'key', field_options: { label: t('Key') }},
-        'value', 'type', 'groupName',
+        { property: 'value', type: 'textarea', required: false },
+        'type', 
+        'groupName',
         { property: 'label', required: false },
         { property: 'description', type: 'text', required: false },
         { property: 'sortOrder', required: false, default_value: 0 }

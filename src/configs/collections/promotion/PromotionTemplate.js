@@ -10,7 +10,7 @@ export default {
         'type',
         { property: 'phase', default_value: 0 },
         { property: 'enabled', type: 'boolean', required: false, default_value: false },
-        { property: 'dsl', type: 'text' },
+        { property: 'dsl', type: 'code' },
         { property: 'fields', type: 'json', required: false }
       ]
     },

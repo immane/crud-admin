@@ -1177,6 +1177,11 @@ export default {
   margin-left: 0;
 }
 
+.easy-admin-actions :deep(.el-button) {
+  height: 30px;
+  padding: 7px 10px;
+}
+
 .easy-admin-selection-count {
   padding: 0 10px;
   border-radius: 999px;
