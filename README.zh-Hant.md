@@ -272,3 +272,12 @@ import { t } from '@/i18n'
 **僅此而已** — 你已擁有自動翻譯的完整列表頁、表單頁和詳情頁。
 
 （以下欄位類型插件、欄位配置參考、路由生成器、API 整合、文件、測試、部署、授權、致謝等章節內容與簡體中文版一致，此處省略以節省空間）
+
+## 文件
+
+- **[設定參考手冊](docs/manual/config-reference.zh-Hant.md)** — EasyAdmin 設定完整指南，從入門到進階
+- **[架構設計](docs/design/architecture.md)** — 系統分層、啟動流程、認證流程、路由、狀態管理
+- **[程式碼與 API 契約](docs/design/contracts.md)** — 請求/回應格式、元件 Props 契約
+- **[EasyAdmin 設計](docs/design/easyadmin-design.md)** — 外掛系統、資料流、擴充點
+- **[EasyAdmin 設定契約](docs/design/easyadmin-config-contract.md)** — 完整設定 Schema 參考
+- **[AI 上下文](docs/ai/context.md)** — 面向 AI 輔助開發的快速參考
