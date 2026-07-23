@@ -169,6 +169,10 @@ Request/Response format:
 }
 ```
 
+The backend currently provides no batch-delete endpoint. `ListAdmin` deletes the
+selected records on the current page with concurrent requests to the single-record
+delete endpoint and reports any partial failures.
+
 ### 3.4 Query Parameters
 
 The list endpoint supports the following query params:

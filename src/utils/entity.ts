@@ -86,4 +86,8 @@ export default class EntityManage {
   async delete(pk: number | string): Promise<ApiResponse<unknown>> {
     return await request.delete(apiPath(this.prefix, `${this.plural}/${pk}`))
   }
+
+  async deleteMany(pks: Array<number | string>): Promise<PromiseSettledResult<ApiResponse<unknown>>[]> {
+    return await Promise.allSettled(pks.map(pk => this.delete(pk)))
+  }
 }

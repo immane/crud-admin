@@ -218,7 +218,7 @@ interface ListConfig {
 
   /**
    * Hide default actions
-   * Available: 'new' | 'detail' | 'edit' | 'delete' | 'lines' | 'pager' | 'export'
+   * Available: 'new' | 'detail' | 'edit' | 'delete' | 'batch_delete' | 'lines' | 'pager' | 'export'
    */
   disabled_actions?: string[]
 

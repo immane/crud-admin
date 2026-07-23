@@ -38,6 +38,29 @@
           />
         </slot>
         &emsp;
+        <template v-if="hasBatchDelete">
+          <span class="easy-admin-selection-count">
+            {{ $t('{0} records selected', selectedRecords.length) }}
+          </span>
+          <el-popconfirm
+            :title="$t('Delete {0} selected records?', selectedRecords.length)"
+            @confirm="removeSelected"
+          >
+            <template #reference>
+              <el-button
+                size="default"
+                type="danger"
+                icon="el-icon-delete"
+                plain
+                :disabled="!selectedRecords.length"
+                :loading="batchDeleting"
+              >
+                {{ $t('Batch Delete') }}
+              </el-button>
+            </template>
+          </el-popconfirm>
+          &emsp;
+        </template>
         <slot name="topButton">
           <!-- Export action -->
           <template
@@ -144,9 +167,12 @@
           style="width: 100%"
           v-on="tableEvent || {}"
           @sort-change="changeSort"
+          @selection-change="handleSelectionChange"
         >
 
         <slot name="tableSelection" />
+
+        <el-table-column v-if="hasBatchDelete" type="selection" width="48" />
 
         <el-table-column
           label="#"
@@ -562,6 +588,8 @@ export default {
       // Table data source
       list: [],
       paginator: null,
+      selectedRecords: [],
+      batchDeleting: false,
 
       // Translated filter config
       filters: {},
@@ -601,6 +629,9 @@ export default {
     pagerTotal() {
       if (!this.paginator) return 0
       return Number(this.paginator.totalCount ?? this.paginator.total ?? 0)
+    },
+    hasBatchDelete() {
+      return !this.disabledActions.includes('delete') && !this.disabledActions.includes('batch_delete')
     }
   },
 
@@ -871,12 +902,33 @@ export default {
       this.fetchData()
     },
 
+    handleSelectionChange(records) {
+      this.selectedRecords = records
+    },
+
     // Remove action
     removeAction(pk) {
       this.em.delete(pk).then(res => {
         this.notifySuccess(this.$t('Deleted successfully'))
         this.fetchData()
       })
+    },
+
+    async removeSelected() {
+      const ids = this.selectedRecords.map(record => record.id).filter(id => id != null)
+      if (!ids.length) return
+
+      this.batchDeleting = true
+      const results = await this.em.deleteMany(ids)
+      this.batchDeleting = false
+
+      const failed = results.filter(result => result.status === 'rejected').length
+      const deleted = ids.length - failed
+      if (deleted) this.notifySuccess(this.$t('Deleted {0} records successfully', deleted))
+      if (failed) this.uiFeedback().warning(this.$t('Failed to delete {0} records', failed))
+
+      this.selectedRecords = []
+      this.fetchData()
     },
 
     // Extract relation field
@@ -923,6 +975,12 @@ export default {
 
 .easy-admin-actions :deep(.el-button + .el-button) {
   margin-left: 0;
+}
+
+.easy-admin-selection-count {
+  margin-right: 8px;
+  color: #667085;
+  font-size: 14px;
 }
 
 :deep(.el-overlay-dialog:has(.easy-admin-dialog)) {
