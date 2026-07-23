@@ -97,6 +97,15 @@ interface FormConfig {
    * '__all__': Use all fields from the backend API
    */
   fields: FieldConfig[] | '__all__'
+
+  /**
+   * Batch edit config
+   * Fields shown in the batch edit dialog.
+   * Uses the same FieldConfig format as fields.
+   */
+  batch_edit?: {
+    fields: FieldConfig[]
+  }
 }
 ```
 
@@ -218,7 +227,7 @@ interface ListConfig {
 
   /**
    * Hide default actions
-   * Available: 'new' | 'detail' | 'edit' | 'delete' | 'lines' | 'pager' | 'export'
+   * Available: 'new' | 'detail' | 'edit' | 'delete' | 'batch_edit' | 'batch_delete' | 'lines' | 'pager' | 'export'
    */
   disabled_actions?: string[]
 

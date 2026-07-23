@@ -19,13 +19,16 @@ export type FieldConfig = string | FieldOption
 
 export interface FormConfig {
   fields: FieldConfig[] | '__all__'
+  batch_edit?: {
+    fields: FieldConfig[]
+  }
 }
 
 export interface ListConfig {
   list_display?: FieldConfig[]
   list_filter?: Record<string, unknown>
   query?: Record<string, unknown>
-  disabled_actions?: string[]
+  disabled_actions?: Array<'new' | 'detail' | 'edit' | 'delete' | 'batch_edit' | 'batch_delete' | 'lines' | 'pager' | 'export'>
   data_processor?: (...args: unknown[]) => unknown
   actions?: Array<Record<string, unknown>>
   export?: Record<string, unknown>

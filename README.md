@@ -367,6 +367,7 @@ interface FieldOption {
 - **[Code & API Contracts](docs/design/contracts.md)** — Request/response formats, component props contract
 - **[EasyAdmin Design](docs/design/easyadmin-design.md)** — Plugin system, data flow, extension points
 - **[EasyAdmin Config Contract](docs/design/easyadmin-config-contract.md)** — Complete config schema reference
+- **[Config Reference Manual](docs/manual/config-reference.md)** — Complete EasyAdmin config guide, from simple to advanced
 - **[AI Context](docs/ai/context.md)** — Quick reference for AI-assisted development
 - **[Vue 3 Migration Plan](docs/plan/vue3-tsx-vite-migration.md)** — Migration notes and current status
 

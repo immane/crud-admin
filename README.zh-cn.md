@@ -365,6 +365,7 @@ interface FieldOption {
 - **[代码与 API 契约](docs/design/contracts.md)** — 请求/响应格式、组件 Props 契约
 - **[EasyAdmin 设计](docs/design/easyadmin-design.md)** — 插件系统、数据流、扩展点
 - **[EasyAdmin 配置契约](docs/design/easyadmin-config-contract.md)** — 完整配置 Schema 参考
+- **[配置参考手册](docs/manual/config-reference.zh.md)** — EasyAdmin 配置完整指南，从入门到高级
 - **[AI 上下文](docs/ai/context.md)** — 面向 AI 辅助开发的快速参考
 - **[Vue 3 迁移计划](docs/plan/vue3-tsx-vite-migration.md)** — 迁移说明及当前状态
 

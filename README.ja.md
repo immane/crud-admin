@@ -296,3 +296,12 @@ EasyAdmin には 17 のフィールド型プラグインが組み込まれてお
 | `code.vue` | — | コードテキストエリア |
 
 （以下、フィールド設定リファレンス、ルートジェネレータ、API 統合、ドキュメント、テスト、デプロイ、ライセンス、謝辞の章は英語版と同様のため省略）
+
+## ドキュメント
+
+- **[設定リファレンスマニュアル](docs/manual/config-reference.ja.md)** — 簡単なものから高度なものまで、EasyAdmin 設定の完全ガイド
+- **[アーキテクチャ設計](docs/design/architecture.md)** — システムレイヤー、起動フロー、認証フロー、ルーティング、状態管理
+- **[コード & API 契約](docs/design/contracts.md)** — リクエスト/レスポンス形式、コンポーネント Props 契約
+- **[EasyAdmin 設計](docs/design/easyadmin-design.md)** — プラグインシステム、データフロー、拡張ポイント
+- **[EasyAdmin 設定契約](docs/design/easyadmin-config-contract.md)** — 完全な設定スキーマリファレンス
+- **[AI コンテキスト](docs/ai/context.md)** — AI 支援開発のためのクイックリファレンス

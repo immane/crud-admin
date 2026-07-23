@@ -1,7 +1,7 @@
 # AI Context
 
 > Vue Admin Skeleton — AI Assistant Context Document  
-> Last updated: 2026-07-14
+> Last updated: 2026-07-23
 
 ---
 
@@ -71,7 +71,7 @@ src/
 ├── types/                # TypeScript type definitions
 ├── utils/                # Utilities
 │   ├── auth.js           # Cookie token management
-│   ├── entity.ts         # EntityManage CRUD class
+│   ├── entity.ts         # EntityManage CRUD class (CRUD + deleteMany + batchUpdate)
 │   ├── request.ts        # Axios JWT instance
 │   └── upload.js         # Unified upload (host resolution, headers, path normalisation)
 └── views/                # Page views
@@ -111,7 +111,7 @@ Each file exports a single entity config:
 export default {
   EntityName: {
     entity?: string | { name, prefix?, plural? },
-    form: { fields: [...] },
+    form: { fields: [...], batch_edit?: { fields: [...] } },
     list: { query, list_filter, list_display, disabled_actions, ... },
     detail: { detail_display, disabled_actions, ... }
   }
@@ -257,7 +257,7 @@ Adding a new detail plugin: create `plugins/detail/{type}.vue` with the same pro
    export default {
      EntityName: {
        form: { fields: [...] },
-       list: { list_display: [...], list_filter: {...} },
+       list: { list_display: [...], list_filter: {...}, disabled_actions: [...] },
        detail: { detail_display: [...], disabled_actions: [...] }  // optional
      }
    }
@@ -384,6 +384,71 @@ The `json.vue` form plugin uses the vanilla `jsoneditor` library directly from n
   shows a success message and closes the dialog.
 - `@closed="fetchData"` refreshes list data via API after dialog close.
 - `v-model` replaces the old `.sync` modifier for Vue 3.
+
+### Batch Operations (Batch Delete + Batch Edit)
+
+`ListAdmin` provides two batch operations that work on the current page's selection:
+
+#### Selection Column
+
+- A selection column (`type="selection"`) appears when `hasBatchDelete` is true (i.e., `delete` is not disabled and `batch_delete` is not in `disabled_actions`).
+- Selection state is tracked in `selectedRecords` via `@selection-change="handleSelectionChange"`.
+- Selections are cleared on data refresh (`fetchData()`) and after successful batch operations.
+
+#### Batch Delete
+
+- Button appears in the toolbar alongside a count badge when records are selected.
+- Uses `EntityManage.deleteMany(ids)` which calls `Promise.allSettled` on individual `DELETE /{plural}/{id}` calls.
+- Reports success count and, on partial failure, a warning with the failure count.
+- `disabled_actions` available: `'batch_delete'`, or inherits `'delete'` (if delete is disabled, batch delete hides too).
+
+#### Batch Edit (`EntityManage.batchUpdate`)
+
+**Config location**: `form.batch_edit.fields` in entity config:
+```js
+form: {
+  batch_edit: {
+    fields: ['category', 'tags']     // FieldConfig[] — same format as form.fields
+  }
+}
+```
+
+**Backend contract**: `POST /{plural}/batch-update?@basis=id&@mode=update`
+```json
+[
+  { "id": 1, "fieldToUpdate": "new value" },
+  { "id": 2, "fieldToUpdate": "new value" }
+]
+```
+Each record includes only `id` and the fields to update; omitted fields retain their original values. The endpoint is provided by the backend's `UpdateApiViewMixin`.
+
+**Dialog UI**:
+- Opens when "Batch Edit" toolbar button is clicked with one or more selected rows.
+- Each field in `batch_edit.fields` is rendered using the existing FormAdmin form plugins (`formPlugins`), resolved by `resolveBatchPluginType()` and loaded via `loadBatchPlugin()`.
+- A per-field `<el-checkbox>` in the label area lets the user decide which fields to include.
+- **Auto-selection**: When a user modifies a field value, the corresponding checkbox is automatically checked (except for empty arrays from `RelationToMany` initialisation).
+- Only checked fields with a value present in the form object (`Object.hasOwn(form, key)`) are included in the request.
+
+**`EntityManage` methods**:
+```ts
+deleteMany(pks: Array<number | string>): Promise<PromiseSettledResult<ApiResponse<unknown>>[]>
+batchUpdate(ids: Array<number | string>, data: Record<string, any>): Promise<ApiResponse<unknown>>
+```
+
+**`disabled_actions`** supports: `'batch_edit'` | `'batch_delete'`
+
+### Toolbar Layout
+
+The list toolbar (`.easy-admin-toolbar`) uses flex-based layout instead of the old `el-row/el-col` grid:
+
+- **Title** (`.easy-admin-toolbar__title`): auto-width, bold, vertically centered.
+- **Body** (`.easy-admin-toolbar__body`): flex row with `justify-content: space-between`.
+  - **Search** (`.easy-admin-toolbar__search`): `flex: 1 1 auto`, wraps to fit.
+  - **Actions** (`.easy-admin-toolbar__actions`): `flex: 0 0 auto`, right-aligned.
+    - Custom action slots (`extraTopButton`), batch buttons, then default actions (export + new).
+- Batch buttons appear only when `selectedRecords.length > 0`.
+- Selection count badge: rounded pill with blue background.
+- On `max-width: 767px`: toolbar and body become `flex-direction: column`, search fields stretch to full width, actions left-align.
 
 ### URL Search Params Sync
 

@@ -1,87 +1,89 @@
 <template>
-  <span>
-    <span v-for="(v, k) in filters" :key="k" style="margin-right: .5em">
-      <!-- Dynamic components and JSX function -->
-      <div v-if="Object.keys(v).includes('component')">
-        <component
-          :is="v.component"
+  <div class="easy-admin-search-filter">
+    <div class="easy-admin-search-filter__fields">
+      <template v-for="(v, k) in filters" :key="k">
+        <!-- Dynamic components and JSX function -->
+        <div v-if="Object.keys(v).includes('component')">
+          <component
+            :is="v.component"
+            v-model="filterData[k]"
+          />
+        </div>
+
+        <!-- Datetime -->
+        <el-date-picker
+          v-if="v.type === 'datetime' || v.type === 'date' || v.type === 'time'"
           v-model="filterData[k]"
+          :type="v.type"
+          :placeholder="`${v.label ? v.label : k}`"
+          style="width: 150px;"
+          size="default"
+          :value-format="{
+            datetime: 'yyyy-MM-dd HH:mm:ss',
+            date: 'yyyy-MM-dd',
+            time: 'HH:mm:ss',
+          }[v.type]
+          "
         />
-      </div>
 
-      <!-- Datetime -->
-      <el-date-picker
-        v-if="v.type === 'datetime' || v.type === 'date' || v.type === 'time'"
-        v-model="filterData[k]"
-        :type="v.type"
-        :placeholder="`${v.label ? v.label : k}`"
-        style="width: 150px;"
+        <!-- Input -->
+        <el-input
+          v-else-if="v.type === 'input'"
+          v-model="filterData[k]"
+          :placeholder="`${v.label ? v.label : k}`"
+          style="width: 150px;"
+          size="default"
+          clearable
+        >
+          <template #prefix><el-icon><el-icon-search /></el-icon></template>
+        </el-input>
+
+        <!-- Boolean -->
+        <el-switch
+          v-else-if="v.type === 'boolean'"
+          v-model="filterData[k]"
+          :inactive-text="`${v.label ? v.label : k}`"
+          size="default"
+        />
+
+        <!-- Select -->
+        <el-select
+          v-else
+          v-model="filterData[k]"
+          filterable
+          clearable
+          :placeholder="`${v.label ? v.label : k}`"
+          style="width: 150px;"
+          size="default"
+        >
+          <el-option
+            v-for="item in v.data"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </template>
+    </div>
+
+    <div v-if="Object.keys(filters).length" class="easy-admin-search-filter__actions">
+      <el-button
         size="default"
-        :value-format="{
-          datetime: 'yyyy-MM-dd HH:mm:ss',
-          date: 'yyyy-MM-dd',
-          time: 'HH:mm:ss',
-        }[v.type]
-        "
+        type="primary"
+        icon="el-icon-search"
+        circle
+        @click="filterGenerate(); fetchData();"
       />
 
-      <!-- Input -->
-      <el-input
-        v-else-if="v.type === 'input'"
-        v-model="filterData[k]"
-        :placeholder="`${v.label ? v.label : k}`"
-        style="width: 150px;"
+      <el-button
         size="default"
-        clearable
-      >
-        <template #prefix><el-icon><el-icon-search /></el-icon></template>
-      </el-input>
-
-      <!-- Boolean -->
-      <el-switch
-        v-else-if="v.type === 'boolean'"
-        v-model="filterData[k]"
-        :inactive-text="`${v.label ? v.label : k}`"
-        size="default"
+        icon="el-icon-refresh"
+        title="Reset search"
+        circle
+        @click="reset"
       />
-
-      <!-- Select -->
-      <el-select
-        v-else
-        v-model="filterData[k]"
-        filterable
-        clearable
-        :placeholder="`${v.label ? v.label : k}`"
-        style="width: 150px;"
-        size="default"
-      >
-        <el-option
-          v-for="item in v.data"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        />
-      </el-select>
-    </span>
-
-    <el-button
-      v-if="Object.keys(filters).length"
-      size="default"
-      icon="el-icon-search"
-      style="margin-right: -0.5em;"
-      circle
-      @click="filterGenerate(); fetchData();"
-    />
-
-    <el-button
-      v-if="Object.keys(filters).length"
-      size="default"
-      icon="el-icon-refresh"
-      title="Reset search"
-      circle
-      @click="reset"
-    />
-  </span>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -349,3 +351,35 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.easy-admin-search-filter,
+.easy-admin-search-filter__fields,
+.easy-admin-search-filter__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.easy-admin-search-filter {
+  flex-wrap: wrap;
+}
+
+.easy-admin-search-filter__fields {
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 767px) {
+  .easy-admin-search-filter,
+  .easy-admin-search-filter__fields {
+    align-items: stretch;
+  }
+
+  .easy-admin-search-filter__fields :deep(.el-input),
+  .easy-admin-search-filter__fields :deep(.el-select),
+  .easy-admin-search-filter__fields :deep(.el-date-editor) {
+    width: 100% !important;
+  }
+}
+</style>

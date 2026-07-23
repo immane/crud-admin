@@ -11,7 +11,10 @@ export default {
         { property: 'body' },
         { property: 'category', required: false },
         { property: 'tags', required: false }
-      ]
+      ],
+      batch_edit: {
+        fields: ['category', 'tags']
+      }
     },
     list: {
       query: orderByIdDesc,

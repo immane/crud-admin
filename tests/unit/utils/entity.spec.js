@@ -87,10 +87,37 @@ describe('utils/entity.ts', () => {
     await em.create({ username: 'u' })
     await em.update(1, { username: 'u2' })
     await em.delete(1)
+    await em.deleteMany([2, 3])
 
     expect(mockGet).toHaveBeenCalledWith('/api/v1/manage/users', { params: { page: 1 } })
     expect(mockPost).toHaveBeenCalledWith('/api/v1/manage/users', { username: 'u' })
     expect(mockPut).toHaveBeenCalledWith('/api/v1/manage/users/1', { username: 'u2' })
     expect(mockDelete).toHaveBeenCalledWith('/api/v1/manage/users/1')
+    expect(mockDelete).toHaveBeenCalledWith('/api/v1/manage/users/2')
+    expect(mockDelete).toHaveBeenCalledWith('/api/v1/manage/users/3')
+  })
+
+  it('keeps successful deletions when some batch deletions fail', async() => {
+    mockDelete
+      .mockResolvedValueOnce({ data: true })
+      .mockRejectedValueOnce(new Error('delete failed'))
+
+    const { default: EntityManage } = await import('@/utils/entity')
+    const results = await new EntityManage('User').deleteMany([1, 2])
+
+    expect(results.map(result => result.status)).toEqual(['fulfilled', 'rejected'])
+  })
+
+  it('sends batch update records with only the changed fields', async() => {
+    mockPost.mockResolvedValue({ data: true })
+
+    const { default: EntityManage } = await import('@/utils/entity')
+    await new EntityManage('User').batchUpdate([1, 2], { enabled: true })
+
+    expect(mockPost).toHaveBeenCalledWith(
+      '/api/v1/manage/users/batch-update',
+      [{ id: 1, enabled: true }, { id: 2, enabled: true }],
+      { params: { '@basis': 'id', '@mode': 'update' } }
+    )
   })
 })
