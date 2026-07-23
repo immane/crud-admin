@@ -214,7 +214,7 @@ interface FieldOption {
 | `datetime` | `<el-date-picker>` (yyyy-MM-dd HH:mm:ss) | 日期 + 時間 |
 | `image` | `<el-upload>` 單圖上傳 | 圖片上傳 |
 | `file` | `<el-upload>` 單檔案 | 檔案上傳 |
-| `code` | `<el-input type="textarea">` | 程式碼片段 |
+| `code` | CodeMirror 6 編輯器 | 帶行號和語法醒目提示的程式碼片段 |
 | `json` | `<jsoneditor>` 樹/程式碼檢視 | 結構化 JSON |
 | `json-custom` | 巢狀 `<FormAdmin>` 子表單 | 子物件修改 |
 | `array` | `<el-select multiple>` 或巢狀表單 | 陣列/清單值 |
@@ -223,6 +223,25 @@ interface FieldOption {
 | `transfer` | `<el-transfer>` 穿梭框 | 雙欄選擇 |
 
 **類型解析優先級**：`field.type` → API 元資料類型 → `input`。
+
+#### CodeMirror 6 選項
+
+`code` 欄位類型使用 CodeMirror 6，預設會填滿表單可用寬度。
+
+```js
+{
+  property: 'dsl',
+  type: 'code',
+  type_options: {
+    language: 'javascript',  // javascript | typescript | json | html | css | sql
+    height: 360,             // 像素；預設：280px
+    readonly: false,
+    disabled: false
+  }
+}
+```
+
+內建行號、語法醒目提示、括號配對、目前行醒目提示、復原/重做和 Tab 縮排。
 
 ### 5.2 標籤與國際化
 

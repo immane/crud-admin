@@ -91,7 +91,7 @@ export default {
   line-height: 1.5;
 }
 
-.detail-json__empty { color: #b3bcc7; }
+.detail-json__empty { color: var(--text-secondary); }
 
 .detail-json__header {
   display: flex;
@@ -105,13 +105,13 @@ export default {
   font-size: 11px;
   font-weight: 600;
   color: #fff;
-  background: #6c8fd4;
+  background: var(--accent);
   border-radius: 3px;
 }
 
 .detail-json__size {
   font-size: 12px;
-  color: #8a97a8;
+  color: var(--text-secondary);
 }
 
 .detail-json__toggle {
@@ -123,8 +123,9 @@ export default {
 .detail-json__code {
   margin: 0;
   padding: 14px 16px;
-  background: #f4f6fb;
-  border: 1px solid #dde3ef;
+  color: var(--text-primary);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
   border-radius: 6px;
   overflow-x: auto;
   max-height: 520px;
@@ -139,4 +140,9 @@ export default {
 .detail-json__code .kv { color: #9a5d11; }
 .detail-json__code .b { color: #b5128c; font-weight: 600; }
 .detail-json__code .n { color: #1b75c4; }
+
+:global(html[data-theme='dark']) .detail-json__code .k { color: #5eead4; }
+:global(html[data-theme='dark']) .detail-json__code .kv { color: #fbbf24; }
+:global(html[data-theme='dark']) .detail-json__code .b { color: #f9a8d4; }
+:global(html[data-theme='dark']) .detail-json__code .n { color: #93c5fd; }
 </style>

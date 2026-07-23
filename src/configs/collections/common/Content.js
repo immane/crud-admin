@@ -8,9 +8,9 @@ export default {
     form: {
       fields: [
         'title',
-        { property: 'body' },
-        { property: 'category', required: false },
-        { property: 'tags', required: false }
+        { property: 'body', required: true },
+        { property: 'category', required: false, tab: `${t('Metadata')}` },
+        { property: 'tags', required: false, tab: `${t('Metadata')}` }
       ],
       batch_edit: {
         fields: ['category', 'tags']
@@ -24,7 +24,7 @@ export default {
           .get(apiPath(API_PREFIX, 'manage/categories'))
           .then(res => Object.assign({ __label: t('Category') }, ...res.data.map(v => ({ [v.id]: v.name }))))
       },
-      list_display: ['id', 'title', 'category', 'tags', 'createdAt', 'updatedAt']
+      list_display: ['id', 'title', 'category', 'tags', 'createdAt']
     },
     detail: {
       detail_display: '__all__'

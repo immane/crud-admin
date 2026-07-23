@@ -95,6 +95,7 @@ export default {
     }
   },
   mounted() {
+    window.addEventListener('app-theme-change', this.refreshForTheme)
     this.init()
   },
   activated() {
@@ -106,6 +107,7 @@ export default {
     this.destroyTinymce()
   },
   unmounted() {
+    window.removeEventListener('app-theme-change', this.refreshForTheme)
     this.destroyTinymce()
   },
   methods: {
@@ -146,11 +148,15 @@ export default {
     },
     initTinymce() {
       const _this = this
+      const isDark = document.documentElement.dataset.theme === 'dark'
       window.tinymce.init({
         selector: `#${this.tinymceId}`,
         language: this.languageTypeList['en'],
         height: this.height,
         body_class: 'panel-body ',
+        content_style: isDark
+          ? 'body { color: #e4e7ec; background: #182230; } a { color: #84adff; }'
+          : '',
         object_resizing: false,
         toolbar: this.toolbar.length > 0 ? this.toolbar : toolbar,
         menubar: false, // this.menubar,
@@ -220,13 +226,20 @@ export default {
     },
     destroyTinymce() {
       const tinymce = window.tinymce.get(this.tinymceId)
-      if (this.fullscreen) {
+      if (tinymce && this.fullscreen) {
         tinymce.execCommand('mceFullScreen')
       }
 
       if (tinymce) {
         tinymce.destroy()
       }
+    },
+    refreshForTheme() {
+      if (!window.tinymce || !window.tinymce.get(this.tinymceId)) return
+
+      this.hasChange = false
+      this.destroyTinymce()
+      this.$nextTick(() => this.initTinymce())
     },
     setContent(value) {
       window.tinymce.get(this.tinymceId).setContent(value)
@@ -277,5 +290,42 @@ export default {
 
 .editor-upload-btn {
   display: inline-block;
+}
+
+:global(html[data-theme='dark']) .tinymce-container {
+  ::v-deep {
+    .mce-tinymce,
+    .mce-container,
+    .mce-container-body,
+    .mce-toolbar-grp,
+    .mce-menubar,
+    .mce-statusbar,
+    .mce-edit-area {
+      color: #e4e7ec !important;
+      background: #182230 !important;
+      border-color: #475467 !important;
+    }
+
+    .mce-btn,
+    .mce-btn button,
+    .mce-menubtn button,
+    .mce-ico,
+    .mce-menubar .mce-menubtn button {
+      color: #e4e7ec !important;
+      text-shadow: none !important;
+      background: #253247 !important;
+    }
+
+    .mce-btn:hover,
+    .mce-btn:hover button,
+    .mce-menubtn:hover button {
+      background: #344054 !important;
+    }
+
+    .mce-path-item,
+    .mce-statusbar .mce-ico {
+      color: #98a2b3 !important;
+    }
+  }
 }
 </style>

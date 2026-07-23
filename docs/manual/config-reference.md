@@ -214,7 +214,7 @@ interface FieldOption {
 | `datetime` | `<el-date-picker>` (yyyy-MM-dd HH:mm:ss) | Date + time |
 | `image` | `<el-upload>` single-image wall mode | Image upload |
 | `file` | `<el-upload>` single file | File upload |
-| `code` | `<el-input type="textarea">` | Code snippets |
+| `code` | CodeMirror 6 editor | Code snippets with line numbers and syntax highlighting |
 | `json` | `<jsoneditor>` tree/code view | Structured JSON objects |
 | `json-custom` | Nested `<FormAdmin>` sub-form | Sub-object editing |
 | `array` | `<el-select multiple>` or nested form | Array/list values |
@@ -223,6 +223,25 @@ interface FieldOption {
 | `transfer` | `<el-transfer>` shuttle box | Dual-pane selection |
 
 **Type resolution priority**: `field.type` → API metadata type → `input`.
+
+#### CodeMirror 6 Options
+
+The `code` field type uses CodeMirror 6 and fills the available form width by default.
+
+```js
+{
+  property: 'dsl',
+  type: 'code',
+  type_options: {
+    language: 'javascript',  // javascript | typescript | json | html | css | sql
+    height: 360,             // pixels; default: 280px
+    readonly: false,
+    disabled: false
+  }
+}
+```
+
+It includes line numbers, syntax highlighting, bracket matching, active-line highlighting, undo/redo, and Tab indentation.
 
 ### 5.2 Labels & i18n
 

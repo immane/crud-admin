@@ -20,7 +20,11 @@ export default {
         phone: t('Phone')
       },
       list_display: [
-        'id', 'username', 'email', 'phone', 'phoneVerified',
+        'id', 
+        'username', 
+        'email', 
+        'phone', 
+        { property: 'phoneVerified', editable: true },
         { property: 'roles', type: 'array' }
       ]
     },

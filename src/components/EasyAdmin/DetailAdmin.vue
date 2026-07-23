@@ -140,8 +140,9 @@ export default {
 <style lang="scss" scoped>
 .detail-admin {
   min-height: 360px;
-  background: #fff;
-  border: 1px solid #e8edf5;
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(49, 78, 112, 0.08);
   overflow: hidden;
@@ -154,10 +155,10 @@ export default {
   gap: 24px;
   padding: 28px 32px;
   color: #fff;
-  background: linear-gradient(125deg, #213c72, #3c6dc4);
+  background: var(--detail-header);
 }
 
-.detail-admin__eyebrow, .detail-admin__subtitle { margin: 0; opacity: .72; }
+.detail-admin__eyebrow, .detail-admin__subtitle { margin: 0; color: var(--detail-header-muted); }
 .detail-admin__eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; }
 .detail-admin__header h1 { margin: 6px 0 3px; font-size: 24px; font-weight: 600; }
 .detail-admin__subtitle { font-size: 13px; }
@@ -167,14 +168,14 @@ export default {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1px;
-  background: #e8edf5;
-  border-top: 1px solid #e8edf5;
+  background: var(--border);
+  border-top: 1px solid var(--border);
 }
 
-.detail-admin__field { min-height: 96px; padding: 20px 28px; background: #fff; }
+.detail-admin__field { min-height: 96px; padding: 20px 28px; background: var(--surface); }
 .detail-admin__field--wide { grid-column: span 2; }
-.detail-admin__label { margin-bottom: 10px; color: #8a97a8; font-size: 12px; font-weight: 600; }
-.detail-admin__value { color: #27364a; line-height: 1.6; word-break: break-word; }
+.detail-admin__label { margin-bottom: 10px; color: var(--text-secondary); font-size: 12px; font-weight: 600; }
+.detail-admin__value { color: var(--text-primary); line-height: 1.6; word-break: break-word; }
 
 @media screen and (max-width: 768px) {
   .detail-admin__header { align-items: flex-start; flex-direction: column; padding: 24px; }

@@ -214,7 +214,7 @@ interface FieldOption {
 | `datetime` | `<el-date-picker>` (yyyy-MM-dd HH:mm:ss) | 日付 + 時刻 |
 | `image` | `<el-upload>` 単一画像アップロード | 画像アップロード |
 | `file` | `<el-upload>` 単一ファイル | ファイルアップロード |
-| `code` | `<el-input type="textarea">` | コードスニペット |
+| `code` | CodeMirror 6 エディタ | 行番号とシンタックスハイライト付きのコードスニペット |
 | `json` | `<jsoneditor>` ツリー/コードビュー | 構造化 JSON |
 | `json-custom` | ネストされた `<FormAdmin>` サブフォーム | 子オブジェクト編集 |
 | `array` | `<el-select multiple>` またはネストフォーム | 配列/リスト値 |
@@ -223,6 +223,25 @@ interface FieldOption {
 | `transfer` | `<el-transfer>` 二面選択 | 二面選択 |
 
 **タイプ解決優先順位**：`field.type` → API メタデータタイプ → `input`。
+
+#### CodeMirror 6 オプション
+
+`code` フィールド型は CodeMirror 6 を使用し、デフォルトでフォーム内の利用可能な幅をすべて使用します。
+
+```js
+{
+  property: 'dsl',
+  type: 'code',
+  type_options: {
+    language: 'javascript',  // javascript | typescript | json | html | css | sql
+    height: 360,             // ピクセル。デフォルト: 280px
+    readonly: false,
+    disabled: false
+  }
+}
+```
+
+行番号、シンタックスハイライト、括弧の対応付け、アクティブ行のハイライト、元に戻す/やり直し、Tab インデントを備えています。
 
 ### 5.2 ラベルと国際化
 

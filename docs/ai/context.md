@@ -211,7 +211,7 @@ const entityCollections = import.meta.glob('./collections/**/*.{js,jsx}', { eage
 | `datetime.vue` | datetime | `<el-date-picker>` (yyyy-MM-dd HH:mm:ss) |
 | `image.vue` | image | `<el-upload>` (single image, wall mode) |
 | `file.vue` | — | `<el-upload>` (single file, configurable storage driver) |
-| `code.vue` | — | `<el-input type="textarea">` (no syntax highlight) |
+| `code.vue` | — | CodeMirror 6 editor (line numbers, history, syntax highlighting) |
 | `json.vue` | — | `<jsoneditor>` (tree/code view, direct npm import, no Vue wrapper) |
 | `json-custom.vue` | — | Nested `<FormAdmin>` (sub-object editor) |
 | `array.vue` | array | `<el-select multiple>` or nested `<FormAdmin>` |

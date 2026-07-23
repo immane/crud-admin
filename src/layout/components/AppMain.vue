@@ -26,7 +26,7 @@ export default {
   width: 100%;
   position: relative;
   overflow: clip;
-  background: #f4f7fb;
+  background: var(--app-bg);
 }
 .fixed-header+.app-main {
   padding-top: 56px;

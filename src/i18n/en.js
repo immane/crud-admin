@@ -118,6 +118,10 @@ export default {
   // EasyAdmin CRUD
   'New Record': 'New Record',
   'Edit Record': 'Edit Record',
+  'Theme': 'Theme',
+  'Ocean Blue': 'Ocean Blue',
+  'Light Gray': 'Light Gray',
+  'Dark Mode': 'Dark Mode',
   'Batch Edit': 'Batch Edit',
   'Delete': 'Delete',
   'Details': 'Details',
