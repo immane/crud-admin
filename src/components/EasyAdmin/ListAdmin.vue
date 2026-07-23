@@ -847,7 +847,7 @@ export default {
         if (Array.isArray(value)) return 'RelationToMany'
         return null
       }
-      if (['boolean', 'date', 'datetime', 'datetime_immutable', 'image', 'array'].includes(type)) return type
+      if (['boolean', 'currency', 'date', 'datetime', 'datetime_immutable', 'image', 'array'].includes(type)) return type
       if (['ManyToOne', 'OneToOne'].includes(type)) return 'RelationToOne'
       if (['ManyToMany', 'OneToMany'].includes(type)) return 'RelationToMany'
       return null

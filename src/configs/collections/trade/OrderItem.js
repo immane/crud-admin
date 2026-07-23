@@ -5,10 +5,10 @@ export default {
     form: {
       fields: [
         'quantity',
-        { property: 'unitPrice', required: false },
-        { property: 'price', required: false },
-        { property: 'cost', required: false },
-        { property: 'profit', required: false },
+        { property: 'unitPrice', type: 'currency', required: false, type_options: { multiplier: 100, currency: 'CNY' }},
+        { property: 'price', type: 'currency', required: false, type_options: { multiplier: 100, currency: 'CNY' }},
+        { property: 'cost', type: 'currency', required: false, type_options: { multiplier: 100, currency: 'CNY' }},
+        { property: 'profit', type: 'currency', required: false, type_options: { multiplier: 100, currency: 'CNY' }},
         { property: 'specSnapshot', type: 'json', required: false },
         { property: 'productSnapshot', type: 'json', required: false },
         { property: 'metadata', type: 'json', required: false }
@@ -21,9 +21,9 @@ export default {
         'id',
         'specificationTitle',
         'quantity',
-        'unitPrice',
-        'price',
-        'profit',
+        { property: 'unitPrice', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
+        { property: 'price', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
+        { property: 'profit', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
         'createdAt'
       ]
     },
@@ -34,10 +34,10 @@ export default {
         'product',
         'specificationTitle',
         'quantity',
-        'unitPrice',
-        'price',
-        'cost',
-        'profit',
+        { property: 'unitPrice', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
+        { property: 'price', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
+        { property: 'cost', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
+        { property: 'profit', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
         { property: 'specSnapshot', type: 'json', full_width: true },
         { property: 'productSnapshot', type: 'json', full_width: true },
         { property: 'metadata', type: 'json', full_width: true },

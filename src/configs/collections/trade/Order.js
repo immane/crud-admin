@@ -25,7 +25,7 @@ export default {
         }
       },
       list_display: [
-        'id', 'uuid', 'user', 'totalAmount', 'currency',
+        'id', 'uuid', 'user', { property: 'totalAmount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }}, 'currency',
         'status', 'paymentMethod', 'paidAt', 'createdAt'
       ]
     },
@@ -34,7 +34,7 @@ export default {
         'id',
         'uuid',
         'user',
-        'totalAmount',
+        { property: 'totalAmount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
         'currency',
         'status',
         'paymentMethod',

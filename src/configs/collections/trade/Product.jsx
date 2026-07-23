@@ -163,6 +163,7 @@ export default {
         {
           property: 'specifications',
           tab: t('Specifications'),
+          required: false,
           component: SpecificationManager
         }
       ]

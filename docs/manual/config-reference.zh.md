@@ -210,6 +210,7 @@ interface FieldOption {
 | `select` | `<el-select>` 静态选项 | 预定义选项 |
 | `boolean` | `<el-checkbox>` | 布尔标志 |
 | `integer` | `<el-input-number>` | 整数 |
+| `currency` | `<el-input-number>` + 货币代码 | 货币金额（以最小单位整数存储） |
 | `date` | `<el-date-picker>` (yyyy-MM-dd) | 日期 |
 | `datetime` | `<el-date-picker>` (yyyy-MM-dd HH:mm:ss) | 日期 + 时间 |
 | `image` | `<el-upload>` 单图上传 | 图片上传 |
@@ -242,6 +243,30 @@ interface FieldOption {
 ```
 
 内置行号、语法高亮、括号匹配、当前行高亮、撤销/重做和 Tab 缩进。
+
+#### Currency 选项
+
+`currency` 字段类型以整数存储（如分），并以格式化货币形式显示。输入单位为十进制（如元）；存储值为输入值乘以 `multiplier`。
+
+```js
+{
+  property: 'amount',
+  type: 'currency',
+  type_options: {
+    multiplier: 100,    // 显示时除以该值；默认：100
+    currency: 'CNY'     // ISO 4217 货币代码；默认：'CNY'
+  }
+}
+```
+
+显示使用 `Intl.NumberFormat`，根据当前语言使用 `narrowSymbol`。例如：
+- `CNY` → `¥12,345.00`（zh-CN）、`¥12,345.00`（en-US）
+- `USD` → `$123.45`
+- `EUR` → `€123.45`
+
+其他 `type_options` 将透传至 `<el-input-number>`。例如 `{ min: 0, max: 999999 }`。
+
+在列表/详情视图中，值以货币符号格式化显示。在表单中，用户输入十进制金额，旁边显示货币代码标签。
 
 ### 5.2 标签与国际化
 
@@ -475,7 +500,7 @@ list_display: [
 ]
 ```
 
-可用的列表插件类型：`boolean`、`date`、`datetime`、`image`、`array`、`RelationToOne`、`RelationToMany`、`editable-plain`（字符串/数字可编辑）、`plain-text`（回退）。
+可用的列表插件类型：`boolean`、`currency`、`date`、`datetime`、`image`、`array`、`RelationToOne`、`RelationToMany`、`editable-plain`（字符串/数字可编辑）、`plain-text`（回退）。
 
 ### 8.2 `list_filter` — 三种风格
 
@@ -888,6 +913,7 @@ export default {
 |---|---|
 | 文本 | `input`、`text`、`textarea`、`code` |
 | 数字 | `integer` |
+| 货币 | `currency` |
 | 布尔 | `boolean` |
 | 日期/时间 | `date`、`datetime` |
 | 媒体 | `image`、`file` |

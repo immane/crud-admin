@@ -5,7 +5,7 @@ export default {
     form: {
       fields: [
         'name',
-        'price',
+        { property: 'price', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
         { property: 'status', type: 'select', default_value: 'active', type_options: {
           options: [
             { value: 'active', label: t('Active') },
@@ -27,14 +27,17 @@ export default {
       list_display: [
         'id',
         'name',
-        { property: 'price', editable: true },
+        { property: 'price', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
         { property: 'status', editable: true },
         { property: 'sort', editable: true },
         'createdAt'
       ]
     },
     detail: {
-      detail_display: '__all__'
+      detail_display: [
+        { property: 'price', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
+        '__all__'
+      ]
     }
   }
 }

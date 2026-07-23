@@ -82,7 +82,7 @@ export default {
     }
   },
   created() {
-    this.properties = (this.fields === '__all__' ? [] : this.fields).map(field =>
+    this.properties = (this.fields === '__all__' ? [] : this.fields.filter(field => field !== '__all__')).map(field =>
       typeof field === 'string' ? { property: field } : (field.component ? { ...field, component: markRaw(toRaw(field.component)) } : field)
     )
     this.fetchData()
@@ -94,8 +94,13 @@ export default {
         .then(([structure, response]) => {
           this.structure = structure
           this.record = response.data
-          if (this.fields === '__all__') {
-            this.properties = Object.keys(structure).map(property => ({ property }))
+          if (this.fields === '__all__' || this.fields.includes('__all__')) {
+            const configuredFields = this.fields === '__all__' ? [] : this.fields.filter(field => field !== '__all__')
+            const explicitFields = configuredFields.filter(field => typeof field !== 'string')
+            const explicitProperties = new Set(explicitFields.map(field => field.property))
+            this.properties = [...explicitFields, ...Object.keys(structure)
+              .filter(property => !explicitProperties.has(property))
+              .map(property => ({ property }))]
           }
         })
         .catch(error => createUiFeedback(this).error(error.message || this.$t('Failed to load record')))
@@ -107,7 +112,7 @@ export default {
     getListPluginType(field, struct, value) {
       const type = field.type || struct?.metadata?.type
       if (!type) return Array.isArray(value) ? 'RelationToMany' : null
-      if (['boolean', 'date', 'datetime', 'datetime_immutable', 'image', 'array', 'json'].includes(type)) return type
+      if (['boolean', 'currency', 'date', 'datetime', 'datetime_immutable', 'image', 'array', 'json'].includes(type)) return type
       if (['ManyToOne', 'OneToOne'].includes(type)) return 'RelationToOne'
       if (['ManyToMany', 'OneToMany'].includes(type)) return 'RelationToMany'
       return null

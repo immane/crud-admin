@@ -5,7 +5,10 @@ export default {
   WalletPaymentDeduction: {
     entity: { name: 'WalletPaymentDeduction', plural: 'payment-deductions' },
     form: {
-      fields: '__all__'
+      fields: [
+        { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
+        '__all__'
+      ]
     },
     list: {
       query: orderByIdDesc,
@@ -28,12 +31,15 @@ export default {
         }
       },
       list_display: [
-        'id', 'invoiceNo', 'amount', 'type', 'status',
+        'id', 'invoiceNo', { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }}, 'type', 'status',
         'wallet', 'referenceId', 'createdAt'
       ]
     },
     detail: {
-      detail_display: '__all__'
+      detail_display: [
+        { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
+        '__all__'
+      ]
     }
   }
 }

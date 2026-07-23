@@ -251,10 +251,14 @@ export default {
       this.structure = res
 
       // fields transform
-      const fields =
-        this.fields !== '__all__'
-          ? this.fields
-          : Object.keys(this.structure)
+      const configuredFields = this.fields === '__all__' ? [] : this.fields
+      const explicitFields = configuredFields.filter(field => typeof field !== 'string')
+      const explicitProperties = new Set(explicitFields.map(field => field.property))
+      const fields = this.fields === '__all__'
+        ? Object.keys(this.structure)
+        : configuredFields.includes('__all__')
+          ? [...explicitFields, ...Object.keys(this.structure).filter(field => !explicitProperties.has(field))]
+          : configuredFields
 
       for (const field of fields) {
         if (typeof field === 'string') {
