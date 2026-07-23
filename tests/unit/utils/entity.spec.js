@@ -107,4 +107,13 @@ describe('utils/entity.ts', () => {
 
     expect(results.map(result => result.status)).toEqual(['fulfilled', 'rejected'])
   })
+
+  it('sends batch update request with ids and data', async() => {
+    mockPost.mockResolvedValue({ data: true })
+
+    const { default: EntityManage } = await import('@/utils/entity')
+    await new EntityManage('User').batchUpdate([1, 2], { enabled: true })
+
+    expect(mockPost).toHaveBeenCalledWith('/api/v1/manage/users/batch-update', { ids: [1, 2], data: { enabled: true } })
+  })
 })

@@ -61,6 +61,19 @@
           </el-popconfirm>
           &emsp;
         </template>
+        <template v-if="hasBatchEdit">
+          <el-button
+            size="default"
+            type="primary"
+            icon="el-icon-edit"
+            plain
+            :disabled="!selectedRecords.length"
+            @click="openBatchEditDialog"
+          >
+            {{ $t('Batch Edit') }}
+          </el-button>
+          &emsp;
+        </template>
         <slot name="topButton">
           <!-- Export action -->
           <template
@@ -337,6 +350,38 @@
         </el-button>
       </template>
     </el-dialog>
+
+    <el-dialog
+      v-model="batchEditDialog.show"
+      class="easy-admin-dialog"
+      width="640px"
+      :title="$t('Batch Edit')"
+      @closed="batchEditDialog.form = {}"
+    >
+      <div class="app-container">
+        <el-form label-width="120px">
+          <el-form-item
+            v-for="field in resolvedBatchFields"
+            :key="field.property"
+            :label="field.label || (structure[field.property] ? structure[field.property]['translation'] : field.property)"
+          >
+            <component
+              :is="loadBatchPlugin(resolveBatchPluginType(field))"
+              :em-prefix="em.prefix"
+              :form="batchEditDialog.form"
+              :field="field"
+              :struct="structure[field.property]"
+            />
+          </el-form-item>
+        </el-form>
+      </div>
+      <template #footer>
+        <el-button @click="batchEditDialog.show = false">{{ $t('Cancel') }}</el-button>
+        <el-button type="primary" icon="el-icon-edit-outline" :loading="batchEditing" @click="submitBatchEdit">
+          {{ $t('Save') }}
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -358,6 +403,16 @@ const resolveListPlugin = (path) => {
     listPluginCache[path] = defineAsyncComponent(() => listPlugins[path]().then(module => module.default))
   }
   return listPluginCache[path]
+}
+
+const formPlugins = import.meta.glob('./plugins/form/*.vue')
+const formPluginCache = {}
+
+const resolveFormPlugin = (path) => {
+  if (!formPluginCache[path]) {
+    formPluginCache[path] = defineAsyncComponent(() => formPlugins[path]().then(module => module.default))
+  }
+  return formPluginCache[path]
 }
 
 export default {
@@ -590,6 +645,11 @@ export default {
       paginator: null,
       selectedRecords: [],
       batchDeleting: false,
+      batchEditing: false,
+      batchEditDialog: {
+        show: false,
+        form: {}
+      },
 
       // Translated filter config
       filters: {},
@@ -632,6 +692,19 @@ export default {
     },
     hasBatchDelete() {
       return !this.disabledActions.includes('delete') && !this.disabledActions.includes('batch_delete')
+    },
+    hasBatchEdit() {
+      return !this.disabledActions.includes('edit')
+        && !this.disabledActions.includes('batch_edit')
+        && this.config?.form?.batch_edit?.fields?.length
+    },
+    resolvedBatchFields() {
+      const fields = this.config?.form?.batch_edit?.fields
+      if (!fields) return []
+      return fields.map(field => {
+        if (typeof field === 'string') return { property: field }
+        return field.component ? { ...field, component: markRaw(toRaw(field.component)) } : field
+      })
     }
   },
 
@@ -929,6 +1002,76 @@ export default {
 
       this.selectedRecords = []
       this.fetchData()
+    },
+
+    resolveBatchPluginType(field) {
+      if (field.type) return field.type
+      const metadataType = this.structure[field.property]?.metadata?.type || ''
+      const normalized = String(metadataType).replace(/[_-]/g, '').toLowerCase()
+      const relationTypes = {
+        manytoone: 'RelationToOne',
+        onetoone: 'RelationToOne',
+        manytomany: 'RelationToMany',
+        onetomany: 'RelationToMany'
+      }
+      if (relationTypes[normalized]) return relationTypes[normalized]
+      const supported = new Set([
+        'array', 'boolean', 'code', 'date', 'datetime',
+        'datetime_immutable', 'file', 'image', 'images', 'integer',
+        'json', 'text', 'textarea', 'transfer'
+      ])
+      return supported.has(metadataType) ? metadataType : 'input'
+    },
+
+    loadBatchPlugin(type) {
+      const typeMapping = {
+        'images': 'image',
+        'datetime_immutable': 'datetime',
+        'ManyToOne': 'RelationToOne',
+        'OneToOne': 'RelationToOne',
+        'ManyToMany': 'RelationToMany',
+        'OneToMany': 'RelationToMany'
+      }
+      const targetType = typeMapping[type] || type || 'input'
+      const path = formPlugins[`./plugins/form/${targetType}.vue`]
+        ? `./plugins/form/${targetType}.vue`
+        : './plugins/form/input.vue'
+      return resolveFormPlugin(path)
+    },
+
+    openBatchEditDialog() {
+      this.batchEditDialog.form = {}
+      this.batchEditDialog.show = true
+    },
+
+    async submitBatchEdit() {
+      const ids = this.selectedRecords.map(r => r.id).filter(id => id != null)
+      if (!ids.length) return
+
+      const form = this.batchEditDialog.form
+      const data = {}
+      for (const key of Object.keys(form)) {
+        if (form[key] !== null && form[key] !== undefined) {
+          data[key] = form[key]
+        }
+      }
+      if (!Object.keys(data).length) {
+        this.uiFeedback().warning(this.$t('No fields to update'))
+        return
+      }
+
+      this.batchEditing = true
+      try {
+        await this.em.batchUpdate(ids, data)
+        this.batchEditing = false
+        this.notifySuccess(this.$t('Data saved successfully'))
+        this.batchEditDialog.show = false
+        this.selectedRecords = []
+        this.fetchData()
+      } catch (err) {
+        this.batchEditing = false
+        this.uiFeedback().error(err.message || 'Error')
+      }
     },
 
     // Extract relation field

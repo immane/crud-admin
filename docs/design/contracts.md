@@ -173,7 +173,32 @@ The backend currently provides no batch-delete endpoint. `ListAdmin` deletes the
 selected records on the current page with concurrent requests to the single-record
 delete endpoint and reports any partial failures.
 
-### 3.4 Query Parameters
+### 3.5 Batch Update
+
+```
+POST /api/v1/manage/{plural}/batch-update
+Content-Type: application/json
+
+Request:
+{
+  "ids": number[],
+  "data": { ... }    // Fields to update
+}
+
+Response (200):
+{
+  "code": 0,
+  "message": "SUCCESS",
+  "data": ...
+}
+```
+
+Each managed entity exposes a `POST .../batch-update` endpoint. The request
+contains `ids` (array of primary keys) and `data` (the fields to update with
+their new values). Only the fields present in `data` are modified; omitted
+fields retain their original values.
+
+### 3.6 Query Parameters
 
 The list endpoint supports the following query params:
 

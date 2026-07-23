@@ -118,6 +118,7 @@ export default {
   // EasyAdmin CRUD
   'New Record': 'New Record',
   'Edit Record': 'Edit Record',
+  'Batch Edit': 'Batch Edit',
   'Delete': 'Delete',
   'Details': 'Details',
   'Edit': 'Edit',
@@ -143,6 +144,7 @@ export default {
   'Failed to update property': 'Failed to update property',
   'New': 'New',
   'Add': 'Add',
+  'No fields to update': 'No fields to update',
 
   // Form Plugins
   'Please select': 'Please select',

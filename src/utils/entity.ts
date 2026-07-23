@@ -90,4 +90,8 @@ export default class EntityManage {
   async deleteMany(pks: Array<number | string>): Promise<PromiseSettledResult<ApiResponse<unknown>>[]> {
     return await Promise.allSettled(pks.map(pk => this.delete(pk)))
   }
+
+  async batchUpdate(ids: Array<number | string>, data: Record<string, any>): Promise<ApiResponse<unknown>> {
+    return await request.post(apiPath(this.prefix, `${this.plural}/batch-update`), { ids, data })
+  }
 }
