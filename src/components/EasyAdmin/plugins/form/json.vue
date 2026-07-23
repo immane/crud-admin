@@ -107,4 +107,5 @@ export default {
   min-height: 220px;
   max-height: 520px;
 }
+
 </style>

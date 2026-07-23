@@ -18,7 +18,7 @@ import router from './router'
 import installIcons from '@/icons'
 import installLegacyIcons from '@/icons/legacy-icons'
 import i18n from '@/i18n'
-import { t } from '@/i18n'
+import { applyTheme, getTheme } from '@/utils/theme'
 import '@/permission' // permission control
 
 import request from '@/utils/request'
@@ -35,6 +35,7 @@ function detectLocale() {
 }
 
 const currentLocale = detectLocale()
+applyTheme(getTheme())
 
 const app = createApp(App)
 installIcons(app)

@@ -147,4 +147,5 @@ export default {
   height: var(--code-editor-height);
   outline: none;
 }
+
 </style>

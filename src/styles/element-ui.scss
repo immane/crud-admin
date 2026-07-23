@@ -10,6 +10,53 @@
   font-weight: 600;
 }
 
+html[data-theme='dark'] {
+  .el-button:not(.el-button--primary):not(.el-button--success):not(.el-button--warning):not(.el-button--danger) {
+    --el-button-bg-color: #253247;
+    --el-button-border-color: #475467;
+    --el-button-text-color: #e4e7ec;
+    --el-button-hover-bg-color: #344054;
+    --el-button-hover-text-color: #fff;
+  }
+
+  .el-input__wrapper,
+  .el-select__wrapper,
+  .el-textarea__inner,
+  .el-input-number,
+  .el-pagination button,
+  .el-pager li {
+    color: #e4e7ec;
+    background: #253247;
+    box-shadow: 0 0 0 1px #475467 inset !important;
+  }
+
+  .el-table {
+    --el-table-bg-color: #182230;
+    --el-table-tr-bg-color: #182230;
+    --el-table-header-bg-color: #1f2937;
+    --el-table-header-text-color: #cbd5e1;
+    --el-table-text-color: #e4e7ec;
+    --el-table-border-color: #344054;
+    --el-table-row-hover-bg-color: #253247;
+  }
+
+  .el-dialog,
+  .el-dropdown-menu,
+  .el-message-box { color: #e4e7ec; background: #182230; }
+
+  .el-loading-mask {
+    background-color: rgba(16, 24, 40, .72);
+  }
+
+  .el-loading-spinner .path {
+    stroke: #8cb8ff;
+  }
+
+  .el-loading-spinner .el-loading-text {
+    color: #e4e7ec;
+  }
+}
+
 .el-input__wrapper,
 .el-textarea__inner,
 .el-select__wrapper,
@@ -25,6 +72,40 @@
   --el-table-row-hover-bg-color: #f8fbff;
   border-radius: 10px;
   overflow: hidden;
+}
+
+html[data-theme='dark'] {
+  .el-table,
+  .el-table__inner-wrapper,
+  .el-table__header-wrapper,
+  .el-table__body-wrapper,
+  .el-table__fixed,
+  .el-table__fixed-right,
+  .el-table__fixed-body-wrapper,
+  .el-table__append-wrapper,
+  .el-table__empty-block {
+    background: #182230 !important;
+  }
+
+  .el-table th.el-table__cell {
+    background: #1f2937 !important;
+  }
+
+  .el-table tr,
+  .el-table td.el-table__cell,
+  .el-table__fixed-right-patch {
+    background: #182230 !important;
+  }
+
+  .el-table__body tr:hover > td.el-table__cell,
+  .el-table__body tr.hover-row > td.el-table__cell {
+    background: #253247 !important;
+  }
+
+  .el-table__inner-wrapper::before,
+  .el-table::before {
+    background: #344054 !important;
+  }
 }
 
 .el-table th.el-table__cell {

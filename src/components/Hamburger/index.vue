@@ -1,5 +1,5 @@
 <template>
-  <div style="padding: 0 15px;" @click="toggleClick">
+  <div class="hamburger-button" @click="toggleClick">
     <svg
       :class="{'is-active':isActive}"
       class="hamburger"
@@ -31,6 +31,13 @@ export default {
 </script>
 
 <style scoped>
+.hamburger-button {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+}
+
 .hamburger {
   display: inline-block;
   vertical-align: middle;

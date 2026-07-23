@@ -1119,14 +1119,14 @@ export default {
   gap: 20px;
   margin-bottom: 20px;
   padding: 16px 18px;
-  border: 1px solid #e7edf4;
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .easy-admin-toolbar__title {
   flex: 0 0 auto;
-  color: #1f2d3d;
+  color: var(--text-primary);
   font-size: 18px;
   font-weight: 650;
   line-height: 32px;
@@ -1185,8 +1185,8 @@ export default {
 .easy-admin-selection-count {
   padding: 0 10px;
   border-radius: 999px;
-  color: #175cd3;
-  background: #eff8ff;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
   font-size: 13px;
   font-weight: 600;
   line-height: 32px;
@@ -1213,12 +1213,12 @@ export default {
   flex-shrink: 0;
   margin-right: 0;
   /* padding: 20px 56px 20px 28px; */
-  border-bottom: 1px solid #e7edf4;
+  border-bottom: 1px solid var(--border);
 }
 
 :deep(.easy-admin-dialog .el-dialog__title) {
   display: block;
-  color: #1f2d3d;
+  color: var(--text-primary);
   font-size: 18px;
   font-weight: 650;
   line-height: 28px;
@@ -1237,11 +1237,11 @@ export default {
 }
 
 :deep(.easy-admin-dialog .el-dialog__headerbtn:hover) {
-  background: #edf2f7;
+  background: var(--control-hover);
 }
 
 :deep(.easy-admin-dialog .el-dialog__close) {
-  color: #667085;
+  color: var(--text-secondary);
   font-size: 18px;
 }
 
@@ -1250,7 +1250,7 @@ export default {
   min-height: 0;
   overflow-y: auto;
   padding: 0;
-  background: #fff;
+  background: var(--surface);
 }
 
 :deep(.easy-admin-dialog .app-container) {
@@ -1266,7 +1266,7 @@ export default {
 }
 
 :deep(.easy-admin-dialog .el-form-item__label) {
-  color: #344054;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
@@ -1275,8 +1275,8 @@ export default {
   z-index: 10;
   flex-shrink: 0;
   /* padding: 16px 28px; */
-  background: #fff;
-  border-top: 1px solid #e7edf4;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
 }
 
 :deep(.easy-admin-dialog .el-dialog__footer .el-button) {
