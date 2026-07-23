@@ -92,6 +92,11 @@ export default class EntityManage {
   }
 
   async batchUpdate(ids: Array<number | string>, data: Record<string, any>): Promise<ApiResponse<unknown>> {
-    return await request.post(apiPath(this.prefix, `${this.plural}/batch-update`), { ids, data })
+    const records = ids.map(id => ({ id, ...data }))
+    return await request.post(
+      apiPath(this.prefix, `${this.plural}/batch-update`),
+      records,
+      { params: { '@basis': 'id', '@mode': 'update' } }
+    )
   }
 }

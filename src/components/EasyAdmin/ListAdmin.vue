@@ -356,15 +356,19 @@
       class="easy-admin-dialog"
       width="640px"
       :title="$t('Batch Edit')"
-      @closed="batchEditDialog.form = {}"
+      @closed="resetBatchEditDialog"
     >
       <div class="app-container">
         <el-form label-width="120px">
           <el-form-item
             v-for="field in resolvedBatchFields"
             :key="field.property"
-            :label="field.label || (structure[field.property] ? structure[field.property]['translation'] : field.property)"
           >
+            <template #label>
+              <el-checkbox v-model="batchEditDialog.selectedFields" :value="field.property">
+                {{ field.label || (structure[field.property] ? structure[field.property]['translation'] : field.property) }}
+              </el-checkbox>
+            </template>
             <component
               :is="loadBatchPlugin(resolveBatchPluginType(field))"
               :em-prefix="em.prefix"
@@ -648,7 +652,8 @@ export default {
       batchEditing: false,
       batchEditDialog: {
         show: false,
-        form: {}
+        form: {},
+        selectedFields: []
       },
 
       // Translated filter config
@@ -723,6 +728,21 @@ export default {
     },
     listFilterData: {
       handler() { this.syncToUrl() },
+      deep: true
+    },
+    'batchEditDialog.form': {
+      handler(form) {
+        if (!this.batchEditDialog.show) return
+
+        const batchFieldProperties = new Set(this.resolvedBatchFields.map(field => field.property))
+        for (const property of Object.keys(form)) {
+          if (!batchFieldProperties.has(property) || this.batchEditDialog.selectedFields.includes(property)) continue
+
+          // RelationToMany initializes an empty array when it mounts; this is not a user edit.
+          if (Array.isArray(form[property]) && form[property].length === 0) continue
+          this.batchEditDialog.selectedFields.push(property)
+        }
+      },
       deep: true
     },
     '$route.query': {
@@ -1040,8 +1060,13 @@ export default {
     },
 
     openBatchEditDialog() {
-      this.batchEditDialog.form = {}
+      this.resetBatchEditDialog()
       this.batchEditDialog.show = true
+    },
+
+    resetBatchEditDialog() {
+      this.batchEditDialog.form = {}
+      this.batchEditDialog.selectedFields = []
     },
 
     async submitBatchEdit() {
@@ -1050,8 +1075,9 @@ export default {
 
       const form = this.batchEditDialog.form
       const data = {}
-      for (const key of Object.keys(form)) {
-        if (form[key] !== null && form[key] !== undefined) {
+      const batchFieldProperties = new Set(this.resolvedBatchFields.map(field => field.property))
+      for (const key of this.batchEditDialog.selectedFields) {
+        if (batchFieldProperties.has(key) && Object.hasOwn(form, key)) {
           data[key] = form[key]
         }
       }

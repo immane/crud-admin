@@ -176,14 +176,14 @@ delete endpoint and reports any partial failures.
 ### 3.5 Batch Update
 
 ```
-POST /api/v1/manage/{plural}/batch-update
+POST /api/v1/manage/{plural}/batch-update?@basis=id&@mode=update
 Content-Type: application/json
 
 Request:
-{
-  "ids": number[],
-  "data": { ... }    // Fields to update
-}
+[
+  { "id": 1, "fieldToUpdate": "new value" },
+  { "id": 2, "fieldToUpdate": "new value" }
+]
 
 Response (200):
 {
@@ -193,10 +193,9 @@ Response (200):
 }
 ```
 
-Each managed entity exposes a `POST .../batch-update` endpoint. The request
-contains `ids` (array of primary keys) and `data` (the fields to update with
-their new values). Only the fields present in `data` are modified; omitted
-fields retain their original values.
+Each managed entity exposes a `POST .../batch-update?@basis=id&@mode=update`
+endpoint. The request contains one record per primary key. Each record includes
+only `id` and the fields to update; omitted fields retain their original values.
 
 ### 3.6 Query Parameters
 
