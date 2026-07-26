@@ -63,6 +63,25 @@ export default [
   },
 
   {
+    path: '/store', name: 'StoreManage', component: Layout,
+    meta: { title: t('Store Management'), icon: 'el-icon-goods', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    children: [
+      ...r('Store', t('Store')),
+      ...r('StoreOrder', t('Store Order'))
+    ]
+  },
+
+  {
+    path: '/inventory', name: 'InventoryManage', component: Layout,
+    meta: { title: t('Inventory Management'), icon: 'el-icon-s-order', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    children: [
+      ...r('Material', t('Material')),
+      ...r('SpecificationRecipe', t('Recipe')),
+      ...r('InventoryStock', t('Stock'))
+    ]
+  },
+
+  {
     path: '/system-option', name: 'SystemOptionManage', component: Layout,
     meta: { title: t('System Options'), icon: 'el-icon-setting', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
