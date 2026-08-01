@@ -29,21 +29,60 @@ export default {
   methods: {
     getBreadcrumb() {
       // only show routes with meta.title
-      let matched = this.$route.matched.filter(item => item.meta && item.meta.title)
-      const first = matched[0]
+      const matched = this.$route.matched.filter(item => item.meta && item.meta.title)
 
-      if (!this.isDashboard(first)) {
-        matched = [{ path: '/dashboard', meta: { title: 'Dashboard' }}].concat(matched)
+      if (matched.length > 0) {
+        this.levelList = matched.filter(item => item.meta && item.meta.title && item.meta.breadcrumb !== false)
+        return
       }
 
-      this.levelList = matched.filter(item => item.meta && item.meta.title && item.meta.breadcrumb !== false)
+      // EasyAdmin fallback routes (/:entityParam/...) carry no meta.title on the
+      // matched records, so rebuild the breadcrumb from the menu config instead.
+      const { entityParam } = this.$route.params
+      this.levelList = entityParam ? this.buildEntityBreadcrumb(entityParam) : []
     },
-    isDashboard(route) {
-      const name = route && route.name
-      if (!name) {
-        return false
+    buildEntityBreadcrumb(entityParam) {
+      const found = this.findEntityMenu(entityParam)
+      const crumbs = []
+
+      if (found) {
+        const { group, child } = found
+        if (group.meta && group.meta.title) {
+          crumbs.push({ path: group.path, redirect: 'noRedirect', meta: { title: group.meta.title }})
+        }
+        crumbs.push({
+          path: `/${entityParam}/list`,
+          meta: { title: child.meta && child.meta.title }
+        })
+      } else {
+        crumbs.push({ meta: { title: entityParam }})
       }
-      return name.trim().toLocaleLowerCase() === 'Dashboard'.toLocaleLowerCase()
+
+      const action = this.entityAction()
+      if (action) {
+        crumbs.push({ path: this.$route.fullPath, meta: { title: action }})
+      }
+
+      return crumbs
+    },
+    findEntityMenu(entityParam) {
+      const menuRoutes = (this.$store && this.$store.state.permission && this.$store.state.permission.routes) || []
+      for (const group of menuRoutes) {
+        if (!group.children) continue
+        const child = group.children.find(route => {
+          const segments = (route.path || '').split('/').filter(Boolean)
+          return segments.length >= 3 && segments[0] === 'dummy' && segments[1] === entityParam && route.meta && route.meta.title
+        })
+        if (child) return { group, child }
+      }
+      return null
+    },
+    entityAction() {
+      const { path } = this.$route
+      if (path.endsWith('/create')) return this.$t('New')
+      if (path.includes('/update')) return this.$t('Edit')
+      if (path.includes('/detail')) return this.$t('Details')
+      return null
     },
     pathCompile(path) {
       // To solve this problem https://github.com/PanJiaChen/vue-element-admin/issues/561
