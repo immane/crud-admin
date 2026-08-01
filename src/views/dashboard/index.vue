@@ -111,7 +111,9 @@ const entityManagers = {
   orders: new EntityManage('Order'),
   products: new EntityManage('Product'),
   users: new EntityManage('User'),
-  transactions: new EntityManage({ name: 'WalletTransaction', plural: 'transactions' })
+  transactions: new EntityManage({ name: 'WalletTransaction', plural: 'transactions' }),
+  stores: new EntityManage({ name: 'Store', plural: 'stores' }),
+  materials: new EntityManage({ name: 'Material', prefix: '/api/v1/manage/inventory', plural: 'materials' })
 }
 
 const weatherByCode = {
@@ -136,7 +138,7 @@ export default {
     return {
       loading: true,
       updatedAt: '--:--',
-      totals: { orders: 0, products: 0, users: 0, pending: 0 },
+      totals: { orders: 0, products: 0, users: 0, pending: 0, stores: 0, materials: 0 },
       recentOrders: [],
       recentTransactions: [],
       weather: { location: this.$t('Local Weather'), temperature: '--', apparentTemperature: '--', windSpeed: '--', condition: this.$t('Loading'), icon: 'el-icon-cloudy', note: this.$t('Geolocate for live weather'), tone: 'weather--cloudy' }
@@ -154,8 +156,10 @@ export default {
       return [
         { label: this.$t('Total Orders'), value: this.totals.orders, hint: this.$t('All order records'), icon: 'el-icon-s-order', tone: 'blue' },
         { label: this.$t('Pending Orders'), value: this.totals.pending, hint: this.$t('Recent pending items'), icon: 'el-icon-timer', tone: 'amber' },
-        { label: this.$t('Total Products'), value: this.totals.products, hint: this.$t('Current product catalog'), icon: 'el-icon-goods', tone: 'green' },
-        { label: this.$t('Total Users'), value: this.totals.users, hint: this.$t('Registered users'), icon: 'el-icon-user', tone: 'violet' }
+        { label: this.$t('Total Stores'), value: this.totals.stores, hint: this.$t('Active storefronts'), icon: 'el-icon-goods', tone: 'green' },
+        { label: this.$t('Total Products'), value: this.totals.products, hint: this.$t('Current product catalog'), icon: 'el-icon-document', tone: 'teal' },
+        { label: this.$t('Total Materials'), value: this.totals.materials, hint: this.$t('Inventory materials'), icon: 'el-icon-notebook', tone: 'violet' },
+        { label: this.$t('Total Users'), value: this.totals.users, hint: this.$t('Registered users'), icon: 'el-icon-user', tone: 'rose' }
       ]
     },
     orderSeries() {
@@ -192,11 +196,13 @@ export default {
     async loadDashboard() {
       this.loading = true
       const query = { page: 1, limit: 12, '@order': 'entity.id|DESC' }
-      const [orders, products, users, transactions] = await Promise.all([
+      const [orders, products, users, transactions, stores, materials] = await Promise.all([
         entityManagers.orders.list(query).catch(() => ({ data: [], paginator: {}})),
         entityManagers.products.list({ page: 1, limit: 1 }).catch(() => ({ data: [], paginator: {}})),
         entityManagers.users.list({ page: 1, limit: 1 }).catch(() => ({ data: [], paginator: {}})),
-        entityManagers.transactions.list({ page: 1, limit: 6, '@order': 'entity.id|DESC' }).catch(() => ({ data: [], paginator: {}}))
+        entityManagers.transactions.list({ page: 1, limit: 6, '@order': 'entity.id|DESC' }).catch(() => ({ data: [], paginator: {}})),
+        entityManagers.stores.list({ page: 1, limit: 1 }).catch(() => ({ data: [], paginator: {}})),
+        entityManagers.materials.list({ page: 1, limit: 1 }).catch(() => ({ data: [], paginator: {}}))
       ])
       this.recentOrders = orders.data || []
       this.recentTransactions = transactions.data || []
@@ -204,7 +210,9 @@ export default {
         orders: this.totalOf(orders),
         products: this.totalOf(products),
         users: this.totalOf(users),
-        pending: this.recentOrders.filter(order => ['draft', 'pending', 'confirmed'].includes(order.status)).length
+        pending: this.recentOrders.filter(order => ['draft', 'pending', 'confirmed'].includes(order.status)).length,
+        stores: this.totalOf(stores),
+        materials: this.totalOf(materials)
       }
       this.updatedAt = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
       this.loading = false
@@ -267,7 +275,7 @@ export default {
 .dashboard__hero .dashboard__eyebrow { color: #a9c3e8; }
 h1, h2, p { margin-top: 0; } h1 { margin-bottom: 8px; font-size: 26px; font-weight: 600; } h2 { margin: 0; font-size: 16px; font-weight: 600; }
 .dashboard__intro { margin: 0; color: #c7d5e9; font-size: 14px; }.dashboard__hero-actions { z-index: 1; display: flex; align-items: center; gap: 18px; }.dashboard__updated { color: #c7d5e9; font-size: 12px; }
-.dashboard__metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin: 20px 0; }.metric-card { display: flex; align-items: center; gap: 15px; padding: 20px; background: #fff; border-radius: 12px; }.metric-card p { margin: 0 0 5px; color: #8190a5; font-size: 13px; }.metric-card strong { display: block; color: #24334b; font-size: 25px; line-height: 1.1; }.metric-card small { display: block; margin-top: 5px; color: #a6b1c0; font-size: 11px; }.metric-card__icon { display: grid; width: 43px; height: 43px; place-items: center; font-size: 20px; border-radius: 12px; }.metric-card--blue .metric-card__icon { color: #3d72c4; background: #eaf1ff; }.metric-card--amber .metric-card__icon { color: #b87b18; background: #fff3dc; }.metric-card--green .metric-card__icon { color: #228869; background: #e6f6ef; }.metric-card--violet .metric-card__icon { color: #7657b6; background: #f0ebff; }
+.dashboard__metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 20px 0; }.metric-card { display: flex; align-items: center; gap: 15px; padding: 20px; background: #fff; border-radius: 12px; }.metric-card p { margin: 0 0 5px; color: #8190a5; font-size: 13px; }.metric-card strong { display: block; color: #24334b; font-size: 25px; line-height: 1.1; }.metric-card small { display: block; margin-top: 5px; color: #a6b1c0; font-size: 11px; }.metric-card__icon { display: grid; width: 43px; height: 43px; place-items: center; font-size: 20px; border-radius: 12px; }.metric-card--blue .metric-card__icon { color: #3d72c4; background: #eaf1ff; }.metric-card--amber .metric-card__icon { color: #b87b18; background: #fff3dc; }.metric-card--green .metric-card__icon { color: #228869; background: #e6f6ef; }.metric-card--teal .metric-card__icon { color: #2d8f86; background: #e6f6f5; }.metric-card--violet .metric-card__icon { color: #7657b6; background: #f0ebff; }.metric-card--rose .metric-card__icon { color: #c24f6e; background: #fdf0f3; }
 .dashboard__grid, .dashboard__lower-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .8fr); gap: 20px; }.dashboard__lower-grid { margin-top: 20px; grid-template-columns: repeat(2, minmax(0, 1fr)); }.panel { min-height: 300px; padding: 23px 25px; background: #fff; border-radius: 14px; }.panel__header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }.panel__header > a { color: #497bc6; font-size: 13px; }.panel__empty { display: grid; min-height: 190px; color: #a2adbd; font-size: 13px; place-items: center; }.panel__badge { padding: 4px 9px; color: #34785f; background: #e7f6ef; border-radius: 20px; font-size: 11px; }
 .chart__summary { display: flex; align-items: baseline; gap: 10px; margin-top: 20px; }.chart__summary strong { color: #244c42; font-size: 25px; }.chart__summary span { color: #92a39e; font-size: 12px; }.chart__svg { width: 100%; height: 175px; margin-top: 5px; overflow: visible; }.chart__grid-line { stroke: #edf1f4; stroke-dasharray: 3 5; }.chart__line { fill: none; stroke: #36a077; stroke-linecap: round; stroke-linejoin: round; stroke-width: 3; }.chart__point { fill: #fff; stroke: #36a077; stroke-width: 3; }.chart__axis { display: flex; justify-content: space-between; color: #a4aebd; font-size: 11px; }
 .panel--weather { color: #fff; border: 0; background: linear-gradient(145deg, #438bd4, #315a9e); }.panel--weather .panel__kicker { color: #cde3fc; }.weather--sunny { background: linear-gradient(145deg, #4e9bdc, #28558f); }.weather--cloudy { background: linear-gradient(145deg, #6a87aa, #425977); }.weather--rainy { background: linear-gradient(145deg, #526f9e, #2e426b); }.weather__locate { padding: 5px; color: #fff; background: transparent; border: 0; cursor: pointer; font-size: 20px; }.weather__body { display: flex; align-items: center; gap: 16px; margin: 38px 0 33px; }.weather__symbol { font-size: 47px; }.weather__body > strong { font-size: 55px; font-weight: 400; letter-spacing: -3px; }.weather__body sup { font-size: 22px; }.weather__body b, .weather__body span { display: block; }.weather__body b { margin-bottom: 5px; font-size: 16px; }.weather__body span, .weather__footer { color: #d5e5f7; font-size: 12px; }.weather__footer { display: flex; justify-content: space-between; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.2); }
