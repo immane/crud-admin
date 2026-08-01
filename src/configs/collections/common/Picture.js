@@ -27,7 +27,15 @@ export default {
       ]
     },
     detail: {
-      detail_display: '__all__'
+      detail_display: [
+        'id',
+        'title',
+        'user',
+        'category',
+        'createdAt',
+        'updatedAt',
+        { property: 'image', type: 'image', full_width: true },
+      ]
     }
   }
 }
