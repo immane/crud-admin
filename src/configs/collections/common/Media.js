@@ -3,17 +3,8 @@ import { orderByIdDesc } from '../helpers'
 
 export default {
   Media: {
-    form: {
-      fields: [
-        'filename', 'originalFilename', 'mimeType', 'size',
-        { property: 'path', type: 'image' },
-        { property: 'alt', required: false },
-        { property: 'title', required: false },
-        { property: 'width', required: false },
-        { property: 'height', required: false }
-      ]
-    },
     list: {
+      disabled_actions: ['new', 'edit'],
       query: orderByIdDesc,
       list_filter: {
         filename: t('Filename'),
