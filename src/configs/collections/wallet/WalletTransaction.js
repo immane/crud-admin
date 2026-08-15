@@ -2,8 +2,8 @@ import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 
 export default {
-  WalletTransaction: {
-    entity: { name: 'WalletTransaction', plural: 'transactions' },
+  Transaction: {
+    entity: { name: 'Transaction', plural: 'transactions' },
     form: {
       fields: [
         { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},

@@ -47,8 +47,8 @@ export default [
     meta: { title: t('Wallet Management'), icon: 'el-icon-wallet', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
       ...r('Wallet', t('Wallet')),
-      ...r('WalletTransaction', t('Transaction')),
-      ...r('WalletPaymentDeduction', t('Payment Deduction'))
+      ...r('Transaction', t('Transaction')),
+      ...r('PaymentDeduction', t('Payment Deduction'))
     ]
   },
 
@@ -77,7 +77,7 @@ export default [
     children: [
       ...r('Material', t('Material')),
       ...r('SpecificationRecipe', t('Recipe')),
-      ...r('InventoryStock', t('Stock'))
+      ...r('Stock', t('Stock'))
     ]
   },
 

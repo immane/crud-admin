@@ -48,7 +48,7 @@ src/configs/
     ├── common/            # Category, Tag, Content, Comment 等
     ├── trade/             # Product, Order, OrderItem, Specification
     ├── identity/          # User, Profile
-    ├── wallet/            # Wallet, WalletTransaction
+    ├── wallet/            # Wallet, Transaction
     ├── promotion/         # Promotion, PromotionTemplate
     ├── payment/           # Invoice
     └── wechat/            # WechatUser
@@ -93,7 +93,7 @@ interface EntityConfig {
 | 形式 | 範例 | 用途 |
 |------|------|------|
 | 字串 | `entity: 'Product'` | 與設定鍵名相同；自動推斷 `/api/v1/manage/products` |
-| 物件 | `entity: { name: 'WalletTransaction', plural: 'transactions' }` | 自訂複數或前綴 |
+| 物件 | `entity: { name: 'Transaction', plural: 'transactions' }` | 自訂複數或前綴 |
 | 省略 | （回退到設定鍵名） | 當 `EntityName === 實體類別名稱` 時 |
 
 #### 巢狀 API 資源
@@ -752,7 +752,7 @@ r('Product', 'Product')
 | 實體名稱 | URL 區段 |
 |---|---|
 | Product | product |
-| WalletTransaction | wallet-transaction |
+| Transaction | wallet-transaction |
 | OrderItem | order-item |
 
 ### 10.2 `g(entityName, title, meta?, component?)` 產生器

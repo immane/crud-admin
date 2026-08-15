@@ -1,8 +1,8 @@
 import { t } from '@/i18n'
 
 export default {
-  InventoryStock: {
-    entity: { name: 'InventoryStock', prefix: '/api/v1/manage/inventory', plural: 'stocks' },
+  Stock: {
+    entity: { name: 'Stock', prefix: '/api/v1/manage/inventory', plural: 'stocks' },
     form: {
       fields: [
         'storeUuid',

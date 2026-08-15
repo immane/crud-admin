@@ -252,7 +252,7 @@ Uses the `i` (inflect) library:
 |-------------|-------------|
 | Product | products |
 | Category | categories |
-| WalletTransaction | wallet-transactions |
+| Transaction | wallet-transactions |
 
 Can be overridden via `{ plural: 'transactions' }`.
 

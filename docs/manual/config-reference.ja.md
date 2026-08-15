@@ -48,7 +48,7 @@ src/configs/
     ├── common/            # Category, Tag, Content, Comment など
     ├── trade/             # Product, Order, OrderItem, Specification
     ├── identity/          # User, Profile
-    ├── wallet/            # Wallet, WalletTransaction
+    ├── wallet/            # Wallet, Transaction
     ├── promotion/         # Promotion, PromotionTemplate
     ├── payment/           # Invoice
     └── wechat/            # WechatUser
@@ -93,7 +93,7 @@ interface EntityConfig {
 | 形式 | 例 | 用途 |
 |------|------|------|
 | 文字列 | `entity: 'Product'` | 設定キー名と同一；`/api/v1/manage/products` を自動推論 |
-| オブジェクト | `entity: { name: 'WalletTransaction', plural: 'transactions' }` | カスタム複数形またはプレフィックス |
+| オブジェクト | `entity: { name: 'Transaction', plural: 'transactions' }` | カスタム複数形またはプレフィックス |
 | 省略 | （設定キー名にフォールバック） | `EntityName === エンティティクラス名` の場合 |
 
 #### ネストされた API リソース
@@ -752,7 +752,7 @@ r('Product', 'Product')
 | エンティティ名 | URL セグメント |
 |---|---|
 | Product | product |
-| WalletTransaction | wallet-transaction |
+| Transaction | wallet-transaction |
 | OrderItem | order-item |
 
 ### 10.2 `g(entityName, title, meta?, component?)` ジェネレーター

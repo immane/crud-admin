@@ -240,7 +240,7 @@ g(entityName: string, title: string, meta?: object, component?: Component): Rout
 
 Entity name transformation: `inflect.dasherize(inflect.underscore(entityName))`
 - `Product` → `product`
-- `WalletTransaction` → `wallet-transaction`
+- `Transaction` → `wallet-transaction`
 
 ---
 
