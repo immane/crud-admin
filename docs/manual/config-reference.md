@@ -48,7 +48,7 @@ src/configs/
     ├── common/            # Category, Tag, Content, Comment, etc.
     ├── trade/             # Product, Order, OrderItem, Specification
     ├── identity/          # User, Profile
-    ├── wallet/            # Wallet, WalletTransaction
+    ├── wallet/            # Wallet, Transaction
     ├── promotion/         # Promotion, PromotionTemplate
     ├── payment/           # Invoice
     └── wechat/            # WechatUser
@@ -93,7 +93,7 @@ interface EntityConfig {
 | Form | Example | Use Case |
 |------|---------|----------|
 | string | `entity: 'Product'` | Same name as the config key; auto-infers `/api/v1/manage/products` |
-| object | `entity: { name: 'WalletTransaction', plural: 'transactions' }` | Custom plural or prefix |
+| object | `entity: { name: 'Transaction', plural: 'transactions' }` | Custom plural or prefix |
 | omitted | (falls back to the config key) | When `EntityName === entity class name` |
 
 #### Nested API Resources
@@ -752,7 +752,7 @@ Entity name to URL segment: `inflect.dasherize(inflect.underscore(entityName))`.
 | Entity Name | URL segment |
 |---|---|
 | Product | product |
-| WalletTransaction | wallet-transaction |
+| Transaction | wallet-transaction |
 | OrderItem | order-item |
 
 ### 10.2 `g(entityName, title, meta?, component?)` Generator

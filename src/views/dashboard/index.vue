@@ -111,7 +111,7 @@ const entityManagers = {
   orders: new EntityManage('Order'),
   products: new EntityManage('Product'),
   users: new EntityManage('User'),
-  transactions: new EntityManage({ name: 'WalletTransaction', plural: 'transactions' }),
+  transactions: new EntityManage({ name: 'Transaction', plural: 'transactions' }),
   stores: new EntityManage({ name: 'Store', plural: 'stores' }),
   materials: new EntityManage({ name: 'Material', prefix: '/api/v1/manage/inventory', plural: 'materials' })
 }

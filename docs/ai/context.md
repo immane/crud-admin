@@ -103,7 +103,7 @@ configs/collections/
 ├── promotion/                Promotion, PromotionTemplate
 ├── payment/                  Invoice
 ├── wechat/                   WechatUser
-└── wallet/                   Wallet, WalletTransaction, WalletPaymentDeduction
+└── wallet/                   Wallet, Transaction, PaymentDeduction
 ```
 
 Each file exports a single entity config:
@@ -512,7 +512,7 @@ The i18n system uses **flat English strings as translation keys** instead of nes
 ### Dashboard
 
 - `src/views/dashboard/index.vue` fetches live data from `EntityManage` for
-  Order, Product, User, WalletTransaction
+  Order, Product, User, Transaction
 - SVG sparkline chart derived from order amounts (no chart library dependency)
 - Browser geolocation + Open-Meteo API for local weather; falls back to Beijing
 - All API calls are `.catch(() => ...)` — dashboard remains functional even when

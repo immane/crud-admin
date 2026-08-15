@@ -73,9 +73,9 @@ export default {
   },
 
   // Advanced form: entity as object (custom plural)
-  WalletTransaction: {
+  Transaction: {
     entity: {
-      name: 'WalletTransaction',
+      name: 'Transaction',
       plural: 'transactions'     // Override auto-inference
     },
     list: { /* ... */ }

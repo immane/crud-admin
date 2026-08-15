@@ -2,8 +2,8 @@ import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 
 export default {
-  WalletPaymentDeduction: {
-    entity: { name: 'WalletPaymentDeduction', plural: 'payment-deductions' },
+  PaymentDeduction: {
+    entity: { name: 'PaymentDeduction', plural: 'payment-deductions' },
     form: {
       fields: [
         { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
