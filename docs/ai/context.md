@@ -359,6 +359,10 @@ for Vue 2's `v-set` pattern):
   removed — use `structure[field.property]` directly in templates.
 - Plugin async components are wrapped in `defineAsyncComponent()`.
 
+### Form Field Visibility (`hidden`)
+
+- `FormAdmin` supports `field.hidden`: `true`/`false` or `[]`/`['create']`/`['update']`/`['create','update']` (also `'edit'` alias for `update`). Checked via `isHidden(field)` using `this.id` (create `!id` vs update `!!id`), hidden fields are excluded from `plainFields`/`rules`, not rendered, not validated, not submitted. Example Wallet: `user`/`currency` `hidden:['update']`, `balance` `hidden:true`.
+
 ### Form Plugins — Vue 3 Model Contract
 
 - `v-model="form[field.property]"` works because the parent `form` object is reactive

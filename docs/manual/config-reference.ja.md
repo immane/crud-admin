@@ -336,7 +336,24 @@ form: {
 
 フィールド入力欄の下部にグレーのヘルプテキストを表示します。
 
-### 5.8 透過 Props とイベント
+### 5.8 バリデーション (`rules` / `validator`)
+
+FormAdmin は `field.rules` / `field.validator` を `el-form` ルールにマージし、`inject('registerFieldValidator')` を提供します。
+
+### 5.9 非表示 (`hidden`)
+
+```js
+{ property: 'user', hidden: true }
+{ property: 'user', hidden: ['update'] }       // 更新時のみ非表示
+{ property: 'balance', hidden: ['create','update'] }
+```
+
+- `true` → 常に非表示
+- `false` / `[]` → 常に表示
+- `['create']` → 作成時のみ非表示
+- `['update']` / `['edit']` → 更新時のみ非表示
+
+### 5.10 透過 Props とイベント
 
 ```js
 {

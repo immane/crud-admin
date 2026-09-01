@@ -185,7 +185,7 @@ export default {
          *     required: true,
          *     field_options: { label: 'Cover image' },
          *     field_events: { click: () => alert('Clicked') },
-         *     type_options: { disabled: true },
+         *     type_options: { disabled: true, hidden: ['create', 'update'] },
          *     type_events: { input: () => alert('Inputed') },
          *     help: 'This is a help text'
          *   },

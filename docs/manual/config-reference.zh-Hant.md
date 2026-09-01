@@ -336,7 +336,19 @@ form: {
 
 在欄位輸入框下方繪製灰色說明文字。
 
-### 5.8 透傳 Props 和事件
+ 校驗 (`rules` / `validator`)
+
+FormAdmin 會將 `field.rules` / `field.validator` 合併到 `el-form` 校驗中，並提供 `inject('registerFieldValidator')` 供外掛註冊。
+
+### 5.9 隱藏 (`hidden`)
+
+```js
+{ property: 'user', hidden: true }
+{ property: 'user', hidden: ['update'] }       // 僅編輯時隱藏
+{ property: 'balance', hidden: ['create','update'] }
+```
+
+### 5.10 透傳 Props 和事件 Props 和事件
 
 ```js
 {
