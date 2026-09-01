@@ -16,7 +16,7 @@ export default {
         },
         { property: 'phone', required: false },
         { property: 'phoneVerified', type: 'boolean', required: false },
-        { property: 'roles', type: 'json', required: false, help: t('User roles help') }
+        { property: 'roles', type: 'json', required: false, default_value: ['ROLE_USER'], help: t('User roles help') }
       ]
     },
     list: {
