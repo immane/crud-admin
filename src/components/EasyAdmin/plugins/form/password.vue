@@ -31,7 +31,13 @@ export default {
   methods: {
     onUpdate(val) {
       // Convert empty string to null so FormAdmin.cleanBlankAttributes can drop it on edit
-      this.form[this.field.property] = val === '' ? null : val
+      const normalized = val === '' ? null : val
+      this.form[this.field.property] = normalized
+      // Compatibility: backend may expect `password` or `plainPassword`; sync both
+      const alias = this.field.property === 'plainPassword' ? 'password' : this.field.property === 'password' ? 'plainPassword' : null
+      if (alias) {
+        this.form[alias] = normalized
+      }
     }
   }
 }
