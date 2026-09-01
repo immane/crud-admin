@@ -377,11 +377,18 @@ export default {
 
 .search-filter__reset--refreshing {
   border-color: #e6a23c !important;
+  background-color: #fdf6ec !important;
   color: #e6a23c !important;
 }
-.search-filter__reset--refreshing .el-icon {
-  animation: rotating 1s linear infinite;
-  color: #e6a23c;
+.search-filter__reset--refreshing .el-icon,
+.search-filter__reset--refreshing i {
+  color: #e6a23c !important;
+}
+.search-filter__reset--refreshing :deep(.el-icon),
+.search-filter__reset--refreshing :deep(i) {
+  animation: rotating 1s linear infinite !important;
+  transform-origin: center center;
+  display: inline-block;
 }
 @keyframes rotating {
   from { transform: rotate(0deg); }

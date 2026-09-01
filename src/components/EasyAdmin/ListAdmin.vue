@@ -148,9 +148,7 @@
     <el-row>
       <el-table
         :key="refreshTable"
-        v-loading="loading"
         :data="list"
-        element-loading-text="Loading..."
         fit
         lazy
         stripe
@@ -575,14 +573,10 @@ export default {
     dataProcessor: {
       type: Function,
       default: (context, dataProcessor = {}) => {
-        // Distinguish initial load vs subsequent refresh
-        // Keep table-layout stable (auto) and avoid full overlay flicker
-        const isInitial = !context.list.length && !context.paginator
-        if (isInitial) {
-          context.loading = true
-        } else {
-          context.refreshing = true
-        }
+        // All loads reuse Reset search icon (no table overlay, keep table-layout auto stable)
+        context.refreshing = true
+        // Keep loading false to avoid v-loading flicker; initial empty state shows table with no data
+        context.loading = false
 
         const promise = [
           // Fetch Structure
@@ -608,7 +602,6 @@ export default {
 
         Promise.all(promise.map(p => p.catch(e => e)))
           .then(res => {
-            context.loading = false
             context.refreshing = false
           })
       }
