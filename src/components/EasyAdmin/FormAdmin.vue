@@ -144,6 +144,12 @@ const resolveFormPlugin = path => {
 export default {
   name: 'FormAdmin',
   components: { Tinymce },
+  provide() {
+    return {
+      registerFieldValidator: this.registerFieldValidator,
+      getFormAdmin: () => this
+    }
+  },
   props: {
     /**
      * @description Form admin initialize properties.
@@ -296,6 +302,38 @@ export default {
             this.tabs.add(property.tab)
           }
         }
+
+        // Merge custom validation from field config
+        // Supports `field.rules` (array) and `field.validator` (function)
+        const customRules = []
+        if (property.rules) {
+          const arr = Array.isArray(property.rules) ? property.rules : [property.rules]
+          customRules.push(...arr)
+        }
+        if (property.validator) {
+          const validators = Array.isArray(property.validator) ? property.validator : [property.validator]
+          validators.forEach(fn => {
+            customRules.push({ validator: fn, trigger: 'blur' })
+          })
+        }
+        if (customRules.length) {
+          if (!this.rules[field]) this.rules[field] = []
+          // Normalize: ensure each rule has trigger
+          const normalized = customRules.map(r => {
+            if (r.validator && !r.trigger) return { ...r, trigger: 'blur' }
+            return r
+          })
+          this.rules[field].push(...normalized)
+        }
+
+        // Ensure required rule exists even without structure
+        if (!this.rules[field] && Object.keys(property).includes('required') && property.required) {
+          this.rules[field] = [{ required: true, message: `${field} is required`, trigger: 'blur' }]
+        }
+        // Tab for fields without structure
+        if (!structure && Object.keys(property).includes('tab')) {
+          this.tabs.add(property.tab)
+        }
       }
 
       if (this.id) {
@@ -312,6 +350,16 @@ export default {
   methods: {
     log(...arg) {
       return console.log(...arg)
+    },
+
+    registerFieldValidator(fieldName, validator, trigger = 'blur') {
+      if (!fieldName || typeof validator !== 'function') return
+      if (!this.rules[fieldName]) this.rules[fieldName] = []
+      // Avoid duplicate registration for same validator reference
+      const exists = this.rules[fieldName].some(r => r.validator === validator)
+      if (!exists) {
+        this.rules[fieldName].push({ validator, trigger })
+      }
     },
 
     uiFeedback() {

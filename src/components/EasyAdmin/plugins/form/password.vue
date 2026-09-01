@@ -55,9 +55,14 @@
 
 <script>
 import { View as ViewIcon, Hide as HideIcon, CircleCheck, CircleClose } from '@element-plus/icons-vue'
+import { createPasswordValidator } from '@/utils/validate'
 
 export default {
   components: { ViewIcon, HideIcon, CircleCheck, CircleClose },
+  inject: {
+    registerFieldValidator: { default: null },
+    getFormAdmin: { default: null }
+  },
   props: {
     form: {
       type: Object,
@@ -97,9 +102,6 @@ export default {
     hasNumber() {
       return /[0-9]/.test(this.pwd)
     },
-    isCompliant() {
-      return this.isLengthOk && this.hasLetter && this.hasNumber
-    },
     isMatch() {
       if (this.passwordVisible) return true
       return this.confirmValue !== '' && this.pwd === this.confirmValue
@@ -123,7 +125,15 @@ export default {
     this.registerValidator()
   },
   methods: {
-    getFormAdmin() {
+    getFormAdminInstance() {
+      if (this.getFormAdmin) {
+        try {
+          const inst = this.getFormAdmin()
+          if (inst && inst.rules) return inst
+        } catch (_) {
+          // ignore
+        }
+      }
       let parent = this.$parent
       while (parent && !parent.rules) {
         parent = parent.$parent
@@ -131,43 +141,26 @@ export default {
       return parent
     },
     registerValidator() {
-      const formAdmin = this.getFormAdmin()
-      if (!formAdmin || !formAdmin.rules) return
+      const formAdmin = this.getFormAdminInstance()
       const fieldName = this.field.property
-      const validator = (rule, value, callback) => {
-        const pwd = value || ''
-        // Empty allowed on edit (id exists), required on create
-        if (!pwd) {
-          if (!formAdmin.id) {
-            return callback(new Error(this.$t('Password is required')))
-          }
-          return callback()
-        }
-        const isLengthOk = pwd.length >= 6
-        const hasLetter = /[A-Za-z]/.test(pwd)
-        const hasNumber = /[0-9]/.test(pwd)
-        if (!isLengthOk || !hasLetter || !hasNumber) {
-          return callback(new Error(this.$t('Password does not meet requirements')))
-        }
-        if (!this.passwordVisible) {
-          if (!this.confirmValue) {
-            return callback(new Error(this.$t('Please confirm password')))
-          }
-          if (pwd !== this.confirmValue) {
-            return callback(new Error(this.$t('Passwords do not match')))
-          }
-        }
-        callback()
+      const validator = createPasswordValidator(
+        () => this.pwd,
+        () => this.confirmValue,
+        () => this.passwordVisible,
+        () => !formAdmin.id,
+        (key) => this.$t(key)
+      )
+      if (this.registerFieldValidator) {
+        this.registerFieldValidator(fieldName, validator, ['blur', 'change'])
+      } else if (formAdmin && formAdmin.rules) {
+        if (!formAdmin.rules[fieldName]) formAdmin.rules[fieldName] = []
+        formAdmin.rules[fieldName].push({ validator, trigger: ['blur', 'change'] })
       }
-      formAdmin.rules[fieldName] = [
-        { validator, trigger: ['blur', 'change'] }
-      ]
     },
     triggerValidate() {
-      const formAdmin = this.getFormAdmin()
+      const formAdmin = this.getFormAdminInstance()
       if (!formAdmin || !formAdmin.$refs || !formAdmin.$refs.form) return
       const fieldName = this.field.property
-      // Defer to next tick to avoid recursive validation
       this.$nextTick(() => {
         try {
           formAdmin.$refs.form.validateField(fieldName)
