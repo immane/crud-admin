@@ -7,11 +7,11 @@ export default {
     form: {
       fields: [
         'name',
-        { property: 'slug', required: false },
+        { property: 'slug', required: false, help: t('Category slug help') },
         { property: 'description', type: 'text', required: false },
-        { property: 'parent', required: false },
-        { property: 'sortOrder', required: false, default_value: 0 },
-        { property: 'enabled', type: 'boolean', required: false, default_value: true }
+        { property: 'parent', required: false, help: t('Category parent help') },
+        { property: 'sortOrder', required: false, default_value: 0, help: t('Category sortOrder help') },
+        { property: 'enabled', type: 'boolean', required: false, default_value: true, help: t('Category enabled help') }
       ]
     },
     list: {

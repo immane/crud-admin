@@ -7,7 +7,7 @@ export default {
       fields: [
         { property: 'nickname', required: false },
         { property: 'avatar', type: 'image', required: false },
-        { property: 'level', type: 'select', default_value: 'bronze', type_options: {
+        { property: 'level', type: 'select', default_value: 'bronze', help: t('Profile level help'), type_options: {
           options: [
             { value: 'bronze', label: t('Bronze') },
             { value: 'silver', label: t('Silver') },
@@ -16,7 +16,7 @@ export default {
             { value: 'diamond', label: t('Diamond') }
           ]
         }},
-        { property: 'metadata', type: 'json', required: false }
+        { property: 'metadata', type: 'json', required: false, help: t('Profile metadata help') }
       ]
     },
     list: {

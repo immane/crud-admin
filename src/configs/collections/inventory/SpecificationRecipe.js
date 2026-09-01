@@ -6,11 +6,12 @@ export default {
     entity: { name: 'SpecificationRecipe', prefix: '/api/v1/manage/inventory', plural: 'recipes' },
     form: {
       fields: [
-        'specificationUuid',
+        { property: 'specificationUuid', help: t('SpecificationRecipe specificationUuid help') },
         {
           property: 'status',
           type: 'select',
           default_value: 'active',
+          help: t('SpecificationRecipe status help'),
           type_options: {
             options: [
               { value: 'active', label: t('Active') },
@@ -18,7 +19,7 @@ export default {
             ]
           }
         },
-        { property: 'lines', full_width: true }
+        { property: 'lines', full_width: true, help: t('SpecificationRecipe lines help') }
       ]
     },
     list: {

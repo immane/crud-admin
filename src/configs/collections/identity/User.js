@@ -9,7 +9,7 @@ export default {
         { property: 'email', field_options: { label: t('Email') }},
         { property: 'phone', required: false },
         { property: 'phoneVerified', type: 'boolean', required: false },
-        { property: 'roles', type: 'json', required: false }
+        { property: 'roles', type: 'json', required: false, help: t('User roles help') }
       ]
     },
     list: {
@@ -20,10 +20,10 @@ export default {
         phone: t('Phone')
       },
       list_display: [
-        'id', 
-        'username', 
-        'email', 
-        'phone', 
+        'id',
+        'username',
+        'email',
+        'phone',
         { property: 'phoneVerified', editable: true },
         { property: 'roles', type: 'array' }
       ]

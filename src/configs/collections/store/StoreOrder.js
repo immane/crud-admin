@@ -10,11 +10,12 @@ export default {
         'storeNameSnapshot',
         { property: 'customerUserUuid', required: false },
         { property: 'currency', default_value: 'CNY' },
-        { property: 'totalAmount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
+        { property: 'totalAmount', type: 'currency', help: t('StoreOrder totalAmount help'), type_options: { multiplier: 100, currency: 'CNY' }},
         {
           property: 'operationalStatus',
           type: 'select',
           default_value: 'pending',
+          help: t('StoreOrder operationalStatus help'),
           type_options: {
             options: [
               { value: 'pending', label: t('Pending') },
@@ -25,10 +26,10 @@ export default {
             ]
           }
         },
-        { property: 'rejectionCode', required: false },
-        { property: 'rejectionReason', type: 'text', required: false },
-        { property: 'fulfillmentData', type: 'json', required: false },
-        { property: 'orderSnapshot', type: 'json' }
+        { property: 'rejectionCode', required: false, help: t('StoreOrder rejectionCode help') },
+        { property: 'rejectionReason', type: 'text', required: false, help: t('StoreOrder rejectionReason help') },
+        { property: 'fulfillmentData', type: 'json', required: false, help: t('StoreOrder fulfillmentData help') },
+        { property: 'orderSnapshot', type: 'json', help: t('StoreOrder orderSnapshot help') }
       ]
     },
     list: {

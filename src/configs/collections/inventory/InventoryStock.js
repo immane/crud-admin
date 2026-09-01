@@ -5,11 +5,11 @@ export default {
     entity: { name: 'Stock', prefix: '/api/v1/manage/inventory', plural: 'stocks' },
     form: {
       fields: [
-        'storeUuid',
-        'material',
-        'onHandQuantity',
-        'reservedQuantity',
-        'allowNegativeStock'
+        { property: 'storeUuid', help: t('Stock storeUuid help') },
+        { property: 'material', help: t('Stock material help') },
+        { property: 'onHandQuantity', help: t('Stock onHandQuantity help') },
+        { property: 'reservedQuantity', help: t('Stock reservedQuantity help') },
+        { property: 'allowNegativeStock', help: t('Stock allowNegativeStock help') }
       ]
     },
     list: {

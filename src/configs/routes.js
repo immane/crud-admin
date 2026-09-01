@@ -13,7 +13,7 @@ export default [
 
   {
     path: '/order', name: 'OrderManage', component: Layout,
-    meta: { title: t('Order Management'), icon: 'el-icon-tickets', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('Order Management'), icon: 'el-icon-list', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
       ...r('Order', t('Order')),
       ...r('Invoice', t('Invoice')),
@@ -64,7 +64,7 @@ export default [
 
   {
     path: '/store', name: 'StoreManage', component: Layout,
-    meta: { title: t('Store Management'), icon: 'el-icon-goods', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('Store Management'), icon: 'el-icon-shop', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
       ...r('Store', t('Store')),
       ...r('StoreOrder', t('Store Order'))
@@ -73,11 +73,22 @@ export default [
 
   {
     path: '/inventory', name: 'InventoryManage', component: Layout,
-    meta: { title: t('Inventory Management'), icon: 'el-icon-s-order', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('Inventory Management'), icon: 'el-icon-box', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
       ...r('Material', t('Material')),
       ...r('SpecificationRecipe', t('Recipe')),
       ...r('Stock', t('Stock'))
+    ]
+  },
+
+  {
+    path: '/authorization', name: 'AuthorizationManage', component: Layout,
+    meta: { title: t('Authorization'), icon: 'el-icon-lock', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    children: [
+      ...r('Role', t('Role')),
+      ...r('Permission', t('Permission')),
+      ...r('Assignment', t('Assignment')),
+      ...r('AuditLog', t('Audit Log'))
     ]
   },
 

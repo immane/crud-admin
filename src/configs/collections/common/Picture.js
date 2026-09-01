@@ -8,8 +8,8 @@ export default {
         { property: 'user', required: false },
         { property: 'title', required: false },
         'category',
-        { property: 'image', type: 'image', required: true },
-        { property: 'metadata', type: 'json', required: false }
+        { property: 'image', type: 'image', required: true, help: t('Picture image help') },
+        { property: 'metadata', type: 'json', required: false, help: t('Picture metadata help') }
       ]
     },
     list: {
@@ -34,7 +34,7 @@ export default {
         'category',
         'createdAt',
         'updatedAt',
-        { property: 'image', type: 'image', full_width: true },
+        { property: 'image', type: 'image', full_width: true }
       ]
     }
   }

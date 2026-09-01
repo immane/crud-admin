@@ -5,11 +5,11 @@ export default {
   Page: {
     form: {
       fields: [
-        'title', 'slug',
+        'title', { property: 'slug', help: t('Page slug help') },
         { property: 'body', type: 'text' },
-        { property: 'metaTitle', required: false },
-        { property: 'metaDescription', type: 'text', required: false },
-        { property: 'status', type: 'select', default_value: 'draft', type_options: {
+        { property: 'metaTitle', required: false, help: t('Page metaTitle help') },
+        { property: 'metaDescription', type: 'text', required: false, help: t('Page metaDescription help') },
+        { property: 'status', type: 'select', default_value: 'draft', help: t('Page status help'), type_options: {
           options: [
             { value: 'draft', label: t('Draft') },
             { value: 'published', label: t('Published') }

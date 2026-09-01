@@ -12,6 +12,7 @@ export default {
           property: 'status',
           type: 'select',
           default_value: 'activate',
+          help: t('Store status help'),
           type_options: {
             options: [
               { value: 'activate', label: t('Activate') },
@@ -21,9 +22,9 @@ export default {
           }
         },
         'timezone',
-        { property: 'contact', type: 'json', required: false },
-        { property: 'address', type: 'json', required: false },
-        { property: 'settings', type: 'json', required: false }
+        { property: 'contact', type: 'json', required: false, help: t('Store contact help') },
+        { property: 'address', type: 'json', required: false, help: t('Store address help') },
+        { property: 'settings', type: 'json', required: false, help: t('Store settings help') }
       ]
     },
     list: {
