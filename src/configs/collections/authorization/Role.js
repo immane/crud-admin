@@ -155,8 +155,7 @@ export default {
           help: 'global=全局可见，store=限定门店'
         },
         { property: 'isSystem', type: 'boolean' },
-        { property: 'permissions', type: 'RelationToMany', help: '关联权限数/列表' },
-        { property: 'createdAt', type: 'datetime' },
+        'permissions',
         { property: 'updatedAt', type: 'datetime' }
       ]
     },
