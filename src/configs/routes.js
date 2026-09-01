@@ -4,6 +4,15 @@ import Layout from '@/layout'
 
 export default [
   {
+    path: '/store', name: 'StoreManage', component: Layout,
+    meta: { title: t('Store Management'), icon: 'el-icon-shop', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    children: [
+      ...r('Store', t('Store')),
+      ...r('StoreOrder', t('Store Order'))
+    ]
+  },
+
+  {
     path: '/product', name: 'ProductManage', component: Layout,
     meta: { title: t('Product Management'), icon: 'el-icon-goods', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
@@ -31,14 +40,12 @@ export default [
   },
 
   {
-    path: '/content', name: 'ContentManage', component: Layout,
-    meta: { title: t('Content Management'), icon: 'el-icon-notebook', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    path: '/inventory', name: 'InventoryManage', component: Layout,
+    meta: { title: t('Inventory Management'), icon: 'el-icon-box', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
-      ...r('Content', t('Content')),
-      ...r('Page', t('Page')),
-      ...r('Comment', t('Comment')),
-      ...r('Media', t('Media')),
-      ...r('Picture', t('Picture'))
+      ...r('Material', t('Material')),
+      ...r('SpecificationRecipe', t('Recipe')),
+      ...r('Stock', t('Stock'))
     ]
   },
 
@@ -53,31 +60,24 @@ export default [
   },
 
   {
+    path: '/content', name: 'ContentManage', component: Layout,
+    meta: { title: t('Content Management'), icon: 'el-icon-notebook', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    children: [
+      ...r('Content', t('Content')),
+      ...r('Page', t('Page')),
+      ...r('Comment', t('Comment')),
+      ...r('Media', t('Media')),
+      ...r('Picture', t('Picture'))
+    ]
+  },
+
+  {
     path: '/user', name: 'UserManage', component: Layout,
     meta: { title: t('User Management'), icon: 'el-icon-user', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
       ...r('User', t('User')),
       ...r('Profile', t('Profile')),
       ...r('WechatUser', t('Wechat User'))
-    ]
-  },
-
-  {
-    path: '/store', name: 'StoreManage', component: Layout,
-    meta: { title: t('Store Management'), icon: 'el-icon-shop', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
-    children: [
-      ...r('Store', t('Store')),
-      ...r('StoreOrder', t('Store Order'))
-    ]
-  },
-
-  {
-    path: '/inventory', name: 'InventoryManage', component: Layout,
-    meta: { title: t('Inventory Management'), icon: 'el-icon-box', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
-    children: [
-      ...r('Material', t('Material')),
-      ...r('SpecificationRecipe', t('Recipe')),
-      ...r('Stock', t('Stock'))
     ]
   },
 
