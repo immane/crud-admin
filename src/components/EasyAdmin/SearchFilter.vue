@@ -80,6 +80,7 @@
         icon="el-icon-refresh"
         title="Reset search"
         circle
+        :class="{ 'search-filter__reset--refreshing': refreshing }"
         @click="reset"
       />
     </div>
@@ -91,6 +92,10 @@ export default {
   name: 'SearchFilter',
 
   props: {
+    refreshing: {
+      type: Boolean,
+      default: false
+    },
     // v-model
     modelValue: {
       type: Object,
@@ -368,6 +373,19 @@ export default {
 .easy-admin-search-filter__fields {
   flex: 1 1 auto;
   flex-wrap: wrap;
+}
+
+.search-filter__reset--refreshing {
+  border-color: #e6a23c !important;
+  color: #e6a23c !important;
+}
+.search-filter__reset--refreshing .el-icon {
+  animation: rotating 1s linear infinite;
+  color: #e6a23c;
+}
+@keyframes rotating {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @media (max-width: 767px) {

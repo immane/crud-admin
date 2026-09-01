@@ -20,6 +20,7 @@
               :query="query"
               :fetch-data-func="fetchFilteredData"
               :list-filter="listFilter"
+              :refreshing="refreshing"
               @reset="resetSearch"
             />
           </slot>
@@ -144,13 +145,7 @@
       </div>
     </div>
 
-    <!-- Subtle refresh indicator for pagination / search / update (keeps table visible) -->
-    <div v-if="refreshing" class="table-refresh-bar">
-      <el-icon class="is-loading table-refresh-bar__icon"><Refresh /></el-icon>
-      <span>{{ $t('Loading...') }}</span>
-    </div>
-
-    <el-row :class="{ 'table-refreshing': refreshing }">
+    <el-row>
       <el-table
         :key="refreshTable"
         v-loading="loading"
@@ -383,7 +378,6 @@ import SearchFilter from './SearchFilter.vue'
 import FormAdmin from './FormAdmin.vue'
 import { createUiFeedback } from './ui/feedback'
 import EditablePlain from './plugins/list/editable-plain.vue'
-import { Refresh } from '@element-plus/icons-vue'
 
 const listPlugins = import.meta.glob('./plugins/list/*.vue')
 const listPluginCache = {}
@@ -407,7 +401,7 @@ const resolveFormPlugin = (path) => {
 
 export default {
   name: 'ListAdmin',
-  components: { FormAdmin, SearchFilter, Refresh },
+  components: { FormAdmin, SearchFilter },
 
   props: {
     /**
@@ -1175,26 +1169,6 @@ export default {
 .easy-admin-toolbar__actions {
   flex: 0 0 auto;
   justify-content: flex-end;
-}
-
-.table-refresh-bar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  margin-bottom: 8px;
-  font-size: 12px;
-  color: var(--text-secondary);
-  background: color-mix(in srgb, var(--accent) 8%, transparent);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
-.table-refresh-bar__icon {
-  font-size: 14px;
-}
-.table-refreshing {
-  opacity: 0.88;
-  transition: opacity 0.15s ease;
 }
 
 .easy-admin-toolbar__actions :deep(.el-button + .el-button),
