@@ -107,13 +107,75 @@ export default {
   },
   watch: {
     pwd() {
-      // keep alias in sync if needed is handled in onUpdate, but watch for external clears
       if (!this.pwd) {
         this.confirmValue = ''
       }
+      this.triggerValidate()
+    },
+    confirmValue() {
+      this.triggerValidate()
+    },
+    passwordVisible() {
+      this.triggerValidate()
     }
   },
+  mounted() {
+    this.registerValidator()
+  },
   methods: {
+    getFormAdmin() {
+      let parent = this.$parent
+      while (parent && !parent.rules) {
+        parent = parent.$parent
+      }
+      return parent
+    },
+    registerValidator() {
+      const formAdmin = this.getFormAdmin()
+      if (!formAdmin || !formAdmin.rules) return
+      const fieldName = this.field.property
+      const validator = (rule, value, callback) => {
+        const pwd = value || ''
+        // Empty allowed on edit (id exists), required on create
+        if (!pwd) {
+          if (!formAdmin.id) {
+            return callback(new Error(this.$t('Password is required')))
+          }
+          return callback()
+        }
+        const isLengthOk = pwd.length >= 6
+        const hasLetter = /[A-Za-z]/.test(pwd)
+        const hasNumber = /[0-9]/.test(pwd)
+        if (!isLengthOk || !hasLetter || !hasNumber) {
+          return callback(new Error(this.$t('Password does not meet requirements')))
+        }
+        if (!this.passwordVisible) {
+          if (!this.confirmValue) {
+            return callback(new Error(this.$t('Please confirm password')))
+          }
+          if (pwd !== this.confirmValue) {
+            return callback(new Error(this.$t('Passwords do not match')))
+          }
+        }
+        callback()
+      }
+      formAdmin.rules[fieldName] = [
+        { validator, trigger: ['blur', 'change'] }
+      ]
+    },
+    triggerValidate() {
+      const formAdmin = this.getFormAdmin()
+      if (!formAdmin || !formAdmin.$refs || !formAdmin.$refs.form) return
+      const fieldName = this.field.property
+      // Defer to next tick to avoid recursive validation
+      this.$nextTick(() => {
+        try {
+          formAdmin.$refs.form.validateField(fieldName)
+        } catch (_) {
+          // ignore
+        }
+      })
+    },
     onUpdate(val) {
       const normalized = val === '' ? null : val
       this.form[this.field.property] = normalized
@@ -121,13 +183,14 @@ export default {
       if (alias) {
         this.form[alias] = normalized
       }
-      // reset confirm if password cleared
       if (!normalized) {
         this.confirmValue = ''
       }
+      this.triggerValidate()
     },
     onConfirmUpdate(val) {
       this.confirmValue = val
+      this.triggerValidate()
     }
   }
 }
