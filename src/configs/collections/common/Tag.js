@@ -6,7 +6,7 @@ export default {
     form: {
       fields: [
         'name',
-        { property: 'slug', required: false },
+        { property: 'slug', required: false, help: t('Tag slug help') },
         { property: 'color', required: false }
       ]
     },

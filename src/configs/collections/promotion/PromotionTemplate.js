@@ -7,11 +7,11 @@ export default {
       fields: [
         'name',
         { property: 'description', type: 'text', required: false },
-        'type',
-        { property: 'phase', default_value: 0 },
-        { property: 'enabled', type: 'boolean', required: false, default_value: false },
-        { property: 'dsl', type: 'code' },
-        { property: 'fields', type: 'json', required: false }
+        { property: 'type', help: t('PromotionTemplate type help') },
+        { property: 'phase', default_value: 0, help: t('PromotionTemplate phase help') },
+        { property: 'enabled', type: 'boolean', required: false, default_value: false, help: t('PromotionTemplate enabled help') },
+        { property: 'dsl', type: 'code', help: t('PromotionTemplate dsl help') },
+        { property: 'fields', type: 'json', required: false, help: t('PromotionTemplate fields help') }
       ]
     },
     list: {

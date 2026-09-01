@@ -1,10 +1,11 @@
+import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 
 export default {
   Invoice: {
     form: {
       fields: [
-        { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
+        { property: 'amount', type: 'currency', help: t('Invoice amount help'), type_options: { multiplier: 100, currency: 'CNY' }},
         '__all__'
       ]
     },

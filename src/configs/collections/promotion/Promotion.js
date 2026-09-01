@@ -7,12 +7,12 @@ export default {
       fields: [
         'name',
         { property: 'description', type: 'text', required: false },
-        { property: 'storeCode', required: false },
-        { property: 'enabled', type: 'boolean', required: false, default_value: false },
+        { property: 'storeCode', required: false, help: t('Promotion storeCode help') },
+        { property: 'enabled', type: 'boolean', required: false, default_value: false, help: t('Promotion enabled help') },
         { property: 'startTime', required: false },
         { property: 'endTime', required: false },
-        { property: 'config', type: 'json', required: false },
-        { property: 'conflictMode', type: 'select', default_value: 'stackable', type_options: {
+        { property: 'config', type: 'json', required: false, help: t('Promotion config help') },
+        { property: 'conflictMode', type: 'select', default_value: 'stackable', help: t('Promotion conflictMode help'), type_options: {
           options: [
             { value: 'stackable', label: t('Stackable') },
             { value: 'exclusive', label: t('Exclusive') },

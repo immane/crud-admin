@@ -153,13 +153,13 @@ export default {
       fields: [
         'name',
         { property: 'description', type: 'text', required: false },
-        { property: 'status', type: 'select', default_value: 'active', type_options: {
+        { property: 'status', type: 'select', default_value: 'active', help: t('Product status help'), type_options: {
           options: [
             { value: 'active', label: t('Active') },
             { value: 'inactive', label: t('Inactive') }
           ]
         }},
-        { property: 'metadata', type: 'json', required: false },
+        { property: 'metadata', type: 'json', required: false, help: t('Product metadata help') },
         {
           property: 'specifications',
           tab: t('Specifications'),

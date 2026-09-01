@@ -12,6 +12,7 @@ export default {
           property: 'kind',
           type: 'select',
           default_value: 'raw',
+          help: t('Material kind help'),
           type_options: {
             options: [
               { value: 'raw', label: t('Raw') },
@@ -25,6 +26,7 @@ export default {
           property: 'status',
           type: 'select',
           default_value: 'active',
+          help: t('Material status help'),
           type_options: {
             options: [
               { value: 'active', label: t('Active') },
@@ -32,7 +34,7 @@ export default {
             ]
           }
         },
-        { property: 'metadata', type: 'json', required: false }
+        { property: 'metadata', type: 'json', required: false, help: t('Material metadata help') }
       ]
     },
     list: {

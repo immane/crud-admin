@@ -6,7 +6,7 @@ export default {
     entity: { name: 'PaymentDeduction', plural: 'payment-deductions' },
     form: {
       fields: [
-        { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
+        { property: 'amount', type: 'currency', help: t('PaymentDeduction amount help'), type_options: { multiplier: 100, currency: 'CNY' }},
         '__all__'
       ]
     },

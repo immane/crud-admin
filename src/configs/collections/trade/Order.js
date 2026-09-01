@@ -6,7 +6,7 @@ export default {
     form: {
       fields: [
         { property: 'notes', type: 'text', required: false },
-        { property: 'metadata', type: 'json', required: false }
+        { property: 'metadata', type: 'json', required: false, help: t('Order metadata help') }
       ]
     },
     list: {

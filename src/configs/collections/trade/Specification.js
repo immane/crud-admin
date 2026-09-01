@@ -5,8 +5,8 @@ export default {
     form: {
       fields: [
         'name',
-        { property: 'price', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
-        { property: 'status', type: 'select', default_value: 'active', type_options: {
+        { property: 'price', type: 'currency', help: t('Specification price help'), type_options: { multiplier: 100, currency: 'CNY' }},
+        { property: 'status', type: 'select', default_value: 'active', help: t('Specification status help'), type_options: {
           options: [
             { value: 'active', label: t('Active') },
             { value: 'inactive', label: t('Inactive') }
