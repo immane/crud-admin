@@ -10,7 +10,8 @@ import {
   Sunny, PartlyCloudy, Cloudy, Drizzling, Pouring, Lightning,
   Sort,
   Tickets, Notebook, Wallet,
-  Lock, Key
+  Lock, Key,
+  List, Shop, Box, ShoppingCart, DocumentCopy
 } from '@element-plus/icons-vue'
 
 const iconMap = {
@@ -56,7 +57,12 @@ const iconMap = {
   'el-icon-notebook': Notebook,
   'el-icon-wallet': Wallet,
   'el-icon-lock': Lock,
-  'el-icon-key': Key
+  'el-icon-key': Key,
+  'el-icon-list': List,
+  'el-icon-shop': Shop,
+  'el-icon-box': Box,
+  'el-icon-shopping-cart': ShoppingCart,
+  'el-icon-document-copy': DocumentCopy
 }
 
 export default function installLegacyIcons(app) {
