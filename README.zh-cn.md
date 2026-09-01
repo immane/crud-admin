@@ -42,10 +42,11 @@
 ## 功能特色
 
 - **配置驱动 CRUD 引擎（EasyAdmin）** — 在配置中声明实体，即可自动获得完整的列表/表单/详情/路由
-- **17+ 种即插即用表单字段** — 文本输入、文本域、下拉选择、开关、数字、日期、图片、文件、JSON、富文本、关联选择器、穿梭框等
+- **19+ 种即插即用表单字段** — 文本输入、文本域、下拉选择、开关、数字、日期、图片、文件、JSON、富文本、关联选择器、穿梭框、密码（双输入+强度提示）、邮箱（格式校验）等
+- **表单校验** — `field.rules` / `field.validator` 合并至 `el-form`，插件可通过 `registerFieldValidator` 注入校验，未通过时阻断提交
 - **带降级链的详情视图** — `detail/` → `list/` → 纯文本插件逐字段类型降级
 - **国际化（i18n）** — 英文、简体中文、繁体中文、日文；浏览器语言自动检测；导航栏语言切换器；`Accept-Language` 请求头和 `_locale` 参数自动注入 API 请求
-- **JWT 认证** — Bearer token 登录，自动刷新 token 轮换，Cookie 持久化，并发请求排队
+- **JWT 认证** — Bearer token 登录，自动刷新 token 轮换，Cookie 按端口隔离（`dream_studio_admin_token_{port}` 避免同主机跨端口冲突），并发请求排队
 - **基于角色的权限控制** — 通过 Vuex + Vue Router 4 按用户角色过滤动态路由
 - **实体自省** — 查询后端 `/system/entities` 自动推断字段类型、可空性和关联关系
 - **动态筛选与排序** — 基于配置驱动的搜索 UI 生成服务端筛选表达式（`@filter`、`@sort`、`@order`）
@@ -97,7 +98,7 @@
 │   │   ├── DetailAdmin.vue          # 可配置记录详情页
 │   │   ├── SearchFilter.vue         # 动态筛选 UI
 │   │   └── plugins/
-│   │       ├── form/                # 17 个字段类型插件
+│   │       ├── form/                # 19 个字段类型插件
 │   │       ├── list/                # 9 个列表渲染插件
 │   │       └── detail/              # 2 个详情专用插件
 │   ├── configs/                     # 声明式实体配置
@@ -294,6 +295,8 @@ EasyAdmin 内置 17 种字段类型插件，根据实体元数据自动解析：
 | `RelationToMany.vue` | ManyToMany、OneToMany | 多选关联 |
 | `transfer.vue` | — | 穿梭框组件 |
 | `code.vue` | — | 代码文本域 |
+| `password.vue` | — | 密码（可视切换、遮蔽时双输入、6位+字母数字+一致性提示，校验不通过阻断提交） |
+| `email.vue` | — | 邮箱（实时格式提示，非法时阻断提交） |
 
 ### 字段配置参考
 
@@ -314,8 +317,26 @@ interface FieldOption {
   component?: object         // 自定义组件（JSX 渲染函数）
   help?: string              // 字段下方帮助文本
   full_width?: boolean       // 详情视图中跨满网格列宽
+  rules?: object[]           // 自定义 el-form 规则（与自动规则合并）
+  validator?: Function | Function[] // 快捷写法，等价 { validator, trigger:'blur' }
 }
 ```
+
+### 表单校验
+
+FormAdmin 会将 `field.rules` / `field.validator` 合并到 `el-form` 校验中，插件也可通过 `inject('registerFieldValidator')` 注册校验，未通过时阻断提交。示例：
+
+```js
+// User.js
+{
+  property: 'plainPassword',
+  type: 'password', // 遮蔽时双输入、强度提示、6位+字母数字校验
+  help: t('User password help')
+},
+{ property: 'email', type: 'email' } // 实时提示 + 非法阻断
+```
+
+内置校验位于 `src/utils/validate.js`（`isPasswordCompliant`、`createPasswordValidator`、`isEmailValid`、`createEmailValidator`）。
 
 ### 路由生成器
 

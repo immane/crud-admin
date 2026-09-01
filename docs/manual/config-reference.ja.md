@@ -905,6 +905,18 @@ export default {
 
 ---
 
+
+### 11.4 User — パスワードとメール検証
+
+```js
+{
+  property: 'plainPassword',
+  type: 'password',
+  help: t('User password help')
+},
+{ property: 'email', type: 'email' }
+```
+
 ## 12. クイックリファレンス
 
 ### 12.1 すべての `type` 値

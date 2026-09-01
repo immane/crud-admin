@@ -42,10 +42,11 @@
 ## 功能特色
 
 - **配置驅動 CRUD 引擎（EasyAdmin）** — 在配置中宣告實體，即可自動獲得完整的列表/表單/詳情/路由
-- **17+ 種即插即用表單欄位** — 文字輸入、文字域、下拉選擇、開關、數字、日期、圖片、檔案、JSON、富文字、關聯選擇器、穿梭框等
+- **19+ 種即插即用表單欄位** — 文字輸入、文字域、下拉選擇、開關、數字、日期、圖片、檔案、JSON、富文字、關聯選擇器、穿梭框、密碼（雙輸入+強度提示）、信箱（格式校驗）等
+- **表單校驗** — `field.rules` / `field.validator` 合併至 `el-form`，外掛可透過 `registerFieldValidator` 注入校驗，未通過時阻斷提交
 - **帶降級鏈的詳情視圖** — `detail/` → `list/` → 純文字插件逐欄位類型降級
 - **國際化（i18n）** — 英文、簡體中文、繁體中文、日文；瀏覽器語言自動偵測；導覽列語言切換器；`Accept-Language` 請求標頭和 `_locale` 參數自動注入 API 請求
-- **JWT 驗證** — Bearer token 登入，自動刷新 token 輪換，Cookie 持久化，並發請求排隊
+- **JWT 驗證** — Bearer token 登入，自動刷新 token 輪換，Cookie 按埠隔離（`dream_studio_admin_token_{port}` 避免同主機跨埠衝突），並發請求排隊
 - **基於角色的權限控制** — 透過 Vuex + Vue Router 4 按使用者角色過濾動態路由
 - **實體自省** — 查詢後端 `/system/entities` 自動推斷欄位類型、可空性和關聯關係
 - **動態篩選與排序** — 基於配置驅動的搜尋 UI 生成伺服器端篩選表達式（`@filter`、`@sort`、`@order`）
@@ -97,7 +98,7 @@
 │   │   ├── DetailAdmin.vue          # 可配置記錄詳情頁
 │   │   ├── SearchFilter.vue         # 動態篩選 UI
 │   │   └── plugins/
-│   │       ├── form/                # 17 個欄位類型插件
+│   │       ├── form/                # 19 個欄位類型插件
 │   │       ├── list/                # 9 個列表渲染插件
 │   │       └── detail/              # 2 個詳情專用插件
 │   ├── configs/                     # 宣告式實體配置

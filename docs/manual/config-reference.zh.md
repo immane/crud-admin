@@ -905,6 +905,22 @@ export default {
 
 ---
 
+
+### 11.4 User — 密码与邮箱校验
+
+```js
+// src/configs/collections/identity/User.js
+{
+  property: 'plainPassword',
+  type: 'password', // 遮蔽时双输入、6位+字母数字校验
+  help: t('User password help')
+},
+{ property: 'email', type: 'email' } // 实时提示 + 非法阻断
+```
+
+- `password.vue` 双输入/单输入切换、强度提示，`email.vue` 实时格式提示，均通过 FormAdmin 校验阻断提交。
+- 校验工具位于 `src/utils/validate.js`，FormAdmin 支持 `field.rules` / `field.validator` 合并。
+
 ## 12. 快速参考表
 
 ### 12.1 所有 `type` 值

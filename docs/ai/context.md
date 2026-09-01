@@ -1,7 +1,7 @@
 # AI Context
 
 > Vue Admin Skeleton — AI Assistant Context Document  
-> Last updated: 2026-07-23
+> Last updated: 2026-09-02
 
 ---
 
@@ -49,7 +49,7 @@ src/
 │   ├── ListAdmin.vue     # Dynamic list builder
 │   ├── DetailAdmin.vue   # Configurable record detail page
 │   ├── SearchFilter.vue  # Dynamic filter builder
-│   ├── plugins/form/     # 17 field-type plugins
+│   ├── plugins/form/     # 19 field-type plugins
 │   ├── plugins/list/     # 9 list-rendering plugins
 │   └── plugins/detail/   # Detail-only plugins (json, image)
 ├── configs/              # Declarative configs
@@ -167,8 +167,8 @@ const entityCollections = import.meta.glob('./collections/**/*.{js,jsx}', { eage
 
 ### 3. JWT Bearer Token Authentication
 
-- Token stored in Cookie: `dream_studio_admin_token`
-- Refresh token stored in Cookie: `dream_studio_admin_refresh_token`
+- Token stored in Cookie: `dream_studio_admin_token_{port}` (port-isolated, avoids same-host cross-port conflict)
+- Refresh token stored in Cookie: `dream_studio_admin_refresh_token_{port}` (port-isolated)
 - Request interceptor: `Authorization: Bearer {token}`
 - Login: `POST /api/auth/login { identifier, password }` → `{ access_token, refresh_token }`
 - Token refresh: `POST /api/auth/token/refresh { refresh_token }` → `{ access_token, refresh_token }` (rotates both)
@@ -219,6 +219,15 @@ const entityCollections = import.meta.glob('./collections/**/*.{js,jsx}', { eage
 | `RelationToOne.vue` | ManyToOne, OneToOne | `<el-select>` (remote search) |
 | `RelationToMany.vue` | ManyToMany, OneToMany | `<el-select multiple>` (remote search) |
 | `transfer.vue` | — | `<el-transfer>` (shuttle box) |
+| `password.vue` | — | `<el-input type="password">` with show/hide, double-entry when masked, 6+ chars + letter+number + match hints, blocks submit |
+| `email.vue` | — | `<el-input type="email">` with live format hint, blocks on invalid |
+
+### Form Validation
+
+- FormAdmin merges `field.rules` / `field.validator` into `el-form` rules and provides `registerFieldValidator` via `provide` for plugins.
+- Built-in helpers in `src/utils/validate.js`: `isPasswordCompliant`, `createPasswordValidator`, `isEmailValid`, `createEmailValidator`.
+- Password plugin: double-entry when masked, single when visible, realtime hints, blocks submit until 6+ chars + letter + number and match; Email plugin: live hint, blocks on invalid format.
+- Any entity config can declare `field.rules` / `field.validator` declaratively, e.g. `User` `plainPassword` and `email`.
 
 ### List Plugins (`plugins/list/`)
 
