@@ -471,12 +471,59 @@ export default {
 <style lang="scss" scoped>
 .help-text {
   display: flex;
-  p {
-    color: gray;
-    line-height: 1.3em;
+  align-items: flex-start;
+  gap: 8px;
+  background: #f5f7fa;
+  border: 1px solid #ebeef5;
+  border-left: 3px solid #409eff;
+  border-radius: 6px;
+  padding: 9px 12px;
+  margin-top: 8px;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: #606266;
+  word-break: break-word;
+
+  :deep(p) {
+    margin: 0;
+    color: #606266;
   }
-  div {
-    padding: 0 3px;
+
+  :deep(code) {
+    background: #ecf5ff;
+    color: #337ecc;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+    font-size: 11.5px;
+    border: 1px solid #d9ecff;
+    word-break: break-all;
+  }
+
+  :deep(a) {
+    color: #409eff;
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
+
+  :deep(br) {
+    content: '';
+    display: block;
+    margin-top: 4px;
+  }
+
+  > div:first-child {
+    flex-shrink: 0;
+    color: #909399;
+    margin-top: 1px;
+    .el-icon {
+      font-size: 14px;
+    }
+  }
+
+  > div:last-child {
+    flex: 1;
+    min-width: 0;
   }
 }
 
