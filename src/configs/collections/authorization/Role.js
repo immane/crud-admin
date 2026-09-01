@@ -4,39 +4,39 @@ import { orderByIdDesc } from '../helpers'
 /**
  * Role (authorization_role)
  *
- * 后端来源:
- *   - Entity: App\Authorization\Entity\Role (authorization_role 表)
+ * Backend source:
+ *   - Entity: App\Authorization\Entity\Role (authorization_role table)
  *   - Service: App\Authorization\Service\RoleService (extends BaseService<Role>)
  *   - Controller: App\Authorization\Controller\Manage\RoleController
  *     @Route('/manage/roles', name: 'manage-roles-') #[IsGranted('ROLE_ADMIN')]
  *     Mixins: List + Detail + Create + Update + Delete
- *   - 关联表 authorization_role_permission (ManyToMany Permission)
- *   - 字段授权表 authorization_role_field_grant (RoleFieldGrant)
+ *   - Join table authorization_role_permission (ManyToMany Permission)
+ *   - Field grant table authorization_role_field_grant (RoleFieldGrant)
  *
- * 核心约束 (见 RoleController::processCreateContent / processUpdateContent / deleteAction):
- *   - code: ^[a-z0-9_]+$  (80 chars, unique)  例如 store_content_editor / authorization_administrator
- *   - name: 人类可读名称，最大 120 chars
- *   - scopeType: 枚举 global | store (Role::SCOPES) 创建后不可变更语义(种子角色禁止 scopeType 变更)
- *   - isSystem: 系统内置角色 (种子写入) 禁止通过 API 修改/删除/改权限/改 fieldGrant
- *   - uuid: 36 chars UUID v4，创建时自动生成，可显式传入但校验 is_valid
+ * Core constraints (see RoleController::processCreateContent / processUpdateContent / deleteAction):
+ *   - code: ^[a-z0-9_]+$  (80 chars, unique)  e.g. store_content_editor / authorization_administrator
+ *   - name: human-readable name, max 120 chars
+ *   - scopeType: enum global | store (Role::SCOPES) cannot change semantics after creation (seed roles forbid scopeType change)
+ *   - isSystem: system built-in role (written by seeds) forbidden to modify/delete/change permissions/fieldGrant via API
+ *   - uuid: 36 chars UUID v4, auto-generated on creation, can be explicitly passed but validates is_valid
  *
- * 扩展接口 (Manage Role 子资源):
+ * Extended endpoints (Manage Role sub-resources):
  *   - POST   /manage/roles/{uuid}/permissions
- *       Body: { permissions: ["common:content:read", ...] } 或直接 ["code1","code2"]
- *       校验: code 正则 ^[a-z0-9:_]+$，不存在的 code 返回 400，system 角色返回 403
- *       副作用: 清空原 permissions -> addPermission loop -> flush + auditService.record('role.permissions.replaced') + cacheInvalidator.invalidateUsers(...)
+ *       Body: { permissions: ["common:content:read", ...] } or directly ["code1","code2"]
+ *       Validation: code pattern ^[a-z0-9:_]+$, unknown code returns 400, system role returns 403
+ *       Side effects: clear existing permissions -> addPermission loop -> flush + auditService.record('role.permissions.replaced') + cacheInvalidator.invalidateUsers(...)
  *   - PUT    /manage/roles/{uuid}/field-grants/{resource}/{action}
- *       Body: { fields: ["title","body",...] } 或直接 ["title",...]
- *       校验: AuthorizationResourceRegistry::assertValidFields()，未知 resource:action 或非法 field 返回 400
- *       当前 registry 默认: { 'common:content': { create: [title,body,category,tags,metadata], update: [...] } }
- *       副作用: upsert RoleFieldGrant + audit('field_grant.replaced') + invalidateUsers
- *   - DELETE /manage/roles/{id}  (覆写) system 角色禁止删除，返回 403
+ *       Body: { fields: ["title","body",...] } or directly ["title",...]
+ *       Validation: AuthorizationResourceRegistry::assertValidFields(), unknown resource:action or invalid field returns 400
+ *       Current registry default: { 'common:content': { create: [title,body,category,tags,metadata], update: [...] } }
+ *       Side effects: upsert RoleFieldGrant + audit('field_grant.replaced') + invalidateUsers
+ *   - DELETE /manage/roles/{id}  (overridden) system roles forbidden to delete, returns 403
  *
- * 审计: create -> audit 'role.created'；permissions/fieldGrant/更新均写 audit_log + 失效用户缓存
+ * Audit: create -> audit 'role.created'; permissions/fieldGrant/update all write audit_log + invalidate user cache
  *
- * 前端 EasyAdmin 使用:
- *   - 列表/表单自动通过 EntityManage (utils/entity.ts) 走 /api/v1/manage/roles CRUD
- *   - 关联权限建议用 RelationToMany 或 transfer 组件；字段授权可用 json/array + help 说明
+ * Frontend EasyAdmin usage:
+ *   - list/form automatically go through EntityManage (utils/entity.ts) via /api/v1/manage/roles CRUD
+ *   - recommend RelationToMany or transfer component for associated permissions; field grants can use json/array + help text
  */
 
 const scopeOptions = [
@@ -90,8 +90,8 @@ export default {
         },
         {
           property: 'permissions',
-          // 表单使用 transfer 穿梭框更适合权限批量授予（左侧_available_ / 右侧_selected_）；底层复用 RelationToMany 的 EntityManage 拉取逻辑
-          // 使用相应的 type: 列表页自动映射到 plugins/list/RelationToMany，表单页映射到 plugins/form/transfer
+          // Use transfer widget for bulk permission grants (left=available / right=selected); reuses RelationToMany EntityManage fetch logic under the hood
+          // Corresponding type: list page auto-maps to plugins/list/RelationToMany, form page maps to plugins/form/transfer
           type: 'transfer',
           required: false,
           help: t('Role permissions help'),
@@ -101,7 +101,7 @@ export default {
           field_options: { placeholder: t('Please select') }
         }
       ],
-      // 批量编辑仅允许名称相关，scopeType/system 不应在批量中改动
+      // Batch edit only allows name-related fields; scopeType/system should not be changed in bulk
       batch_edit: {
         fields: ['name']
       }

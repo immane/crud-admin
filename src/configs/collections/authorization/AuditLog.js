@@ -4,31 +4,31 @@ import { orderByIdDesc } from '../helpers'
 /**
  * AuditLog (authorization_audit_log)
  *
- * 后端来源:
- *   - Entity: App\Authorization\Entity\AuditLog (authorization_audit_log 表，bigint PK)
+ * Backend source:
+ *   - Entity: App\Authorization\Entity\AuditLog (authorization_audit_log table, bigint PK)
  *   - Service: App\Authorization\Service\AuditLogService / AuthorizationAuditService
  *   - Controller: App\Authorization\Controller\Manage\AuditLogController
  *     @Route('/manage/audit-logs') #[IsGranted('ROLE_ADMIN')]
- *     Mixins: List + Detail (只读，无 Create/Update/Delete)
+ *     Mixins: List + Detail (read-only, no Create/Update/Delete)
  *
- * 字段:
- *   - id: bigint 自增，只读
- *   - actorUuid: 操作人 User.uuid (可为 null，例如种子脚本)
- *   - action: 动作枚举字符串，例如:
+ * Fields:
+ *   - id: bigint auto-increment, read-only
+ *   - actorUuid: operator User.uuid (nullable, e.g. seed scripts)
+ *   - action: action enum string, e.g.:
  *       'role.created' / 'role.permissions.replaced' / 'field_grant.replaced' /
  *       'assignment.granted' / 'assignment.updated' / 'assignment.revoked'
- *   - targetType: 目标类型，例如 'role' / 'assignment' / 'role' (field_grant 复用 role)
- *   - targetUuid: 目标对象 UUID (Role.uuid / Assignment.uuid)，可为 null
- *   - beforeData / afterData: json 快照，记录变更前后 (例如 { permissions: [...] } 或 { fields: [...] })
- *   - requestId: 请求链路 ID (X-Request-Id)，可为 null
- *   - createdAt: datetime_immutable，PrePersist 自动写入
+ *   - targetType: target type, e.g. 'role' / 'assignment' / 'role' (field_grant reuses role)
+ *   - targetUuid: target object UUID (Role.uuid / Assignment.uuid), nullable
+ *   - beforeData / afterData: json snapshots, before/after change (e.g. { permissions: [...] } or { fields: [...] })
+ *   - requestId: request trace ID (X-Request-Id), nullable
+ *   - createdAt: datetime_immutable, auto-written via PrePersist
  *
- * 列表过滤 (AuditLogController::listFilter):
- *   - targetType / actorUuid  (query param 直接映射)
- *   - 通用 @filter / @order / @dql 仍可用 (BaseService)
+ * List filtering (AuditLogController::listFilter):
+ *   - targetType / actorUuid  (direct query param mapping)
+ *   - generic @filter / @order / @dql still available (BaseService)
  *
- * 审计写入时机见各 Controller 的 afterCreated/afterUpdated/replacePermissions/replaceFieldGrant/processDeletion
- * 前端仅做只读审计追溯展示，不开放新增/编辑/删除。
+ * Audit write timing: see afterCreated/afterUpdated/replacePermissions/replaceFieldGrant/processDeletion in each Controller
+ * Frontend only shows read-only audit trace, no create/edit/delete.
  */
 export default {
   AuditLog: {
@@ -84,7 +84,7 @@ export default {
 
     list: {
       query: orderByIdDesc,
-      // 只读审计表
+      // Read-only audit table
       disabled_actions: ['new', 'edit', 'delete', 'batch_edit', 'batch_delete'],
       list_filter: {
         action: {

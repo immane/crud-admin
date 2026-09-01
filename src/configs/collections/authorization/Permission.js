@@ -4,28 +4,28 @@ import { orderByIdDesc } from '../helpers'
 /**
  * Permission (authorization_permission)
  *
- * 后端来源: App\Authorization\Entity\Permission (src/Authorization/Entity/Permission.php)
+ * Backend source: App\Authorization\Entity\Permission (src/Authorization/Entity/Permission.php)
  * Manage API: GET/GET /api/v1/manage/permissions  (App\Authorization\Controller\Manage\PermissionController)
- *   - 仅支持 List + Detail (ListApiViewMixin + DetailApiViewMixin)，无 Create/Update/Delete
- *   - 权限路由限 ROLE_ADMIN: #[IsGranted('ROLE_ADMIN')] @Route('/manage/permissions')
- *   - 列表支持 @filter / @order / @dql / @select / @expands 等通用查询 (BaseService)
+ *   - Only supports List + Detail (ListApiViewMixin + DetailApiViewMixin), no Create/Update/Delete
+ *   - Permission routes require ROLE_ADMIN: #[IsGranted('ROLE_ADMIN')] @Route('/manage/permissions')
+ *   - List supports @filter / @order / @dql / @select / @expands and other generic queries (BaseService)
  *
- * 权限模型: code = "{module}:{resource}:{action}" 例如 "store:product:create"
- *   - module: 业务模块 (authorization / common / store / wallet)
- *   - resource: 资源 (role / assignment / content / product / order / voucher …)
- *   - action: 动作 (manage / read / create / update / delete / accept / fulfill / manual …)
- *   - name/description: 人类可读展示；isSystem: 是否系统内置(不可通过 API 随意增删)
- *   - 权限通过 SeedAuthorizationCommand 种子数据写入 DB，isSystem=true
+ * Permission model: code = "{module}:{resource}:{action}" e.g. "store:product:create"
+ *   - module: business module (authorization / common / store / wallet)
+ *   - resource: resource (role / assignment / content / product / order / voucher ...)
+ *   - action: action (manage / read / create / update / delete / accept / fulfill / manual ...)
+ *   - name/description: human-readable display; isSystem: whether system built-in (cannot be freely added/deleted via API)
+ *   - permissions are written to DB via SeedAuthorizationCommand seed data, isSystem=true
  *
- * 前端注意: Permission 是只读字典表，不提供新增/编辑/删除入口；角色的权限通过 Role 的
- * POST /manage/roles/{uuid}/permissions 接口批量替换。
+ * Frontend note: Permission is a read-only dictionary table, no create/edit/delete entry; role permissions are
+ * replaced in bulk via Role endpoint POST /manage/roles/{uuid}/permissions.
  */
 export default {
   Permission: {
-    // entity 配置: 映射到后端 /api/v1/manage/permissions
+    // entity config: maps to backend /api/v1/manage/permissions
     entity: {
       name: 'Permission',
-      // API 前缀默认 /api/v1/manage，plural 覆写避免复数推断歧义
+      // API prefix defaults to /api/v1/manage, plural override avoids pluralization ambiguity
       plural: 'permissions'
     },
 
@@ -80,7 +80,7 @@ export default {
 
     list: {
       query: orderByIdDesc,
-      // 只读实体: 禁用新增/编辑/删除/批量操作
+      // Read-only entity: disable create/edit/delete/bulk operations
       disabled_actions: ['new', 'edit', 'delete', 'batch_edit', 'batch_delete'],
       list_filter: {
         code: t('Code'),
