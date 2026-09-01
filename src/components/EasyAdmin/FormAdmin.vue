@@ -100,14 +100,12 @@
 
                 <!-- Help text -->
                 <template v-if="Object.keys(field).includes('help')">
-                  <div class="help-text" style="display: flex;">
-                    <div>
+                  <aside class="help-text">
+                    <span class="help-text__icon" aria-hidden="true">
                       <el-icon><el-icon-info /></el-icon>
-                    </div>
-                    <div>
-                      <p v-html="field.help" />
-                    </div>
-                  </div>
+                    </span>
+                    <div class="help-text__content" v-html="field.help" />
+                  </aside>
                 </template>
               </el-form-item>
             </template>
@@ -470,33 +468,55 @@ export default {
 
 <style lang="scss" scoped>
 .help-text {
-  display: flex;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  flex: 0 0 100%;
   align-items: flex-start;
-  gap: 8px;
-  background: #f5f7fa;
-  border: 1px solid #ebeef5;
-  border-left: 3px solid #409eff;
-  border-radius: 6px;
-  padding: 9px 12px;
-  margin-top: 8px;
-  font-size: 12.5px;
-  line-height: 1.65;
-  color: #606266;
+  column-gap: 8px;
+  background: linear-gradient(90deg, #f0f7ff 0%, #fafcff 100%);
+  border: 1px solid #d9ecff;
+  border-radius: 5px;
+  padding: 7px 10px;
+  margin-top: 7px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #5f6b7a;
   word-break: break-word;
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    color: #409eff;
+    background: #fff;
+    border: 1px solid #c6e2ff;
+    border-radius: 50%;
+
+    .el-icon {
+      font-size: 12px;
+    }
+  }
+
+  &__content {
+    min-width: 0;
+  }
 
   :deep(p) {
     margin: 0;
-    color: #606266;
+    color: inherit;
   }
 
   :deep(code) {
-    background: #ecf5ff;
+    display: inline;
+    background: rgb(64 158 255 / 9%);
     color: #337ecc;
-    padding: 1px 5px;
-    border-radius: 4px;
+    padding: 0 3px;
+    border-radius: 3px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
-    font-size: 11.5px;
-    border: 1px solid #d9ecff;
+    font-size: 11px;
     word-break: break-all;
   }
 
@@ -509,21 +529,7 @@ export default {
   :deep(br) {
     content: '';
     display: block;
-    margin-top: 4px;
-  }
-
-  > div:first-child {
-    flex-shrink: 0;
-    color: #909399;
-    margin-top: 1px;
-    .el-icon {
-      font-size: 14px;
-    }
-  }
-
-  > div:last-child {
-    flex: 1;
-    min-width: 0;
+    margin-top: 3px;
   }
 }
 
