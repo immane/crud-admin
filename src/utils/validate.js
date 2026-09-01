@@ -61,3 +61,37 @@ export function createPasswordValidator(getPassword, getConfirm, isVisible, isCr
     callback()
   }
 }
+
+/**
+ * Check if email is valid
+ * @param {string} email
+ * @returns {boolean}
+ */
+export function isEmailValid(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+/**
+ * Create validator for email field
+ * @param {() => string} getValue - getter for current value
+ * @param {() => object} getField - getter for field config
+ * @param {(key:string)=>string} t - i18n
+ * @returns {Function}
+ */
+export function createEmailValidator(getValue, getField, t) {
+  return (rule, value, callback) => {
+    const val = (value ?? getValue?.() ?? '').toString().trim()
+    const field = getField ? getField() : null
+    const required = field && field.required
+    if (!val) {
+      if (required) {
+        return callback(new Error(t ? t('Email is required') : 'Email is required'))
+      }
+      return callback()
+    }
+    if (!isEmailValid(val)) {
+      return callback(new Error(t ? t('Invalid email format') : 'Invalid email format'))
+    }
+    callback()
+  }
+}

@@ -6,7 +6,7 @@ export default {
     form: {
       fields: [
         { property: 'username', field_options: { label: t('Username') }},
-        { property: 'email', field_options: { label: t('Email') }},
+        { property: 'email', type: 'email', field_options: { label: t('Email') }},
         {
           property: 'plainPassword',
           type: 'password',
