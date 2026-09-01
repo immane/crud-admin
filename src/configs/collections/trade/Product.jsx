@@ -167,6 +167,7 @@ export default {
           property: 'specifications',
           tab: t('Specifications'),
           required: false,
+          field_options: { label: '', 'label-width': '60px' },
           component: SpecificationManager
         }
       ]
