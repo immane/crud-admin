@@ -307,6 +307,7 @@ export default {
   'PromotionTemplate dsl help': '定義促銷邏輯的領域特定語言程式碼。',
   'PromotionTemplate fields help': '定義範本所需動態欄位的 JSON 結構。',
   'User roles help': '從權限同步的角色指派 JSON 陣列；請勿手動編輯，由授權管理。',
+  'User password help': '建立時必填；編輯時留空則保持原密碼不變（至少6個字元）。',
   'Profile level help': '會員等級列舉（青銅/白銀/黃金/鉑金/鑽石），控制權限。',
   'Profile metadata help': '用於資料擴充（偏好/額外屬性）的任意巢狀 JSON。',
   'Wallet currency help': 'ISO 貨幣編碼（預設 CNY）；錢包金額以最小單位儲存。',

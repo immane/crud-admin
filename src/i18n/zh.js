@@ -307,6 +307,7 @@ export default {
   'PromotionTemplate dsl help': '定义促销逻辑的领域特定语言代码。',
   'PromotionTemplate fields help': '定义模板所需动态字段的 JSON 模式。',
   'User roles help': '从权限同步的角色分配 JSON 数组；请勿手动编辑，由授权管理。',
+  'User password help': '创建时必填；编辑时留空则保持原密码不变（至少6个字符）。',
   'Profile level help': '会员等级枚举（青铜/白银/黄金/铂金/钻石），控制权限。',
   'Profile metadata help': '用于资料扩展（偏好/额外属性）的任意嵌套 JSON。',
   'Wallet currency help': 'ISO 货币编码（默认 CNY）；钱包金额以最小单位存储。',

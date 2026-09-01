@@ -307,6 +307,7 @@ export default {
   'PromotionTemplate dsl help': 'プロモーションロジックを定義するドメイン固有言語のコード。',
   'PromotionTemplate fields help': 'テンプレートに必要な動的フィールドを定義する JSON スキーマ。',
   'User roles help': 'Authorization から同期されたロール割り当ての JSON 配列。手動で編集しないでください。Assignments で管理されます。',
+  'User password help': '作成時は必須。編集時は空のままにすると現在のパスワードを保持します（6文字以上）。',
   'Profile level help': '会員 tier の列挙（ブロンズ/シルバー/ゴールド/プラチナ/ダイヤモンド）。権限を制御します。',
   'Profile metadata help': 'プロファイル拡張（設定/追加属性）用の任意のネストされた JSON。',
   'Wallet currency help': 'ISO 通貨コード（デフォルト CNY）。ウォレット金額は最小単位で保存されます。',

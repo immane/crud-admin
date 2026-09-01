@@ -12,7 +12,7 @@ export default {
           type: 'password',
           required: false,
           field_options: { label: t('Password'), placeholder: t('Password') },
-          help: 'Required on create; leave empty on edit to keep unchanged (min 6 characters).'
+          help: t('User password help')
         },
         { property: 'phone', required: false },
         { property: 'phoneVerified', type: 'boolean', required: false },
