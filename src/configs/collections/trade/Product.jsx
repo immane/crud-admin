@@ -112,6 +112,9 @@ const SpecificationManager = {
         <el-dialog
           title={this.specId ? t('Update Spec') : t('New Spec')}
           modelValue={this.dialogShow}
+          alignCenter={true}
+          appendToBody={true}
+          destroyOnClose={true}
           {...{
             'onUpdate:modelValue': v => { this.dialogShow = v },
             onClosed: () => { this.refreshKey++ }
