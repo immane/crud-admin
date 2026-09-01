@@ -98,13 +98,13 @@
                   </slot>
                 </template>
 
-                <!-- Help text -->
+                <!-- Help text (supports HTML and Markdown: `code`, **bold**, *italic*, [link](url), lists, ```block```) -->
                 <template v-if="Object.keys(field).includes('help')">
                   <aside class="help-text">
                     <span class="help-text__icon" aria-hidden="true">
                       <el-icon><el-icon-info /></el-icon>
                     </span>
-                    <div class="help-text__content" v-html="field.help" />
+                    <div class="help-text__content" v-html="renderHelp(field.help)" />
                   </aside>
                 </template>
               </el-form-item>
@@ -461,6 +461,45 @@ export default {
           return false
         }
       })
+    },
+
+    /**
+     * Render help text supporting both HTML and Markdown.
+     * - HTML (existing `<code>` etc.) is preserved
+     * - Markdown: `code`, ```block```, **bold**, *italic* / _italic_, [link](url), - list
+     */
+    renderHelp(help) {
+      if (!help) return ''
+      let html = String(help)
+
+      // Fenced code blocks ```...```
+      html = html.replace(/```([\s\S]*?)```/g, (m, p1) => `<pre><code>${p1.trim()}</code></pre>`)
+
+      // Inline code `...`  (avoid already converted <code> tags)
+      html = html.replace(/`([^`\n]+?)`/g, '<code>$1</code>')
+
+      // Bold **...**
+      html = html.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
+
+      // Italic *...* and _..._
+      html = html.replace(/(^|[^*])\*([^*\n]+?)\*(?!\*)/g, '$1<em>$2</em>')
+      html = html.replace(/(^|[^_])_([^_\n]+?)_(?!_)/g, '$1<em>$2</em>')
+
+      // Links [text](url)
+      html = html.replace(/\[([^\]]+?)\]\(([^)]+?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+
+      // Headings # ... (simple bold)
+      html = html.replace(/^#{1,6}\s+(.*)$/gm, '<strong>$1</strong>')
+
+      // Unordered lists: lines starting with - or * -> bullet
+      html = html.replace(/^\s*[-*]\s+(.*)$/gm, '• $1')
+
+      // Preserve existing <br> and convert bare newlines to <br> if needed
+      if (html.includes('\n') && !html.includes('<br')) {
+        html = html.split(/\n{2,}/).map(block => block.replace(/\n/g, '<br>')).join('<br><br>')
+      }
+
+      return html
     }
   }
 }
@@ -530,6 +569,51 @@ export default {
     content: '';
     display: block;
     margin-top: 3px;
+  }
+
+  :deep(strong) {
+    font-weight: 600;
+    color: #303133;
+  }
+
+  :deep(em) {
+    font-style: italic;
+    color: #606266;
+  }
+
+  :deep(pre) {
+    margin: 6px 0 0;
+    padding: 8px 10px;
+    background: #f6f8fa;
+    border: 1px solid #ebeef5;
+    border-radius: 4px;
+    overflow: auto;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  :deep(pre code) {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  :deep(ul),
+  :deep(ol) {
+    margin: 4px 0 0 18px;
+    padding: 0;
+  }
+
+  :deep(li) {
+    margin: 2px 0;
+  }
+
+  :deep(blockquote) {
+    margin: 6px 0 0;
+    padding-left: 8px;
+    border-left: 2px solid #d9ecff;
+    color: #909399;
   }
 }
 
