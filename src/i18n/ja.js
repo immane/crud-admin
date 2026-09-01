@@ -236,6 +236,11 @@ export default {
   'Revoked': '取り消し済み',
   'Description': '説明',
   'Role Code': 'ロールコード',
+  'Role code help': '小文字、数字、アンダースコアのみを使用します。例: <code>store_content_editor</code>。このコードは連携および権限割り当てで使用する固定識別子です。',
+  'Role scope type help': '<code>global</code> ロールはスコープなしで付与できます。<code>store</code> ロールは特定のストアにのみ付与できます。作成時に設定し、Manage API では後から変更できません。',
+  'Role permissions help': '選択した権限により、このロールで実行できる操作が決まります。置き換えると、このロールの有効な割り当てすべてに反映されます。システムロールの権限は変更できません。',
+  'Assignment scope type help': '<code>global</code> ではスコープ UUID を空にします。<code>store</code> では対象ストアの UUID を入力し、同じ <code>store</code> スコープのロールを選択します。',
+  'Role field grant fields help': 'これはフィールド単位の許可リストです。選択したリソースと操作でロールが書き込めるフィールドだけを選択してください。その他の送信フィールドは拒否されます。利用可能なフィールドはサーバーのレジストリで定義されます。',
 
   // Store & Inventory
   'Store Management': 'ストア管理',

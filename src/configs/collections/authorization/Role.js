@@ -54,29 +54,22 @@ export default {
           property: 'id',
           type: 'integer',
           required: false,
-          help: '数据库自增主键，只读。前端详情展示用，表单提交无需填写。<br/>Help: Auto-increment DB id, read-only.',
           field_options: { disabled: true }
         },
         {
           property: 'uuid',
           required: false,
-          help: 'UUID v4 主键 (36 chars)，后端 __construct 自动生成 <code>UUID::v4()</code>。' +
-            '可在创建时显式传入 (acceptedCreateProperties 含 uuid)，需满足 UUID 格式。<br/>' +
-            '更新与详情中展示为只读。种子角色的 uuid 固定用于关联。<br/>Help: Primary business key, auto-generated UUID v4.',
           field_options: { placeholder: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', disabled: false }
         },
         {
           property: 'code',
           required: true,
-          help: '角色编码，唯一索引 (80 chars)，正则 <code>^[a-z0-9_]+$</code>。' +
-            '例如 <code>store_content_editor</code>、<code>authorization_administrator</code>、<code>store_catalog_manager</code>。<br/>' +
-            '创建必填，更新时仍可改但需再次正则校验；system 角色禁止修改。<br/>Help: Unique role code, lowercase snake_case.',
+          help: t('Role code help'),
           field_options: { placeholder: 'store_content_editor' }
         },
         {
           property: 'name',
           required: true,
-          help: '人类可读名称，例如 “Store Content Editor”。最长 120 chars，支持 i18n。<br/>Help: Human-readable role name.',
           field_options: { placeholder: t('Name') }
         },
         {
@@ -84,11 +77,7 @@ export default {
           type: 'select',
           required: true,
           default_value: 'store',
-          help: '作用域类型，枚举值仅 <code>global</code>（全局）或 <code>store</code>（门店级）。<br/>' +
-            'global 角色的 Assignment 的 scopeUuid 必须为 null；store 角色的 Assignment 必须携带合法 store UUID。<br/>' +
-            '后端校验: <code>in_array(scopeType, Role::SCOPES)</code>，非法返回 400 “Invalid scopeType”。<br/>' +
-            '种子角色示例: store_content_editor/store_catalog_manager -> store；authorization_administrator -> global。<br/>' +
-            'Help: Scope that this role can be assigned under.',
+          help: t('Role scope type help'),
           type_options: { options: scopeOptions },
           field_options: { placeholder: t('Please select') }
         },
@@ -97,10 +86,6 @@ export default {
           type: 'boolean',
           required: false,
           default_value: false,
-          help: '系统内置标记。种子数据 isSystem=true 的角色受保护：<br/>' +
-            '- API 禁止修改/删除 (processUpdateContent/deleteAction 抛 InvalidArgumentException / 403)<br/>' +
-            '- 禁止通过 POST /permissions 或 PUT /field-grants 修改<br/>' +
-            '新建时传入 isSystem=true 会被拦截 “Cannot create system role via API”。前端置为只读。<br/>Help: System role is protected from API mutations.',
           field_options: { disabled: true }
         },
         {
@@ -109,12 +94,7 @@ export default {
           // 使用相应的 type: 列表页自动映射到 plugins/list/RelationToMany，表单页映射到 plugins/form/transfer
           type: 'transfer',
           required: false,
-          help: '关联权限 (ManyToMany Permission)。前端展示为穿梭框，实际存储在 <code>authorization_role_permission</code> 中间表。<br/>' +
-            'API 层面并非通过 PUT /roles/{id} 直接写关联，而是通过专用端点 <code>POST /manage/roles/{uuid}/permissions</code> 批量替换。<br/>' +
-            'Body 支持 <code>{ permissions: ["code1","code2"] }</code> 或 <code>{ codes: [...] }</code> 或直接数组。<br/>' +
-            '每个 code 必须匹配 <code>^[a-z0-9:_]+$</code> 且在 permission 表中存在，否则 400。<br/>' +
-            '替换后会 <code>cacheInvalidator.invalidateUsers()</code> 使相关用户权限缓存失效。<br/>' +
-            '列表页该字段将按 <code>RelationToMany</code> 渲染为可点击 Tag（跳转至 Permission 详情），表单页为穿梭框；如需多选下拉可改回 <code>RelationToMany</code>。<br/>Help: Linked permissions; managed via POST /{uuid}/permissions. Form=transfer, List=RelationToMany.',
+          help: t('Role permissions help'),
           type_options: {
             entity_name: 'Permission'
           },
@@ -129,6 +109,7 @@ export default {
 
     list: {
       query: orderByIdDesc,
+      disabled_actions: ['batch_edit', 'batch_delete'],
       list_filter: {
         code: t('Code'),
         name: t('Name'),
@@ -146,13 +127,12 @@ export default {
       },
       list_display: [
         'id',
-        { property: 'uuid', type: 'plain-text', help: '业务主键 UUID' },
+        { property: 'uuid', type: 'plain-text' },
         'code',
         'name',
         {
           property: 'scopeType',
-          type: 'select',
-          help: 'global=全局可见，store=限定门店'
+          type: 'select'
         },
         { property: 'isSystem', type: 'boolean' },
         'permissions',

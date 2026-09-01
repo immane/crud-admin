@@ -88,8 +88,7 @@ export default [
       ...r('Role', t('Role')),
       ...r('Permission', t('Permission')),
       ...r('Assignment', t('Assignment')),
-      ...r('AuditLog', t('Audit Log')),
-      ...r('RoleFieldGrant', t('Role Field Grant'))
+      ...r('AuditLog', t('Audit Log'))
     ]
   },
 

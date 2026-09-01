@@ -55,31 +55,22 @@ export default {
           property: 'id',
           type: 'integer',
           required: false,
-          help: '数据库自增主键，只读。<br/>Help: Auto-increment DB id, read-only.',
           field_options: { disabled: true }
         },
         {
           property: 'uuid',
           required: false,
-          help: 'Assignment UUID v4，创建时后端自动生成。若幂等命中已存在 active 记录则复用该 uuid。<br/>Help: Business primary key, auto-generated UUID v4.',
           field_options: { disabled: true, placeholder: 'auto-generated' }
         },
         {
           property: 'userUuid',
           required: true,
-          help: '被授权用户 UUID，对应 Identity.User.uuid (36 chars, UUID 格式)。' +
-            '创建/更新必填，后端校验 <code>UUID::is_valid</code>，非法返回 400 “Invalid userUuid”。<br/>' +
-            '别名兼容 <code>user_uuid</code>。前端建议用 RelationToOne 远程搜索用户列表后回填 uuid。<br/>Help: Target user UUID (Identity User).',
           field_options: { placeholder: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' }
         },
         {
           property: 'role',
           type: 'RelationToOne',
           required: true,
-          help: '关联角色 (ManyToOne Role)。前端传入 <code>roleUuid</code> / <code>role_uuid</code> / <code>roleId</code> (code/uuid/id 三者皆可解析，优先级 uuid > id > code)。' +
-            '<br/>后端 resolveRole() 按 UUID -> ID -> code 依次查找。<br/>' +
-            '校验: Role.scopeType 必须与 assignment.scopeType 一致，否则 400。<br/>' +
-            'Help: The granted role; its scopeType must match assignment scopeType.',
           type_options: { entity_name: 'Role' },
           // 后端 API 实际接受 roleUuid/roleId/code，此处用 relation 便捷选角色
           field_options: { placeholder: t('Please select') }
@@ -89,10 +80,7 @@ export default {
           type: 'select',
           required: true,
           default_value: 'store',
-          help: '作用域类型，枚举 <code>global</code>（全局）或 <code>store</code>（门店级）。<br/>' +
-            '- global: scopeUuid 必须为 null/空<br/>' +
-            '- store: scopeUuid 必须为合法 UUID (指向 Store.uuid)<br/>' +
-            '非法值返回 400 “Invalid scopeType”。别名兼容 <code>scope_type</code>。<br/>Help: Assignment scope discriminator.',
+          help: t('Assignment scope type help'),
           type_options: {
             options: [
               { value: 'global', label: t('Global') },
@@ -103,33 +91,24 @@ export default {
         {
           property: 'scopeUuid',
           required: false,
-          help: '作用域对象 UUID。<br/>' +
-            '- 当 scopeType=global 时必须为 null/空，否则 400 “scopeUuid must be null for global scope”<br/>' +
-            '- 当 scopeType=store 时必须为合法 UUID，否则 400 “Valid scopeUuid required for store scope”<br/>' +
-            '别名兼容 <code>scope_uuid</code>。后端写入后同步到 scopeKey (scopeUuid ?? \'\') 参与唯一约束。<br/>Help: Scope object UUID, nullable for global scope.',
           field_options: { placeholder: t('UUID') }
         },
         {
           property: 'scopeKey',
           required: false,
-          help: '冗余唯一键 = scopeUuid ?? ""，由 PrePersist/PreUpdate syncScopeKey() 自动维护，用于 UNIQUE(user_uuid, role_id, scope_type, scope_key)。只读。<br/>Help: Derived unique key for scoping, read-only.',
           field_options: { disabled: true }
         },
         {
           property: 'grantedByUuid',
           required: false,
-          help: '授权操作人 UUID (执行授予的管理员 User.uuid)，创建时自动取当前登录用户。只读。<br/>Help: Actor who granted this assignment, auto-filled, read-only.',
           field_options: { disabled: true, placeholder: 'auto-filled' }
         }
-      ],
-      batch_edit: {
-        // 批量仅适合演示，实际通常不批量改 scope
-        fields: ['scopeType']
-      }
+      ]
     },
 
     list: {
       query: orderByIdDesc,
+      disabled_actions: ['batch_edit', 'batch_delete'],
       list_filter: {
         userUuid: t('User UUID'),
         roleId: {
@@ -153,14 +132,14 @@ export default {
       list_display: [
         'id',
         'uuid',
-        { property: 'userUuid', type: 'plain-text', help: '被授权用户' },
+        { property: 'userUuid', type: 'plain-text' },
         { property: 'role', type: 'RelationToOne' },
         'scopeType',
         'scopeUuid',
         'scopeKey',
         'grantedByUuid',
         { property: 'createdAt', type: 'datetime' },
-        { property: 'revokedAt', type: 'datetime', help: 'null=生效中' }
+        { property: 'revokedAt', type: 'datetime' }
       ]
     },
 

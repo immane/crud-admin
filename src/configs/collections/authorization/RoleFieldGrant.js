@@ -67,15 +67,12 @@ export default {
           property: 'id',
           type: 'integer',
           required: false,
-          help: '主键自增，只读。<br/>Help: Auto-increment primary key, read-only.',
           field_options: { disabled: true }
         },
         {
           property: 'role',
           type: 'RelationToOne',
           required: true,
-          help: '关联角色 (ManyToOne Role, 关联键 role_id, onDelete CASCADE)。<br/>' +
-            '创建时传入角色 UUID/code，system 角色禁止改动其 field-grant。<br/>Help: Owning role; system roles are protected.',
           type_options: { entity_name: 'Role' },
           field_options: { placeholder: t('Please select') }
         },
@@ -83,29 +80,19 @@ export default {
           property: 'resource',
           type: 'select',
           required: true,
-          help: '资源标识，格式 <code>{module}:{resource}</code>，例如 <code>common:content</code>。<br/>' +
-            '必须是 AuthorizationResourceRegistry 中已注册的 resource，否则 400 “Unknown resource action”。' +
-            '<br/>Help: Resource key, must be registered in AuthorizationResourceRegistry.',
           type_options: { options: resourceOptions }
         },
         {
           property: 'action',
           type: 'select',
           required: true,
-          help: '动作名，例如 <code>create</code> / <code>update</code>。同一个 resource 可含多个动作。<br/>' +
-            '联合 resource 构成唯一键 (role, resource, action)。<br/>Help: Action name, combined with resource as unique key.',
           type_options: { options: actionOptions }
         },
         {
           property: 'fields',
           type: 'array',
           required: true,
-          help: '允许字段白名单，JSON 数组去重。<br/>' +
-            '例如 <code>["title","body","category","tags"]</code> (普通编辑者) ' +
-            'vs <code>["title","body","category","tags","metadata"]</code> (可编辑 metadata 者)。<br/>' +
-            '必须为 Registry 该 resource.action 下的合法字段子集，否则 400 “Invalid fields …”。' +
-            '<br/>当前合法字段集合: <code>title, body, category, tags, metadata</code> (common:content)。<br/>' +
-            '空数组表示该角色在该 resource.action 下无字段权限。<br/>Help: Whitelisted fields for this role/resource/action.',
+          help: t('Role field grant fields help'),
           type_options: {
             options: allowedFields.map(v => ({ value: v, label: v }))
           }
@@ -132,7 +119,7 @@ export default {
         { property: 'role', type: 'RelationToOne' },
         'resource',
         'action',
-        { property: 'fields', type: 'array', help: '白名单字段' },
+        { property: 'fields', type: 'array' },
         { property: 'createdAt', type: 'datetime' },
         { property: 'updatedAt', type: 'datetime' }
       ]

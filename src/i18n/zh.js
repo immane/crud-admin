@@ -236,6 +236,11 @@ export default {
   'Revoked': '已撤销',
   'Description': '描述',
   'Role Code': '角色编码',
+  'Role code help': '仅可使用小写字母、数字和下划线，例如 <code>store_content_editor</code>。该编码是集成与权限分配使用的稳定标识。',
+  'Role scope type help': '<code>global</code> 角色可不带作用域授权；<code>store</code> 角色只能授权到指定门店。请在创建时确认，Manage API 不支持后续修改。',
+  'Role permissions help': '所选权限决定该角色可执行的操作。替换权限会影响该角色的所有生效授权；系统角色不允许修改权限。',
+  'Assignment scope type help': '<code>global</code> 不填写作用域 UUID；<code>store</code> 必须填写目标门店 UUID，并选择同为 <code>store</code> 作用域的角色。',
+  'Role field grant fields help': '这是字段级白名单。只选择该角色可在当前资源和动作中写入的字段，其他提交字段会被拒绝；可选字段由服务端注册表定义。',
 
   // Store & Inventory
   'Store Management': '门店管理',

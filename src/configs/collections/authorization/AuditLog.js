@@ -40,59 +40,43 @@ export default {
           property: 'id',
           type: 'integer',
           required: false,
-          help: '主键 bigint，自增只读。<br/>Help: Auto-increment primary key, read-only.',
           field_options: { disabled: true }
         },
         {
           property: 'actorUuid',
           required: false,
-          help: '操作人 UUID (执行该动作的管理员 User.uuid)。可为 null (如 CLI 种子或系统任务)。<br/>' +
-            '后端通过 getUser() instanceof User ? getUuid() : null 写入。<br/>Help: Actor who performed the action, nullable.',
           field_options: { disabled: true, placeholder: 'system / null' }
         },
         {
           property: 'action',
           required: true,
-          help: '审计动作，约定字符串：<br/>' +
-            '- <code>role.created</code> (创建角色)<br/>' +
-            '- <code>role.permissions.replaced</code> (替换角色权限)<br/>' +
-            '- <code>field_grant.replaced</code> (字段授权变更)<br/>' +
-            '- <code>assignment.granted</code> (授予)<br/>' +
-            '- <code>assignment.updated</code> (更新)<br/>' +
-            '- <code>assignment.revoked</code> (撤销/软删)<br/>Help: Canonical audit action name.',
           field_options: { disabled: true }
         },
         {
           property: 'targetType',
           required: true,
-          help: '目标类型，通常 <code>role</code> 或 <code>assignment</code>。field_grant 也以 role 为 targetType 存储。<br/>Help: Type of audited object.',
           field_options: { disabled: true }
         },
         {
           property: 'targetUuid',
           required: false,
-          help: '目标对象 UUID，例如 Role.uuid / Assignment.uuid。可为 null。<br/>Help: Target object UUID, nullable.',
           field_options: { disabled: true }
         },
         {
           property: 'beforeData',
           type: 'json',
           required: false,
-          help: '变更前快照 JSON。permissions 场景为 <code>{ permissions: ["a","b"] }</code>；field_grant 为 <code>{ resource, action, fields: [...] }</code>；assignment 为 <code>{ userUuid, roleCode, scopeType, scopeUuid }</code>。<br/>' +
-            '创建时可能为 null。<br/>Help: Snapshot before change, JSON nullable.',
           field_options: { disabled: true }
         },
         {
           property: 'afterData',
           type: 'json',
           required: false,
-          help: '变更后快照 JSON，结构同 beforeData。撤销/授予时 afterData 含最新关系。<br/>Help: Snapshot after change, JSON nullable.',
           field_options: { disabled: true }
         },
         {
           property: 'requestId',
           required: false,
-          help: '请求链路 ID (x-request-id)，由 AuthorizationAuditService 从 RequestStack 提取。可为 null。<br/>Help: HTTP request correlation id, nullable.',
           field_options: { disabled: true }
         }
       ]
@@ -127,8 +111,8 @@ export default {
         'action',
         'targetType',
         'targetUuid',
-        { property: 'beforeData', type: 'json', help: '變更前 JSON' },
-        { property: 'afterData', type: 'json', help: '變更後 JSON' },
+        { property: 'beforeData', type: 'json' },
+        { property: 'afterData', type: 'json' },
         'requestId',
         { property: 'createdAt', type: 'datetime' }
       ]
