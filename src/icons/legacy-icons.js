@@ -9,7 +9,8 @@ import {
   Money, Coin, User, Setting,
   Sunny, PartlyCloudy, Cloudy, Drizzling, Pouring, Lightning,
   Sort,
-  Tickets, Notebook, Wallet
+  Tickets, Notebook, Wallet,
+  Lock, Key
 } from '@element-plus/icons-vue'
 
 const iconMap = {
@@ -53,7 +54,9 @@ const iconMap = {
   'el-icon-sort': Sort,
   'el-icon-tickets': Tickets,
   'el-icon-notebook': Notebook,
-  'el-icon-wallet': Wallet
+  'el-icon-wallet': Wallet,
+  'el-icon-lock': Lock,
+  'el-icon-key': Key
 }
 
 export default function installLegacyIcons(app) {

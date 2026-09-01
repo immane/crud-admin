@@ -83,7 +83,7 @@ export default [
 
   {
     path: '/authorization', name: 'AuthorizationManage', component: Layout,
-    meta: { title: t('Authorization'), icon: 'el-icon-setting', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    meta: { title: t('Authorization'), icon: 'el-icon-lock', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
       ...r('Role', t('Role')),
       ...r('Permission', t('Permission')),
