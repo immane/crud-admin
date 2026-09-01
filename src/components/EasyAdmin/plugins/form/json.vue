@@ -40,15 +40,23 @@ export default {
     fieldValue: {
       immediate: true,
       handler(v) {
+        let next
         if (v != null) {
           try {
-            this.internalValue = typeof v === 'string' ? JSON.parse(v) : v
+            next = typeof v === 'string' ? JSON.parse(v) : v
           } catch (e) {
-            this.internalValue = v
+            next = v
           }
         } else {
-          this.internalValue = {}
+          next = {}
         }
+        // Avoid resetting editor when change originates from editor itself (cursor jump)
+        try {
+          if (JSON.stringify(next) === JSON.stringify(this.internalValue)) return
+        } catch (_) {
+          if (next === this.internalValue) return
+        }
+        this.internalValue = next
         if (this.editor) {
           this.editor.set(this.internalValue)
         }
