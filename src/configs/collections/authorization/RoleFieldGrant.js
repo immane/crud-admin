@@ -4,45 +4,45 @@ import { orderByIdDesc } from '../helpers'
 /**
  * RoleFieldGrant (authorization_role_field_grant)
  *
- * 后端来源:
+ * Backend source:
  *   - Entity: App\Authorization\Entity\RoleFieldGrant
  *     @Table(name: 'authorization_role_field_grant')
  *     @UniqueConstraint(['role_id','resource','action'])
- *     fields: json  (list<string> 去重排序)
+ *     fields: json  (list<string> deduplicated and sorted)
  *   - Service: App\Authorization\Service\FieldAuthorizationService / AuthorizationResourceRegistry
- *   - 管理入口: 嵌套在 RoleController 中:
+ *   - Admin entry: nested inside RoleController:
  *       PUT /manage/roles/{uuid}/field-grants/{resource}/{action}
- *     Body: { fields: ["title","body",...] } 或直接 ["title",...]
- *     校验: AuthorizationResourceRegistry::assertValidFields()，未知 resource:action 或非法字段返回 400
+ *     Body: { fields: ["title","body",...] } or directly ["title",...]
+ *     Validation: AuthorizationResourceRegistry::assertValidFields(), unknown resource:action or invalid field returns 400
  *
- * 当前 Registry 默认数据 (AuthorizationResourceRegistry 构造):
+ * Current Registry default data (AuthorizationResourceRegistry constructor):
  *   {
  *     'common:content': {
  *       create: ['title','body','category','tags','metadata'],
  *       update: ['title','body','category','tags','metadata']
  *     }
  *   }
- * 可通过 Symfony 服务参数扩展更多资源/动作。
+ * Can be extended via Symfony service parameters for more resources/actions.
  *
- * 种子数据示例 (SeedAuthorizationCommand::getFieldGrantsData):
+ * Seed data example (SeedAuthorizationCommand::getFieldGrantsData):
  *   - role=store_content_editor, resource=common:content, action=create, fields=[title,body,category,tags]
  *   - role=store_content_editor, resource=common:content, action=update, fields=[title,body,category,tags]
  *   - role=store_content_metadata_editor, resource=common:content, action=create, fields=[title,body,category,tags,metadata]
  *   - role=store_content_metadata_editor, resource=common:content, action=update, fields=[title,body,category,tags,metadata]
- * 区别在于 metadata 字段是否可见/可写：metadata_editor 可操作 metadata，其余不可。
+ * Difference is whether metadata field is visible/writable: metadata_editor can operate on metadata, others cannot.
  *
- * 语义:
- *   - 字段授权是“白名单”，仅允许集合内的字段被对应角色在对应动作中写入。
- *   - 运行时由 FieldAuthorizationService 结合 AuthorizationService.effectivePermissions 判定。
- *   - 空或缺失 grant 的资源/动作在 registry 中未注册会抛 Unknown resource action；已注册但无 grant 则按默认拒绝或全开放取决于 voter。
+ * Semantics:
+ *   - field grant is an allowlist: only fields in the set can be written by the corresponding role in the corresponding action.
+ *   - evaluated at runtime by FieldAuthorizationService combined with AuthorizationService.effectivePermissions.
+ *   - missing grant for a registered resource/action throws Unknown resource action if not registered; if registered but no grant, default deny or open depends on voter.
  *
- * 前端注意:
- *   - RoleFieldGrant 无独立 manage 列表端点 (无 ListApiViewMixin)，因此本配置提供两种用法:
- *     1) 作为 Role 表单的子资源：在 Role 详情/编辑中嵌入自定义 component，调用 PUT 子资源接口
- *     2) 作为独立实体测试：若后端另行暴露 /manage/role-field-grants 列表，则本配置可直接复用
- *   - 为便于 EasyAdmin 直接复用，此处提供 entity plural 'role-field-grants' 的完整 CRUD 配置，
- *     若后端未暴露该前缀，请将 entity.prefix 指向 Role 子资源或通过自定义 component 覆写。
- *   - 约束: system 角色的 field-grant 禁止修改 (403)
+ * Frontend notes:
+ *   - RoleFieldGrant has no standalone manage list endpoint (no ListApiViewMixin), so this config provides two usages:
+ *     1) as Role form sub-resource: embed custom component in Role detail/edit and call PUT sub-resource endpoint
+ *     2) as standalone entity for testing: if backend separately exposes /manage/role-field-grants list, this config can be reused directly
+ *   - for EasyAdmin reuse, this config provides full CRUD with entity plural 'role-field-grants',
+ *     if backend does not expose that prefix, point entity.prefix to Role sub-resource or override via custom component.
+ *   - constraint: system role field-grant modification forbidden (403)
  */
 
 const resourceOptions = [
@@ -52,13 +52,13 @@ const actionOptions = [
   { value: 'create', label: 'create' },
   { value: 'update', label: 'update' }
 ]
-// 与 Registry 对齐的可选字段
+// Optional fields aligned with Registry
 const allowedFields = ['title', 'body', 'category', 'tags', 'metadata']
 
 export default {
   RoleFieldGrant: {
-    // 若后端实际未暴露独立前缀，可改为 { name: 'RoleFieldGrant', prefix: '/api/v1/manage/roles', plural: 'field-grants' }
-    // 此处保留独立 plural 以便将来直接暴露 /manage/role-field-grants
+    // If backend does not expose standalone prefix, change to { name: 'RoleFieldGrant', prefix: '/api/v1/manage/roles', plural: 'field-grants' }
+    // Keep standalone plural here for future direct exposure of /manage/role-field-grants
     entity: { name: 'RoleFieldGrant', plural: 'role-field-grants' },
 
     form: {

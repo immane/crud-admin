@@ -42,10 +42,11 @@
 ## Features
 
 - **Configuration-Driven CRUD Engine (EasyAdmin)** — Declare entities in config; get full list/form/detail/routes for free
-- **17+ Pluggable Form Fields** — input, textarea, select, boolean, integer, date, datetime, image, file, JSON, rich text, relation pickers, transfer, and more
+- **19+ Pluggable Form Fields** — input, textarea, select, boolean, integer, date, datetime, image, file, JSON, rich text, relation pickers, transfer, password (double-entry + strength hints), email (format validation), and more
+- **Form Validation** — declarative `field.rules` / `field.validator` merged into `el-form`, with `registerFieldValidator` provide for plugins; blocks submit until valid
 - **Detail View with Fallback Chain** — `detail/` → `list/` → plain text plugins per field type
 - **Internationalization (i18n)** — English, Simplified Chinese, Traditional Chinese, Japanese; browser language detection; locale toggle in navbar; `Accept-Language` header and `_locale` param injected into API requests
-- **JWT Authentication** — Bearer-token login with automatic refresh token rotation, cookie persistence, and concurrent-request queuing
+- **JWT Authentication** — Bearer-token login with automatic refresh token rotation, port-isolated cookie persistence (`dream_studio_admin_token_{port}` avoids same-host cross-port conflict), and concurrent-request queuing
 - **Role-Based Access Control** — Dynamic routes filtered by user roles via Vuex + Vue Router 4
 - **Entity Introspection** — Queries backend `/system/entities` to infer field types, nullability, and relationships
 - **Dynamic Filter & Sort** — Server-side filter expressions (`@filter`, `@sort`, `@order`) built from config-driven search UIs
@@ -97,7 +98,7 @@ Translation keys use the English string directly (flat format), e.g. `$t('New / 
 │   │   ├── DetailAdmin.vue          # Configurable record detail page
 │   │   ├── SearchFilter.vue         # Dynamic filter UI
 │   │   └── plugins/
-│   │       ├── form/                # 17 field-type plugins
+│   │       ├── form/                # 19 field-type plugins
 │   │       ├── list/                # 9 list-rendering plugins
 │   │       └── detail/              # 2 detail-only plugins
 │   ├── configs/                     # Declarative entity configs
@@ -294,6 +295,8 @@ EasyAdmin ships with 17 field type plugins, auto-resolved from entity metadata:
 | `RelationToMany.vue` | ManyToMany, OneToMany | Multi-relation picker |
 | `transfer.vue` | — | Shuttle/transfer component |
 | `code.vue` | — | Code textarea |
+| `password.vue` | — | Password with show/hide, double-entry when masked, 6-char + letter+number + match hints, blocks submit |
+| `email.vue` | — | Email with live format hint, blocks submit on invalid |
 
 ### Field Configuration Reference
 
@@ -316,6 +319,22 @@ interface FieldOption {
   full_width?: boolean       // Span full grid width (detail view)
 }
 ```
+
+### Form Validation
+
+FormAdmin merges `field.rules` / `field.validator` into `el-form` rules. Plugins can also call `inject('registerFieldValidator')` (provided by FormAdmin) to register validators that block `onSubmit`. Example:
+
+```js
+// User.js
+{
+  property: 'plainPassword',
+  type: 'password', // double-entry when masked, strength hints, blocks submit until 6+ chars + letter + number
+  help: t('User password help')
+},
+{ property: 'email', type: 'email' } // live hint + invalid-format blocking
+```
+
+Built-in validators live in `src/utils/validate.js` (`isPasswordCompliant`, `createPasswordValidator`, `isEmailValid`, `createEmailValidator`) and are used by the password/email plugins.
 
 ### Route Generators
 

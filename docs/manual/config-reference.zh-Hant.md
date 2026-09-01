@@ -905,6 +905,18 @@ export default {
 
 ---
 
+
+### 11.4 User — 密碼與信箱校驗
+
+```js
+{
+  property: 'plainPassword',
+  type: 'password',
+  help: t('User password help')
+},
+{ property: 'email', type: 'email' }
+```
+
 ## 12. 快速參考表
 
 ### 12.1 所有 `type` 值

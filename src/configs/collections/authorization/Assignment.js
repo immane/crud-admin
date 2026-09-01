@@ -4,46 +4,46 @@ import { orderByIdDesc } from '../helpers'
 /**
  * Assignment (authorization_assignment)
  *
- * 后端来源:
- *   - Entity: App\Authorization\Entity\Assignment (authorization_assignment 表)
+ * Backend source:
+ *   - Entity: App\Authorization\Entity\Assignment (authorization_assignment table)
  *   - Controller: App\Authorization\Controller\Manage\AssignmentController
  *     @Route('/manage/assignments') #[IsGranted('ROLE_ADMIN')]
- *     Mixins: List + Detail + Create + Update + Delete (Delete 被覆写为软删除)
- *   - 唯一约束: UNIQUE(user_uuid, role_id, scope_type, scope_key)
- *     索引: idx_authorization_assignment_user_revoked, idx_authorization_assignment_scope_revoked
+ *     Mixins: List + Detail + Create + Update + Delete (Delete overridden as soft delete)
+ *   - Unique constraint: UNIQUE(user_uuid, role_id, scope_type, scope_key)
+ *     Indexes: idx_authorization_assignment_user_revoked, idx_authorization_assignment_scope_revoked
  *
- * 核心字段语义:
- *   - uuid: Assignment 自身 UUID v4 (主键业务键)
- *   - userUuid: 被授权用户 User.uuid (36 chars, 需 UUID::is_valid)
- *   - role: ManyToOne Role (外键 role_id, RESTRICT)  — 前端用 RelationToOne 选择角色
- *   - scopeType: 枚举 global | store (Assignment::SCOPE_GLOBAL / SCOPE_STORE)
- *   - scopeUuid: 作用域对象 UUID，global 时必须 null/空；store 时必填合法 UUID (关联 Store.uuid)
- *   - scopeKey: 冗余列 = scopeUuid ?? ''，由 syncScopeKey() 维护，用于唯一约束
- *   - grantedByUuid: 授权操作人 User.uuid (创建时取当前登录用户 getUser()->getUuid())
- *   - createdAt / revokedAt: revokedAt 为软删除标记，isActive() = revokedAt === null
+ * Core field semantics:
+ *   - uuid: Assignment own UUID v4 (primary business key)
+ *   - userUuid: granted user User.uuid (36 chars, requires UUID::is_valid)
+ *   - role: ManyToOne Role (FK role_id, RESTRICT) — frontend selects role via RelationToOne
+ *   - scopeType: enum global | store (Assignment::SCOPE_GLOBAL / SCOPE_STORE)
+ *   - scopeUuid: scope object UUID, must be null/empty for global; must be valid UUID for store (linked to Store.uuid)
+ *   - scopeKey: redundant column = scopeUuid ?? '', maintained by syncScopeKey() for unique constraint
+ *   - grantedByUuid: granting operator User.uuid (taken from current logged-in user getUser()->getUuid() on creation)
+ *   - createdAt / revokedAt: revokedAt is soft-delete marker, isActive() = revokedAt === null
  *
- * 业务校验 (processCreateContent / normalizeAssignmentInput / processEntity):
- *   - userUuid、roleUuid、scopeType 三者必填，否则 400
- *   - userUuid 必须 UUID 合法；scopeType 必须 global/store；scopeUuid 与 scopeType 的 null/合法性强一致
- *   - role.scopeType 必须与 assignment.scopeType 一致，否则 400 'Role scope incompatible ...'
- *   - 若已存在 active Assignment (findActiveAssignment) 则直接返回该记录 (幂等授予)
- *   - 若存在 revoked 记录则复活 (setRevokedAt(null))；否则新建 Assignment
- *   - create 支持兼容字段别名: user_uuid / role_uuid / roleId / scope_type / scope_uuid
+ * Business validation (processCreateContent / normalizeAssignmentInput / processEntity):
+ *   - userUuid, roleUuid and scopeType are all required, otherwise 400
+ *   - userUuid must be valid UUID; scopeType must be global/store; nullability/validity of scopeUuid must strictly match scopeType
+ *   - role.scopeType must match assignment.scopeType, otherwise 400 'Role scope incompatible ...'
+ *   - if active Assignment already exists (findActiveAssignment) return that record directly (idempotent grant)
+ *   - if revoked record exists, revive it (setRevokedAt(null)); otherwise create new Assignment
+ *   - create supports compatible field aliases: user_uuid / role_uuid / roleId / scope_type / scope_uuid
  *
- * 列表过滤 (listFilter 覆写):
- *   - query: userUuid / roleId / scopeType / scopeUuid / includeRevoked (布尔默认 false)
- *   - includeRevoked=false 时自动追加 revokedAt IS NULL，仅展示生效授权
- *   - 若 includeRevoked=true 则展示包含已撤销的全部记录
+ * List filtering (listFilter override):
+ *   - query: userUuid / roleId / scopeType / scopeUuid / includeRevoked (boolean default false)
+ *   - when includeRevoked=false, automatically appends revokedAt IS NULL to show only active grants
+ *   - when includeRevoked=true, shows all records including revoked
  *
- * 软删除行为 (processDeletion 覆写):
- *   - 已 revoked 再 DELETE 直接返回 204 幂等
- *   - 否则置 revokedAt = now()，写审计 'assignment.revoked'，cacheInvalidator.invalidateUser(userUuid)
- *   - update 同理会记录 'assignment.updated' 并失效新旧 userUuid 缓存
- *   - afterCreated 仅当真正新建 (grantedAssignments[oid]=true) 才写 'assignment.granted' + 失效缓存
+ * Soft-delete behavior (processDeletion override):
+ *   - if already revoked, DELETE returns 204 idempotently
+ *   - otherwise set revokedAt = now(), write audit 'assignment.revoked', cacheInvalidator.invalidateUser(userUuid)
+ *   - update similarly records 'assignment.updated' and invalidates cache for old and new userUuid
+ *   - afterCreated only writes 'assignment.granted' + invalidates cache when truly newly created (grantedAssignments[oid]=true)
  *
- * 前端注意:
- *   - 新增/编辑建议提供 User 选择 (可通过 /manage/users 远程搜索，传入 userUuid)
- *   - Role 选择后自动关联 scopeType，建议联动校验：选 global 角色时隐藏 scopeUuid 输入
+ * Frontend notes:
+ *   - for create/edit, provide User selector (via /manage/users remote search, pass userUuid)
+ *   - after selecting Role, scopeType is auto-linked; recommend linked validation: hide scopeUuid input when global role is selected
  */
 export default {
   Assignment: {
@@ -72,7 +72,7 @@ export default {
           type: 'RelationToOne',
           required: true,
           type_options: { entity_name: 'Role' },
-          // 后端 API 实际接受 roleUuid/roleId/code，此处用 relation 便捷选角色
+          // Backend API actually accepts roleUuid/roleId/code, using relation here for convenient role selection
           field_options: { placeholder: t('Please select') }
         },
         {
@@ -127,7 +127,7 @@ export default {
           type: 'boolean',
           expression: 'entity.getRevokedAt() IS NOT NULL'
         }
-        // 注意: 后端 listFilter 额外支持 ?includeRevoked=true 控制是否包含已撤销
+        // Note: backend listFilter additionally supports ?includeRevoked=true to control whether revoked records are included
       },
       list_display: [
         'id',

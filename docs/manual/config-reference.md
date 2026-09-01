@@ -190,6 +190,8 @@ interface FieldOption {
   field_events?: Record<string, any>    // Events → <el-form-item>
   type_options?: Record<string, any>    // Props → field plugin component
   type_events?: Record<string, any>     // Events → field plugin component
+  rules?: object[]                      // Custom el-form rules (merged)
+  validator?: Function | Function[]        // Shorthand -> { validator, trigger:'blur' }
   relation_filter?: {                   // Only for relation fields
     '@filter'?: string                  // DQL expression
     '@order'?: string                   // Sort order
@@ -222,6 +224,12 @@ interface FieldOption {
 | `RelationToOne` | `<el-select>` remote search | ManyToOne / OneToOne |
 | `RelationToMany` | `<el-select multiple>` | ManyToMany / OneToMany |
 | `transfer` | `<el-transfer>` shuttle box | Dual-pane selection |
+| `password` | `<el-input type="password">` with toggle | Password (masked double-entry, visible single, 6+ chars + letter+number + match hints, blocks submit) |
+| `email` | `<el-input type="email">` | Email (live format hint, blocks on invalid) |
+| `RelationToMany` | `<el-select multiple>` | ManyToMany / OneToMany |
+| `transfer` | `<el-transfer>` shuttle box | Dual-pane selection |
+| `password` | `<el-input type="password">` with toggle | Password (masked double-entry, visible single, 6+ chars + letter+number + match hints, blocks submit) |
+| `email` | `<el-input type="email">` | Email (live format hint, blocks on invalid) |
 
 **Type resolution priority**: `field.type` → API metadata type → `input`.
 
@@ -335,6 +343,27 @@ Only applied in **create mode** (`id === 0`). In edit mode the form fetches the 
 ```
 
 Renders a gray help paragraph below the field input.
+
+### 5.8 Validation (`rules` / `validator`)
+
+FormAdmin merges `field.rules` / `field.validator` into `el-form` rules and also provides `inject('registerFieldValidator')` for plugins. Example:
+
+```js
+import { isPasswordCompliant } from '@/utils/validate'
+{
+  property: 'plainPassword',
+  type: 'password', // double-entry when masked, strength hints
+  help: t('User password help'),
+  rules: [{ validator: (rule, value, cb) => {
+    if (!value && !id) return cb(new Error(t('Password is required')))
+    if (value && !isPasswordCompliant(value)) return cb(new Error(t('Password does not meet requirements')))
+    cb()
+  }, trigger: 'blur' }]
+},
+{ property: 'email', type: 'email' } // plugin registers its own validator, shows live hint
+```
+
+Plugins like `password.vue` / `email.vue` use `registerFieldValidator` to block `onSubmit` until `el-form` validation passes. You can also declare `field.rules` declaratively in any entity config.
 
 ### 5.8 Passthrough Props & Events
 
@@ -903,6 +932,36 @@ export default {
 }
 ```
 
+
+### 11.4 User — Password & Email with Validation
+
+```js
+// src/configs/collections/identity/User.js
+import { t } from '@/i18n'
+import { orderByIdDesc } from '../helpers'
+
+export default {
+  User: {
+    form: {
+      fields: [
+        { property: 'username', field_options: { label: t('Username') }},
+        { property: 'email', type: 'email', field_options: { label: t('Email') }},
+        {
+          property: 'plainPassword',
+          type: 'password', // double-entry when masked, 6+ chars + letter+number
+          help: t('User password help')
+        },
+        { property: 'phone', required: false },
+        { property: 'roles', type: 'json', default_value: ['ROLE_USER'] }
+      ]
+    }
+  }
+}
+```
+
+- `password.vue` shows strength hints (length/letter/number/match) and blocks `onSubmit` via `el-form` until valid; `email.vue` shows live format hint.
+- Validation helpers live in `src/utils/validate.js`; FormAdmin merges `field.rules` / `field.validator` and exposes `registerFieldValidator`.
+
 ---
 
 ## 12. Quick Reference Tables
@@ -920,6 +979,7 @@ export default {
 | Structured | `json`, `json-custom`, `array` |
 | Relations | `RelationToOne`, `RelationToMany` |
 | Selection | `select`, `transfer` |
+| Auth | `password`, `email` |
 
 ### 12.2 All `disabled_actions` Values
 
