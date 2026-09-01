@@ -49,7 +49,7 @@
               "
             >
               <el-form-item
-                v-if="field.property !== 'id'"
+                v-if="field.property !== 'id' && !isHidden(field)"
                 :label="
                   (Object.keys(field).includes('field_options') &&
                     Object.keys(field.field_options).includes('label'))
@@ -265,6 +265,8 @@ export default {
           : configuredFields
 
       for (const field of fields) {
+        const normalized = typeof field === 'string' ? { property: field } : field
+        if (this.isHidden(normalized)) continue
         if (typeof field === 'string') {
           this.properties.push({
             property: field
@@ -350,6 +352,32 @@ export default {
   methods: {
     log(...arg) {
       return console.log(...arg)
+    },
+
+    isHidden(field) {
+      const h = field.hidden
+      if (h === undefined || h === null) return false
+      if (typeof h === 'boolean') return h
+      if (Array.isArray(h)) {
+        if (h.length === 0) return false
+        const isCreate = !this.id
+        const isUpdate = !!this.id
+        if (h.includes('create') && isCreate) return true
+        if ((h.includes('update') || h.includes('edit')) && isUpdate) return true
+        return false
+      }
+      if (typeof h === 'function') {
+        try {
+          return !!h(this.form, this.id)
+        } catch (_) {
+          return false
+        }
+      }
+      if (typeof h === 'string') {
+        if (h === 'create' && !this.id) return true
+        if ((h === 'update' || h === 'edit') && !!this.id) return true
+      }
+      return false
     },
 
     registerFieldValidator(fieldName, validator, trigger = 'blur') {
