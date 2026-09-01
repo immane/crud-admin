@@ -20,6 +20,7 @@
               :query="query"
               :fetch-data-func="fetchFilteredData"
               :list-filter="listFilter"
+              :refreshing="refreshing"
               @reset="resetSearch"
             />
           </slot>
@@ -147,9 +148,7 @@
     <el-row>
       <el-table
         :key="refreshTable"
-        v-loading="loading"
         :data="list"
-        element-loading-text="Loading..."
         fit
         lazy
         stripe
@@ -574,8 +573,10 @@ export default {
     dataProcessor: {
       type: Function,
       default: (context, dataProcessor = {}) => {
-        // Loading start
-        context.loading = true
+        // All loads reuse Reset search icon (no table overlay, keep table-layout auto stable)
+        context.refreshing = true
+        // Keep loading false to avoid v-loading flicker; initial empty state shows table with no data
+        context.loading = false
 
         const promise = [
           // Fetch Structure
@@ -600,7 +601,9 @@ export default {
         ]
 
         Promise.all(promise.map(p => p.catch(e => e)))
-          .then(res => { context.loading = false })
+          .then(res => {
+            context.refreshing = false
+          })
       }
     }
   },
@@ -665,7 +668,8 @@ export default {
       },
 
       // Other
-      loading: true
+      loading: true,
+      refreshing: false
     }
   },
 

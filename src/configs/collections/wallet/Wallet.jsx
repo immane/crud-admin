@@ -5,9 +5,9 @@ export default {
   Wallet: {
     form: {
       fields: [
-        'user',
-        { property: 'currency', default_value: 'CNY', help: t('Wallet currency help') },
-        { property: 'balance', type: 'integer', required: false, help: t('Wallet balance help'), field_options: { disabled: true }},
+        { property: 'user', hidden: ['update'] },
+        { property: 'currency', default_value: 'CNY', help: t('Wallet currency help'), hidden: ['update'] },
+        { property: 'balance', type: 'integer', required: false, help: t('Wallet balance help'), hidden: true },
         { property: 'status', type: 'select', default_value: 'active', help: t('Wallet status help'), type_options: {
           options: [
             { value: 'active', label: t('Active') },

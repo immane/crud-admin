@@ -336,7 +336,56 @@ form: {
 
 在字段输入框下方渲染灰色帮助文本。
 
-### 5.8 透传 Props 和事件
+### 5.8 校验 (`rules` / `validator`)
+
+FormAdmin 会将 `field.rules` / `field.validator` 合并到 `el-form` 校验中，并提供 `inject('registerFieldValidator')` 供插件注册。示例：
+
+```js
+{
+  property: 'plainPassword',
+  type: 'password',
+  help: t('User password help'),
+  rules: [{ validator: (rule, value, cb) => {
+    if (!value && !id) return cb(new Error(t('Password is required')))
+    cb()
+  }, trigger: 'blur' }]
+},
+{ property: 'email', type: 'email' }
+```
+
+### 5.9 隐藏 (`hidden`)
+
+按模式控制字段是否渲染/校验/提交，`FormAdmin` 通过 `isHidden(field)`（依据 `this.id` 判断 `create`/`update`）实现：
+
+```js
+{ property: 'user', hidden: true }                 // 始终隐藏
+{ property: 'user', hidden: false }                // 始终显示
+{ property: 'currency', hidden: ['update'] }       // 仅编辑时隐藏
+{ property: 'balance', hidden: ['create','update'] } // 两端都隐藏
+{ property: 'secret', hidden: [] }                 // 始终显示（空数组）
+```
+
+- `true` → 始终隐藏（不加入 `plainFields`/`rules`，不渲染、不校验、不提交）
+- `false` / `[]` → 始终显示
+- `['create']` → 仅 `!id`（新建）时隐藏
+- `['update']` 或 `['edit']` → 仅 `!!id`（编辑）时隐藏
+- `['create','update']` → 两端都隐藏
+
+Wallet 示例（仅 `label`/`status` 可改）：
+
+```js
+form: {
+  fields: [
+    { property: 'user', hidden: ['update'] },
+    { property: 'currency', hidden: ['update'] },
+    { property: 'balance', hidden: true },
+    { property: 'status', type: 'select' },
+    { property: 'label' }
+  ]
+}
+```
+
+### 5.10 透传 Props 和事件
 
 ```js
 {

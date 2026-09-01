@@ -192,6 +192,7 @@ interface FieldOption {
   type_events?: Record<string, any>     // Events → field plugin component
   rules?: object[]                      // Custom el-form rules (merged)
   validator?: Function | Function[]        // Shorthand -> { validator, trigger:'blur' }
+  hidden?: boolean | string[]           // true/false or ['create'] / ['update'] / ['create','update'] (also 'edit' alias)
   relation_filter?: {                   // Only for relation fields
     '@filter'?: string                  // DQL expression
     '@order'?: string                   // Sort order
@@ -226,10 +227,7 @@ interface FieldOption {
 | `transfer` | `<el-transfer>` shuttle box | Dual-pane selection |
 | `password` | `<el-input type="password">` with toggle | Password (masked double-entry, visible single, 6+ chars + letter+number + match hints, blocks submit) |
 | `email` | `<el-input type="email">` | Email (live format hint, blocks on invalid) |
-| `RelationToMany` | `<el-select multiple>` | ManyToMany / OneToMany |
-| `transfer` | `<el-transfer>` shuttle box | Dual-pane selection |
-| `password` | `<el-input type="password">` with toggle | Password (masked double-entry, visible single, 6+ chars + letter+number + match hints, blocks submit) |
-| `email` | `<el-input type="email">` | Email (live format hint, blocks on invalid) |
+
 
 **Type resolution priority**: `field.type` → API metadata type → `input`.
 
@@ -365,7 +363,39 @@ import { isPasswordCompliant } from '@/utils/validate'
 
 Plugins like `password.vue` / `email.vue` use `registerFieldValidator` to block `onSubmit` until `el-form` validation passes. You can also declare `field.rules` declaratively in any entity config.
 
-### 5.8 Passthrough Props & Events
+### 5.9 Hidden (`hidden`)
+
+Control field visibility per mode. `FormAdmin` checks `hidden` via `isHidden(field)` (uses `this.id` to detect create vs update):
+
+```js
+{ property: 'user', hidden: true }                 // always hidden
+{ property: 'user', hidden: false }                // never hidden
+{ property: 'currency', hidden: ['update'] }       // hidden only on update/edit
+{ property: 'balance', hidden: ['create','update'] } // hidden on both (never shown)
+{ property: 'secret', hidden: [] }                 // never hidden (empty array)
+```
+
+- `true` → always hidden (excluded from `plainFields`/`rules`, not rendered, not validated, not submitted)
+- `false` / `[]` → never hidden
+- `['create']` → hidden only when `!id` (create)
+- `['update']` or `['edit']` → hidden only when `!!id` (update)
+- `['create','update']` → hidden on both
+
+Example Wallet (only `label`/`status` editable on update):
+
+```js
+form: {
+  fields: [
+    { property: 'user', hidden: ['update'] },
+    { property: 'currency', hidden: ['update'] },
+    { property: 'balance', hidden: true },
+    { property: 'status', type: 'select' },
+    { property: 'label' }
+  ]
+}
+```
+
+### 5.10 Passthrough Props & Events
 
 ```js
 {

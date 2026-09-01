@@ -80,6 +80,7 @@
         icon="el-icon-refresh"
         title="Reset search"
         circle
+        :class="{ 'search-filter__reset--refreshing': refreshing }"
         @click="reset"
       />
     </div>
@@ -91,6 +92,10 @@ export default {
   name: 'SearchFilter',
 
   props: {
+    refreshing: {
+      type: Boolean,
+      default: false
+    },
     // v-model
     modelValue: {
       type: Object,
@@ -368,6 +373,33 @@ export default {
 .easy-admin-search-filter__fields {
   flex: 1 1 auto;
   flex-wrap: wrap;
+}
+
+.search-filter__reset--refreshing {
+  border-color: #e6a23c !important;
+  background-color: #faecd8 !important;
+  color: #e6a23c !important;
+  box-shadow: 0 0 0 3px rgba(230, 162, 60, 0.26), 0 4px 14px rgba(230, 162, 60, 0.38) !important;
+  animation: refreshing-pulse 1.4s ease-in-out infinite !important;
+}
+.search-filter__reset--refreshing .el-icon,
+.search-filter__reset--refreshing i {
+  color: #e6a23c !important;
+}
+.search-filter__reset--refreshing :deep(.el-icon),
+.search-filter__reset--refreshing :deep(i) {
+  animation: rotating 1s linear infinite !important;
+  transform-origin: center center;
+  display: inline-block;
+  filter: drop-shadow(0 0 2px rgba(230, 162, 60, 0.55));
+}
+@keyframes rotating {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes refreshing-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(230, 162, 60, 0.26), 0 4px 14px rgba(230, 162, 60, 0.38); }
+  50% { box-shadow: 0 0 0 6px rgba(230, 162, 60, 0.14), 0 6px 18px rgba(230, 162, 60, 0.5); }
 }
 
 @media (max-width: 767px) {
