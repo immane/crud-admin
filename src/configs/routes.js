@@ -82,6 +82,18 @@ export default [
   },
 
   {
+    path: '/authorization', name: 'AuthorizationManage', component: Layout,
+    meta: { title: t('Authorization'), icon: 'el-icon-setting', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
+    children: [
+      ...r('Role', t('Role')),
+      ...r('Permission', t('Permission')),
+      ...r('Assignment', t('Assignment')),
+      ...r('AuditLog', t('Audit Log')),
+      ...r('RoleFieldGrant', t('Role Field Grant'))
+    ]
+  },
+
+  {
     path: '/system-option', name: 'SystemOptionManage', component: Layout,
     meta: { title: t('System Options'), icon: 'el-icon-setting', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
     children: [
