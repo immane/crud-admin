@@ -105,18 +105,18 @@ export default {
         },
         {
           property: 'permissions',
-          type: 'RelationToMany',
+          // 表单使用 transfer 穿梭框更适合权限批量授予（左侧_available_ / 右侧_selected_）；底层复用 RelationToMany 的 EntityManage 拉取逻辑
+          // 使用相应的 type: 列表页自动映射到 plugins/list/RelationToMany，表单页映射到 plugins/form/transfer
+          type: 'transfer',
           required: false,
-          help: '关联权限 (ManyToMany Permission)。前端展示为多选关联，实际存储在 <code>authorization_role_permission</code> 中间表。<br/>' +
+          help: '关联权限 (ManyToMany Permission)。前端展示为穿梭框，实际存储在 <code>authorization_role_permission</code> 中间表。<br/>' +
             'API 层面并非通过 PUT /roles/{id} 直接写关联，而是通过专用端点 <code>POST /manage/roles/{uuid}/permissions</code> 批量替换。<br/>' +
             'Body 支持 <code>{ permissions: ["code1","code2"] }</code> 或 <code>{ codes: [...] }</code> 或直接数组。<br/>' +
             '每个 code 必须匹配 <code>^[a-z0-9:_]+$</code> 且在 permission 表中存在，否则 400。<br/>' +
             '替换后会 <code>cacheInvalidator.invalidateUsers()</code> 使相关用户权限缓存失效。<br/>' +
-            '前端如需可视化，可在此字段使用 transfer/RelationToMany，并额外提供按钮调用该子资源接口。<br/>Help: Linked permissions; managed via POST /{uuid}/permissions.',
+            '列表页该字段将按 <code>RelationToMany</code> 渲染为可点击 Tag（跳转至 Permission 详情），表单页为穿梭框；如需多选下拉可改回 <code>RelationToMany</code>。<br/>Help: Linked permissions; managed via POST /{uuid}/permissions. Form=transfer, List=RelationToMany.',
           type_options: {
             entity_name: 'Permission'
-            // 可选: 远程搜索限定
-            // relation_filter: { '@order': 'entity.module|ASC, entity.code|ASC' }
           },
           field_options: { placeholder: t('Please select') }
         }
