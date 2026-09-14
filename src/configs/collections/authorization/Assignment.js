@@ -1,5 +1,10 @@
 import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
+import AssignmentRoleField from './AssignmentRoleField.jsx'
+import AssignmentScopeField from './AssignmentScopeField.jsx'
+import AssignmentScopeLink from './AssignmentScopeLink.jsx'
+import AssignmentUserField from './AssignmentUserField.jsx'
+import AssignmentUserLink from './AssignmentUserLink.jsx'
 
 /**
  * Assignment (authorization_assignment)
@@ -60,19 +65,19 @@ export default {
         {
           property: 'uuid',
           required: false,
+          hidden: 'create',
           field_options: { disabled: true, placeholder: 'auto-generated' }
         },
         {
           property: 'userUuid',
+          component: AssignmentUserField,
           required: true,
-          field_options: { placeholder: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' }
+          field_options: { placeholder: t('Search username to select user') }
         },
         {
           property: 'role',
-          type: 'RelationToOne',
+          component: AssignmentRoleField,
           required: true,
-          type_options: { entity_name: 'Role' },
-          // Backend API actually accepts roleUuid/roleId/code, using relation here for convenient role selection
           field_options: { placeholder: t('Please select') }
         },
         {
@@ -90,17 +95,20 @@ export default {
         },
         {
           property: 'scopeUuid',
+          component: AssignmentScopeField,
           required: false,
           field_options: { placeholder: t('UUID') }
         },
         {
           property: 'scopeKey',
           required: false,
+          hidden: 'create',
           field_options: { disabled: true }
         },
         {
           property: 'grantedByUuid',
           required: false,
+          hidden: 'create',
           field_options: { disabled: true, placeholder: 'auto-filled' }
         }
       ]
@@ -125,19 +133,19 @@ export default {
         revokedAt: {
           label: t('Revoked'),
           type: 'boolean',
-          expression: 'entity.getRevokedAt() IS NOT NULL'
+          expression: 'entity.getRevokedAt()'
         }
         // Note: backend listFilter additionally supports ?includeRevoked=true to control whether revoked records are included
       },
       list_display: [
         'id',
         'uuid',
-        { property: 'userUuid', type: 'plain-text' },
+        { property: 'userUuid', component: AssignmentUserLink },
         { property: 'role', type: 'RelationToOne' },
         'scopeType',
-        'scopeUuid',
+        { property: 'scopeUuid', component: AssignmentScopeLink },
         'scopeKey',
-        'grantedByUuid',
+        { property: 'grantedByUuid', component: AssignmentUserLink },
         { property: 'createdAt', type: 'datetime' },
         { property: 'revokedAt', type: 'datetime' }
       ]
@@ -147,12 +155,12 @@ export default {
       detail_display: [
         'id',
         'uuid',
-        'userUuid',
+        { property: 'userUuid', component: AssignmentUserLink },
         { property: 'role', type: 'RelationToOne' },
         'scopeType',
-        'scopeUuid',
+        { property: 'scopeUuid', component: AssignmentScopeLink },
         'scopeKey',
-        'grantedByUuid',
+        { property: 'grantedByUuid', component: AssignmentUserLink },
         { property: 'createdAt', type: 'datetime' },
         { property: 'revokedAt', type: 'datetime' }
       ]

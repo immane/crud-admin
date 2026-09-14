@@ -1,5 +1,9 @@
 import { t } from '@/i18n'
-import { orderByIdDesc } from '../helpers'
+import RolePermissionsAction from './RolePermissionsAction.jsx'
+import RolePermissionsDetail from './RolePermissionsDetail.jsx'
+import RoleSystemLockedInput from './RoleSystemLockedInput.jsx'
+import RoleSystemLockedScope from './RoleSystemLockedScope.jsx'
+import RoleUuidField from './RoleUuidField.jsx'
 
 /**
  * Role (authorization_role)
@@ -58,11 +62,13 @@ export default {
         },
         {
           property: 'uuid',
+          component: RoleUuidField,
           required: false,
-          field_options: { placeholder: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', disabled: false }
+          field_options: { disabled: true }
         },
         {
           property: 'code',
+          component: RoleSystemLockedInput,
           required: true,
           help: t('Role code help'),
           field_options: { placeholder: 'store_content_editor' }
@@ -74,7 +80,7 @@ export default {
         },
         {
           property: 'scopeType',
-          type: 'select',
+          component: RoleSystemLockedScope,
           required: true,
           default_value: 'store',
           help: t('Role scope type help'),
@@ -82,23 +88,12 @@ export default {
           field_options: { placeholder: t('Please select') }
         },
         {
-          property: 'isSystem',
+          property: 'system',
           type: 'boolean',
           required: false,
           default_value: false,
-          field_options: { disabled: true }
-        },
-        {
-          property: 'permissions',
-          // Use transfer widget for bulk permission grants (left=available / right=selected); reuses RelationToMany EntityManage fetch logic under the hood
-          // Corresponding type: list page auto-maps to plugins/list/RelationToMany, form page maps to plugins/form/transfer
-          type: 'transfer',
-          required: false,
-          help: t('Role permissions help'),
-          type_options: {
-            entity_name: 'Permission'
-          },
-          field_options: { placeholder: t('Please select') }
+          hidden: true,
+          field_options: { disabled: true, label: t('Is System') }
         }
       ],
       // Batch edit only allows name-related fields; scopeType/system should not be changed in bulk
@@ -108,8 +103,12 @@ export default {
     },
 
     list: {
-      query: orderByIdDesc,
+      query: { '@order': 'entity.id|ASC' },
       disabled_actions: ['batch_edit', 'batch_delete'],
+      is_locked: (record) => !!(record?.system ?? record?.isSystem),
+      actions: [
+        { name: 'role-permissions', position: 'list', component: RolePermissionsAction }
+      ],
       list_filter: {
         code: t('Code'),
         name: t('Name'),
@@ -118,7 +117,7 @@ export default {
           global: t('Global'),
           store: t('Store')
         },
-        isSystem: {
+        system: {
           label: t('Is System'),
           type: 'boolean',
           expression: 'entity.isSystem() == :value'
@@ -134,8 +133,8 @@ export default {
           property: 'scopeType',
           type: 'select'
         },
-        { property: 'isSystem', type: 'boolean' },
-        'permissions',
+        { property: 'system', type: 'boolean', label: t('Is System') },
+        { property: 'permissions', component: RolePermissionsDetail },
         { property: 'updatedAt', type: 'datetime' }
       ]
     },
@@ -147,8 +146,8 @@ export default {
         'code',
         'name',
         'scopeType',
-        { property: 'isSystem', type: 'boolean' },
-        { property: 'permissions', type: 'RelationToMany' },
+        { property: 'system', type: 'boolean', label: t('Is System') },
+        { property: 'permissions', component: RolePermissionsDetail },
         { property: 'createdAt', type: 'datetime' },
         { property: 'updatedAt', type: 'datetime' }
       ],
