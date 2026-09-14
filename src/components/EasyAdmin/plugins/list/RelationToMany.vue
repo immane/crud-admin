@@ -31,7 +31,7 @@
 
 <script>
 import entities from '@/configs/entities'
-import { loadRelationRecords, relationLabel, relationValue, resolveRelation } from '@/utils/relation'
+import { loadRelationRecords, relationIdentifier, relationLabel, relationValue, resolveRelation } from '@/utils/relation'
 
 export default {
   props: {
@@ -78,9 +78,10 @@ export default {
     },
     detailRoute(item) {
       const record = this.resolveRecord(item)
-      if (record?.id == null || !this.targetEntity) return null
+      const identifier = relationIdentifier(record, this.relation)
+      if (!identifier || !this.targetEntity) return null
       const name = `${this.targetEntity}Detail`
-      return this.$router.hasRoute(name) ? { name, params: { id: record.id }} : null
+      return this.$router.hasRoute(name) ? { name, params: { id: identifier.value }} : null
     },
     async resolveRecords() {
       this.resolvedRecords = []

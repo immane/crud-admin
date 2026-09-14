@@ -51,6 +51,14 @@ export const resolveRelation = (field = {}, struct = {}, entities = {}) => {
 
 export const relationValue = (record, relation) => record?.[relation?.valueKey || 'id']
 
+export const relationIdentifier = (record, relation) => {
+  if (!record || typeof record !== 'object') return null
+  const preferred = relation?.valueKey === 'uuid' ? 'uuid' : 'id'
+  const fallback = preferred === 'uuid' ? 'id' : 'uuid'
+  const key = record[preferred] != null && record[preferred] !== '' ? preferred : fallback
+  return record[key] != null && record[key] !== '' ? { key, value: record[key] } : null
+}
+
 export const relationLabel = (record, fallback = '') => {
   if (!record || typeof record !== 'object') return String(fallback || '')
   return record.__toString || record.name || record.title || record.username || record.email || record.phone || record.code || record.uuid || String(record.id ?? fallback ?? '')

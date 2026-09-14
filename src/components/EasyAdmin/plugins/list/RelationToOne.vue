@@ -5,7 +5,7 @@
 
 <script>
 import entities from '@/configs/entities'
-import { loadRelationRecords, relationLabel, resolveRelation } from '@/utils/relation'
+import { loadRelationRecords, relationIdentifier, relationLabel, resolveRelation } from '@/utils/relation'
 
 export default {
   props: {
@@ -32,9 +32,12 @@ export default {
       return this.value && typeof this.value === 'object' ? this.value : this.resolvedRecord
     },
     detailRoute() {
-      if (this.displayRecord?.id == null || !this.targetEntity) return null
+      const identifier = relationIdentifier(this.displayRecord, this.relation)
+      if (!identifier || !this.targetEntity) return null
       const name = `${this.targetEntity}Detail`
-      return this.$router.hasRoute(name) ? { name, params: { id: this.displayRecord.id }} : null
+      // Generated entity routes use an `id` placeholder, then redirect to the
+      // final ID or UUID path. The value determines which final route matches.
+      return this.$router.hasRoute(name) ? { name, params: { id: identifier.value }} : null
     }
   },
   watch: {

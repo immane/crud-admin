@@ -1,5 +1,5 @@
 import EntityManage from '@/utils/entity'
-export { relationLabel, relationValue, resolveRelation } from './relation-descriptor'
+export { relationIdentifier, relationLabel, relationValue, resolveRelation } from './relation-descriptor'
 
 const recordCache = new Map()
 

@@ -1,4 +1,4 @@
-import { relationLabel, resolveRelation } from '@/utils/relation-descriptor'
+import { relationIdentifier, relationLabel, resolveRelation } from '@/utils/relation-descriptor'
 
 const entities = { User: {}, Store: {}}
 
@@ -48,5 +48,12 @@ describe('utils/relation', () => {
 
   it('uses user identifiers when an API response omits __toString', () => {
     expect(relationLabel({ id: 1, username: 'alice' })).toBe('alice')
+  })
+
+  it('prefers the relation value key for detail links', () => {
+    const record = { id: 1, uuid: '550e8400-e29b-41d4-a716-446655440000' }
+
+    expect(relationIdentifier(record, { valueKey: 'id' })).toEqual({ key: 'id', value: 1 })
+    expect(relationIdentifier(record, { valueKey: 'uuid' })).toEqual({ key: 'uuid', value: record.uuid })
   })
 })
