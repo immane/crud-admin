@@ -158,11 +158,11 @@ export default {
      * @param {Object} value v-modal value
      * @param {Object, String} entityConf Entity name or config
      * @param {Array, String} fields Load main fields of entity
-     * @param {Number} id Entity ID
+     * @param {Number|String} id Entity ID or UUID
      */
 
     id: {
-      type: Number,
+      type: [Number, String],
       default: () => 0
     },
     modelValue: {

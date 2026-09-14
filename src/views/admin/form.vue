@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <form-admin
-      :id="Number($route.params.id)"
+      :id="identifier"
       v-model="form"
       :entity-conf="entity"
       :fields="fields"
@@ -21,13 +21,17 @@ export default {
   components: { FormAdmin },
   data() {
     return {
-      id: Number(this.$route.params.id),
       entityParam: this.$route.params.entityParam,
       fields: null,
       form: this.$route.query,
       entity: '',
       alias: '',
       config: {}
+    }
+  },
+  computed: {
+    identifier() {
+      return this.$route.params.uuid || this.$route.params.id || 0
     }
   },
   created() {
