@@ -4,7 +4,10 @@
       v-model="form[field.property]"
       filterable
       clearable
+      reserve-keyword
       :placeholder="$t('Please select')"
+      :remote-method="remoteSearch"
+      :loading="loading"
       v-bind="field.type_options"
       multiple
       v-on="field.type_events || {}"

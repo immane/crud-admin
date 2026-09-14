@@ -370,7 +370,9 @@
 <script>
 import { defineAsyncComponent, markRaw, toRaw } from 'vue'
 import EntityManage from '@/utils/entity'
+import entities from '@/configs/entities'
 import { asyncRoutes } from '@/router'
+import { resolveRelation } from '@/utils/relation'
 import SIP from '@/utils/simple-image-process'
 import SearchFilter from './SearchFilter.vue'
 import FormAdmin from './FormAdmin.vue'
@@ -846,6 +848,8 @@ export default {
     },
 
     getListPluginType(field, struct, value) {
+      const relation = resolveRelation(field, struct, entities)
+      if (relation) return relation.multiple ? 'RelationToMany' : 'RelationToOne'
       const type = field.type || struct?.metadata?.type
       if (!type) {
         if (Array.isArray(value)) return 'RelationToMany'

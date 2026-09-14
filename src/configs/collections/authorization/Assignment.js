@@ -2,9 +2,6 @@ import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
 import AssignmentRoleField from './AssignmentRoleField.jsx'
 import AssignmentScopeField from './AssignmentScopeField.jsx'
-import AssignmentScopeLink from './AssignmentScopeLink.jsx'
-import AssignmentUserField from './AssignmentUserField.jsx'
-import AssignmentUserLink from './AssignmentUserLink.jsx'
 
 /**
  * Assignment (authorization_assignment)
@@ -70,8 +67,10 @@ export default {
         },
         {
           property: 'userUuid',
-          component: AssignmentUserField,
+          relation: { entity: 'User', valueKey: 'uuid' },
+          relation_filter: { '@filter': 'entity.username matches ":value"' },
           required: true,
+          type_options: { remote: true },
           field_options: { placeholder: t('Search username to select user') }
         },
         {
@@ -140,12 +139,12 @@ export default {
       list_display: [
         'id',
         'uuid',
-        { property: 'userUuid', component: AssignmentUserLink },
+        { property: 'userUuid', relation: { entity: 'User', valueKey: 'uuid' }},
         { property: 'role', type: 'RelationToOne' },
         'scopeType',
-        { property: 'scopeUuid', component: AssignmentScopeLink },
+        { property: 'scopeUuid', relation: { entity: 'Store', valueKey: 'uuid' }},
         'scopeKey',
-        { property: 'grantedByUuid', component: AssignmentUserLink },
+        { property: 'grantedByUuid', relation: { entity: 'User', valueKey: 'uuid' }},
         { property: 'createdAt', type: 'datetime' },
         { property: 'revokedAt', type: 'datetime' }
       ]
@@ -155,12 +154,12 @@ export default {
       detail_display: [
         'id',
         'uuid',
-        { property: 'userUuid', component: AssignmentUserLink },
+        { property: 'userUuid', relation: { entity: 'User', valueKey: 'uuid' }},
         { property: 'role', type: 'RelationToOne' },
         'scopeType',
-        { property: 'scopeUuid', component: AssignmentScopeLink },
+        { property: 'scopeUuid', relation: { entity: 'Store', valueKey: 'uuid' }},
         'scopeKey',
-        { property: 'grantedByUuid', component: AssignmentUserLink },
+        { property: 'grantedByUuid', relation: { entity: 'User', valueKey: 'uuid' }},
         { property: 'createdAt', type: 'datetime' },
         { property: 'revokedAt', type: 'datetime' }
       ]

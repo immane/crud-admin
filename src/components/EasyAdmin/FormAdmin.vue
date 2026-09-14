@@ -128,6 +128,8 @@
 import { defineAsyncComponent, markRaw, toRaw } from 'vue'
 import { t } from '@/i18n'
 import EntityManage from '@/utils/entity'
+import entities from '@/configs/entities'
+import { relationValue, resolveRelation } from '@/utils/relation'
 import Tinymce from '@/components/Tinymce'
 import { createUiFeedback } from './ui/feedback'
 
@@ -412,6 +414,8 @@ export default {
     },
 
     resolvePluginType(field, currentStruct) {
+      const relation = resolveRelation(field, currentStruct, entities)
+      if (field.relation && relation) return relation.multiple ? 'RelationToMany' : 'RelationToOne'
       // Select needs explicit options. Metadata alone must not turn a normal
       // scalar into an empty select control.
       if (field.type) return field.type
@@ -425,6 +429,8 @@ export default {
         onetomany: 'OneToMany'
       }
       if (relationTypes[normalized]) return relationTypes[normalized]
+
+      if (relation) return relation.multiple ? 'RelationToMany' : 'RelationToOne'
 
       const supportedMetadataTypes = new Set([
         'array', 'boolean', 'code', 'date', 'datetime',
@@ -475,9 +481,15 @@ export default {
         for (const key of this.plainFields) {
           if (Object.keys(data).includes(key)) {
             const value = data[key]
+            const field = this.properties.find(property => property.property === key) || { property: key }
+            const relation = resolveRelation(field, this.structure[key], entities)
             if (value != null) {
               if (jsonFields.has(key)) {
                 form[key] = value
+              } else if (relation && typeof value === 'object' && !Array.isArray(value)) {
+                form[key] = relationValue(value, relation)
+              } else if (relation && Array.isArray(value) && value.every(item => item && typeof item === 'object')) {
+                form[key] = value.map(item => relationValue(item, relation))
               } else if (typeof value === 'object' &&
                     Object.keys(value).includes('id')
               ) {
