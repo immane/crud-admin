@@ -156,6 +156,10 @@ export default {
 
   // Form Plugins
   'Please select': 'Please select',
+  'Please select a role': 'Please select a role',
+  'Please select a store': 'Please select a store',
+  'Search username to select user': 'Search username to select user',
+  'No scope needed for global': 'No scope needed for global',
   'Select date': 'Select date',
   'Select date & time': 'Select date & time',
   'Select file': 'Select file',
@@ -165,6 +169,8 @@ export default {
   'Type and press Enter to add': 'Type and press Enter to add',
   'Available': 'Available',
   'Selected': 'Selected',
+  'Permissions': 'Permissions',
+  'Edit Permissions': 'Edit Permissions',
   'Yes': 'Yes',
   'No': 'No',
   'Collapse': 'Collapse',
@@ -255,6 +261,7 @@ export default {
   'Role code help': 'Use lowercase letters, digits, and underscores only, for example <code>store_content_editor</code>. The code is the stable identifier used by integrations and permission assignments.',
   'Role scope type help': '<code>global</code> roles can be granted without a scope. <code>store</code> roles can only be granted for a specific store. Set this when creating the role; the Manage API does not allow changing it later.',
   'Role permissions help': 'The selected permissions define what this role can do. Replacing them applies to every active assignment of this role. System roles cannot have their permissions changed.',
+  'System roles cannot be modified': 'System roles cannot be modified',
   'Assignment scope type help': 'For <code>global</code>, leave Scope UUID empty. For <code>store</code>, enter the target store UUID and select a role whose scope type is also <code>store</code>.',
   'Role field grant fields help': 'This is a field-level allowlist. Select only fields this role may write for the selected resource and action; all other submitted fields are rejected. Available fields are defined by the server registry.',
 
