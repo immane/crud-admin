@@ -13,6 +13,13 @@ export default {
     },
     list: {
       query: orderByIdDesc,
+      list_filter: {
+        'user.username': t('User'),
+        openid: t('OpenID'),
+        unionid: t('UnionID'),
+        nickname: t('Nickname'),
+        appType: t('App Type')
+      },
       list_display: [
         'id',
         'user',

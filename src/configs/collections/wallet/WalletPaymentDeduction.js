@@ -28,7 +28,14 @@ export default {
           released: t('Released'),
           refunded: t('Refunded'),
           reversed: t('Reversed')
-        }
+        },
+        invoiceNo: t('Invoice Number'),
+        'wallet.id': {
+          label: t('Wallet'),
+          type: 'input',
+          expression: 'entity.getWallet().getId() == :value'
+        },
+        referenceId: t('Reference ID')
       },
       list_display: [
         'id', 'invoiceNo', { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }}, 'type', 'status',

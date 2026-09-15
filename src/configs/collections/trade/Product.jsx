@@ -176,7 +176,12 @@ export default {
       query: orderByIdDesc,
       list_filter: {
         name: t('Product Name'),
-        status: statusFilterLabel()
+        status: statusFilterLabel(),
+        isDeleted: {
+          label: t('Deleted'),
+          type: 'boolean',
+          expression: 'entity.isDeleted() == :value'
+        }
       },
       list_display: ['id', 'name', 'status', 'isDeleted', 'createdAt', 'updatedAt']
     },

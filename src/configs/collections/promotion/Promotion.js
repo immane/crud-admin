@@ -30,9 +30,15 @@ export default {
           label: t('Enabled'),
           type: 'boolean',
           expression: 'entity.getEnabled() == :value'
+        },
+        conflictMode: {
+          __label: t('Conflict Mode'),
+          stackable: t('Stackable'),
+          exclusive: t('Exclusive'),
+          priority: t('By Priority')
         }
       },
-      list_display: ['id', 'name', 'enabled', 'startTime', 'endTime', 'conflictMode', 'template', 'createdAt']
+      list_display: ['id', 'name', 'storeCode', 'enabled', 'startTime', 'endTime', 'conflictMode', 'template', 'createdAt']
     },
     detail: {
       detail_display: '__all__'

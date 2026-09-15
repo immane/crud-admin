@@ -103,7 +103,12 @@ export default {
         },
         targetUuid: t('Target UUID'),
         actorUuid: t('Actor UUID'),
-        requestId: t('Request ID')
+        requestId: t('Request ID'),
+        createdAt: {
+          label: t('Created At'),
+          type: 'datetime',
+          expression: 'entity.getCreatedAt() >= datetime.get(":value")'
+        }
       },
       list_display: [
         'id',
@@ -111,8 +116,6 @@ export default {
         'action',
         'targetType',
         'targetUuid',
-        { property: 'beforeData', type: 'json' },
-        { property: 'afterData', type: 'json' },
         'requestId',
         { property: 'createdAt', type: 'datetime' }
       ]
@@ -121,7 +124,6 @@ export default {
     detail: {
       detail_display: [
         'id',
-        'uuid',
         'actorUuid',
         'action',
         'targetType',

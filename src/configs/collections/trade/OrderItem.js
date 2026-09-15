@@ -18,8 +18,19 @@ export default {
     list: {
       query: orderByIdDesc,
       disabled_actions: ['new', 'delete'],
+      list_filter: {
+        'order.id': {
+          label: t('Order'),
+          type: 'input',
+          expression: 'entity.getOrder().getId() == :value'
+        },
+        'product.name': t('Product'),
+        specificationTitle: t('Specification')
+      },
       list_display: [
         'id',
+        'order',
+        'product',
         'specificationTitle',
         'quantity',
         { property: 'unitPrice', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},

@@ -18,6 +18,7 @@ export default {
       query: { '@order': 'entity.sortOrder|ASC, entity.id|DESC' },
       list_filter: {
         name: t('Category Name'),
+        slug: t('Slug'),
         enabled: {
           label: t('Enabled'),
           type: 'boolean',
@@ -27,7 +28,7 @@ export default {
           .get(apiPath(API_PREFIX, 'manage/categories'))
           .then(res => Object.assign({ __label: t('Parent Category') }, ...res.data.map(v => ({ [v.id]: v.name }))))
       },
-      list_display: ['id', 'name', 'slug', 'parent', 'enabled', 'sortOrder', 'createdAt']
+      list_display: ['id', 'name', 'slug', 'parent', 'enabled', 'sortOrder', 'createdAt', 'updatedAt']
     },
     detail: {
       detail_display: '__all__'

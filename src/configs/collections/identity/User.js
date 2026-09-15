@@ -24,15 +24,24 @@ export default {
       list_filter: {
         username: t('Username'),
         email: t('Email'),
-        phone: t('Phone')
+        phone: t('Phone'),
+        uuid: t('UUID'),
+        phoneVerified: {
+          label: t('Phone Verified'),
+          type: 'boolean',
+          expression: 'entity.getPhoneVerified() == :value'
+        }
       },
       list_display: [
         'id',
+        'uuid',
         'username',
         'email',
         'phone',
         { property: 'phoneVerified', editable: true },
-        { property: 'roles', type: 'array' }
+        { property: 'roles', type: 'array' },
+        'createdAt',
+        'updatedAt'
       ]
     },
     detail: {

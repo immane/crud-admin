@@ -21,13 +21,14 @@ export default {
       query: orderByIdDesc,
       list_filter: {
         title: t('Title'),
+        slug: t('Slug'),
         status: {
           __label: t('Status'),
           draft: t('Draft'),
           published: t('Published')
         }
       },
-      list_display: ['id', 'title', 'slug', 'status', 'publishedAt', 'createdAt']
+      list_display: ['id', 'title', 'slug', 'status', 'publishedAt', 'createdAt', 'updatedAt']
     },
     detail: {
       detail_display: '__all__'

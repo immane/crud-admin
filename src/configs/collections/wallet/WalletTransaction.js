@@ -28,7 +28,18 @@ export default {
           completed: t('Completed'),
           failed: t('Failed'),
           reversed: t('Reversed')
-        }
+        },
+        'fromWallet.id': {
+          label: t('From Wallet'),
+          type: 'input',
+          expression: 'entity.getFromWallet().getId() == :value'
+        },
+        'toWallet.id': {
+          label: t('To Wallet'),
+          type: 'input',
+          expression: 'entity.getToWallet().getId() == :value'
+        },
+        referenceId: t('Reference ID')
       },
       list_display: [
         'id', 'uuid', { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }}, 'type', 'status',
