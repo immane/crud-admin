@@ -21,86 +21,76 @@ EasyAdmin is the core CRUD engine of Vue Admin Skeleton. It is a **configuration
 
 ## 2. Core Architecture
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                      Config Layer                             │
-│  configs/routes.js     Menu/route definitions                 │
-│  configs/collections/  Entity schema definitions              │
-│  configs/entities.js   Auto-loader (import.meta.glob)         │
-└──────────────────────────┬───────────────────────────────────┘
-                           │ entity config
-                           ▼
-┌──────────────────────────────────────────────────────────────┐
-│                       View Layer                              │
-│  views/admin/list.vue   Reads config → renders ListAdmin      │
-│  views/admin/form.vue   Reads config → renders FormAdmin      │
-└──────────────────────────┬───────────────────────────────────┘
-                           │ props
-                           ▼
-┌──────────────────────────────────────────────────────────────┐
-│                    EasyAdmin Engine Layer                      │
-│  ┌─────────────────────────────────────────────────────────┐ │
-│  │  ListAdmin.vue                                           │ │
-│  │  ├── SearchFilter.vue  (Dynamic filter builder)          │ │
-│  │  ├── el-table           (Dynamic column renderer)        │ │
-│  │  ├── el-pagination      (Pagination)                     │ │
-│  │  └── plugins/list/      (Inline edit plugins)            │ │
-│  └─────────────────────────────────────────────────────────┘ │
-│  ┌─────────────────────────────────────────────────────────┐ │
-│  │  FormAdmin.vue                                            │ │
-│  │  ├── el-tabs            (Tab grouping)                    │ │
-│  │  ├── el-form            (Dynamic form)                    │ │
-│  │  └── plugins/form/      (17 field-type plugins)           │ │
-│  └─────────────────────────────────────────────────────────┘ │
-└──────────────────────────┬───────────────────────────────────┘
-                           │ API calls
-                           ▼
-┌──────────────────────────────────────────────────────────────┐
-│                       Data Layer                              │
-│  utils/entity.ts    EntityManage CRUD class                   │
-│  utils/request.ts   Axios JWT instance                        │
-│  store/entity.js    Vuex structure cache                      │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph Config ["Config Layer"]
+        C1["configs/routes.js - Menu and route definitions"]
+        C2["configs/collections - Entity schema definitions"]
+        C3["configs/entities.js - Auto-loader via import.meta.glob"]
+    end
+    subgraph View ["View Layer"]
+        V1["views/admin/list.vue - Reads config and renders ListAdmin"]
+        V2["views/admin/form.vue - Reads config and renders FormAdmin"]
+    end
+    subgraph Engine ["EasyAdmin Engine Layer"]
+        L1["ListAdmin.vue"]
+        L2["SearchFilter.vue - Dynamic filter builder"]
+        L3["el-table - Dynamic column renderer"]
+        L4["el-pagination - Pagination"]
+        L5["plugins/list - Inline edit plugins"]
+        F1["FormAdmin.vue"]
+        F2["el-tabs - Tab grouping"]
+        F3["el-form - Dynamic form"]
+        F4["plugins/form - 20 field-type plugins"]
+        L1 --> L2
+        L1 --> L3
+        L1 --> L4
+        L1 --> L5
+        F1 --> F2
+        F1 --> F3
+        F1 --> F4
+    end
+    subgraph Data ["Data Layer"]
+        D1["utils/entity.ts - EntityManage CRUD class"]
+        D2["utils/request.ts - Axios JWT instance"]
+        D3["store/entity.js - Vuex structure cache"]
+    end
+    C3 -- "entity config" --> V1
+    V2 -- "props" --> L1
+    V2 -- "props" --> F1
+    L1 -- "API calls" --> D1
+    F1 -- "API calls" --> D1
 ```
 
 ---
 
 ## 3. Data Flow
 
-```
-User visits /:entityParam/list
-  ↓
-views/admin/list.vue:
-  1. Extract $route.params.entityParam
-  2. camelize → lookup admin.entities[alias]
-  3. Pass config → <ListAdmin>
-  ↓
-ListAdmin.created():
-  1. Create EntityManage instance
-  2. Call dataProcessor (default: em.structure() + em.list())
-  3. Build table columns (from list_display config)
-  4. Render el-table
-  ↓
-User clicks "Create" → router.push(`/${entityPath}/create`)
-  ↓
-views/admin/form.vue:
-  1. Same entityParam extraction
-  2. Pass config.fields → <FormAdmin>
-  ↓
-FormAdmin.created():
-  1. Create EntityManage instance
-  2. Call em.structure() → get field metadata
-  3. Transform fields (string → {property} object)
-  4. Generate validation rules (from metadata.nullable)
-  5. Build tabs (from field.tab)
-  6. If editing: em.retrieve(id) → populate form
-  7. If creating: apply default_value
-  ↓
-FormAdmin submit:
-  1. el-form.validate()
-  2. cleanBlankAttributes()
-  3. em.create() or em.update()
-  4. $router.go(-1)
+```mermaid
+flowchart TD
+    A["User visits entity list route with entityParam"]
+    B["views/admin/list.vue - Extract route params entityParam"]
+    C["Camelize entityParam and lookup admin.entities by alias"]
+    D["Pass config to ListAdmin component"]
+    E["ListAdmin created - Create EntityManage instance"]
+    F["Call dataProcessor - default em.structure plus em.list"]
+    G["Build table columns from list_display config"]
+    H["Render el-table"]
+    I["User clicks Create - router.push to entity create route"]
+    J["views/admin/form.vue - Same entityParam extraction"]
+    K["Pass config fields to FormAdmin component"]
+    L["FormAdmin created - Create EntityManage instance"]
+    M["Call em.structure to get field metadata"]
+    N["Transform fields - string to property object"]
+    O["Generate validation rules from metadata nullable"]
+    P["Build tabs from field tab"]
+    Q["If editing - em.retrieve with id to populate form"]
+    R["If creating - apply default_value"]
+    S["FormAdmin submit - el-form validate"]
+    T["cleanBlankAttributes"]
+    U["em.create or em.update"]
+    V["router.go back one step"]
+    A --> B --> C --> D --> E --> F --> G --> H --> I --> J --> K --> L --> M --> N --> O --> P --> Q --> R --> S --> T --> U --> V
 ```
 
 ---

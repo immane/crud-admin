@@ -49,8 +49,8 @@ src/
 │   ├── ListAdmin.vue     # Dynamic list builder
 │   ├── DetailAdmin.vue   # Configurable record detail page
 │   ├── SearchFilter.vue  # Dynamic filter builder
-│   ├── plugins/form/     # 19 field-type plugins
-│   ├── plugins/list/     # 9 list-rendering plugins
+│   ├── plugins/form/     # 20 field-type plugins
+│   ├── plugins/list/     # 10 list-rendering plugins
 │   └── plugins/detail/   # Detail-only plugins (json, image)
 ├── configs/              # Declarative configs
 │   ├── routes.js         # Menu/route definitions

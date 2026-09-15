@@ -690,8 +690,9 @@ interface DetailConfig {
 
 ### 9.1 フィールドフォールバックチェーン
 
-```
-detail.detail_display  →  list.list_display  →  form.fields  →  全 API フィールド
+```mermaid
+flowchart LR
+    A["detail.detail_display"] --> B["list.list_display"] --> C["form.fields"] --> D["全 API フィールド"]
 ```
 
 ### 9.2 詳細ページ固有の機能

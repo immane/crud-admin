@@ -685,8 +685,9 @@ interface DetailConfig {
 
 ### 9.1 欄位回退鏈
 
-```
-detail.detail_display  →  list.list_display  →  form.fields  →  所有 API 欄位
+```mermaid
+flowchart LR
+    A["detail.detail_display"] --> B["list.list_display"] --> C["form.fields"] --> D["所有 API 欄位"]
 ```
 
 ### 9.2 詳情頁獨有功能

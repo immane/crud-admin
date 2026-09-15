@@ -42,7 +42,7 @@
 ## Features
 
 - **Configuration-Driven CRUD Engine (EasyAdmin)** — Declare entities in config; get full list/form/detail/routes for free
-- **19+ Pluggable Form Fields** — input, textarea, select, boolean, integer, date, datetime, image, file, JSON, rich text, relation pickers, transfer, password (double-entry + strength hints), email (format validation), and more
+- **20 Pluggable Form Fields** — input, textarea, select, boolean, integer, currency, date, datetime, image, file, JSON, rich text, relation pickers, transfer, password (double-entry + strength hints), email (format validation), and more
 - **Form Validation** — declarative `field.rules` / `field.validator` merged into `el-form`, with `registerFieldValidator` provide for plugins; blocks submit until valid
 - **Detail View with Fallback Chain** — `detail/` → `list/` → plain text plugins per field type
 - **Internationalization (i18n)** — English, Simplified Chinese, Traditional Chinese, Japanese; browser language detection; locale toggle in navbar; `Accept-Language` header and `_locale` param injected into API requests
@@ -53,7 +53,9 @@
 - **Enterprise Dashboard** — Live order/product/user metrics, SVG sparkline chart, geolocation weather widget
 - **Responsive Layout** — Collapsible sidebar with SVG icons, breadcrumb navigation, fixed header option
 - **Code Splitting & Build Optimization** — Vite-powered chunk splitting with tree-shaking
-- **Vitest Unit Testing** — 38 tests across components and utilities
+- **Server Health Monitor** — navbar status dot polling `GET /health/live`, `/health/ready` and `/metrics`
+- **Vitest Unit Testing** — 1041 tests across 78 spec files with 100% coverage thresholds on `src/components/EasyAdmin`
+- **Tracked Lockfile** — `package-lock.json` is committed for reproducible installs
 
 
 ## Tech Stack
@@ -98,13 +100,13 @@ Translation keys use the English string directly (flat format), e.g. `$t('New / 
 │   │   ├── DetailAdmin.vue          # Configurable record detail page
 │   │   ├── SearchFilter.vue         # Dynamic filter UI
 │   │   └── plugins/
-│   │       ├── form/                # 19 field-type plugins
-│   │       ├── list/                # 9 list-rendering plugins
+│   │       ├── form/                # 20 field-type plugins
+│   │       ├── list/                # 10 list-rendering plugins
 │   │       └── detail/              # 2 detail-only plugins
 │   ├── configs/                     # Declarative entity configs
 │   │   ├── routes.js                # Menu / route definitions
 │   │   ├── entities.js              # Auto-loader (import.meta.glob)
-│   │   └── collections/             # Entity schemas (7 bundles, 22 entities)
+│   │   └── collections/             # Entity schemas (10 bundles: authorization, common, identity, inventory, payment, promotion, store, trade, wallet, wechat)
 │   ├── i18n/                        # Locale files (en, zh, zh-Hant, ja)
 │   │   └── index.js                 # i18n plugin + browser detection
 │   ├── icons/                       # SVG sprite + legacy icon compat map
@@ -117,7 +119,7 @@ Translation keys use the English string directly (flat format), e.g. `$t('New / 
 │       ├── admin/                   # Generic CRUD (list + form + detail)
 │       ├── dashboard/               # Enterprise dashboard
 │       └── login/                   # Login page
-├── tests/unit/                      # 38 Vitest tests
+├── tests/unit/                      # 1041 Vitest tests (78 spec files)
 ├── docs/                            # Design contracts + AI context
 │   └── ai/context.md                # AI assistant reference
 ├── vite.config.ts                   # Vite 5 + Vue 3 + JSX config
@@ -199,7 +201,7 @@ npm run test         # Vitest
 
 `vite.config.ts` key settings:
 - **base**: `/admin/` in production, `/` in development
-- **Dev proxy**: `/api`, `/system`, `/upload`, `/uploads` proxied to `VITE_PROXY_TARGET`
+- **Dev proxy**: `/api`, `/system`, `/health`, `/metrics`, `/upload`, `/uploads` proxied to `VITE_PROXY_TARGET`
 - **Plugins**: `@vitejs/plugin-vue` + `@vitejs/plugin-vue-jsx`
 - **Aliases**: `@` → `src/`
 - **Define**: Injects `process.env.VITE_*` at compile time
@@ -208,19 +210,13 @@ npm run test         # Vitest
 
 EasyAdmin is the heart of this project — a configuration-driven engine that **auto-generates CRUD interfaces** from declarative entity definitions.
 
-```
-┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│  Entity Config   │     │ Backend API      │     │  Rendered UI     │
-│  (collections/)  │     │ /system/entities │     │                  │
-│                  │     │                  │     │  ┌────────────┐  │
-│  fields: [...]   │────▶│ field types,     │────▶│  │ ListAdmin  │  │
-│  list_display    │     │ nullability,     │     │  │ (table)    │  │
-│  list_filter     │     │ relations        │     │  └────────────┘  │
-│  detail_display  │     │                  │     │  ┌────────────┐  │
-│                  │     │                  │     │  │ FormAdmin  │  │
-│                  │     │                  │     │  │ (form)     │  │
-│                  │     │                  │     │  └────────────┘  │
-└──────────────────┘     └──────────────────┘     └──────────────────┘
+```mermaid
+flowchart LR
+    Config["Entity Config<br/>(collections/)<br/>fields / list_display<br/>list_filter / detail_display"] --> Meta["Backend API<br/>/system/entities<br/>field types, nullability, relations"]
+    Meta --> List["ListAdmin (table)"]
+    Meta --> Form["FormAdmin (form)"]
+    List --> UI["Rendered UI"]
+    Form --> UI
 ```
 
 ### Step 1 — Define an Entity Config
@@ -274,7 +270,7 @@ import { t } from '@/i18n'
 
 ### Field Type Plugins
 
-EasyAdmin ships with 17 field type plugins, auto-resolved from entity metadata:
+EasyAdmin ships with 20 field type plugins, auto-resolved from entity metadata:
 
 | Plugin | Type | Description |
 |--------|------|-------------|
@@ -283,6 +279,7 @@ EasyAdmin ships with 17 field type plugins, auto-resolved from entity metadata:
 | `text.vue` | — | TinyMCE rich text editor |
 | `boolean.vue` | boolean | Checkbox |
 | `integer.vue` | integer | Number input |
+| `currency.vue` | currency | Number input with currency code (yuan input, cents storage) |
 | `select.vue` | — | Dropdown selector |
 | `date.vue` | date | Date picker |
 | `datetime.vue` | datetime | DateTime picker |
@@ -393,19 +390,23 @@ Built-in validators live in `src/utils/validate.js` (`isPasswordCompliant`, `cre
 
 ## Testing
 
-**38 tests · Vitest 2.1**
+**1041 tests across 78 spec files · Vitest 2.1 · 100% statements/branches/lines thresholds on `src/components/EasyAdmin`**
 
 ```bash
-npm run test          # Run all tests
-npm run type-check    # TypeScript check
-npm run test:ci       # CI (type-check + test)
+npm run test              # Run all tests (watch mode off in CI)
+npm run test:related      # Run tests related to changed files
+npm run test:coverage     # Run with coverage report
+npm run type-check        # TypeScript check
+npm run test:ci           # CI (type-check + test)
 ```
 
 Tests organized in `tests/unit/`:
 - **Component tests**: Breadcrumb, Hamburger, SvgIcon, EasyAdmin feedback UI
 - **Utility tests**: `request.ts`, `validate.js`, `entity.ts`, `formatTime`, `parseTime`, `param2Obj`
 
-Configuration: `vitest.config.ts` (jsdom environment, Vue 3 plugin)
+Configuration: `vitest.config.ts` (jsdom environment, Vue 3 plugin; 100% statements/branches/lines thresholds enforced on `src/components/EasyAdmin`).
+
+CI: GitHub Actions runs type-check plus sharded unit tests and a coverage job. Docs/config/i18n-only changes are path-filtered so CI jobs are skipped.
 
 ## Deployment
 

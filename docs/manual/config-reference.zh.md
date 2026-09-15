@@ -722,8 +722,9 @@ interface DetailConfig {
 
 ### 9.1 字段回退链
 
-```
-detail.detail_display  →  list.list_display  →  form.fields  →  所有 API 字段
+```mermaid
+flowchart LR
+    A["detail.detail_display"] --> B["list.list_display"] --> C["form.fields"] --> D["所有 API 字段"]
 ```
 
 ### 9.2 详情页独有功能

@@ -42,7 +42,7 @@
 ## 功能特色
 
 - **配置驱动 CRUD 引擎（EasyAdmin）** — 在配置中声明实体，即可自动获得完整的列表/表单/详情/路由
-- **19+ 种即插即用表单字段** — 文本输入、文本域、下拉选择、开关、数字、日期、图片、文件、JSON、富文本、关联选择器、穿梭框、密码（双输入+强度提示）、邮箱（格式校验）等
+- **20 种即插即用表单字段** — 文本输入、文本域、下拉选择、开关、数字、货币、日期、日期时间、图片、文件、JSON、富文本、关联选择器、穿梭框、密码（双输入+强度提示）、邮箱（格式校验）等
 - **表单校验** — `field.rules` / `field.validator` 合并至 `el-form`，插件可通过 `registerFieldValidator` 注入校验，未通过时阻断提交
 - **带降级链的详情视图** — `detail/` → `list/` → 纯文本插件逐字段类型降级
 - **国际化（i18n）** — 英文、简体中文、繁体中文、日文；浏览器语言自动检测；导航栏语言切换器；`Accept-Language` 请求头和 `_locale` 参数自动注入 API 请求
@@ -53,7 +53,9 @@
 - **企业控制台** — 实时订单/商品/用户指标、SVG 折线图、浏览器定位天气组件
 - **响应式布局** — 可折叠侧边栏（SVG 图标）、面包屑导航、可选固定顶栏
 - **代码分割与构建优化** — Vite 驱动的 chunk 分割和 tree-shaking
-- **Vitest 单元测试** — 38 项组件和工具函数测试
+- **服务端健康监控** — 导航栏状态点轮询 `GET /health/live`、`/health/ready` 和 `/metrics`
+- **Vitest 单元测试** — 78 个 spec 文件共 1041 项测试，`src/components/EasyAdmin` 上强制 100% 覆盖率阈值
+- **锁定文件已提交** — `package-lock.json` 已提交以保证可复现安装
 
 
 ## 技术栈
@@ -98,13 +100,13 @@
 │   │   ├── DetailAdmin.vue          # 可配置记录详情页
 │   │   ├── SearchFilter.vue         # 动态筛选 UI
 │   │   └── plugins/
-│   │       ├── form/                # 19 个字段类型插件
-│   │       ├── list/                # 9 个列表渲染插件
+│   │       ├── form/                # 20 个字段类型插件
+│   │       ├── list/                # 10 个列表渲染插件
 │   │       └── detail/              # 2 个详情专用插件
 │   ├── configs/                     # 声明式实体配置
 │   │   ├── routes.js                # 菜单/路由定义
 │   │   ├── entities.js              # 自动加载器（import.meta.glob）
-│   │   └── collections/             # 实体 Schema（7 个包，22 个实体）
+│   │   └── collections/             # 实体 Schema（10 个包：authorization、common、identity、inventory、payment、promotion、store、trade、wallet、wechat）
 │   ├── i18n/                        # 语言文件（en、zh、zh-Hant、ja）
 │   │   └── index.js                 # i18n 插件 + 浏览器语言检测
 │   ├── icons/                       # SVG 雪碧图 + 旧图标兼容映射
@@ -117,7 +119,7 @@
 │       ├── admin/                   # 通用 CRUD（list + form + detail）
 │       ├── dashboard/               # 企业控制台
 │       └── login/                   # 登录页
-├── tests/unit/                      # 38 项 Vitest 测试
+├── tests/unit/                      # 1041 项 Vitest 测试（78 个 spec 文件）
 ├── docs/                            # 设计合约 + AI 上下文
 │   └── ai/context.md                # AI 助手参考文档
 ├── vite.config.ts                   # Vite 5 + Vue 3 + JSX 配置
@@ -199,7 +201,7 @@ npm run test         # Vitest
 
 `vite.config.ts` 关键设置：
 - **base**：生产环境 `/admin/`，开发环境 `/`
-- **开发代理**：`/api`、`/system`、`/upload`、`/uploads` 代理至 `VITE_PROXY_TARGET`
+- **开发代理**：`/api`、`/system`、`/health`、`/metrics`、`/upload`、`/uploads` 代理至 `VITE_PROXY_TARGET`
 - **插件**：`@vitejs/plugin-vue` + `@vitejs/plugin-vue-jsx`
 - **别名**：`@` → `src/`
 - **Define**：编译时注入 `process.env.VITE_*`
@@ -208,19 +210,13 @@ npm run test         # Vitest
 
 EasyAdmin 是本项目的核心——一个**配置驱动引擎**，能够根据声明式实体定义**自动生成 CRUD 界面**。
 
-```
-┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│  实体配置          │     │  后端 API         │     │  渲染出的 UI       │
-│  (collections/)  │     │  /system/entities │     │                   │
-│                  │     │                   │     │  ┌─────────────┐  │
-│  fields: [...]   │────▶│  字段类型、        │────▶│  │ ListAdmin   │  │
-│  list_display    │     │  可空性、          │     │  │ (表格)       │  │
-│  list_filter     │     │  关联关系          │     │  └─────────────┘  │
-│  detail_display  │     │                   │     │  ┌─────────────┐  │
-│                  │     │                   │     │  │ FormAdmin   │  │
-│                  │     │                   │     │  │ (表单)       │  │
-│                  │     │                   │     │  └─────────────┘  │
-└──────────────────┘     └──────────────────┘     └──────────────────┘
+```mermaid
+flowchart LR
+    Config["实体配置<br/>(collections/)<br/>fields / list_display<br/>list_filter / detail_display"] --> Meta["后端 API<br/>/system/entities<br/>字段类型、可空性、关联关系"]
+    Meta --> List["ListAdmin (表格)"]
+    Meta --> Form["FormAdmin (表单)"]
+    List --> UI["渲染出的 UI"]
+    Form --> UI
 ```
 
 ### 第一步 — 定义实体配置
@@ -274,7 +270,7 @@ import { t } from '@/i18n'
 
 ### 字段类型插件
 
-EasyAdmin 内置 17 种字段类型插件，根据实体元数据自动解析：
+EasyAdmin 内置 20 种字段类型插件，根据实体元数据自动解析：
 
 | 插件 | 类型 | 描述 |
 |--------|------|-------------|
@@ -283,6 +279,7 @@ EasyAdmin 内置 17 种字段类型插件，根据实体元数据自动解析：
 | `text.vue` | — | TinyMCE 富文本编辑器 |
 | `boolean.vue` | boolean | 复选框 |
 | `integer.vue` | integer | 数字输入框 |
+| `currency.vue` | currency | 带货币代码的数字输入框（元输入、分存储） |
 | `select.vue` | — | 下拉选择器 |
 | `date.vue` | date | 日期选择器 |
 | `datetime.vue` | datetime | 日期时间选择器 |
@@ -313,13 +310,11 @@ interface FieldOption {
   field_events?: object      // 绑定到 el-form-item 的事件
   type_options?: object      // 传递给字段插件的 Props
   type_events?: object       // 绑定到字段插件的事件
-  hidden?: boolean | string[]            // true/false 或 ['create']/['update']
+  hidden?: boolean | string[]            // true/false 或 ['create']/['update']/['create','update']（'edit' 别名）
   relation_filter?: object   // 关联查询的筛选条件
   component?: object         // 自定义组件（JSX 渲染函数）
   help?: string              // 字段下方帮助文本
   full_width?: boolean       // 详情视图中跨满网格列宽
-  rules?: object[]           // 自定义 el-form 规则（与自动规则合并）
-  validator?: Function | Function[] // 快捷写法，等价 { validator, trigger:'blur' }
 }
 ```
 
@@ -331,13 +326,13 @@ FormAdmin 会将 `field.rules` / `field.validator` 合并到 `el-form` 校验中
 // User.js
 {
   property: 'plainPassword',
-  type: 'password', // 遮蔽时双输入、强度提示、6位+字母数字校验
+  type: 'password', // 遮蔽时双输入、强度提示，未通过 6位+字母+数字时阻断提交
   help: t('User password help')
 },
 { property: 'email', type: 'email' } // 实时提示 + 非法阻断
 ```
 
-内置校验位于 `src/utils/validate.js`（`isPasswordCompliant`、`createPasswordValidator`、`isEmailValid`、`createEmailValidator`）。
+内置校验位于 `src/utils/validate.js`（`isPasswordCompliant`、`createPasswordValidator`、`isEmailValid`、`createEmailValidator`），并由 password/email 插件使用。
 
 ### 路由生成器
 
@@ -393,19 +388,23 @@ FormAdmin 会将 `field.rules` / `field.validator` 合并到 `el-form` 校验中
 
 ## 测试
 
-**38 项测试 · Vitest 2.1**
+**1041 项测试，共 78 个 spec 文件 · Vitest 2.1 · `src/components/EasyAdmin` 上 100% statements/branches/lines 覆盖率阈值**
 
 ```bash
-npm run test          # 运行全部测试
-npm run type-check    # TypeScript 类型检查
-npm run test:ci       # CI（类型检查 + 测试）
+npm run test              # 运行全部测试（CI 中关闭 watch 模式）
+npm run test:related      # 运行与变更文件相关的测试
+npm run test:coverage     # 运行并生成覆盖率报告
+npm run type-check        # TypeScript 类型检查
+npm run test:ci           # CI（类型检查 + 测试）
 ```
 
 测试文件位于 `tests/unit/`：
 - **组件测试**：Breadcrumb、Hamburger、SvgIcon、EasyAdmin feedback UI
 - **工具函数测试**：`request.ts`、`validate.js`、`entity.ts`、`formatTime`、`parseTime`、`param2Obj`
 
-配置文件：`vitest.config.ts`（jsdom 环境，Vue 3 插件）
+配置文件：`vitest.config.ts`（jsdom 环境，Vue 3 插件；`src/components/EasyAdmin` 上强制 100% statements/branches/lines 阈值）。
+
+CI：GitHub Actions 运行类型检查、分片单元测试和覆盖率任务。仅文档/配置/i18n 变更会被路径过滤跳过 CI 任务。
 
 ## 部署
 
