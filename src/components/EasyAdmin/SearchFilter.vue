@@ -50,7 +50,7 @@
         <el-select
           v-else
           v-model="filterData[k]"
-          filterable
+          :filterable="!v.data || v.data.length > 8"
           clearable
           :placeholder="`${v.label ? v.label : k}`"
           style="width: 150px;"
