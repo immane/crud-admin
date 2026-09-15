@@ -42,18 +42,20 @@
 ## 機能
 
 - **設定駆動型 CRUD エンジン（EasyAdmin）** — 設定でエンティティを宣言するだけで、リスト/フォーム/詳細/ルートを自動生成
-- **19 種類以上のプラグ可能なフォームフィールド** — テキスト入力、テキストエリア、セレクト、ブール、数値、日付、画像、ファイル、JSON、リッチテキスト、リレーションピッカー、トランスファー、パスワード（二重入力+強度ヒント）、メール（形式検証）など
-- **フォームバリデーション** — `field.rules` / `field.validator` を `el-form` にマージ、`registerFieldValidator` でプラグインから登録、未通過時は送信をブロック
-- **フォールバックチェーン付き詳細ビュー** — `detail/` → `list/` → プレーンテキストプラグイン
+- **20 種類のプラグ可能なフォームフィールド** — input、textarea、select、boolean、integer、currency、date、datetime、image、file、JSON、リッチテキスト、リレーションピッカー、トランスファー、パスワード（二重入力＋強度ヒント）、メール（形式検証）など
+- **フォームバリデーション** — 宣言的な `field.rules` / `field.validator` を `el-form` にマージし、プラグイン向けに `registerFieldValidator` を provide、有効になるまで送信をブロック
+- **フォールバックチェーン付き詳細ビュー** — フィールド型ごとに `detail/` → `list/` → プレーンテキストプラグイン
 - **国際化（i18n）** — 英語、簡体字中国語、繁体字中国語、日本語；ブラウザ言語自動検出；ナビゲーションバーの言語切替；`Accept-Language` ヘッダーと `_locale` パラメータを API リクエストに自動注入
-- **JWT 認証** — Bearer トークンログイン、自動トークンリフレッシュ、ポート分離 Cookie 永続化（`dream_studio_admin_token_{port}` で同一ホストのポート間衝突を回避）、同時リクエストキューイング
-- **ロールベースのアクセス制御** — Vuex + Vue Router 4 によるロール別動的ルートフィルタリング
-- **エンティティイントロスペクション** — バックエンド `/system/entities` からフィールド型、null 許容、リレーションを自動推論
+- **JWT 認証** — Bearer トークンログイン、リフレッシュトークンの自動ローテーション、ポート分離 Cookie 永続化（`dream_studio_admin_token_{port}` で同一ホストのポート間衝突を回避）、同時リクエストキューイング
+- **ロールベースのアクセス制御** — Vuex + Vue Router 4 によるユーザーロール別の動的ルートフィルタリング
+- **エンティティイントロスペクション** — バックエンド `/system/entities` に問い合わせてフィールド型、null 許容、リレーションを自動推論
 - **動的フィルタとソート** — 設定駆動の検索 UI からサーバーサイドフィルタ式を生成（`@filter`、`@sort`、`@order`）
-- **エンタープライズダッシュボード** — リアルタイムの注文/商品/ユーザー指標、SVG スパークライン、位置情報天気ウィジェット
+- **エンタープライズダッシュボード** — リアルタイムの注文/商品/ユーザー指標、SVG スパークラインチャート、位置情報天気ウィジェット
 - **レスポンシブレイアウト** — 折りたたみ可能なサイドバー（SVG アイコン）、パンくずナビゲーション、固定ヘッダーオプション
 - **コード分割とビルド最適化** — Vite によるチャンク分割とツリーシェイキング
-- **Vitest ユニットテスト** — 38 のコンポーネントおよびユーティリティテスト
+- **サーバーヘルスモニター** — ナビゲーションバーのステータスドットが `GET /health/live`、`/health/ready`、`/metrics` をポーリング
+- **Vitest ユニットテスト** — 78 スペックファイル・1041 テスト、`src/components/EasyAdmin` に 100% カバレッジ閾値
+- **追跡対象のロックファイル** — 再現可能なインストールのため `package-lock.json` をコミット
 
 
 ## 技術スタック
@@ -98,13 +100,13 @@
 │   │   ├── DetailAdmin.vue          # 設定可能なレコード詳細ページ
 │   │   ├── SearchFilter.vue         # 動的フィルタ UI
 │   │   └── plugins/
-│   │       ├── form/                # 19 のフィールド型プラグイン
-│   │       ├── list/                # 9 のリストレンダリングプラグイン
+│   │       ├── form/                # 20 のフィールド型プラグイン
+│   │       ├── list/                # 10 のリストレンダリングプラグイン
 │   │       └── detail/              # 2 の詳細専用プラグイン
 │   ├── configs/                     # 宣言的エンティティ設定
 │   │   ├── routes.js                # メニュー/ルート定義
 │   │   ├── entities.js              # 自動ローダー（import.meta.glob）
-│   │   └── collections/             # エンティティスキーマ（7 バンドル、22 エンティティ）
+│   │   └── collections/             # エンティティスキーマ（10 バンドル：authorization、common、identity、inventory、payment、promotion、store、trade、wallet、wechat）
 │   ├── i18n/                        # ロケールファイル（en, zh, zh-Hant, ja）
 │   │   └── index.js                 # i18n プラグイン + ブラウザ言語検出
 │   ├── icons/                       # SVG スプライト + レガシーアイコン互換マップ
@@ -117,7 +119,7 @@
 │       ├── admin/                   # 汎用 CRUD（list + form + detail）
 │       ├── dashboard/               # エンタープライズダッシュボード
 │       └── login/                   # ログインページ
-├── tests/unit/                      # 38 の Vitest テスト
+├── tests/unit/                      # 1041 の Vitest テスト（78 スペックファイル）
 ├── docs/                            # 設計契約 + AI コンテキスト
 │   └── ai/context.md                # AI アシスタントリファレンス
 ├── vite.config.ts                   # Vite 5 + Vue 3 + JSX 設定
@@ -199,7 +201,7 @@ npm run test         # Vitest
 
 `vite.config.ts` の主要設定：
 - **base**：本番環境 `/admin/`、開発環境 `/`
-- **開発プロキシ**：`/api`、`/system`、`/upload`、`/uploads` を `VITE_PROXY_TARGET` にプロキシ
+- **開発プロキシ**：`/api`、`/system`、`/health`、`/metrics`、`/upload`、`/uploads` を `VITE_PROXY_TARGET` にプロキシ
 - **プラグイン**：`@vitejs/plugin-vue` + `@vitejs/plugin-vue-jsx`
 - **エイリアス**：`@` → `src/`
 - **Define**：コンパイル時に `process.env.VITE_*` を注入
@@ -208,19 +210,13 @@ npm run test         # Vitest
 
 EasyAdmin は本プロジェクトの中核です——宣言的なエンティティ定義から **CRUD インターフェースを自動生成** する設定駆動エンジンです。
 
-```
-┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│  エンティティ設定  │     │  バックエンド API  │     │  レンダリング UI  │
-│  (collections/)  │     │  /system/entities │     │                   │
-│                  │     │                   │     │  ┌─────────────┐  │
-│  fields: [...]   │────▶│  フィールド型、    │────▶│  │ ListAdmin   │  │
-│  list_display    │     │  null 許容、      │     │  │ (テーブル)   │  │
-│  list_filter     │     │  リレーション     │     │  └─────────────┘  │
-│  detail_display  │     │                   │     │  ┌─────────────┐  │
-│                  │     │                   │     │  │ FormAdmin   │  │
-│                  │     │                   │     │  │ (フォーム)   │  │
-│                  │     │                   │     │  └─────────────┘  │
-└──────────────────┘     └──────────────────┘     └──────────────────┘
+```mermaid
+flowchart LR
+    Config["エンティティ設定<br/>(collections/)<br/>fields / list_display<br/>list_filter / detail_display"] --> Meta["バックエンド API<br/>/system/entities<br/>field types, nullability, relations"]
+    Meta --> List["ListAdmin (table)"]
+    Meta --> Form["FormAdmin (form)"]
+    List --> UI["レンダリング UI"]
+    Form --> UI
 ```
 
 ### ステップ 1 — エンティティ設定を定義
@@ -274,7 +270,7 @@ import { t } from '@/i18n'
 
 ### フィールド型プラグイン
 
-EasyAdmin には 17 のフィールド型プラグインが組み込まれており、エンティティメタデータから自動解決されます：
+EasyAdmin には 20 のフィールド型プラグインが組み込まれており、エンティティメタデータから自動解決されます：
 
 | プラグイン | 型 | 説明 |
 |--------|------|-------------|
@@ -283,6 +279,7 @@ EasyAdmin には 17 のフィールド型プラグインが組み込まれてお
 | `text.vue` | — | TinyMCE リッチテキストエディタ |
 | `boolean.vue` | boolean | チェックボックス |
 | `integer.vue` | integer | 数値入力 |
+| `currency.vue` | currency | 通貨コード付き数値入力（元入力、分単位保存） |
 | `select.vue` | — | ドロップダウンセレクタ |
 | `date.vue` | date | 日付ピッカー |
 | `datetime.vue` | datetime | 日時ピッカー |
@@ -295,16 +292,150 @@ EasyAdmin には 17 のフィールド型プラグインが組み込まれてお
 | `RelationToMany.vue` | ManyToMany, OneToMany | 複数リレーションピッカー |
 | `transfer.vue` | — | シャトル/トランスファーコンポーネント |
 | `code.vue` | — | コードテキストエリア |
-| `password.vue` | — | パスワード（表示切替、マスク時二重入力、6文字+英字数字+一致ヒント、未通過時ブロック） |
+| `password.vue` | — | パスワード（表示切替、マスク時二重入力、6文字＋英字数字＋一致ヒント、未通過時ブロック） |
 | `email.vue` | — | メール（リアルタイム形式ヒント、不正時ブロック） |
 
-（以下、フィールド設定リファレンス、ルートジェネレータ、API 統合、ドキュメント、テスト、デプロイ、ライセンス、謝辞の章は英語版と同様のため省略）
+### フィールド設定リファレンス
+
+```ts
+interface FieldOption {
+  property: string           // Entity property name (required)
+  label?: string             // Override display label
+  type?: string              // Force field type
+  required?: boolean         // Override nullable metadata
+  editable?: boolean         // Inline editable in list view
+  tab?: string               // Group into a named tab
+  default_value?: unknown    // Default value for create mode
+  field_options?: object     // Props passed to el-form-item
+  field_events?: object      // Events bound to el-form-item
+  type_options?: object      // Props passed to the field plugin
+  type_events?: object       // Events bound to the field plugin
+  hidden?: boolean | string[]            // true/false or ['create']/['update']/['create','update'] (also 'edit' alias)
+  relation_filter?: object   // Filter for relation queries
+  component?: object         // Custom component (JSX render function)
+  help?: string              // Help text below the field
+  full_width?: boolean       // Span full grid width (detail view)
+}
+```
+
+### フォームバリデーション
+
+FormAdmin は `field.rules` / `field.validator` を `el-form` のルールにマージします。プラグインは FormAdmin が provide する `inject('registerFieldValidator')` を呼び出してバリデータを登録し、`onSubmit` をブロックすることもできます。例：
+
+```js
+// User.js
+{
+  property: 'plainPassword',
+  type: 'password', // double-entry when masked, strength hints, blocks submit until 6+ chars + letter + number
+  help: t('User password help')
+},
+{ property: 'email', type: 'email' } // live hint + invalid-format blocking
+```
+
+組み込みバリデータは `src/utils/validate.js`（`isPasswordCompliant`、`createPasswordValidator`、`isEmailValid`、`createEmailValidator`）にあり、password/email プラグインから利用されています。
+
+### ルートジェネレータ
+
+| 関数 | 動作 |
+|----------|----------|
+| `r(entity, title)` | リダイレクトルート — `admin/list.vue`、`admin/form.vue`、`admin/detail.vue` を再利用（推奨） |
+| `g(entity, title)` | 直接ルート — エンティティごとに専用ビューファイルが必要（予備の代替手段） |
+
+> `r()` はネストされたサブフォーム、JSX カスタムコンポーネント、リレーション検索、詳細フォールバックチェーン、非同期フィルタ関数など、ほぼすべての CRUD シナリオに対応します。`g()` は完全に独立したページが必要な場合のバックアップ手段として残されていますが、実際に必要になることはほとんどありません。
+
+## API 統合
+
+### Axios インスタンス（`src/utils/request.ts`）
+
+- **ベース URL**：環境変数の `VITE_BASE_API`
+- **タイムアウト**：30 秒
+- **リクエストインターセプタ**：`Authorization: Bearer <token>` ヘッダー、`Accept-Language` ヘッダー、`_locale` クエリパラメータを注入
+- **レスポンスインターセプタ**：401 時にトークンを自動リフレッシュし、同時失敗リクエストを単一リフレッシュの背後でキューイング
+
+### API レスポンス形式
+
+```json
+{
+  "code": 0,
+  "message": "SUCCESS",
+  "data": {},
+  "paginator": { "totalCount": 42 }
+}
+```
+
+### 期待されるバックエンドエンドポイント
+
+| エンドポイント | メソッド | 説明 |
+|----------|--------|-------------|
+| `/api/auth/login` | POST | ユーザー認証 |
+| `/api/auth/token/refresh` | POST | リフレッシュトークンのローテーション |
+| `/api/auth/logout` | POST | リフレッシュトークンの無効化 |
+| `/api/v1/app/users/me` | GET | 現在のユーザー＋ロール |
+| `/system/entities` | GET | 全エンティティクラス名の一覧 |
+| `/system/entities/{entity}` | GET | エンティティのフィールドメタデータ |
+| `/api/v1/manage/{entity}` | GET/POST | エンティティ一覧 / 作成 |
+| `/api/v1/manage/{entity}/{id}` | GET/PUT/DELETE | エンティティ詳細 / 更新 / 削除 |
 
 ## ドキュメント
 
-- **[設定リファレンスマニュアル](docs/manual/config-reference.ja.md)** — 簡単なものから高度なものまで、EasyAdmin 設定の完全ガイド
 - **[アーキテクチャ設計](docs/design/architecture.md)** — システムレイヤー、起動フロー、認証フロー、ルーティング、状態管理
 - **[コード & API 契約](docs/design/contracts.md)** — リクエスト/レスポンス形式、コンポーネント Props 契約
 - **[EasyAdmin 設計](docs/design/easyadmin-design.md)** — プラグインシステム、データフロー、拡張ポイント
 - **[EasyAdmin 設定契約](docs/design/easyadmin-config-contract.md)** — 完全な設定スキーマリファレンス
+- **[設定リファレンスマニュアル](docs/manual/config-reference.ja.md)** — 簡単なものから高度なものまで、EasyAdmin 設定の完全ガイド
 - **[AI コンテキスト](docs/ai/context.md)** — AI 支援開発のためのクイックリファレンス
+- **[Vue 3 移行計画](docs/plan/vue3-tsx-vite-migration.md)** — 移行メモと現状
+
+## テスト
+
+**78 スペックファイル・1041 テスト · Vitest 2.1 · `src/components/EasyAdmin` に 100% の statements/branches/lines 閾値**
+
+```bash
+npm run test              # 全テストを実行（CI ではウォッチモード OFF）
+npm run test:related      # 変更ファイル関連のテストを実行
+npm run test:coverage     # カバレッジレポート付きで実行
+npm run type-check        # TypeScript チェック
+npm run test:ci           # CI（type-check + test）
+```
+
+`tests/unit/` の構成：
+- **コンポーネントテスト**：Breadcrumb、Hamburger、SvgIcon、EasyAdmin フィードバック UI
+- **ユーティリティテスト**：`request.ts`、`validate.js`、`entity.ts`、`formatTime`、`parseTime`、`param2Obj`
+
+設定：`vitest.config.ts`（jsdom 環境、Vue 3 プラグイン；`src/components/EasyAdmin` に 100% の statements/branches/lines 閾値を適用）。
+
+CI：GitHub Actions で type-check とシャーディングされたユニットテスト、 coverage ジョブを実行します。ドキュメント/設定/i18n のみの変更はパスフィルタにより CI ジョブがスキップされます。
+
+## デプロイ
+
+### ビルド出力
+
+```
+dist/
+├── static/
+│   ├── css/
+│   ├── js/
+│   └── img/
+├── favicon.ico
+└── index.html
+```
+
+### デプロイ時の注意点
+
+1. `.env.production` の `VITE_BASE_API` に API サーバーの URL を設定
+2. `npm run build` を実行
+3. `dist/` を Web サーバーにデプロイ
+4. クライアントサイドルーティングを設定 — すべてのパスを `index.html` にリダイレクト：
+   - **Nginx**：`try_files $uri $uri/ /admin/index.html;`
+   - **Apache**：mod_rewrite で `.htaccess` を使用
+
+## ライセンス
+
+MIT
+
+## 謝辞
+
+本プロジェクトは以下の優れた成果を基にしています：
+
+- [vue-admin-template](https://github.com/PanJiaChen/vue-admin-template) — Vue 2 ベース（現在は積極的にメンテナンスされていません）
+- [Element UI](https://element.eleme.io/) — オリジナルの UI コンポーネントライブラリ

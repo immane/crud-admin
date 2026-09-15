@@ -38,22 +38,25 @@
 - [測試](#測試)
 - [部署](#部署)
 - [授權](#授權)
+- [致謝](#致謝)
 
 ## 功能特色
 
 - **配置驅動 CRUD 引擎（EasyAdmin）** — 在配置中宣告實體，即可自動獲得完整的列表/表單/詳情/路由
-- **19+ 種即插即用表單欄位** — 文字輸入、文字域、下拉選擇、開關、數字、日期、圖片、檔案、JSON、富文字、關聯選擇器、穿梭框、密碼（雙輸入+強度提示）、信箱（格式校驗）等
-- **表單校驗** — `field.rules` / `field.validator` 合併至 `el-form`，外掛可透過 `registerFieldValidator` 注入校驗，未通過時阻斷提交
-- **帶降級鏈的詳情視圖** — `detail/` → `list/` → 純文字插件逐欄位類型降級
+- **20 種即插即用表單欄位** — input、textarea、select、boolean、integer、currency、date、datetime、image、file、JSON、富文字、關聯選擇器、transfer、password（雙輸入＋強度提示）、email（格式校驗）等
+- **表單校驗** — 宣告式 `field.rules` / `field.validator` 合併至 `el-form`，外掛可透過 `registerFieldValidator` 注入校驗；未通過時阻斷提交
+- **帶降級鏈的詳情視圖** — 依欄位類型按 `detail/` → `list/` → 純文字外掛逐級降級
 - **國際化（i18n）** — 英文、簡體中文、繁體中文、日文；瀏覽器語言自動偵測；導覽列語言切換器；`Accept-Language` 請求標頭和 `_locale` 參數自動注入 API 請求
-- **JWT 驗證** — Bearer token 登入，自動刷新 token 輪換，Cookie 按埠隔離（`dream_studio_admin_token_{port}` 避免同主機跨埠衝突），並發請求排隊
-- **基於角色的權限控制** — 透過 Vuex + Vue Router 4 按使用者角色過濾動態路由
-- **實體自省** — 查詢後端 `/system/entities` 自動推斷欄位類型、可空性和關聯關係
-- **動態篩選與排序** — 基於配置驅動的搜尋 UI 生成伺服器端篩選表達式（`@filter`、`@sort`、`@order`）
-- **企業儀表板** — 即時訂單/商品/使用者指標、SVG 折線圖、瀏覽器定位天氣元件
+- **JWT 驗證** — Bearer token 登入，自動刷新 token 輪換，按埠隔離的 Cookie 持久化（`dream_studio_admin_token_{port}` 避免同主機跨埠衝突），並發請求排隊
+- **基於角色的存取控制** — 透過 Vuex + Vue Router 4 按使用者角色過濾動態路由
+- **實體自省** — 查詢後端 `/system/entities` 推斷欄位類型、可空性和關聯關係
+- **動態篩選與排序** — 基於配置驅動的搜尋 UI 組裝伺服器端篩選表達式（`@filter`、`@sort`、`@order`）
+- **企業儀表板** — 即時訂單/商品/使用者指標、SVG sparkline 圖表、地理定位天氣元件
 - **響應式佈局** — 可折疊側邊欄（SVG 圖示）、麵包屑導覽、可選固定頂欄
-- **程式碼分割與建置最佳化** — Vite 驅動的 chunk 分割和 tree-shaking
-- **Vitest 單元測試** — 38 項元件和工具函數測試
+- **程式碼分割與建置最佳化** — Vite 驅動的 chunk 分割與 tree-shaking
+- **伺服器健康監控** — 導覽列狀態燈輪詢 `GET /health/live`、`/health/ready` 與 `/metrics`
+- **Vitest 單元測試** — 78 個 spec 檔案共 1041 項測試，`src/components/EasyAdmin` 強制 100% 覆蓋率門檻
+- **受控的 Lockfile** — 提交 `package-lock.json`，確保依賴安裝可重現
 
 
 ## 技術棧
@@ -83,32 +86,32 @@
 | 中文 (繁體) | `zh-Hant` | zh-tw | `Accept-Language: zh-Hant`, `_locale=zh-Hant` |
 | 日本語 | `ja` | ja | `Accept-Language: ja`, `_locale=ja` |
 
-翻譯鍵直接使用英文字串（扁平格式），如 `$t('New / Edit')`。新增語言只需新建 `src/i18n/{代碼}.js` 檔案並在導覽列下拉選單中增加一項。
+翻譯鍵直接使用英文字串（扁平格式），如 `$t('New / Edit')`。新增語言只需新建 `src/i18n/{code}.js` 檔案並在導覽列下拉選單中增加一項。
 
 ## 專案結構
 
 ```text
 .
 ├── src/
-│   ├── main.js                      # 應用入口：createApp、安裝插件、掛載
-│   ├── permission.js                # 路由守衛（驗證 + 角色檢查）
+│   ├── main.js                      # 應用入口：createApp、安裝外掛、掛載
+│   ├── permission.js                # 路由守衛（驗證＋角色檢查）
 │   ├── components/EasyAdmin/        # ⭐ 核心 CRUD 引擎
 │   │   ├── FormAdmin.vue            # 動態表單生成器
 │   │   ├── ListAdmin.vue            # 動態列表/表格生成器
 │   │   ├── DetailAdmin.vue          # 可配置記錄詳情頁
 │   │   ├── SearchFilter.vue         # 動態篩選 UI
 │   │   └── plugins/
-│   │       ├── form/                # 19 個欄位類型插件
-│   │       ├── list/                # 9 個列表渲染插件
-│   │       └── detail/              # 2 個詳情專用插件
+│   │       ├── form/                # 20 個欄位類型外掛
+│   │       ├── list/                # 10 個列表渲染外掛
+│   │       └── detail/              # 2 個詳情專用外掛
 │   ├── configs/                     # 宣告式實體配置
-│   │   ├── routes.js                # 選單/路由定義
+│   │   ├── routes.js                # 選單／路由定義
 │   │   ├── entities.js              # 自動載入器（import.meta.glob）
-│   │   └── collections/             # 實體 Schema（7 個包，22 個實體）
+│   │   └── collections/             # 實體 Schema（10 個 bundles：authorization、common、identity、inventory、payment、promotion、store、trade、wallet、wechat）
 │   ├── i18n/                        # 語言檔案（en、zh、zh-Hant、ja）
-│   │   └── index.js                 # i18n 插件 + 瀏覽器語言偵測
-│   ├── icons/                       # SVG 雪碧圖 + 舊圖示相容對應
-│   ├── layout/                      # 側邊欄 + 導覽列 + 主內容區
+│   │   └── index.js                 # i18n 外掛＋瀏覽器語言偵測
+│   ├── icons/                       # SVG 雪碧圖＋舊圖示相容對應
+│   ├── layout/                      # 側邊欄＋導覽列＋主內容區
 │   ├── router/                      # Vue Router 4 + r()/g() 生成器
 │   ├── store/                       # Vuex 4（自動載入 modules/）
 │   ├── styles/                      # 全域 SCSS（側邊欄、過渡、覆寫）
@@ -117,8 +120,8 @@
 │       ├── admin/                   # 通用 CRUD（list + form + detail）
 │       ├── dashboard/               # 企業儀表板
 │       └── login/                   # 登入頁
-├── tests/unit/                      # 38 項 Vitest 測試
-├── docs/                            # 設計合約 + AI 上下文
+├── tests/unit/                      # 1041 項 Vitest 測試（78 個 spec 檔案）
+├── docs/                            # 設計合約＋AI 上下文
 │   └── ai/context.md                # AI 助手參考文件
 ├── vite.config.ts                   # Vite 5 + Vue 3 + JSX 配置
 ├── vitest.config.ts                 # Vitest 配置
@@ -199,8 +202,8 @@ npm run test         # Vitest
 
 `vite.config.ts` 關鍵設定：
 - **base**：生產環境 `/admin/`，開發環境 `/`
-- **開發代理**：`/api`、`/system`、`/upload`、`/uploads` 代理至 `VITE_PROXY_TARGET`
-- **插件**：`@vitejs/plugin-vue` + `@vitejs/plugin-vue-jsx`
+- **開發代理**：`/api`、`/system`、`/health`、`/metrics`、`/upload`、`/uploads` 代理至 `VITE_PROXY_TARGET`
+- **外掛**：`@vitejs/plugin-vue` + `@vitejs/plugin-vue-jsx`
 - **別名**：`@` → `src/`
 - **Define**：編譯時注入 `process.env.VITE_*`
 
@@ -208,19 +211,13 @@ npm run test         # Vitest
 
 EasyAdmin 是本專案的核心——一個**配置驅動引擎**，能夠根據宣告式實體定義**自動生成 CRUD 介面**。
 
-```
-┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│  實體配置          │     │  後端 API         │     │  渲染出的 UI       │
-│  (collections/)  │     │  /system/entities │     │                   │
-│                  │     │                   │     │  ┌─────────────┐  │
-│  fields: [...]   │────▶│  欄位類型、        │────▶│  │ ListAdmin   │  │
-│  list_display    │     │  可空性、          │     │  │ (表格)       │  │
-│  list_filter     │     │  關聯關係          │     │  └─────────────┘  │
-│  detail_display  │     │                   │     │  ┌─────────────┐  │
-│                  │     │                   │     │  │ FormAdmin   │  │
-│                  │     │                   │     │  │ (表單)       │  │
-│                  │     │                   │     │  └─────────────┘  │
-└──────────────────┘     └──────────────────┘     └──────────────────┘
+```mermaid
+flowchart LR
+    Config["實體配置<br/>(collections/)<br/>fields / list_display<br/>list_filter / detail_display"] --> Meta["後端 API<br/>/system/entities<br/>欄位類型、可空性、關聯關係"]
+    Meta --> List["ListAdmin（表格）"]
+    Meta --> Form["FormAdmin（表單）"]
+    List --> UI["渲染出的 UI"]
+    Form --> UI
 ```
 
 ### 第一步 — 定義實體配置
@@ -272,13 +269,174 @@ import { t } from '@/i18n'
 
 **僅此而已** — 你已擁有自動翻譯的完整列表頁、表單頁和詳情頁。
 
-（以下欄位類型插件、欄位配置參考、路由生成器、API 整合、文件、測試、部署、授權、致謝等章節內容與簡體中文版一致，此處省略以節省空間）
+### 欄位類型外掛
+
+EasyAdmin 內建 20 種欄位類型外掛，根據實體元資料自動解析：
+
+| 外掛 | 類型 | 描述 |
+|--------|------|-------------|
+| `input.vue` | string（預設） | 文字輸入框 |
+| `textarea.vue` | text | 多行文字域 |
+| `text.vue` | — | TinyMCE 富文字編輯器 |
+| `boolean.vue` | boolean | 核取方塊 |
+| `integer.vue` | integer | 數字輸入框 |
+| `currency.vue` | currency | 含幣別的數字輸入（元輸入、分儲存） |
+| `select.vue` | — | 下拉選擇器 |
+| `date.vue` | date | 日期選擇器 |
+| `datetime.vue` | datetime | 日期時間選擇器 |
+| `image.vue` | image | 圖片上傳/預覽 |
+| `file.vue` | — | 檔案上傳 |
+| `json.vue` | — | JSON 編輯器（程式碼/樹視圖） |
+| `json-custom.vue` | — | 巢狀子物件編輯器 |
+| `array.vue` | array | 陣列編輯器（選擇器或巢狀表單） |
+| `RelationToOne.vue` | ManyToOne、OneToOne | 單一關聯選擇器（含遠端搜尋） |
+| `RelationToMany.vue` | ManyToMany、OneToMany | 多重關聯選擇器 |
+| `transfer.vue` | — | 穿梭框元件 |
+| `code.vue` | — | 程式碼文字域 |
+| `password.vue` | — | 密碼（含顯示/隱藏切換，遮蔽時雙輸入，6 位＋字母＋數字＋一致性提示，校驗不通過阻斷提交） |
+| `email.vue` | — | 信箱（即時格式提示，格式非法時阻斷提交） |
+
+### 欄位配置參考
+
+```ts
+interface FieldOption {
+  property: string           // 實體屬性名稱（必填）
+  label?: string             // 覆寫顯示標籤
+  type?: string              // 強制指定欄位類型
+  required?: boolean         // 覆寫可空性元資料
+  editable?: boolean         // 列表視圖中可內聯編輯
+  tab?: string               // 分組到指定命名頁籤
+  default_value?: unknown    // 新增模式下的預設值
+  field_options?: object     // 傳遞給 el-form-item 的 Props
+  field_events?: object      // 綁定到 el-form-item 的事件
+  type_options?: object      // 傳遞給欄位外掛的 Props
+  type_events?: object       // 綁定到欄位外掛的事件
+  hidden?: boolean | string[]            // true/false 或 ['create']/['update']/['create','update']（亦支援 'edit' 別名）
+  relation_filter?: object   // 關聯查詢的篩選條件
+  component?: object         // 自訂元件（JSX 渲染函數）
+  help?: string              // 欄位下方說明文字
+  full_width?: boolean       // 詳情視圖中跨滿網格寬度
+}
+```
+
+### 表單校驗
+
+FormAdmin 會將 `field.rules` / `field.validator` 合併至 `el-form` 規則。外掛亦可呼叫 FormAdmin 提供的 `inject('registerFieldValidator')` 註冊校驗器，未通過時阻斷 `onSubmit`。範例：
+
+```js
+// User.js
+{
+  property: 'plainPassword',
+  type: 'password', // 遮蔽時雙輸入、強度提示，6 位＋字母＋數字校驗通過前阻斷提交
+  help: t('User password help')
+},
+{ property: 'email', type: 'email' } // 即時提示＋格式非法時阻斷
+```
+
+內建校驗位於 `src/utils/validate.js`（`isPasswordCompliant`、`createPasswordValidator`、`isEmailValid`、`createEmailValidator`），由 password/email 外掛使用。
+
+### 路由生成器
+
+| 函數 | 行為 |
+|----------|----------|
+| `r(entity, title)` | 重定向路由 — 複用 `admin/list.vue`、`admin/form.vue`、`admin/detail.vue`（推薦） |
+| `g(entity, title)` | 直接路由 — 期望每個實體有獨立的視圖檔案（預留備選方案） |
+
+> `r()` 已可滿足幾乎所有 CRUD 場景，包括巢狀子表單、JSX 自訂元件、關聯搜尋、詳情降級鏈和非同步篩選函數。`g()` 保留為備選方案，用於需要完全獨立頁面的情況，但實務上很少需要。
+
+## API 整合
+
+### Axios 實例（`src/utils/request.ts`）
+
+- **Base URL**：來自環境變數的 `VITE_BASE_API`
+- **逾時時間**：30 秒
+- **請求攔截器**：注入 `Authorization: Bearer <token>` 請求標頭、`Accept-Language` 請求標頭和 `_locale` 查詢參數
+- **回應攔截器**：遇到 401 自動刷新 token；將並發失敗的請求排隊到單次刷新之後
+
+### API 回應格式
+
+```json
+{
+  "code": 0,
+  "message": "SUCCESS",
+  "data": {},
+  "paginator": { "totalCount": 42 }
+}
+```
+
+### 期望的後端端點
+
+| 端點 | 方法 | 描述 |
+|----------|--------|-------------|
+| `/api/auth/login` | POST | 使用者驗證 |
+| `/api/auth/token/refresh` | POST | 輪換 refresh token |
+| `/api/auth/logout` | POST | 作廢 refresh token |
+| `/api/v1/app/users/me` | GET | 目前使用者＋角色 |
+| `/system/entities` | GET | 列出所有實體類別名稱 |
+| `/system/entities/{entity}` | GET | 實體欄位元資料 |
+| `/api/v1/manage/{entity}` | GET/POST | 實體列表／新增 |
+| `/api/v1/manage/{entity}/{id}` | GET/PUT/DELETE | 實體詳情／更新／刪除 |
 
 ## 文件
 
-- **[設定參考手冊](docs/manual/config-reference.zh-Hant.md)** — EasyAdmin 設定完整指南，從入門到進階
-- **[架構設計](docs/design/architecture.md)** — 系統分層、啟動流程、認證流程、路由、狀態管理
+- **[架構設計](docs/design/architecture.md)** — 系統分層、啟動流程、驗證流程、路由、狀態管理
 - **[程式碼與 API 契約](docs/design/contracts.md)** — 請求/回應格式、元件 Props 契約
 - **[EasyAdmin 設計](docs/design/easyadmin-design.md)** — 外掛系統、資料流、擴充點
-- **[EasyAdmin 設定契約](docs/design/easyadmin-config-contract.md)** — 完整設定 Schema 參考
+- **[EasyAdmin 配置契約](docs/design/easyadmin-config-contract.md)** — 完整配置 Schema 參考
+- **[配置參考手冊](docs/manual/config-reference.md)** — EasyAdmin 配置完整指南，從入門到進階
 - **[AI 上下文](docs/ai/context.md)** — 面向 AI 輔助開發的快速參考
+- **[Vue 3 遷移計畫](docs/plan/vue3-tsx-vite-migration.md)** — 遷移說明及目前狀態
+
+## 測試
+
+**78 個 spec 檔案共 1041 項測試 · Vitest 2.1 · `src/components/EasyAdmin` 強制 100% statements/branches/lines 門檻**
+
+```bash
+npm run test              # 執行全部測試（CI 中關閉 watch 模式）
+npm run test:related      # 僅執行與變更檔案相關的測試
+npm run test:coverage     # 產生覆蓋率報告
+npm run type-check        # TypeScript 類型檢查
+npm run test:ci           # CI（類型檢查＋測試）
+```
+
+測試位於 `tests/unit/`：
+- **元件測試**：Breadcrumb、Hamburger、SvgIcon、EasyAdmin 回饋 UI
+- **工具函數測試**：`request.ts`、`validate.js`、`entity.ts`、`formatTime`、`parseTime`、`param2Obj`
+
+配置：`vitest.config.ts`（jsdom 環境、Vue 3 外掛；`src/components/EasyAdmin` 強制 100% statements/branches/lines 門檻）。
+
+CI：GitHub Actions 執行類型檢查＋分片單元測試與覆蓋率任務。僅文件/配置/i18n 變更時透過路徑過濾跳過 CI 任務。
+
+## 部署
+
+### 建置產物
+
+```
+dist/
+├── static/
+│   ├── css/
+│   ├── js/
+│   └── img/
+├── favicon.ico
+└── index.html
+```
+
+### 部署說明
+
+1. 在 `.env.production` 中將 `VITE_BASE_API` 設為你的 API 伺服器位址
+2. 執行 `npm run build`
+3. 將 `dist/` 目錄部署到你的 Web 伺服器
+4. 配置客戶端路由 — 將所有路徑重定向至 `index.html`：
+   - **Nginx**：`try_files $uri $uri/ /admin/index.html;`
+   - **Apache**：使用 `.htaccess` + mod_rewrite
+
+## 授權
+
+MIT
+
+## 致謝
+
+本專案基於以下優秀專案構建：
+
+- [vue-admin-template](https://github.com/PanJiaChen/vue-admin-template) — Vue 2 基礎模板（已停止維護）
+- [Element UI](https://element.eleme.io/) — 原始 UI 元件庫

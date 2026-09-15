@@ -732,8 +732,9 @@ interface DetailConfig {
 
 ### 9.1 Field Fallback Chain
 
-```
-detail.detail_display  →  list.list_display  →  form.fields  →  all API fields
+```mermaid
+flowchart LR
+    A["detail.detail_display"] --> B["list.list_display"] --> C["form.fields"] --> D["all API fields"]
 ```
 
 ### 9.2 Detail-Only Features

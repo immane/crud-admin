@@ -7,41 +7,45 @@
 
 ## 1. System Layers
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                         Presentation Layer                        │
-│  index.html  →  src/main.ts  →  src/main.js  →  App.vue          │
-│  ├── Layout/           Shell (Sidebar + Navbar + AppMain)        │
-│  ├── Views/            Page Components (login, dashboard, admin) │
-│  └── Components/       Shared UI (Breadcrumb, Hamburger, SvgIcon)│
-├──────────────────────────────────────────────────────────────────┤
-│                         Routing Layer                             │
-│  src/permission.js     Navigation Guard (Auth + Role Check)      │
-│  src/router/           Vue Router (history mode, base: /admin/)  │
-│  src/router/generator  r() / g() Route Generators                │
-├──────────────────────────────────────────────────────────────────┤
-│                      State Management Layer                       │
-│  src/store/            Vuex (auto-loaded namespaced modules)     │
-│  ├── user              Auth State (token, roles, profile)         │
-│  ├── permission        Dynamic Route Generation                   │
-│  ├── app               Sidebar State, Device Detection            │
-│  ├── entity            Entity Schema Cache (sessionStorage)       │
-│  ├── tagsView          Open Tab State                             │
-│  └── settings          App Settings                               │
-├──────────────────────────────────────────────────────────────────┤
-│                         Business Logic Layer                      │
-│  src/utils/entity.ts   EntityManage CRUD Class                   │
-│  src/utils/request.ts  Axios Instance + JWT Interceptor          │
-│  src/api/              API Endpoint Definitions                   │
-│  src/configs/          Declarative Entity & Route Configs         │
-├──────────────────────────────────────────────────────────────────┤
-│                       EasyAdmin Engine Layer                      │
-│  FormAdmin.vue         Dynamic Form Generator                     │
-│  ListAdmin.vue         Dynamic Table/List Generator              │
-│  SearchFilter.vue      Dynamic Filter Builder                     │
-│  plugins/form/         17 Field-Type Plugins                      │
-│  plugins/list/         List Cell Plugins                          │
-└──────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph Presentation ["Presentation Layer"]
+        P1["index.html → src/main.ts → src/main.js → App.vue"]
+        P2["Layout - Shell - Sidebar plus Navbar plus AppMain"]
+        P3["Views - Page Components - login, dashboard, admin"]
+        P4["Components - Shared UI - Breadcrumb, Hamburger, SvgIcon"]
+    end
+    subgraph Routing ["Routing Layer"]
+        R1["src/permission.js - Navigation Guard - Auth plus Role Check"]
+        R2["src/router - Vue Router - history mode, base /admin/"]
+        R3["src/router/generator - r and g Route Generators"]
+    end
+    subgraph State ["State Management Layer"]
+        S0["src/store - Vuex auto-loaded namespaced modules"]
+        S1["user - Auth State - token, roles, profile"]
+        S2["permission - Dynamic Route Generation"]
+        S3["app - Sidebar State, Device Detection"]
+        S4["entity - Entity Schema Cache - sessionStorage"]
+        S5["tagsView - Open Tab State"]
+        S6["settings - App Settings"]
+    end
+    subgraph Business ["Business Logic Layer"]
+        B1["src/utils/entity.ts - EntityManage CRUD Class"]
+        B2["src/utils/request.ts - Axios Instance plus JWT Interceptor"]
+        B3["src/api - API Endpoint Definitions"]
+        B4["src/configs - Declarative Entity and Route Configs"]
+    end
+    subgraph Engine ["EasyAdmin Engine Layer"]
+        E1["FormAdmin.vue - Dynamic Form Generator"]
+        E2["ListAdmin.vue - Dynamic Table and List Generator"]
+        E3["SearchFilter.vue - Dynamic Filter Builder"]
+        E4["plugins/form - 17 Field-Type Plugins"]
+        E5["plugins/list - List Cell Plugins"]
+    end
+    P4 --> R1
+    R3 --> S0
+    S6 --> B1
+    B4 --> E1
 ```
 
 ---
@@ -69,42 +73,66 @@
 
 ### 3.1 Login
 
-```
-User enters username + password
-  → POST /api/auth/login { identifier, password }
-  → Server returns { access_token, refresh_token, expires_in }
-  → access_token stored in Cookie (dream_studio_admin_token)
-  → Vuex: SET_TOKEN, SET_REFRESH_TOKEN
+```mermaid
+sequenceDiagram
+    actor User
+    participant Frontend
+    participant Backend
+    User->>Frontend: "Enter username plus password"
+    Frontend->>Backend: "POST /api/auth/login with identifier and password"
+    Backend-->>Frontend: "Return access_token, refresh_token, expires_in"
+    Frontend->>Frontend: "Store access_token in Cookie dream_studio_admin_token"
+    Frontend->>Frontend: "Vuex SET_TOKEN and SET_REFRESH_TOKEN"
 ```
 
 ### 3.2 Route Guard
 
-```
-router.beforeEach():
-  NO token → redirect /login (whitelist bypass)
-  HAS token + on /login → redirect /
-  HAS token + not /login:
-    has roles? → proceed
-    no roles? → dispatch('user/getInfo') → get roles
-              → dispatch('permission/generateRoutes', roles)
-              → router.addRoutes(accessRoutes)
-              → next({ ...to, replace: true })
+```mermaid
+sequenceDiagram
+    participant Guard as "router.beforeEach"
+    participant UserStore as "user store"
+    participant PermStore as "permission store"
+    Guard->>Guard: "Check token"
+    alt "No token"
+        Guard-->>Guard: "Redirect to /login with whitelist bypass"
+    else "Has token and on /login"
+        Guard-->>Guard: "Redirect to /"
+    else "Has token and not on /login"
+        alt "Has roles"
+            Guard-->>Guard: "Proceed"
+        else "No roles"
+            Guard->>UserStore: "dispatch user/getInfo to get roles"
+            Guard->>PermStore: "dispatch permission/generateRoutes with roles"
+            Guard->>Guard: "router.addRoutes with accessRoutes"
+            Guard-->>Guard: "next to target with replace true"
+        end
+    end
 ```
 
 ### 3.3 Request Interception
 
-```
-Every Axios request:
-  has token → headers.Authorization = `Bearer ${getToken()}`
+```mermaid
+sequenceDiagram
+    participant App
+    participant Interceptor as "Axios request interceptor"
+    App->>Interceptor: "Axios request"
+    alt "Has token"
+        Interceptor->>Interceptor: "Set headers.Authorization to Bearer token from getToken"
+    end
+    Interceptor-->>App: "Proceed with request"
 ```
 
 ### 3.4 Logout
 
-```
-dispatch('user/logout')
-  → POST /api/auth/logout { refresh_token }
-  → Clear Cookie, clear Vuex state
-  → resetRouter(), clear tagsView
+```mermaid
+sequenceDiagram
+    actor User
+    participant Frontend
+    participant Backend
+    User->>Frontend: "dispatch user/logout"
+    Frontend->>Backend: "POST /api/auth/logout with refresh_token"
+    Frontend->>Frontend: "Clear Cookie and clear Vuex state"
+    Frontend->>Frontend: "resetRouter and clear tagsView"
 ```
 
 ---
