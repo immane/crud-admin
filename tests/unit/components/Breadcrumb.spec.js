@@ -49,12 +49,12 @@ describe('Breadcrumb.vue', () => {
 
   it('renders nested route breadcrumbs', async() => {
     await navigate('/menu/menu1/menu1-2/menu1-2-1')
-    expect(wrapper.findAll('.el-breadcrumb__inner')).toHaveLength(4)
-    expect(wrapper.findAll('.el-breadcrumb__inner').at(3).find('a').exists()).toBe(false)
+    expect(wrapper.findAll('.el-breadcrumb__inner')).toHaveLength(3)
+    expect(wrapper.findAll('.el-breadcrumb__inner').at(2).find('a').exists()).toBe(false)
   })
 
   it('omits routes without meta.title', async() => {
     await navigate('/menu/menu1/menu1-2/menu1-2-2')
-    expect(wrapper.findAll('.el-breadcrumb__inner')).toHaveLength(3)
+    expect(wrapper.findAll('.el-breadcrumb__inner')).toHaveLength(2)
   })
 })
