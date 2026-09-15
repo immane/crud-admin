@@ -47,6 +47,8 @@
 <script>
 import { defineAsyncComponent, markRaw, toRaw } from 'vue'
 import EntityManage from '@/utils/entity'
+import entities from '@/configs/entities'
+import { resolveRelation } from '@/utils/relation'
 import { createUiFeedback } from './ui/feedback'
 
 const detailPlugins = import.meta.glob('./plugins/detail/*.vue')
@@ -110,6 +112,8 @@ export default {
       return field.label || field.field_options?.label || this.structure[field.property]?.translation || field.property
     },
     getListPluginType(field, struct, value) {
+      const relation = resolveRelation(field, struct, entities)
+      if (relation) return relation.multiple ? 'RelationToMany' : 'RelationToOne'
       const type = field.type || struct?.metadata?.type
       if (!type) return Array.isArray(value) ? 'RelationToMany' : null
       if (['boolean', 'currency', 'date', 'datetime', 'datetime_immutable', 'image', 'array', 'json'].includes(type)) return type

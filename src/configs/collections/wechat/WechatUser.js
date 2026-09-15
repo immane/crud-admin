@@ -27,6 +27,7 @@ export default {
     detail: {
       detail_display: [
         'id',
+        'uuid',
         'user',
         'nickname',
         'openid',

@@ -128,6 +128,7 @@ export default {
     detail: {
       detail_display: [
         'id',
+        'uuid',
         { property: 'role', type: 'RelationToOne' },
         'resource',
         'action',

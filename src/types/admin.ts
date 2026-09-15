@@ -1,3 +1,14 @@
+export interface RelationOption {
+  entity?: string | { name: string, plural?: string, prefix?: string }
+  target?: string | { name: string, plural?: string, prefix?: string }
+  entity_name?: string
+  plural?: string
+  prefix?: string
+  valueKey?: 'id' | 'uuid'
+  multiple?: boolean
+  cardinality?: 'one' | 'many'
+}
+
 export interface FieldOption {
   property: string
   label?: string
@@ -11,6 +22,7 @@ export interface FieldOption {
   type_options?: Record<string, unknown>
   type_events?: Record<string, unknown>
   relation_filter?: Record<string, unknown>
+  relation?: RelationOption
   component?: unknown
   [key: string]: unknown
 }

@@ -2,7 +2,7 @@
   <div class="app-container">
     <detail-admin
       v-if="fields"
-      :id="$route.params.id"
+      :id="identifier"
       :entity-conf="entity"
       :fields="fields"
       :title="$route.meta.title || alias"
@@ -25,6 +25,11 @@ export default {
   },
   data() {
     return { entity: '', alias: '', fields: null, disabledActions: [] }
+  },
+  computed: {
+    identifier() {
+      return this.$route.params.uuid || this.$route.params.id
+    }
   },
   created() {
     const entityParam = this.entityParam || this.$route.params.entityParam

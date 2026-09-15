@@ -36,7 +36,7 @@ export default {
       ]
     },
     detail: {
-      detail_display: ['id', 'username', 'email', 'phone', 'phoneVerified', { property: 'roles', type: 'array' }, 'createdAt', 'updatedAt']
+      detail_display: ['id', 'uuid', 'username', 'email', 'phone', 'phoneVerified', { property: 'roles', type: 'array' }, 'createdAt', 'updatedAt']
     }
   }
 }

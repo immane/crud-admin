@@ -66,6 +66,8 @@
   }
 */
 import EntityManage from '@/utils/entity'
+import entities from '@/configs/entities'
+import { loadRelationRecords, relationLabel, relationValue, resolveRelation } from '@/utils/relation'
 export default {
   props: {
     emPrefix: {
@@ -93,18 +95,17 @@ export default {
 
       // m2o or o2o options
       entity: null,
+      relation: null,
       options: []
     }
   },
 
   async created() {
-    if (this.field?.type_options?.entity_name) {
-      this.entity = this.field?.type_options?.entity_name?.split('\\')?.pop()
-    } else {
-      this.entity = this.struct?.metadata?.targetEntity?.split('\\')?.pop()
-    }
+    this.relation = resolveRelation(this.field, this.struct, entities)
+    this.entity = this.relation?.name || null
 
     this.addSelectedOptions()
+    this.hydrateSelectedOptions()
 
     if (this.entity && !this.field?.type_options?.remote) {
       this.fetchData(this.entity, this.field.relation_filter ?? {})
@@ -121,6 +122,22 @@ export default {
         .map(value => ({ value, label: String(value) }))
     },
 
+    async hydrateSelectedOptions() {
+      if (this.relation?.valueKey !== 'uuid') return
+      const values = Array.isArray(this.form[this.field.property])
+        ? this.form[this.field.property]
+        : [this.form[this.field.property]]
+      const selected = new Set(values.filter(value => typeof value === 'string' && value))
+      if (!selected.size) return
+      const records = await loadRelationRecords(this.relation, this.emPrefix)
+      const options = records
+        .filter(record => selected.has(relationValue(record, this.relation)))
+        .map(record => ({ value: relationValue(record, this.relation), label: relationLabel(record) }))
+      const existing = new Map(this.options.map(option => [option.value, option]))
+      options.forEach(option => existing.set(option.value, option))
+      this.options = [...existing.values()]
+    },
+
     async remoteSearch(query) {
       if (query !== '') {
         this.loading = true
@@ -133,8 +150,11 @@ export default {
 
     async fetchData(entityName, relationFilter, query = null) {
       try {
-        const em = new EntityManage(entityName)
-        em.prefix = this.emPrefix
+        const em = new EntityManage({
+          name: entityName,
+          plural: this.relation?.plural,
+          prefix: this.relation?.prefix || this.emPrefix || undefined
+        })
 
         const currentFilter = Object.assign({}, relationFilter)
 
@@ -147,8 +167,13 @@ export default {
 
         const targetList = await em.list(currentFilter)
 
-        this.options =
-          targetList.data.map(v => { return { value: v.id, label: v.__toString || v.name || v.title } })
+        const fetched = targetList.data.map(record => ({
+          value: relationValue(record, this.relation),
+          label: relationLabel(record)
+        })).filter(option => option.value !== null && typeof option.value !== 'undefined')
+        const existing = new Map(this.options.map(option => [option.value, option]))
+        fetched.forEach(option => existing.set(option.value, option))
+        this.options = [...existing.values()]
 
         // eslint-disable-next-line no-empty
       } catch (e) {}

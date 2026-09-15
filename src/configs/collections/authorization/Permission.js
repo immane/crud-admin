@@ -136,6 +136,7 @@ export default {
     detail: {
       detail_display: [
         'id',
+        'uuid',
         'code',
         'module',
         'resource',

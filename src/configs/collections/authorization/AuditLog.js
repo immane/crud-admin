@@ -121,6 +121,7 @@ export default {
     detail: {
       detail_display: [
         'id',
+        'uuid',
         'actorUuid',
         'action',
         'targetType',

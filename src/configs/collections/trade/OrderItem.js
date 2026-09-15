@@ -31,6 +31,7 @@ export default {
     detail: {
       detail_display: [
         'id',
+        'uuid',
         'order',
         'product',
         'specificationTitle',

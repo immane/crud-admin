@@ -4,6 +4,7 @@ import { t } from '@/i18n'
 /* Layout */
 import Layout from '@/layout'
 import admin from '@/config'
+import { adminIdParam, adminUuidParam } from './admin-identifiers'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -73,7 +74,7 @@ export const lastRoutes = [
     ]
   },
   {
-    path: '/:entityParam/:id/update',
+    path: `/:entityParam/${adminIdParam}/update`,
     component: Layout,
     hidden: true,
     children: [
@@ -85,7 +86,19 @@ export const lastRoutes = [
     ]
   },
   {
-    path: '/:entityParam/:id/detail',
+    path: `/:entityParam/${adminUuidParam}/update`,
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '',
+        name: `EasyAdminUuidUpdate`,
+        component: () => import('@/views/admin/form')
+      }
+    ]
+  },
+  {
+    path: `/:entityParam/${adminIdParam}/detail`,
     component: Layout,
     hidden: true,
     children: [
@@ -93,6 +106,42 @@ export const lastRoutes = [
         path: '',
         name: `EasyAdminDetail`,
         component: () => import('@/views/admin/detail')
+      }
+    ]
+  },
+  {
+    path: `/:entityParam/${adminUuidParam}/detail`,
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '',
+        name: `EasyAdminUuidDetail`,
+        component: () => import('@/views/admin/detail')
+      }
+    ]
+  },
+  {
+    path: `/:entityParam/${adminIdParam}/list`,
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '',
+        name: `EasyAdminIdList`,
+        component: () => import('@/views/admin/list')
+      }
+    ]
+  },
+  {
+    path: `/:entityParam/${adminUuidParam}/list`,
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '',
+        name: `EasyAdminUuidList`,
+        component: () => import('@/views/admin/list')
       }
     ]
   },
