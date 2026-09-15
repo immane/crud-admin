@@ -36,6 +36,8 @@ function createProxyConfig(target?: string) {
   return {
     '/api': createApiProxy(target),
     '/system': createApiProxy(target),
+    '/health': createApiProxy(target),
+    '/metrics': createApiProxy(target),
     '/upload': createApiProxy(target),
     '/uploads': createApiProxy(target)
   }
