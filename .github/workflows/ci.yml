@@ -7,7 +7,21 @@ on:
     branches: [master, dev]
 
 jobs:
-  verify:
+  unit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shard: [1/2, 2/2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run test -- --shard=${{ matrix.shard }}
+
+  coverage:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,4 +31,4 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: npm run type-check
-      - run: npm run test -- --coverage
+      - run: npm run test -- --coverage tests/unit/components/easy-admin/
