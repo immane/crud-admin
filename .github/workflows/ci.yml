@@ -7,7 +7,30 @@ on:
     branches: [master, dev]
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            code:
+              - 'src/**'
+              - '!src/configs/**'
+              - '!src/i18n/**'
+              - 'tests/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'vitest.config.ts'
+              - 'vite.config.ts'
+              - '.github/workflows/**'
+
   unit:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -22,6 +45,8 @@ jobs:
       - run: npm run test -- --shard=${{ matrix.shard }}
 
   coverage:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
