@@ -21,6 +21,14 @@ export default {
       query: orderByIdDesc,
       list_filter: {
         body: t('Comment Body'),
+        entityType: t('Entity Type'),
+        entityId: t('Entity ID'),
+        'author.username': t('Author'),
+        'parent.id': {
+          label: t('Parent'),
+          type: 'input',
+          expression: 'entity.getParent().getId() == :value'
+        },
         status: {
           __label: t('Status'),
           pending: t('Pending Review'),
@@ -29,7 +37,7 @@ export default {
         }
       },
       list_display: [
-        'id', 'body', 'entityType', 'entityId', 'status', 'author', 'createdAt'
+        'id', 'body', 'entityType', 'entityId', 'status', 'author', 'parent', 'createdAt', 'updatedAt'
       ]
     },
     detail: {

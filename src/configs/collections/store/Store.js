@@ -33,6 +33,7 @@ export default {
       list_filter: {
         code: t('Code'),
         name: t('Name'),
+        timezone: t('Timezone'),
         status: {
           __label: t('Status'),
           activate: t('Activate'),

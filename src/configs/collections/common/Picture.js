@@ -15,7 +15,9 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
-        title: t('Title')
+        title: t('Title'),
+        'user.username': t('User'),
+        'category.name': t('Category')
       },
       list_display: [
         'id',
@@ -23,7 +25,8 @@ export default {
         'title',
         'user',
         'category',
-        'createdAt'
+        'createdAt',
+        'updatedAt'
       ]
     },
     detail: {
@@ -33,6 +36,7 @@ export default {
         'title',
         'user',
         'category',
+        { property: 'metadata', type: 'json', full_width: true },
         'createdAt',
         'updatedAt',
         { property: 'image', type: 'image', full_width: true }

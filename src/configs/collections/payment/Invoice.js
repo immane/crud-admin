@@ -12,6 +12,11 @@ export default {
     list: {
       query: orderByIdDesc,
       disabled_actions: ['new', 'delete'],
+      list_filter: {
+        'payer.username': t('Payer'),
+        status: t('Status'),
+        currency: t('Currency')
+      },
       list_display: [
         'id',
         'payer',

@@ -43,7 +43,11 @@ export default {
           rejected: t('Rejected'),
           fulfilled: t('Fulfilled'),
           cancelled: t('Cancelled')
-        }
+        },
+        storeCodeSnapshot: t('Store Code'),
+        customerUserUuid: t('User UUID'),
+        currency: t('Currency'),
+        rejectionCode: t('Rejection Code')
       },
       list_display: [
         'id',

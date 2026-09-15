@@ -17,9 +17,10 @@ export default {
       query: { '@order': 'entity.groupName|ASC, entity.sortOrder|ASC, entity.id|DESC' },
       list_filter: {
         key: t('Key'),
-        groupName: t('Group')
+        groupName: t('Group'),
+        type: t('Type')
       },
-      list_display: ['id', 'key', 'value', 'type', 'groupName', 'label', 'sortOrder']
+      list_display: ['id', 'key', 'value', 'type', 'groupName', 'label', 'sortOrder', 'updatedAt']
     },
     detail: {
       detail_display: '__all__'

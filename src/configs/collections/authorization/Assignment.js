@@ -68,7 +68,7 @@ export default {
         {
           property: 'userUuid',
           relation: { entity: 'User', valueKey: 'uuid' },
-          relation_filter: { '@filter': 'entity.username matches ":value"' },
+          relation_filter: { '@filter': 'entity.getUsername() matches ":value"' },
           required: true,
           type_options: { remote: true },
           field_options: { placeholder: t('Search username to select user') }

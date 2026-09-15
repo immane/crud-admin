@@ -20,6 +20,9 @@ export default {
     list: {
       query: orderByIdDesc,
       list_filter: {
+        'user.username': t('User'),
+        currency: t('Currency'),
+        label: t('Label'),
         status: {
           __label: t('Status'),
           active: t('Active'),
@@ -37,7 +40,7 @@ export default {
             }
           }
         },
-        'status', 'version', 'label'
+        'status', 'version', 'label', 'createdAt', 'updatedAt'
       ]
     },
     detail: {

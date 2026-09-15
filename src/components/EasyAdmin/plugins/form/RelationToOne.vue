@@ -100,6 +100,24 @@ export default {
     }
   },
 
+  computed: {
+    selectedValues() {
+      const value = this.form[this.field.property]
+      return Array.isArray(value) ? value : [value]
+    }
+  },
+
+  watch: {
+    selectedValues: {
+      handler() {
+        // Edit forms receive their values after relation fields have mounted.
+        this.addSelectedOptions()
+        this.hydrateSelectedOptions()
+      },
+      deep: true
+    }
+  },
+
   async created() {
     this.relation = resolveRelation(this.field, this.struct, entities)
     this.entity = this.relation?.name || null
@@ -114,20 +132,18 @@ export default {
 
   methods: {
     addSelectedOptions() {
-      const values = Array.isArray(this.form[this.field.property])
-        ? this.form[this.field.property]
-        : [this.form[this.field.property]]
-      this.options = values
+      const options = new Map(this.options.map(option => [option.value, option]))
+      this.selectedValues
         .filter(value => value !== null && typeof value !== 'undefined' && value !== '')
-        .map(value => ({ value, label: String(value) }))
+        .forEach(value => {
+          if (!options.has(value)) options.set(value, { value, label: String(value) })
+        })
+      this.options = [...options.values()]
     },
 
     async hydrateSelectedOptions() {
       if (this.relation?.valueKey !== 'uuid') return
-      const values = Array.isArray(this.form[this.field.property])
-        ? this.form[this.field.property]
-        : [this.form[this.field.property]]
-      const selected = new Set(values.filter(value => typeof value === 'string' && value))
+      const selected = new Set(this.selectedValues.filter(value => typeof value === 'string' && value))
       if (!selected.size) return
       const records = await loadRelationRecords(this.relation, this.emPrefix)
       const options = records

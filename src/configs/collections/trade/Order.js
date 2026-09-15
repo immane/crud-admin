@@ -22,7 +22,10 @@ export default {
           completed: t('Completed'),
           cancelled: t('Cancelled'),
           refunded: t('Refunded')
-        }
+        },
+        'user.username': t('User'),
+        currency: t('Currency'),
+        paymentMethod: t('Payment Method')
       },
       list_display: [
         'id', 'uuid', 'user', { property: 'totalAmount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }}, 'currency',

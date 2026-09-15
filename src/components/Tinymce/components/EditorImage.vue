@@ -19,7 +19,7 @@
         list-type="picture"
       >
         <el-icon><el-icon-upload /></el-icon>
-        <div class="el-upload__text" v-html="$t('Drag images here or &lt;em&gt;click to upload&lt;/em&gt;')"></div>
+        <div class="el-upload__text" v-html="$t('Drag images here or <em>click to upload</em>')"></div>
       </el-upload>
       <el-button @click="dialogVisible = false">
         Cancel

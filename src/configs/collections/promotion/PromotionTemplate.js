@@ -19,6 +19,7 @@ export default {
       list_filter: {
         name: t('Template Name'),
         type: t('Type'),
+        phase: t('Phase'),
         enabled: {
           label: t('Enabled'),
           type: 'boolean',
