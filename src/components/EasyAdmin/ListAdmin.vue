@@ -204,9 +204,7 @@
 
               <!-- Normal fields -->
               <div v-else>
-                <template v-if="false" />
-
-                <template v-else-if="isEditableField(field, structure[field.property])">
+                <template v-if="isEditableField(field, structure[field.property])">
                   <component
                     :is="EditablePlain"
                     :em="em"

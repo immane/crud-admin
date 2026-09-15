@@ -5,11 +5,20 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 
 export default defineConfig({
   plugins: [vue(), vueJsx({ include: [/\.[jt]sx?$/] })],
-  resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
+  resolve: { alias: { '@': path.resolve(__dirname, 'src') }, extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'] },
   test: {
     environment: 'jsdom',
     globals: true,
     setupFiles: ['tests/unit/setup.js'],
-    include: ['tests/unit/**/*.spec.js']
+    include: ['tests/unit/**/*.spec.js'],
+    coverage: {
+      provider: 'v8',
+      include: ['src/components/EasyAdmin/**/*.{vue,ts}'],
+      thresholds: {
+        statements: 100,
+        branches: 100,
+        lines: 100
+      }
+    }
   }
 })
