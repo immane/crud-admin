@@ -479,8 +479,8 @@ export default {
          *
          * @example
          * {
-         *   '@filter': 'entity.getId() in [1,3,4] && entity.getUser().getProfile().getAge() > 18',
-         *   '@sort': 'entity.id|ASC, entity.createdTime|DESC',
+          *   '@filter': 'entity.getId() in [1,3,4] && entity.getUser().getProfile().getAge() > 18',
+          *   '@order': 'entity.id|ASC, entity.createdTime|DESC',
          *   page: 1, limit: 20,
          * }
          */
@@ -657,7 +657,7 @@ export default {
         refresh: 0 // refresh key
       },
 
-      // Sort query: {'@sort': 'entity.id|ASC, entity.createdTime|DESC'}
+      // Sort query: {'@order': 'entity.id|ASC, entity.createdTime|DESC'}
       sort: {},
       // Filter: {'@filter': 'entity.getId() == 1'}
       filter: {},

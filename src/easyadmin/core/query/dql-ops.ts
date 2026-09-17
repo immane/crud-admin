@@ -1,4 +1,16 @@
 // Pure DQL helpers. Preserves SearchFilter.filterProcess / filterGenerate semantics.
+//
+// Backend-verified CSQE DQL rules (crud-skeleton ExpressionDqlParser):
+// - Filter paths must use entity.getX() chains (e.g. entity.getUser().getName()).
+//   Bare property access (entity.status), is*/has* getters (entity.isSystem()),
+//   and bare names are NOT DQL-safe: non-admin requests get HTTP 403, admin
+//   requests silently fall back to full-table in-memory filtering. Boolean
+//   `isSystem` fields must be queried as entity.getIsSystem().
+// - Join multiple conditions with && / || (never the `and` / `or` keywords).
+// - Sort with '@order': 'entity.field|ASC, ...' (never '@sort': admin-only
+//   in-memory comparator). ':value' is a frontend pre-substitution placeholder,
+//   never interpreted server-side in the @filter path. `matches 'text'` is a
+//   backend-wrapped substring LIKE (do NOT pre-wrap %).
 
 export function dottedKeyToExpression(key: string): string {
   return key

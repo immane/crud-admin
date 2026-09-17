@@ -79,11 +79,12 @@ const INLINE_FILTERS = {
   AuditLog: {
     createdAt: { expression: `entity.getCreatedAt() >= datetime.get(":value")` }
   },
-  // Role: `system` key maps to non-getter `entity.isSystem() == :value`
-  // (key-vs-expression mismatch, no-get method syntax).
+  // Role: `system` key maps to `entity.getIsSystem() == :value`
+  // (key-vs-expression mismatch; backend DQL fast path only accepts getX(),
+  // so the boolean `isSystem` property must be queried as getIsSystem()).
   Role: {
     code: { expression: `entity.getCode() matches ':value'` },
-    system: { expression: 'entity.isSystem() == :value' }
+    system: { expression: 'entity.getIsSystem() == :value' }
   },
   Setting: {
     key: { expression: `entity.getKey() matches ':value'` }

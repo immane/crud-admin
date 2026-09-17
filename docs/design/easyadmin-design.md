@@ -211,8 +211,22 @@ User clicks Search:
     Trigger fetchDataFunc()
 ```
 
-### 6.2 Filter Widget Types
+### 6.2 DQL Expression Rules (backend-verified)
 
+Against crud-skeleton `ExpressionDqlParser`:
+
+- Filter paths must use `entity.getX()` chains. Bare property access
+  (`entity.status`), `is*`/`has*` getters (`entity.isSystem()`), and bare
+  names are not DQL-safe (non-admin → HTTP 403, admin → full-table
+  in-memory fallback). Boolean `isSystem` properties are queried as
+  `entity.getIsSystem()`.
+- Join with `&&` / `||` (never `and` / `or`). Null tests: bare
+  `entity.getX()` (`IS NOT NULL`) or `!entity.getX()` (`IS NULL`) —
+  never `== null`.
+- Sort with `@order` (`field|DIR`, comma-separated). Never `@sort`
+  (admin-only in-memory comparator).
+
+### 6.3 Filter Widget Types
 | type | Widget |
 |------|--------|
 | `datetime` / `date` / `time` | `<el-date-picker>` |

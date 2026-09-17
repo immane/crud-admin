@@ -120,7 +120,7 @@ export default {
         system: {
           label: t('Is System'),
           type: 'boolean',
-          expression: 'entity.isSystem() == :value'
+          expression: 'entity.getIsSystem() == :value'
         }
       },
       list_display: [
