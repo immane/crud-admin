@@ -65,7 +65,7 @@
     }
   }
 */
-import EntityManage from '@/utils/entity'
+import CrudSkeletonAdapter from '@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter'
 import entities from '@/configs/entities'
 import { loadRelationRecords, relationLabel, relationValue, resolveRelation } from '@/utils/relation'
 export default {
@@ -166,7 +166,7 @@ export default {
 
     async fetchData(entityName, relationFilter, query = null) {
       try {
-        const em = new EntityManage({
+        const em = new CrudSkeletonAdapter({
           name: entityName,
           plural: this.relation?.plural,
           prefix: this.relation?.prefix || this.emPrefix || undefined

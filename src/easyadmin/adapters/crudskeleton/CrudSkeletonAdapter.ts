@@ -1,22 +1,24 @@
 import request from '@/utils/request'
-import store from '@/store'
-import { API_PREFIX, SYSTEM_API_PREFIX, apiPath } from '@/api/prefix'
+import { API_PREFIX, apiPath } from '@/api/prefix'
 import { ApiResponse, EntityStructure } from '@/types/api'
 import inflectFactory from 'i'
 import { resolveEntityIdentity, type EntityConf } from '@/easyadmin/core/model/entity-identity'
 import type { EntityListResponse, EntityRecord } from '@/easyadmin/core/model/record'
+import type { AdminRepository } from '@/easyadmin/core/ports/admin-repository'
+import type { MetaProvider } from '@/easyadmin/core/ports/meta-provider'
+import { CrudSkeletonMetaProvider } from './CrudSkeletonMetaProvider'
 
 const inflect = inflectFactory(true)
 
 const parameterize = (text: string) =>
   inflect.dasherize(inflect.underscore(inflect.pluralize(text)))
 
-export class CrudSkeletonAdapter {
+export class CrudSkeletonAdapter implements AdminRepository, MetaProvider {
   name: string | null = null
   plural: string | null = null
   prefix = apiPath(API_PREFIX, 'manage')
 
-  constructor(conf: EntityConf) {
+  constructor(conf: EntityConf, private meta: MetaProvider = new CrudSkeletonMetaProvider()) {
     const identity = resolveEntityIdentity(conf, {
       defaultPrefix: this.prefix,
       parameterize
@@ -26,13 +28,16 @@ export class CrudSkeletonAdapter {
     this.plural = identity.plural
   }
 
+  async listEntities(): Promise<string[]> {
+    return this.meta.listEntities()
+  }
+
+  async getStructure(fqcn: string): Promise<EntityStructure> {
+    return this.meta.getStructure(fqcn)
+  }
+
   async structure(): Promise<EntityStructure> {
-    let entities = store.getters.entity.entities ? store.getters.entity.entities : []
-    if (!(entities instanceof Array && entities.length)) {
-      const entityResponse = await request.get(apiPath(SYSTEM_API_PREFIX, 'entities')) as ApiResponse<string[]>
-      entities = entityResponse.data
-      store.dispatch('entity/set_entities', entities)
-    }
+    const entities = await this.meta.listEntities()
 
     const list = entities.filter((v: string) => v.split('\\').pop() === this.name)
 
@@ -40,15 +45,7 @@ export class CrudSkeletonAdapter {
       throw Error('No entity was found.')
     }
 
-    const structureMap = store.getters.entity.structures
-    if (structureMap && Object.prototype.hasOwnProperty.call(structureMap, list[0])) {
-      return structureMap[list[0]]
-    }
-
-    const structureResponse = await request.get(apiPath(SYSTEM_API_PREFIX, `entities/${list[0]}`)) as ApiResponse<EntityStructure>
-    const structure = structureResponse.data
-    store.dispatch('entity/set_structures', { entity: list[0], structure })
-    return structure
+    return this.meta.getStructure(list[0])
   }
 
   async retrieve(pk: number | string): Promise<ApiResponse<EntityRecord>> {

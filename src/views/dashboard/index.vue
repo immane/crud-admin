@@ -105,15 +105,15 @@
 <script>
 import { mapGetters } from 'vuex'
 import { t as $t } from '@/i18n'
-import EntityManage from '@/utils/entity'
+import CrudSkeletonAdapter from '@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter'
 
 const entityManagers = {
-  orders: new EntityManage('Order'),
-  products: new EntityManage('Product'),
-  users: new EntityManage('User'),
-  transactions: new EntityManage({ name: 'Transaction', plural: 'transactions' }),
-  stores: new EntityManage({ name: 'Store', plural: 'stores' }),
-  materials: new EntityManage({ name: 'Material', prefix: '/api/v1/manage/inventory', plural: 'materials' })
+  orders: new CrudSkeletonAdapter('Order'),
+  products: new CrudSkeletonAdapter('Product'),
+  users: new CrudSkeletonAdapter('User'),
+  transactions: new CrudSkeletonAdapter({ name: 'Transaction', plural: 'transactions' }),
+  stores: new CrudSkeletonAdapter({ name: 'Store', plural: 'stores' }),
+  materials: new CrudSkeletonAdapter({ name: 'Material', prefix: '/api/v1/manage/inventory', plural: 'materials' })
 }
 
 const weatherByCode = {

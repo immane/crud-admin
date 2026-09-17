@@ -39,7 +39,7 @@ import RoleUuidField from './RoleUuidField.jsx'
  * Audit: create -> audit 'role.created'; permissions/fieldGrant/update all write audit_log + invalidate user cache
  *
  * Frontend EasyAdmin usage:
- *   - list/form automatically go through EntityManage (utils/entity.ts) via /api/v1/manage/roles CRUD
+ *   - list/form automatically go through CrudSkeletonAdapter via /api/v1/manage/roles CRUD
  *   - recommend RelationToMany or transfer component for associated permissions; field grants can use json/array + help text
  */
 

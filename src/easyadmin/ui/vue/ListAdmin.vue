@@ -375,7 +375,7 @@
 
 <script>
 import { defineAsyncComponent, markRaw, toRaw } from 'vue'
-import EntityManage from '@/utils/entity'
+import CrudSkeletonAdapter from '@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter'
 import entities from '@/configs/entities'
 import { asyncRoutes } from '@/router'
 import { resolveRelation } from '@/utils/relation'
@@ -622,7 +622,7 @@ export default {
 
       // Entity manager and entity structure
       // sample: 'Category'
-      em: new EntityManage(this.entityConf),
+      em: new CrudSkeletonAdapter(this.entityConf),
       structure: {},
 
       // Table refresh key

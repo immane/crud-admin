@@ -9,7 +9,7 @@ const { listMock, loadMock, constructed } = vi.hoisted(() => ({
   constructed: []
 }))
 
-vi.mock('@/utils/entity', () => ({
+vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => ({
   default: class EntityManageMock {
     constructor(conf) {
       this.conf = conf

@@ -67,7 +67,7 @@ only a reserved placeholder and must not introduce speculative behavior.
 
 ### Current Test Baseline
 
-- 99 test files and 1316 tests pass.
+- 100 test files and 1322 tests pass.
 - EasyAdmin UI, core, application, and CrudSkeleton adapter coverage has a 100%
   statements/branches/lines threshold.
 - Golden outputs use explicit `*.golden.json` plus `toEqual`; snapshots are not
@@ -296,16 +296,21 @@ Acceptance:
 
 ### Phase 2: Replace `EntityManage` Behind a Port
 
-Status: adapter exists; UI is not yet switched.
+Status: consuming code switched; `utils/entity.ts` retained as a deprecated
+re-export until test imports migrate in Phase 6.
 
-1. Define `AdminRepository` and `MetaProvider` ports in `core/ports/`.
-2. Make `CrudSkeletonAdapter` implement those ports.
-3. Extract the Vuex/sessionStorage entity-structure cache from
-   `store/modules/entity.js` into the CrudSkeleton metadata adapter boundary while
-   retaining the store as an implementation detail initially.
-4. Move `EntityManage` consumers incrementally to injected/constructed
+1. Defined `AdminRepository` and `MetaProvider` ports in `core/ports/`;
+   `CrudSkeletonAdapter` implements both.
+2. Extracted the Vuex/sessionStorage entity-structure flow into
+   `adapters/crudskeleton/CrudSkeletonMetaProvider`; the adapter delegates
+   `listEntities()` / `getStructure()` / `structure()` to it. The store remains
+   the persistence implementation detail.
+3. Moved all production `EntityManage` consumers (`ListAdmin`, `FormAdmin`,
+   `DetailAdmin`, `RelationToOne`, `utils/relation`, dashboard) to constructed
    `CrudSkeletonAdapter` instances.
-5. Delete `src/utils/entity.ts` only after no production or test import remains.
+4. `src/utils/entity.ts` is now a deprecated re-export of the adapter; it will
+   be deleted in Phase 6 after `tests/unit/utils/entity*.spec.js` migrate.
+5. Component specs mock the adapter module path instead of `utils/entity`.
 
 Acceptance:
 

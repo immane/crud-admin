@@ -1,4 +1,4 @@
-import EntityManage from '@/utils/entity'
+import CrudSkeletonAdapter from '@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter'
 export { relationIdentifier, relationLabel, relationValue, resolveRelation } from './relation-descriptor'
 
 const recordCache = new Map()
@@ -11,7 +11,7 @@ const listData = (response) => {
 export const loadRelationRecords = async(relation, emPrefix = '') => {
   const key = [relation.name, relation.plural || '', relation.prefix || emPrefix, relation.valueKey].join(':')
   if (!recordCache.has(key)) {
-    const entity = new EntityManage({
+    const entity = new CrudSkeletonAdapter({
       name: relation.name,
       plural: relation.plural,
       prefix: relation.prefix || emPrefix || undefined

@@ -15,7 +15,7 @@ const feedbackMocks = vi.hoisted(() => ({
   warning: vi.fn()
 }))
 
-vi.mock('@/utils/entity', () => {
+vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => {
   class EntityManageMock {
     constructor(conf) {
       this.conf = conf

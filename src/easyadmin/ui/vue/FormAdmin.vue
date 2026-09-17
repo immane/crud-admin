@@ -127,7 +127,7 @@
 <script>
 import { defineAsyncComponent, markRaw, toRaw } from 'vue'
 import { t } from '@/i18n'
-import EntityManage from '@/utils/entity'
+import CrudSkeletonAdapter from '@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter'
 import entities from '@/configs/entities'
 import { relationValue, resolveRelation } from '@/utils/relation'
 import Tinymce from '@/components/Tinymce'
@@ -222,7 +222,7 @@ export default {
       BASE_API: process.env.VITE_BASE_API,
 
       // entity manager instance
-      em: new EntityManage(this.entityConf),
+      em: new CrudSkeletonAdapter(this.entityConf),
 
       // entity structure
       structure: {},

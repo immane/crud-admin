@@ -131,6 +131,21 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter', () => {
     expect(request.delete).toHaveBeenCalledWith('/api/v1/manage/users/3')
   })
 
+  it('delegates listEntities and getStructure to the meta provider', async() => {
+    store.getters.entity.entities = ['CommonBundle\\Entity\\User']
+    store.getters.entity.structures = {
+      'CommonBundle\\Entity\\User': { id: { metadata: { type: 'integer' } } }
+    }
+
+    const em = new CrudSkeletonAdapter('User')
+
+    await expect(em.listEntities()).resolves.toEqual(['CommonBundle\\Entity\\User'])
+    await expect(em.getStructure('CommonBundle\\Entity\\User')).resolves.toEqual(
+      store.getters.entity.structures['CommonBundle\\Entity\\User']
+    )
+    expect(request.get).not.toHaveBeenCalled()
+  })
+
   it('keeps successful deletions when some batch deletions fail', async() => {
     request.delete
       .mockResolvedValueOnce({ data: true })

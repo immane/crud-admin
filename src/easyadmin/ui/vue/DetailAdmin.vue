@@ -46,7 +46,7 @@
 
 <script>
 import { defineAsyncComponent, markRaw, toRaw } from 'vue'
-import EntityManage from '@/utils/entity'
+import CrudSkeletonAdapter from '@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter'
 import entities from '@/configs/entities'
 import { resolveRelation } from '@/utils/relation'
 import { createUiFeedback } from './ui/feedback'
@@ -76,7 +76,7 @@ export default {
   },
   data() {
     return {
-      em: new EntityManage(this.entityConf),
+      em: new CrudSkeletonAdapter(this.entityConf),
       structure: {},
       record: {},
       properties: [],
