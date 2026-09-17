@@ -350,4 +350,47 @@ describe('ListAdmin.vue gaps', () => {
       expect(wrapper.find('.dummy-comp').exists()).toBe(true)
     })
   })
+
+  describe('renderHelp in batch edit dialog', () => {
+    it('returns empty string for falsy help', () => {
+      const { wrapper } = mountList()
+      expect(wrapper.vm.renderHelp('')).toBe('')
+      expect(wrapper.vm.renderHelp(null)).toBe('')
+      expect(wrapper.vm.renderHelp(undefined)).toBe('')
+    })
+
+    it.each([
+      ['inline code', 'use `code` here', '<code>code</code>'],
+      ['fenced block', '```\nconst a = 1\n```', '<pre><code>const a = 1</code></pre>'],
+      ['bold', '**strong** text', '<strong>strong</strong>'],
+      ['italic star', '*soft* text', '<em>soft</em>'],
+      ['italic underscore', '_soft_ text', '<em>soft</em>'],
+      ['link', '[docs](https://example.com)', '<a href="https://example.com" target="_blank" rel="noopener">docs</a>'],
+      ['heading', '# Title', '<strong>Title</strong>'],
+      ['list dash', '- item one', '• item one'],
+      ['list star', '* item one', '• item one']
+    ])('renders %s markdown', (_label, input, expected) => {
+      const { wrapper } = mountList()
+      expect(wrapper.vm.renderHelp(input)).toContain(expected)
+    })
+
+    it('converts bare newlines to line breaks', () => {
+      const { wrapper } = mountList()
+      expect(wrapper.vm.renderHelp('line one\nline two')).toContain('<br>')
+    })
+
+    it('renders help blocks only for fields that declare help', async () => {
+      const { wrapper } = mountList({
+        config: { form: { batch_edit: { fields: [
+          { property: 'phoneVerified', type: 'boolean', help: 'use `code` now' },
+          { property: 'note' }
+        ] } } }
+      })
+      wrapper.vm.openBatchEditDialog()
+      await wrapper.vm.$nextTick()
+      const helps = wrapper.findAll('.help-text__content')
+      expect(helps.length).toBe(1)
+      expect(helps[0].html()).toContain('<code>code</code>')
+    })
+  })
 })

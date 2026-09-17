@@ -15,9 +15,12 @@ export default {
           help: t('User password help')
         },
         { property: 'phone', required: false },
-        { property: 'phoneVerified', type: 'boolean', required: false },
+        { property: 'phoneVerified', type: 'boolean', required: false, help: t('User phoneVerified help') },
         { property: 'roles', type: 'json', required: false, default_value: ['ROLE_USER'], help: t('User roles help') }
-      ]
+      ],
+      batch_edit: {
+        fields: [{ property: 'phoneVerified', type: 'boolean', help: t('User phoneVerified help') }]
+      }
     },
     list: {
       query: orderByIdDesc,
@@ -25,7 +28,6 @@ export default {
         username: t('Username'),
         email: t('Email'),
         phone: t('Phone'),
-        uuid: t('UUID'),
         phoneVerified: {
           label: t('Phone Verified'),
           type: 'boolean',
@@ -34,7 +36,6 @@ export default {
       },
       list_display: [
         'id',
-        'uuid',
         'username',
         'email',
         'phone',

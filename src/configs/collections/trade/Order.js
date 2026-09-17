@@ -28,7 +28,7 @@ export default {
         paymentMethod: t('Payment Method')
       },
       list_display: [
-        'id', 'uuid', 'user', { property: 'totalAmount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }}, 'currency',
+        'id', 'user', { property: 'totalAmount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }}, 'currency',
         'status', 'paymentMethod', 'paidAt', 'createdAt'
       ]
     },

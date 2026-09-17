@@ -377,6 +377,7 @@ export default {
   'PromotionTemplate fields help': 'JSON schema defining dynamic fields required by the template.',
   'User roles help': 'JSON array of role assignments synced from Authorization; do not edit manually, managed via Assignments.',
   'User password help': 'Required on create; leave empty on edit to keep current password (min 6 characters).',
+  'User phoneVerified help': 'Batch update whether the phone number is verified. Unchecked means unverified.',
   'Confirm Password': 'Confirm Password',
   'Password hint length': 'At least 6 characters',
   'Password hint letter': 'Contains letter',

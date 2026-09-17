@@ -361,6 +361,7 @@ export default {
   'PromotionTemplate fields help': 'テンプレートに必要な動的フィールドを定義する JSON スキーマ。',
   'User roles help': 'Authorization から同期されたロール割り当ての JSON 配列。手動で編集しないでください。Assignments で管理されます。',
   'User password help': '作成時は必須。編集時は空のままにすると現在のパスワードを保持します（6文字以上）。',
+  'User phoneVerified help': '電話番号の認証済み状態を一括更新します。チェックなしは未認証を意味します。',
   'Confirm Password': 'パスワード確認',
   'Password hint length': '6文字以上',
   'Password hint letter': '英字を含む',

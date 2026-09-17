@@ -51,13 +51,12 @@ export default {
       },
       list_display: [
         'id',
-        'uuid',
         'storeCodeSnapshot',
         'storeNameSnapshot',
         { property: 'totalAmount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
         'currency',
         'operationalStatus',
-        'customerUserUuid',
+        { property: 'customerUserUuid', relation: { entity: 'User', valueKey: 'uuid' }},
         'createdAt',
         'updatedAt'
       ]

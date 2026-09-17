@@ -42,7 +42,7 @@ export default {
         referenceId: t('Reference ID')
       },
       list_display: [
-        'id', 'uuid', { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }}, 'type', 'status',
+        'id', { property: 'amount', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }}, 'type', 'status',
         'fromWallet', 'toWallet', 'referenceId', 'createdAt'
       ]
     },

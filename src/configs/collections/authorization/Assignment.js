@@ -138,7 +138,6 @@ export default {
       },
       list_display: [
         'id',
-        'uuid',
         { property: 'userUuid', relation: { entity: 'User', valueKey: 'uuid' }},
         { property: 'role', type: 'RelationToOne' },
         'scopeType',
