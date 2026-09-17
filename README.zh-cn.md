@@ -42,8 +42,9 @@
 ## 功能特色
 
 - **配置驱动 CRUD 引擎（EasyAdmin）** — 在配置中声明实体，即可自动获得完整的列表/表单/详情/路由
-- **20 种即插即用表单字段** — 文本输入、文本域、下拉选择、开关、数字、货币、日期、日期时间、图片、文件、JSON、富文本、关联选择器、穿梭框、密码（双输入+强度提示）、邮箱（格式校验）等
+- **21 种即插即用表单字段** — 文本输入、文本域、下拉选择、开关、数字、货币、日期、日期时间、图片、文件、JSON、JSON Schema、富文本、关联选择器、穿梭框、密码（双输入+强度提示）、邮箱（格式校验）等
 - **表单校验** — `field.rules` / `field.validator` 合并至 `el-form`，插件可通过 `registerFieldValidator` 注入校验，未通过时阻断提交
+- **JSON Schema 表单** — 将 JSON 对象渲染为已国际化的嵌套 FormAdmin 控件，并使用 Ajv 校验；支持静态或异步 Schema 提供者
 - **带降级链的详情视图** — `detail/` → `list/` → 纯文本插件逐字段类型降级
 - **国际化（i18n）** — 英文、简体中文、繁体中文、日文；浏览器语言自动检测；导航栏语言切换器；`Accept-Language` 请求头和 `_locale` 参数自动注入 API 请求
 - **JWT 认证** — Bearer token 登录，自动刷新 token 轮换，Cookie 按端口隔离（`dream_studio_admin_token_{port}` 避免同主机跨端口冲突），并发请求排队
@@ -100,7 +101,7 @@
 │   │   ├── DetailAdmin.vue          # 可配置记录详情页
 │   │   ├── SearchFilter.vue         # 动态筛选 UI
 │   │   └── plugins/
-│   │       ├── form/                # 20 个字段类型插件
+│   │       ├── form/                # 21 个字段类型插件
 │   │       ├── list/                # 10 个列表渲染插件
 │   │       └── detail/              # 2 个详情专用插件
 │   ├── configs/                     # 声明式实体配置
@@ -270,7 +271,7 @@ import { t } from '@/i18n'
 
 ### 字段类型插件
 
-EasyAdmin 内置 20 种字段类型插件，根据实体元数据自动解析：
+EasyAdmin 内置 21 种字段类型插件，根据实体元数据自动解析：
 
 | 插件 | 类型 | 描述 |
 |--------|------|-------------|
@@ -286,6 +287,7 @@ EasyAdmin 内置 20 种字段类型插件，根据实体元数据自动解析：
 | `image.vue` | image | 图片上传/预览 |
 | `file.vue` | — | 文件上传 |
 | `json.vue` | — | JSON 编辑器（代码/树视图） |
+| `json_schema.vue` | `json_schema` | 由 JSON Schema 生成的嵌套表单，使用 Ajv 校验 |
 | `json-custom.vue` | — | 嵌套子对象编辑器 |
 | `array.vue` | array | 数组编辑器（选择器或嵌套表单） |
 | `RelationToOne.vue` | ManyToOne、OneToOne | 单选关联（含远程搜索） |
@@ -317,6 +319,24 @@ interface FieldOption {
   full_width?: boolean       // 详情视图中跨满网格列宽
 }
 ```
+
+### JSON Schema 表单
+
+当 JSON 对象有确定的数据契约时，使用 `json_schema` 生成普通表单控件，而不是使用原始 JSON 编辑器。静态 Schema 应与实体配置放在同一目录，例如
+`src/configs/collections/store/StoreAddress.json` 与 `StoreContact.json`。
+
+```js
+import StoreAddressSchema from './StoreAddress.json'
+
+{
+  property: 'address',
+  type: 'json_schema',
+  required: false,
+  type_options: { schema: StoreAddressSchema }
+}
+```
+
+`schema` 也可以是接收 `{ entity, id, property, form }` 的异步函数，为后端生成的 Schema 预留相同接口。Schema 的标签、描述和枚举标签会自动经过 `t()`；Ajv 会在提交时校验完整对象。可选空值不会参与校验，必填项仍会校验，嵌套对象中的 `null` / `undefined` 不会传入请求。将相同字段定义放入 `detail.detail_display`，即可在详情页按 Schema 顺序显示标签和值。支持的关键字与复杂 Schema 的降级策略见[配置参考手册](docs/manual/config-reference.zh.md)。
 
 ### 表单校验
 

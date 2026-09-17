@@ -42,8 +42,9 @@
 ## Features
 
 - **Configuration-Driven CRUD Engine (EasyAdmin)** — Declare entities in config; get full list/form/detail/routes for free
-- **20 Pluggable Form Fields** — input, textarea, select, boolean, integer, currency, date, datetime, image, file, JSON, rich text, relation pickers, transfer, password (double-entry + strength hints), email (format validation), and more
+- **21 Pluggable Form Fields** — input, textarea, select, boolean, integer, currency, date, datetime, image, file, JSON, JSON Schema, rich text, relation pickers, transfer, password (double-entry + strength hints), email (format validation), and more
 - **Form Validation** — declarative `field.rules` / `field.validator` merged into `el-form`, with `registerFieldValidator` provide for plugins; blocks submit until valid
+- **JSON Schema Forms** — render JSON objects as localized nested FormAdmin controls with Ajv validation; static or asynchronous schema providers
 - **Detail View with Fallback Chain** — `detail/` → `list/` → plain text plugins per field type
 - **Internationalization (i18n)** — English, Simplified Chinese, Traditional Chinese, Japanese; browser language detection; locale toggle in navbar; `Accept-Language` header and `_locale` param injected into API requests
 - **JWT Authentication** — Bearer-token login with automatic refresh token rotation, port-isolated cookie persistence (`dream_studio_admin_token_{port}` avoids same-host cross-port conflict), and concurrent-request queuing
@@ -100,7 +101,7 @@ Translation keys use the English string directly (flat format), e.g. `$t('New / 
 │   │   ├── DetailAdmin.vue          # Configurable record detail page
 │   │   ├── SearchFilter.vue         # Dynamic filter UI
 │   │   └── plugins/
-│   │       ├── form/                # 20 field-type plugins
+│   │       ├── form/                # 21 field-type plugins
 │   │       ├── list/                # 10 list-rendering plugins
 │   │       └── detail/              # 2 detail-only plugins
 │   ├── configs/                     # Declarative entity configs
@@ -270,7 +271,7 @@ import { t } from '@/i18n'
 
 ### Field Type Plugins
 
-EasyAdmin ships with 20 field type plugins, auto-resolved from entity metadata:
+EasyAdmin ships with 21 field type plugins, auto-resolved from entity metadata:
 
 | Plugin | Type | Description |
 |--------|------|-------------|
@@ -286,6 +287,7 @@ EasyAdmin ships with 20 field type plugins, auto-resolved from entity metadata:
 | `image.vue` | image | Image upload/preview |
 | `file.vue` | — | File upload |
 | `json.vue` | — | JSON editor (code/tree view) |
+| `json_schema.vue` | `json_schema` | JSON Schema-generated nested form with Ajv validation |
 | `json-custom.vue` | — | Nested sub-object editor |
 | `array.vue` | array | Array editor (select or nested form) |
 | `RelationToOne.vue` | ManyToOne, OneToOne | Relation picker with remote search |
@@ -317,6 +319,32 @@ interface FieldOption {
   full_width?: boolean       // Span full grid width (detail view)
 }
 ```
+
+### JSON Schema Forms
+
+Use `json_schema` to edit a known JSON object through generated form controls instead of
+the raw JSON editor. Store a static schema beside the entity config, as with
+`src/configs/collections/store/StoreAddress.json` and `StoreContact.json`.
+
+```js
+import StoreAddressSchema from './StoreAddress.json'
+
+{
+  property: 'address',
+  type: 'json_schema',
+  required: false,
+  type_options: { schema: StoreAddressSchema }
+}
+```
+
+The schema may also be an async provider receiving `{ entity, id, property, form }`,
+which reserves the same interface for backend-generated schemas. Schema labels,
+descriptions, and enum labels are passed through `t()`. Ajv validates the complete JSON
+object on submit; optional blank values are ignored, required values are enforced, and
+`null`/`undefined` object properties are omitted from the request payload. See the
+[Config Reference Manual](docs/manual/config-reference.md#json-schema-forms) for supported
+keywords and fallback behavior. Reuse the same field definition in `detail.detail_display`
+to render a schema-ordered label/value view on record detail pages.
 
 ### Form Validation
 

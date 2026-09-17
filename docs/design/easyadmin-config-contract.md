@@ -152,7 +152,7 @@ interface FieldOption {
    *   'integer' | 'float' | 'decimal' |
    *   'date' | 'datetime' | 'time' |
    *   'image' | 'images' | 'file' |
-   *   'code' | 'json' | 'json-custom' | 'array' | 'transfer' |
+   *   'code' | 'json' | 'json_schema' | 'json-custom' | 'array' | 'transfer' |
    *   'RelationToOne' | 'RelationToMany'
    */
   type?: string
@@ -203,6 +203,72 @@ interface FieldOption {
 
   /** Help text below the field */
   help?: string
+}
+```
+
+### JSON Schema Fields
+
+Use `type: 'json_schema'` to render an object-valued JSON property with generated
+FormAdmin fields. `type_options.schema` accepts a static JSON Schema object or an
+async provider receiving `{ entity, id, property, form }`. Unsupported schemas fall
+back to the raw JSON editor so existing data remains editable.
+
+```js
+{
+  property: 'address',
+  type: 'json_schema',
+  type_options: { schema: StoreAddressSchema }
+}
+```
+
+The generated field labels (`title` or property name), descriptions, and enum labels
+are translated through `t()` automatically. Add those English keys to every locale
+file under `src/i18n/` when adding a schema.
+
+Supported Schema keywords include `type`, `properties`, `required`, `default`,
+`description`, `enum`, `const`, `format` (`email`, `date`, `date-time`), string
+lengths, numeric bounds, `pattern`, primitive array item schemas, `uniqueItems`,
+`additionalProperties`, and draft-07 `dependencies`. Composition keywords such as
+`$ref`, `oneOf`, `anyOf`, `allOf`, and `patternProperties` fall back to `json.vue`.
+
+Schema validation is performed with Ajv when the outer form submits. Empty optional
+properties are excluded from the validation copy; empty required properties remain
+invalid. Before submission, FormAdmin recursively removes `null` and `undefined`
+object properties from the payload.
+
+Static schemas should live beside their entity configuration:
+
+```js
+// src/configs/collections/store/Store.js
+import StoreAddressSchema from './StoreAddress.json'
+
+{ property: 'address', type: 'json_schema', type_options: { schema: StoreAddressSchema } }
+```
+
+Use the same explicit field definition in `detail.detail_display` to render a
+schema-ordered label/value view in `DetailAdmin`. Properties absent from the schema
+are retained as additional rows; unsupported schemas fall back to the standard JSON
+detail renderer.
+
+`type_options.fields` accepts normal `FieldOption[]` overrides for schema properties.
+Configured properties render first in that order; remaining schema properties follow.
+`field_options` and `type_options` merge with generated values. `hidden`, display type,
+labels, help text, plugin options, and additional rules can be overridden, but schema
+required properties remain required for JSON Schema validation.
+
+For schemas supplied by the backend, use an async provider without changing the field
+contract:
+
+```js
+{
+  property: 'address',
+  type: 'json_schema',
+  type_options: {
+    schema: async ({ entity, id, property }) => {
+      const { data } = await request.get(`/schemas/${entity}/${property}`, { params: { id } })
+      return data
+    }
+  }
 }
 ```
 

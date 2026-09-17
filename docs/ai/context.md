@@ -49,7 +49,7 @@ src/
 │   ├── ListAdmin.vue     # Dynamic list builder
 │   ├── DetailAdmin.vue   # Configurable record detail page
 │   ├── SearchFilter.vue  # Dynamic filter builder
-│   ├── plugins/form/     # 20 field-type plugins
+│   ├── plugins/form/     # 21 field-type plugins
 │   ├── plugins/list/     # 10 list-rendering plugins
 │   └── plugins/detail/   # Detail-only plugins (json, image)
 ├── configs/              # Declarative configs
@@ -214,6 +214,7 @@ const entityCollections = import.meta.glob('./collections/**/*.{js,jsx}', { eage
 | `file.vue` | — | `<el-upload>` (single file, configurable storage driver) |
 | `code.vue` | — | CodeMirror 6 editor (line numbers, history, syntax highlighting) |
 | `json.vue` | — | `<jsoneditor>` (tree/code view, direct npm import, no Vue wrapper) |
+| `json_schema.vue` | `json_schema` | Nested generated `<FormAdmin>` with Ajv validation (static or async schema provider) |
 | `json-custom.vue` | — | Nested `<FormAdmin>` (sub-object editor) |
 | `array.vue` | array | `<el-select multiple>` or nested `<FormAdmin>` |
 | `RelationToOne.vue` | ManyToOne, OneToOne | `<el-select>` (remote search) |
@@ -254,6 +255,7 @@ DetailAdmin uses a fallback chain: `plugins/detail/` → `plugins/list/` → pla
 |-------------|--------------|------------------|
 | `image.vue` | image | Full-width `<el-image>` with border, shadow, preview |
 | `json.vue` | json | `<pre>` with 2-space indent, syntax coloring, expand/collapse |
+| `json_schema.vue` | json_schema | Schema-ordered label/value rows; preserves unknown properties, falls back to `json.vue` |
 
 Adding a new detail plugin: create `plugins/detail/{type}.vue` with the same props as list plugins (`value`, `field`, `scope`, `em`, `struct`). It auto-discover via `import.meta.glob` and takes priority over the list counterpart.
 
