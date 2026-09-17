@@ -116,7 +116,7 @@ export default {
       if (relation) return relation.multiple ? 'RelationToMany' : 'RelationToOne'
       const type = field.type || struct?.metadata?.type
       if (!type) return Array.isArray(value) ? 'RelationToMany' : null
-      if (['boolean', 'currency', 'date', 'datetime', 'datetime_immutable', 'image', 'array', 'json'].includes(type)) return type
+      if (['boolean', 'currency', 'date', 'datetime', 'datetime_immutable', 'image', 'array', 'json', 'json_schema'].includes(type)) return type
       if (['ManyToOne', 'OneToOne'].includes(type)) return 'RelationToOne'
       if (['ManyToMany', 'OneToMany'].includes(type)) return 'RelationToMany'
       return null
