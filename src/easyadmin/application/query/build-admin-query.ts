@@ -5,24 +5,9 @@
 import { andFilter, cond, emptyFilter, type FilterNode } from '../../core/query/filter-node'
 import { joinExpressions, shouldIncludeValue } from '../../core/query/dql-ops'
 import { normalizePage } from '../../core/query/pagination'
+import type { AdminQuery, AdminQueryInput } from '../../core/query/admin-query'
 
-export interface AdminQueryInput {
-  entity: string
-  listFilterData?: Record<string, any>
-  filters?: Record<string, { expression: string }>
-  pager?: { page: number; limit: number }
-  sort?: Record<string, string>
-  query?: Record<string, string>
-}
-
-export interface AdminQuery {
-  entity: string
-  filter: FilterNode
-  sort: Array<{ field: string; dir: 'ASC' | 'DESC' }>
-  page: { page: number; limit: number }
-  rawSortParam: string
-  rawFilterParam?: string
-}
+export type { AdminQuery, AdminQueryInput }
 
 export function buildAdminQuery(input: AdminQueryInput): AdminQuery {
   const listFilterData = input.listFilterData ?? {}

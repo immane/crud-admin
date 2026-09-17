@@ -67,7 +67,7 @@ only a reserved placeholder and must not introduce speculative behavior.
 
 ### Current Test Baseline
 
-- 98 test files and 1312 tests pass.
+- 99 test files and 1316 tests pass.
 - EasyAdmin UI, core, application, and CrudSkeleton adapter coverage has a 100%
   statements/branches/lines threshold.
 - Golden outputs use explicit `*.golden.json` plus `toEqual`; snapshots are not
@@ -272,18 +272,22 @@ query/filter/identity change.
 
 ### Phase 1: Introduce Canonical Core Models
 
-Status: partially complete.
+Status: complete for query/identity/record/ports; `field-config.ts` re-exports
+`src/types/admin.ts` as the single source until consumers migrate, and
+`admin-meta.ts` holds backend-faithful `plantext` types.
 
-1. Add `core/query/admin-query.ts` as the canonical `AdminQuery` type and move
-   duplicated interfaces from `build-admin-query.ts` and
-   `CrudSkeletonQueryCompiler.ts` into it.
-2. Add `core/model/entity-identity.ts`, `record.ts`, and `field-config.ts`.
-3. Move the unused parts of `src/types/admin.ts` into `core/model/field-config.ts`
-   only after all imports are migrated; do not create a compatibility layer without
-   a current consumer.
-4. Define `AdminMeta` from the audited `/system/entities` response. Preserve the
-   backend spelling `plantext` at the adapter boundary and expose a normalized
-   application model only if needed.
+1. Added `core/query/admin-query.ts` as the canonical `AdminQuery` type; the
+   duplicated interfaces in `build-admin-query.ts` and
+   `CrudSkeletonQueryCompiler.ts` now import it (compiler keeps a `CompileInput`
+   extension for transport extras).
+2. Added `core/model/entity-identity.ts` (`resolveEntityIdentity`, injected
+   pluralize strategy), `record.ts`, and `field-config.ts`.
+3. `CrudSkeletonAdapter` now builds identity via `resolveEntityIdentity` and
+   imports record types from core; runtime output unchanged.
+4. Defined `AdminMeta` raw types from the audited `/system/entities` response,
+   preserving the backend spelling `plantext` at the adapter boundary.
+5. Added `core/ports/admin-repository.ts`, `meta-provider.ts`, and
+   `query-compiler.ts` (interfaces only, no implementations wired yet).
 
 Acceptance:
 

@@ -1,35 +1,21 @@
 import { formatSortParam } from '@/easyadmin/core/query/sort-node'
+import type { AdminQuery } from '@/easyadmin/core/query/admin-query'
 
 export interface CompiledCsqeParams extends Record<string, any> {}
 
-export interface AdminFilterChild {
-  expression: string
-}
-
-export interface AdminFilterNode {
-  kind: string
-  children?: AdminFilterChild[]
-}
-
-export interface AdminSortNode {
-  field: string
-  dir: string
-}
-
-export interface AdminQuery {
-  filter?: AdminFilterNode | string
-  sort?: AdminSortNode[] | Record<string, any>
-  rawSortParam?: string
-  rawFilterParam?: string
-  page?: { page?: number; limit?: number }
+// Compiler input: canonical AdminQuery plus transport extras. The `filter`
+// union preserves the pre-canonical callers that pass a ready-made string.
+export interface CompileInput extends Omit<Partial<AdminQuery>, 'filter' | 'sort'> {
+  filter?: AdminQuery['filter'] | string
+  sort?: AdminQuery['sort'] | Record<string, any>
   query?: Record<string, string>
 }
 
 // Pure query compiler: no axios, no side effects.
 // Honors the ListAdmin dataProcessor flow which merges params via
 // Object.assign({}, query, filter, pager, sort).
-export function compileCsqeQuery(adminQuery: AdminQuery): CompiledCsqeParams {
-  const { filter, sort, rawSortParam, rawFilterParam, page, query } = adminQuery || ({} as AdminQuery)
+export function compileCsqeQuery(adminQuery: CompileInput): CompiledCsqeParams {
+  const { filter, sort, rawSortParam, rawFilterParam, page, query } = adminQuery || ({} as CompileInput)
 
   let filterPart: Record<string, any> = {}
   if (typeof rawFilterParam === 'string' && rawFilterParam) {

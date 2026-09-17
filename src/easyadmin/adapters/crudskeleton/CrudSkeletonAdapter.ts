@@ -3,25 +3,13 @@ import store from '@/store'
 import { API_PREFIX, SYSTEM_API_PREFIX, apiPath } from '@/api/prefix'
 import { ApiResponse, EntityStructure } from '@/types/api'
 import inflectFactory from 'i'
+import { resolveEntityIdentity, type EntityConf } from '@/easyadmin/core/model/entity-identity'
+import type { EntityListResponse, EntityRecord } from '@/easyadmin/core/model/record'
 
 const inflect = inflectFactory(true)
 
-type EntityConf = string | {
-  name: string
-  prefix?: string
-  plural?: string
-}
-
-interface EntityRecord {
-  id: number
-  __toString?: string
-  [key: string]: any
-}
-
-interface EntityListResponse {
-  data: EntityRecord[]
-  paginator?: Record<string, any>
-}
+const parameterize = (text: string) =>
+  inflect.dasherize(inflect.underscore(inflect.pluralize(text)))
 
 export class CrudSkeletonAdapter {
   name: string | null = null
@@ -29,17 +17,13 @@ export class CrudSkeletonAdapter {
   prefix = apiPath(API_PREFIX, 'manage')
 
   constructor(conf: EntityConf) {
-    const parameterize = (text: string) =>
-      inflect.dasherize(inflect.underscore(inflect.pluralize(text)))
-
-    if (typeof conf === 'string') {
-      this.name = conf
-      this.plural = parameterize(this.name)
-    } else {
-      this.name = conf.name
-      this.prefix = conf.prefix || this.prefix
-      this.plural = conf.plural || parameterize(this.name)
-    }
+    const identity = resolveEntityIdentity(conf, {
+      defaultPrefix: this.prefix,
+      parameterize
+    })
+    this.name = identity.name
+    this.prefix = identity.prefix
+    this.plural = identity.plural
   }
 
   async structure(): Promise<EntityStructure> {
