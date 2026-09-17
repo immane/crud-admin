@@ -103,15 +103,15 @@ export default {
   min-height: 220px;
   max-height: 520px;
 }
-.json-editor-field ::v-deep .jsoneditor {
+.json-editor-field :deep(.jsoneditor) {
   border: 1px solid #dcdfe6;
   border-radius: 4px;
 }
-.json-editor-field ::v-deep .jsoneditor-outer {
+.json-editor-field :deep(.jsoneditor-outer) {
   min-height: 220px;
   max-height: 520px;
 }
-.json-editor-field ::v-deep .ace_editor {
+.json-editor-field :deep(.ace_editor) {
   min-height: 220px;
   max-height: 520px;
 }

@@ -261,13 +261,11 @@ export default {
 }
 
 .tinymce-container {
-  ::v-deep {
-    .mce-fullscreen {
-      z-index: 10000;
-    }
-    .mce-tinymce {
-      box-sizing: border-box;
-    }
+  :deep(.mce-fullscreen) {
+    z-index: 10000;
+  }
+  :deep(.mce-tinymce) {
+    box-sizing: border-box;
   }
 }
 
@@ -293,39 +291,37 @@ export default {
 }
 
 :global(html[data-theme='dark']) .tinymce-container {
-  ::v-deep {
-    .mce-tinymce,
-    .mce-container,
-    .mce-container-body,
-    .mce-toolbar-grp,
-    .mce-menubar,
-    .mce-statusbar,
-    .mce-edit-area {
-      color: #e4e7ec !important;
-      background: #182230 !important;
-      border-color: #475467 !important;
-    }
+  :deep(.mce-tinymce),
+  :deep(.mce-container),
+  :deep(.mce-container-body),
+  :deep(.mce-toolbar-grp),
+  :deep(.mce-menubar),
+  :deep(.mce-statusbar),
+  :deep(.mce-edit-area) {
+    color: #e4e7ec !important;
+    background: #182230 !important;
+    border-color: #475467 !important;
+  }
 
-    .mce-btn,
-    .mce-btn button,
-    .mce-menubtn button,
-    .mce-ico,
-    .mce-menubar .mce-menubtn button {
-      color: #e4e7ec !important;
-      text-shadow: none !important;
-      background: #253247 !important;
-    }
+  :deep(.mce-btn),
+  :deep(.mce-btn button),
+  :deep(.mce-menubtn button),
+  :deep(.mce-ico),
+  :deep(.mce-menubar .mce-menubtn button) {
+    color: #e4e7ec !important;
+    text-shadow: none !important;
+    background: #253247 !important;
+  }
 
-    .mce-btn:hover,
-    .mce-btn:hover button,
-    .mce-menubtn:hover button {
-      background: #344054 !important;
-    }
+  :deep(.mce-btn:hover),
+  :deep(.mce-btn:hover button),
+  :deep(.mce-menubtn:hover button) {
+    background: #344054 !important;
+  }
 
-    .mce-path-item,
-    .mce-statusbar .mce-ico {
-      color: #98a2b3 !important;
-    }
+  :deep(.mce-path-item),
+  :deep(.mce-statusbar .mce-ico) {
+    color: #98a2b3 !important;
   }
 }
 </style>
