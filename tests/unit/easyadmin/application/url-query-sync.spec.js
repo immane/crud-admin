@@ -23,11 +23,11 @@ describe('application/query/url-query-sync', () => {
       ).toEqual({ d: 'x' })
     })
 
-    it('keeps 0/false (!= null && !== "" semantics) and stringifies values', () => {
+    it('keeps 0/false raw (!= null && !== "" semantics; only page/limit stringify)', () => {
       expect(buildQueryParams({ n: 0, b: false, s: 42 }, { page: 1, limit: 20 })).toEqual({
-        n: '0',
-        b: 'false',
-        s: '42'
+        n: 0,
+        b: false,
+        s: 42
       })
     })
   })

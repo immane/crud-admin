@@ -322,16 +322,21 @@ Acceptance:
 
 ### Phase 3: Move List Query Assembly Out of Vue
 
-Status: helpers exist; `ListAdmin.vue` still owns behavior.
+Status: complete for list, export, and batch paths. `SearchFilter` expression
+ownership moves in Phase 4; relation option loading moves in Phase 5.
 
-1. Replace `ListAdmin`'s default `dataProcessor` merge with
-   `buildAdminQuery()` -> `compileCsqeQuery()` -> `CrudSkeletonAdapter.list()`.
-2. Replace component-local `buildQueryParams()` and `applyQueryParams()` calls
-   with `application/query/url-query-sync.ts`.
-3. Extract `normalizePaginator()` into the application read path while retaining
-   current `totalCount ?? total` behavior until the backend paginator owner is
-   audited.
-4. Route export and batch edit through their existing pure use cases.
+1. `ListAdmin`'s default `dataProcessor` now merges via `compileCsqeQuery()`
+   (`query` + `@filter` + pager + sort) instead of an inline `Object.assign`.
+2. Component-local `buildQueryParams()` / `applyQueryParams()` delegate to
+   `application/query/url-query-sync.ts` (method names and external behavior
+   unchanged; the helper preserves raw filter values and stringifies only
+   `page`/`limit`).
+3. `normalizePaginator()` delegates to `core/query/pagination.ts`, retaining
+   `totalCount ?? total` until the backend paginator owner is audited.
+4. Export flows through `buildExportRequest()` via a new `exportData()` method;
+   batch delete/edit ids and payloads flow through `collectBatchDeleteIds()` /
+   `collectBatchUpdateData()`; sort mapping flows through
+   `mapElementPlusSort()` / `formatSortParam()`.
 
 Acceptance:
 

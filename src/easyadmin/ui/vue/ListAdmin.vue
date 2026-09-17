@@ -68,59 +68,7 @@
                   type="primary"
                   icon="el-icon-download"
                   plain
-                  @click="() => {
-                    const loading = startLoading({
-                      lock: true,
-                      text: $t('Exporting data'),
-                      spinner: 'el-icon-loading',
-                      background: 'rgba(0, 0, 0, 0.7)'
-                    })
-
-                    // default config
-                    const exportConf = config.list.export
-                    const confQuery = config.list.query
-                    let query = {}, label = {}, listQuery = {}
-                    if(exportConf) {
-                      if(exportConf.hasOwnProperty('query'))
-                        query = exportConf.query
-                      if(exportConf.hasOwnProperty('label'))
-                        label = exportConf.label
-                    }
-                    if(confQuery) {
-                      listQuery = confQuery
-                    }
-
-                    // Use current filter
-                    query = Object.assign({}, listQuery, filter, query)
-
-                    em.list(query).then(res => {
-                      loading.close()
-                      let keys = []
-                      res.data.forEach(datum => {
-                        keys = Object.keys(datum)
-                        keys.forEach(key => {
-                          const value = datum[key]
-                          if(typeof datum[key] === 'object' && datum[key] !== null) {
-                            datum[key] = datum[key].hasOwnProperty('__toString')
-                              ? datum[key].__toString : '[Object]'
-                          }
-                          else if(Array.isArray(datum[key])) {
-                            datum[key] = '[Array]'
-                          }
-                        })
-                      })
-
-                      const data = res.data
-                      if(label
-                        && Object.keys(label).length === 0
-                        && Object.getPrototypeOf(label) === Object.prototype
-                      ) {
-                        keys.forEach(v => { label[v] = v } )
-                      }
-
-                      exportExcelCsv(label, data, `export-${em.name}.csv`)
-                    })
-                  }"
+                  @click="exportData"
                 >
                   {{ $t('Export') }}
                 </el-button>
@@ -384,6 +332,18 @@ import SearchFilter from './SearchFilter.vue'
 import FormAdmin from './FormAdmin.vue'
 import { createUiFeedback } from './ui/feedback'
 import EditablePlain from './plugins/list/editable-plain.vue'
+import { compileCsqeQuery } from '@/easyadmin/adapters/crudskeleton/CrudSkeletonQueryCompiler'
+import {
+  buildQueryParams as buildUrlQueryParams,
+  applyQueryParams as applyUrlQueryParams
+} from '@/easyadmin/application/query/url-query-sync'
+import { normalizePaginator as normalizePaginatorResult } from '@/easyadmin/core/query/pagination'
+import { formatSortParam, mapElementPlusSort } from '@/easyadmin/core/query/sort-node'
+import {
+  collectBatchDeleteIds,
+  collectBatchUpdateData
+} from '@/easyadmin/application/usecases/batch-update-records'
+import { buildExportRequest } from '@/easyadmin/application/usecases/export-records'
 
 const listPlugins = import.meta.glob('./plugins/list/*.vue')
 const listPluginCache = {}
@@ -591,17 +551,12 @@ export default {
           context.em.structure().then(res => { context.structure = res }),
 
           // Fetch Data
-          context.em.list(Object.assign(
-            /**
-             * Combine default constant query to dynamic pager and sort
-             * Pager and sort object will change in the page
-             */
-            {},
-            context.query ? context.query : {},
-            context.filter,
-            context.pager,
-            context.sort
-          )).then(res => {
+          context.em.list(compileCsqeQuery({
+            query: context.query ? { ...context.query } : {},
+            rawFilterParam: context.filter && context.filter['@filter'],
+            page: context.pager,
+            sort: context.sort
+          })).then(res => {
             // Assign data
             context.list = res.data
             context.paginator = context.normalizePaginator(res.paginator)
@@ -780,15 +735,7 @@ export default {
 
   methods: {
     buildQueryParams() {
-      const query = {}
-      for (const key of Object.keys(this.listFilterData)) {
-        if (this.listFilterData[key] != null && this.listFilterData[key] !== '') {
-          query[key] = this.listFilterData[key]
-        }
-      }
-      if (this.pager.page !== 1) query.page = String(this.pager.page)
-      if (this.pager.limit !== 20) query.limit = String(this.pager.limit)
-      return query
+      return buildUrlQueryParams(this.listFilterData, this.pager)
     },
     syncToUrl() {
       clearTimeout(this._syncTimer)
@@ -803,18 +750,9 @@ export default {
       }, 50)
     },
     applyQueryParams(query) {
-      const filterData = {}
-      for (const key of Object.keys(query)) {
-        if (key === 'page') {
-          this.pager.page = Math.max(1, Number(query[key]) || 1)
-        } else if (key === 'limit') {
-          this.pager.limit = Math.max(1, Number(query[key]) || 20)
-        } else {
-          filterData[key] = query[key]
-        }
-      }
-      if (!Object.hasOwn(query, 'page')) this.pager.page = 1
-      if (!Object.hasOwn(query, 'limit')) this.pager.limit = 20
+      const { filterData, pager } = applyUrlQueryParams(query)
+      this.pager.page = pager.page
+      this.pager.limit = pager.limit
       this.listFilterData = filterData
     },
     uiFeedback() {
@@ -958,17 +896,46 @@ export default {
       this.fetchData()
     },
 
-    normalizePaginator(paginator = {}) {
-      return {
-        ...paginator,
-        totalCount: Number(paginator.totalCount ?? paginator.total ?? 0)
+    // Export current list data with merged query, labels and filename.
+    exportData() {
+      const loading = this.startLoading({
+        lock: true,
+        text: this.$t('Exporting data'),
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+
+      // default config
+      const exportConf = this.config.list.export
+      const listQuery = this.config.list.query
+      let exportQuery = {}, exportLabel = {}
+      if (exportConf) {
+        if (exportConf.hasOwnProperty('query')) exportQuery = exportConf.query
+        if (exportConf.hasOwnProperty('label')) exportLabel = exportConf.label
       }
+
+      // Use current filter
+      const query = Object.assign({}, listQuery, this.filter, exportQuery)
+
+      this.em.list(query).then(res => {
+        loading.close()
+        const req = buildExportRequest(
+          this.em.name,
+          { configQuery: listQuery || {}, filter: this.filter, exportQuery, rows: res.data },
+          exportLabel
+        )
+        this.exportExcelCsv(req.label, req.data, req.filename)
+      })
+    },
+
+    normalizePaginator(paginator = {}) {
+      return normalizePaginatorResult(paginator)
     },
 
     // Sorter changed
     changeSort(val) {
-      const orderMap = { ascending: 'ASC', descending: 'DESC' }
-      this.sort['@order'] = val.order ? `entity.${val.prop}|${orderMap[val.order]}` : ''
+      const mapped = mapElementPlusSort(val.prop, val.order)
+      this.sort['@order'] = mapped ? formatSortParam([mapped]) : ''
 
       // Reload data
       this.fetchData()
@@ -1001,7 +968,7 @@ export default {
     },
 
     async removeSelected() {
-      const ids = this.selectedRecords.map(record => record.id).filter(id => id != null)
+      const ids = collectBatchDeleteIds(this.selectedRecords)
       if (!ids.length) return
 
       this.batchDeleting = true
@@ -1063,17 +1030,15 @@ export default {
     },
 
     async submitBatchEdit() {
-      const ids = this.selectedRecords.map(r => r.id).filter(id => id != null)
+      const ids = collectBatchDeleteIds(this.selectedRecords)
       if (!ids.length) return
 
       const form = this.batchEditDialog.form
-      const data = {}
-      const batchFieldProperties = new Set(this.resolvedBatchFields.map(field => field.property))
-      for (const key of this.batchEditDialog.selectedFields) {
-        if (batchFieldProperties.has(key) && Object.hasOwn(form, key)) {
-          data[key] = form[key]
-        }
-      }
+      const data = collectBatchUpdateData(
+        this.resolvedBatchFields,
+        this.batchEditDialog.selectedFields,
+        form
+      )
       if (!Object.keys(data).length) {
         this.uiFeedback().warning(this.$t('No fields to update'))
         return

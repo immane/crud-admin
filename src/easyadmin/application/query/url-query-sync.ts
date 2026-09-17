@@ -5,11 +5,11 @@
 export function buildQueryParams(
   listFilterData: Record<string, any>,
   pager: { page: number; limit: number }
-): Record<string, string> {
-  const query: Record<string, string> = {}
+): Record<string, any> {
+  const query: Record<string, any> = {}
   for (const key of Object.keys(listFilterData)) {
     if (listFilterData[key] != null && listFilterData[key] !== '') {
-      query[key] = String(listFilterData[key])
+      query[key] = listFilterData[key]
     }
   }
   if (pager.page !== 1) query.page = String(pager.page)
@@ -38,6 +38,6 @@ export function applyQueryParams(query: Record<string, any>): {
   return { filterData, pager: { page, limit } }
 }
 
-export function buildUrlSearch(params: Record<string, string>): string {
+export function buildUrlSearch(params: Record<string, any>): string {
   return new URLSearchParams(params).toString()
 }
