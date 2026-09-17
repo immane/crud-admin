@@ -19,7 +19,13 @@ export default defineConfig({
     include: ['tests/unit/**/*.spec.js'],
     coverage: {
       provider: 'v8',
-      include: ['src/easyadmin/ui/vue/**/*.{vue,ts}'],
+      include: [
+        'src/easyadmin/ui/vue/**/*.{vue,ts}',
+        'src/easyadmin/core/**/*.ts',
+        'src/easyadmin/application/**/*.ts',
+        'src/easyadmin/adapters/crudskeleton/**/*.ts'
+      ],
+      exclude: ['src/easyadmin/adapters/graphql/**'],
       thresholds: {
         statements: 100,
         branches: 100,

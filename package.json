@@ -7,7 +7,7 @@
         "test:unit": "vitest run",
         "test": "vitest run",
         "test:related": "vitest related --run",
-        "test:coverage": "vitest run --coverage tests/unit/components/easy-admin/",
+        "test:coverage": "vitest run --coverage",
         "lint": "eslint --ext .js,.ts,.vue src",
         "type-check": "tsc --noEmit",
         "build": "vite build",
