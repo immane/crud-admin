@@ -41,7 +41,7 @@ flowchart TB
         F1["FormAdmin.vue"]
         F2["el-tabs - Tab grouping"]
         F3["el-form - Dynamic form"]
-        F4["plugins/form - 20 field-type plugins"]
+        F4["plugins/form - 21 field-type plugins"]
         L1 --> L2
         L1 --> L3
         L1 --> L4
@@ -157,6 +157,7 @@ Plugins receive additional config via `v-bind="field.type_options"` and `v-on="f
 | `file.vue` | — | `<el-upload>` (single file, Qiniu) |
 | `code.vue` | — | `<PrismEditor>` (JS highlight) |
 | `json.vue` | — | `<PrismEditor>` (JSON highlight + format) |
+| `json_schema.vue` | `json_schema` | Nested generated `<FormAdmin>` with Ajv validation |
 | `json-custom.vue` | — | Nested `<FormAdmin>` (sub-object editor) |
 | `array.vue` | array | `<el-select multiple>` or nested `<FormAdmin>` |
 | `RelationToOne.vue` | ManyToOne, OneToOne | `<el-select>` (remote search) |

@@ -220,6 +220,7 @@ interface FieldOption {
 | `file` | `<el-upload>` single file | File upload |
 | `code` | CodeMirror 6 editor | Code snippets with line numbers and syntax highlighting |
 | `json` | `<jsoneditor>` tree/code view | Structured JSON objects |
+| `json_schema` | Nested generated `<FormAdmin>` | JSON Schema object editor with Ajv validation |
 | `json-custom` | Nested `<FormAdmin>` sub-form | Sub-object editing |
 | `array` | `<el-select multiple>` or nested form | Array/list values |
 | `RelationToOne` | `<el-select>` remote search | ManyToOne / OneToOne |
@@ -249,6 +250,104 @@ The `code` field type uses CodeMirror 6 and fills the available form width by de
 ```
 
 It includes line numbers, syntax highlighting, bracket matching, active-line highlighting, undo/redo, and Tab indentation.
+
+#### JSON Schema Forms
+
+Use `json_schema` when a JSON object has a known contract and should be edited as
+normal form controls rather than raw JSON. Keep the schema beside the entity config
+so the frontend contract is versioned with its consumer.
+
+```js
+// src/configs/collections/store/Store.js
+import StoreContactSchema from './StoreContact.json'
+
+{
+  property: 'contact',
+  type: 'json_schema',
+  required: false,
+  type_options: { schema: StoreContactSchema }
+}
+```
+
+`type_options.schema` accepts a static JSON Schema object or an async provider:
+
+```js
+schema: async ({ entity, id, property, form }) => {
+  const { data } = await request.get(`/schemas/${entity}/${property}`, { params: { id } })
+  return data
+}
+```
+
+The plugin maps object properties to existing form controls: strings, email/date/date-time
+formats, integers/numbers, booleans, enums, primitive arrays, and nested objects. Complex
+composition (`$ref`, `oneOf`, `anyOf`, `allOf`, `patternProperties`) falls back to the raw
+JSON editor. Labels, descriptions, and enum labels pass through `t()`; add matching keys
+to each `src/i18n/*.js` locale file.
+
+##### EasyAdmin Field Overrides
+
+Use `type_options.fields` to override generated fields with normal `FieldOption` objects.
+This is presentation configuration: it can change order, widget type, labels, help text,
+visibility, plugin options, and supplementary Element Plus rules without modifying the
+Schema itself.
+
+```js
+{
+  property: 'address',
+  type: 'json_schema',
+  type_options: {
+    schema: StoreAddressSchema,
+    fields: [
+      // Configured fields are rendered first, in this order.
+      {
+        property: 'province',
+        field_options: { label: t('Province'), placeholder: t('Select province') },
+        type_options: { clearable: true }
+      },
+      {
+        property: 'latitude',
+        type: 'integer',
+        type_options: { precision: 6, step: 0.000001 }
+      },
+      {
+        property: 'geohash',
+        hidden: true
+      }
+    ]
+  }
+}
+```
+
+Only entries whose `property` exists in `schema.properties` are used. Listed fields are
+rendered first; all remaining schema properties follow their schema order. Matching
+`field_options` and `type_options` are merged with generated options rather than replaced.
+The same `fields` configuration works recursively for an object property:
+
+```js
+{
+  property: 'location',
+  type_options: {
+    fields: [
+      {
+        property: 'coordinates',
+        type_options: {
+          fields: [{ property: 'latitude', hidden: true }]
+        }
+      }
+    ]
+  }
+}
+```
+
+`hidden` affects only rendering. JSON Schema remains the final authority for JSON payload
+validation: a schema-required property cannot be made optional with `required: false`, and
+manual `required: true` adds an EasyAdmin form requirement without changing the backend
+Schema contract.
+
+Ajv validates the complete object at submit time, including `required`, `pattern`, bounds,
+formats, `additionalProperties`, `uniqueItems`, and draft-07 `dependencies`. Empty optional
+values are skipped for validation, while empty required properties fail. `null` and
+`undefined` object properties are recursively omitted from the submitted payload.
 
 #### Currency Options
 
@@ -762,6 +861,7 @@ Custom plugins for detail view go in `plugins/detail/`. The existing ones:
 |--------|------|----------|
 | `image.vue` | image | Full-width preview with border and shadow |
 | `json.vue` | json | `<pre>` with 2-space indent, expand/collapse, syntax coloring |
+| `json_schema.vue` | json_schema | Schema-ordered label/value rows; preserves unknown properties and falls back to `json.vue` |
 
 Adding a new detail plugin: create `plugins/detail/{type}.vue` with props `value`, `field`, `scope`, `em`, `struct`. It is auto-discovered via `import.meta.glob`.
 
@@ -1007,7 +1107,7 @@ export default {
 | Boolean | `boolean` |
 | Date/Time | `date`, `datetime` |
 | Media | `image`, `file` |
-| Structured | `json`, `json-custom`, `array` |
+| Structured | `json`, `json_schema`, `json-custom`, `array` |
 | Relations | `RelationToOne`, `RelationToMany` |
 | Selection | `select`, `transfer` |
 | Auth | `password`, `email` |

@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-row>
+    <el-row v-if="!embedded">
       <el-col :span="4">
         <slot name="formTitle">
           <strong style="font-size: 20px;">
@@ -113,7 +113,7 @@
         </el-tab-pane>
       </el-tabs>
 
-      <el-form-item>
+      <el-form-item v-if="!embedded">
         <slot name="action" :form="form" :submit="onSubmit">
           <el-button type="primary" icon="el-icon-edit-outline" @click="onSubmit()">{{ $t('Save') }}</el-button>
           <!--<el-button type="primary" @click="onSubmit()">Save and Continue Editing</el-button>-->
@@ -205,6 +205,15 @@ export default {
          * ]
          */
       ]
+    },
+    // Lets nested schema forms reuse the renderer without loading an entity structure.
+    structureOverride: {
+      type: Object,
+      default: null
+    },
+    embedded: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -239,6 +248,12 @@ export default {
     }
   },
   watch: {
+    modelValue(value) {
+      // Schema-backed child forms mount before the parent finishes fetching edit data.
+      if (this.embedded && value && typeof value === 'object' && value !== this.form) {
+        this.form = value
+      }
+    },
     form: {
       handler: function(value) {
         // TODO: Is here need cleaning blank values?
@@ -252,8 +267,11 @@ export default {
   created() {
     this.loading = true
 
-    // get structure
-    this.em.structure().then(async res => {
+    // Schema-backed nested forms provide their structure locally.
+    const structurePromise = this.structureOverride
+      ? Promise.resolve(this.structureOverride)
+      : this.em.structure()
+    structurePromise.then(async res => {
       this.structure = res
 
       // fields transform
@@ -474,7 +492,7 @@ export default {
         const form = {}
         const jsonFields = new Set(
           this.properties
-            .filter(p => p.type === 'json')
+            .filter(p => ['json', 'json_schema'].includes(p.type))
             .map(p => p.property)
         )
 
@@ -516,9 +534,16 @@ export default {
     },
 
     cleanBlankAttributes(data) {
-      for (var propName in data) {
-        if (data[propName] === null || data[propName] === undefined) {
+      for (const propName in data) {
+        const value = data[propName]
+        if (value === null || value === undefined) {
           delete data[propName]
+        } else if (Array.isArray(value)) {
+          value.forEach(item => {
+            if (item && typeof item === 'object' && !Array.isArray(item)) this.cleanBlankAttributes(item)
+          })
+        } else if (typeof value === 'object') {
+          this.cleanBlankAttributes(value)
         }
       }
     },

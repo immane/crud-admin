@@ -124,6 +124,23 @@ describe('i18n', () => {
       modZh.setLocale('ja')
       expect(modZh.t('Back')).toBe('戻る')
     })
+    it('translates Store JSON Schema field labels and help text', async () => {
+      const mod = await setup('en')
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      expect(mod.t('Province')).toBe('Province')
+      expect(mod.t('Detailed address, building/floor/room')).toBe('Detailed address, building/floor/room')
+
+      mod.setLocale('zh')
+      expect(mod.t('Province')).toBe('省/州')
+      expect(mod.t('Store phone (mobile or landline)')).toBe('门店电话（手机或座机）')
+
+      mod.setLocale('zh-Hant')
+      expect(mod.t('Postal Code')).toBe('郵遞區號')
+
+      mod.setLocale('ja')
+      expect(mod.t('Manager User Uuid')).toBe('担当者ユーザー UUID')
+      expect(warnSpy).not.toHaveBeenCalled()
+    })
     it('missing key returns key and warns', async () => {
       const mod = await setup('en')
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
