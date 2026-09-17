@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/vue-3.5-brightgreen?logo=vue.js" alt="Vue 3">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/vite-5.x-646CFF?logo=vite" alt="Vite">
-  <img src="https://img.shields.io/badge/node-%3E%3D14-green?logo=node.js" alt="Node">
+  <img src="https://img.shields.io/badge/node-%3E%3D18-green?logo=node.js" alt="Node">
   <br><br>
 </p>
 
@@ -51,12 +51,12 @@
 - **JWT 驗證** — Bearer token 登入，自動刷新 token 輪換，按埠隔離的 Cookie 持久化（`dream_studio_admin_token_{port}` 避免同主機跨埠衝突），並發請求排隊
 - **基於角色的存取控制** — 透過 Vuex + Vue Router 4 按使用者角色過濾動態路由
 - **實體自省** — 查詢後端 `/system/entities` 推斷欄位類型、可空性和關聯關係
-- **動態篩選與排序** — 基於配置驅動的搜尋 UI 組裝伺服器端篩選表達式（`@filter`、`@sort`、`@order`）
+- **動態篩選與排序** — 基於配置驅動的搜尋 UI 組裝伺服器端篩選表達式（`@filter`、`@order`）
 - **企業儀表板** — 即時訂單/商品/使用者指標、SVG sparkline 圖表、地理定位天氣元件
 - **響應式佈局** — 可折疊側邊欄（SVG 圖示）、麵包屑導覽、可選固定頂欄
 - **程式碼分割與建置最佳化** — Vite 驅動的 chunk 分割與 tree-shaking
 - **伺服器健康監控** — 導覽列狀態燈輪詢 `GET /health/live`、`/health/ready` 與 `/metrics`
-- **Vitest 單元測試** — 78 個 spec 檔案共 1041 項測試，`src/easyadmin/ui/vue` 強制 100% 覆蓋率門檻
+- **Vitest 單元測試** — 101 個 spec 檔案共 1330 項測試，`src/easyadmin/{ui/vue,core,application,adapters/crudskeleton}` 強制 100% 覆蓋率門檻
 - **受控的 Lockfile** — 提交 `package-lock.json`，確保依賴安裝可重現
 
 
@@ -95,16 +95,31 @@
 .
 ├── src/
 │   ├── main.js                      # 應用入口：createApp、安裝外掛、掛載
+│   ├── App.vue                      # 根組件（<router-view />）
 │   ├── permission.js                # 路由守衛（驗證＋角色檢查）
-│   ├── easyadmin/ui/vue/        # ⭐ 核心 CRUD UI
-│   │   ├── FormAdmin.vue            # 動態表單生成器
-│   │   ├── ListAdmin.vue            # 動態列表/表格生成器
-│   │   ├── DetailAdmin.vue          # 可配置記錄詳情頁
-│   │   ├── SearchFilter.vue         # 動態篩選 UI
-│   │   └── plugins/
-│   │       ├── form/                # 21 個欄位類型外掛
-│   │       ├── list/                # 10 個列表渲染外掛
-│   │       └── detail/              # 2 個詳情專用外掛
+│   ├── settings.js                  # 應用標題、佈局選項
+│   ├── config.js                    # 宣告式配置再匯出
+│   ├── api/                         # 接口定義（prefix、user/auth）
+│   ├── assets/                      # 靜態圖片（登入背景、404）
+│   ├── components/                  # 通用 UI（Breadcrumb、Hamburger、SvgIcon、Tinymce）
+│   ├── easyadmin/                   # ⭐ 配置驅動 CRUD 引擎
+│   │   ├── core/query/              # 純查詢模型（AdminQuery、FilterNode、排序、分頁、DQL 工具）
+│   │   ├── core/model/              # 實體標識、記錄、欄位配置、管理元數據
+│   │   ├── core/ports/              # 倉儲、元數據、編譯器接口
+│   │   ├── application/query/       # AdminQuery 構建＋URL 查詢同步
+│   │   ├── application/usecases/    # 保存、刪除、批量、匯出、關聯、分批欄位工具
+│   │   ├── adapters/crudskeleton/   # 適配器、元數據提供器、CSQE 查詢編譯器
+│   │   ├── adapters/graphql/        # 預留佔位（暫無後端契約）
+│   │   └── ui/vue/                  # Vue UI：List/Form/Detail/SearchFilter＋外掛
+│   │       ├── FormAdmin.vue        # 動態表單生成器
+│   │       ├── ListAdmin.vue        # 動態列表/表格生成器
+│   │       ├── DetailAdmin.vue      # 可配置記錄詳情頁
+│   │       ├── SearchFilter.vue     # 動態篩選 UI
+│   │       ├── feedback.ts          # Element Plus 訊息/載入工具
+│   │       └── plugins/
+│   │           ├── form/            # 21 個欄位類型外掛
+│   │           ├── list/            # 10 個列表渲染外掛
+│   │           └── detail/          # 3 個詳情專用外掛
 │   ├── configs/                     # 宣告式實體配置
 │   │   ├── routes.js                # 選單／路由定義
 │   │   ├── entities.js              # 自動載入器（import.meta.glob）
@@ -116,16 +131,23 @@
 │   ├── router/                      # Vue Router 4 + r()/g() 生成器
 │   ├── store/                       # Vuex 4（自動載入 modules/）
 │   ├── styles/                      # 全域 SCSS（側邊欄、過渡、覆寫）
-│   ├── utils/                       # auth.js、entity.ts、request.ts 等
+│   ├── types/                       # TypeScript 定義（admin、api）
+│   ├── utils/                       # auth.js、request.ts 等
 │   └── views/                       # 頁面視圖
 │       ├── admin/                   # 通用 CRUD（list + form + detail）
 │       ├── dashboard/               # 企業儀表板
 │       └── login/                   # 登入頁
-├── tests/unit/                      # 1041 項 Vitest 測試（78 個 spec 檔案）
-├── docs/                            # 設計合約＋AI 上下文
-│   └── ai/context.md                # AI 助手參考文件
+├── tests/unit/                      # 1330 項 Vitest 測試（101 個 spec 檔案）
+│   ├── components/                  # 組件＋外掛測試
+│   ├── easyadmin/                   # core/application/adapter/golden/config 測試
+│   └── store/、router/、utils/      # Store、路由、工具函數測試
+├── docs/                            # design/、manual/、plan/、tasks/、ai/context.md
+├── mock/                            # 歷史遺留開發 API 模擬（未接入 Vite 建置）
+├── public/                          # favicon.ico、.htaccess
+├── index.html                       # Vite 入口 HTML
+├── .env.development/.staging/.production
 ├── vite.config.ts                   # Vite 5 + Vue 3 + JSX 配置
-├── vitest.config.ts                 # Vitest 配置
+├── vitest.config.ts                 # Vitest 配置（easyadmin 路徑 100% 閾值）
 ├── tsconfig.json
 └── package.json
 ```
@@ -134,8 +156,8 @@
 
 ### 前置要求
 
-- **Node.js** >= 14.18
-- **npm** >= 6.0.0
+- **Node.js** >= 18.0
+- **npm** >= 9.0.0
 
 ### 1) 複製
 
@@ -152,10 +174,11 @@ npm install
 
 ### 3) 配置環境變數
 
-複製並編輯開發環境檔案：
+編輯開發環境檔案（`.env.development` 已提交本地預設值，不提供 `.env.example`）：
 
 ```bash
-cp .env.example .env.development
+# .env.development — 將代理指向你的後端
+VITE_PROXY_TARGET=http://127.0.0.1:8000
 ```
 
 關鍵變數：
@@ -166,6 +189,7 @@ VITE_PROXY_TARGET=http://127.0.0.1:8000
 VITE_API_PREFIX=/api/v1
 VITE_AUTH_API_PREFIX=/api/auth
 VITE_SYSTEM_API_PREFIX=/system
+MEDIA_STORAGE_DEFAULT=local
 ```
 
 ### 4) 執行
@@ -198,6 +222,7 @@ npm run test         # Vitest
 | `VITE_AUTH_API_PREFIX` | 驗證 API 前綴 | `/api/auth` |
 | `VITE_SYSTEM_API_PREFIX` | 系統 API 前綴 | `/system` |
 | `VITE_TINYMCE_SRC` | TinyMCE 腳本源 | `''` |
+| `MEDIA_STORAGE_DEFAULT` | 預設上傳儲存驅動（`local` / `qiniu`） | `local` |
 
 ### 建置自訂配置
 
@@ -227,28 +252,35 @@ flowchart LR
 
 ```js
 import { t } from '@/i18n'
+import axios from '@/utils/request'
+import { API_PREFIX, apiPath } from '@/api/prefix'
+import { orderByIdDesc } from '../helpers'
 
 export default {
   Content: {
     form: {
       fields: [
         'title',
-        { property: 'category', required: false },
-        { property: 'tags', required: false }
-      ]
+        { property: 'body', required: true },
+        { property: 'category', required: false, tab: `${t('Metadata')}` },
+        { property: 'tags', required: false, tab: `${t('Metadata')}` }
+      ],
+      batch_edit: {
+        fields: ['category', 'tags']
+      }
     },
     list: {
-      query: { '@order': 'entity.id|DESC' },
+      query: orderByIdDesc,
       list_filter: {
         title: t('Title'),
         'category.id': () => axios
-          .get('/api/v1/manage/categories')
+          .get(apiPath(API_PREFIX, 'manage/categories'))
           .then(res => Object.assign({ __label: t('Category') }, ...res.data.map(v => ({ [v.id]: v.name }))))
       },
-      list_display: ['id', 'title', 'category', 'tags', 'createdAt']
+      list_display: ['id', 'title', 'category', 'tags', 'createdAt', 'updatedAt']
     },
     detail: {
-      detail_display: ['id', 'title', 'category', 'tags', 'body', 'createdAt']
+      detail_display: '__all__'
     }
   }
 }
@@ -315,6 +347,7 @@ interface FieldOption {
   type_events?: object       // 綁定到欄位外掛的事件
   hidden?: boolean | string[]            // true/false 或 ['create']/['update']/['create','update']（亦支援 'edit' 別名）
   relation_filter?: object   // 關聯查詢的篩選條件
+  relation?: object         // 關聯目標覆寫（entity、valueKey、cardinality）
   component?: object         // 自訂元件（JSX 渲染函數）
   help?: string              // 欄位下方說明文字
   full_width?: boolean       // 詳情視圖中跨滿網格寬度
@@ -409,7 +442,7 @@ FormAdmin 會將 `field.rules` / `field.validator` 合併至 `el-form` 規則。
 
 ## 測試
 
-**78 個 spec 檔案共 1041 項測試 · Vitest 2.1 · `src/easyadmin/ui/vue` 強制 100% statements/branches/lines 門檻**
+**101 個 spec 檔案共 1330 項測試 · Vitest 2.1 · `src/easyadmin/{ui/vue,core,application,adapters/crudskeleton}` 強制 100% statements/branches/lines 門檻**
 
 ```bash
 npm run test              # 執行全部測試（CI 中關閉 watch 模式）
@@ -421,9 +454,9 @@ npm run test:ci           # CI（類型檢查＋測試）
 
 測試位於 `tests/unit/`：
 - **元件測試**：Breadcrumb、Hamburger、SvgIcon、EasyAdmin 回饋 UI
-- **工具函數測試**：`request.ts`、`validate.js`、`entity.ts`、`formatTime`、`parseTime`、`param2Obj`
+- **工具函數測試**：`request.ts`、`validate.js`、`formatTime`、`parseTime`、`param2Obj`，以及 EasyAdmin 查詢 core/adapter golden 測試
 
-配置：`vitest.config.ts`（jsdom 環境、Vue 3 外掛；`src/easyadmin/ui/vue` 強制 100% statements/branches/lines 門檻）。
+配置：`vitest.config.ts`（jsdom 環境、Vue 3 外掛；`src/easyadmin/{ui/vue,core,application,adapters/crudskeleton}` 強制 100% statements/branches/lines 門檻）。
 
 CI：GitHub Actions 執行類型檢查＋分片單元測試與覆蓋率任務。僅文件/配置/i18n 變更時透過路徑過濾跳過 CI 任務。
 
@@ -433,12 +466,12 @@ CI：GitHub Actions 執行類型檢查＋分片單元測試與覆蓋率任務。
 
 ```
 dist/
-├── static/
-│   ├── css/
-│   ├── js/
-│   └── img/
+├── index.html
 ├── favicon.ico
-└── index.html
+└── static/
+    ├── index-[hash].js
+    ├── index-[hash].css
+    └── ...（帶內容雜湊的圖片與字體檔案）
 ```
 
 ### 部署說明

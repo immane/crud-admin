@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/vue-3.5-brightgreen?logo=vue.js" alt="Vue 3">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/vite-5.x-646CFF?logo=vite" alt="Vite">
-  <img src="https://img.shields.io/badge/node-%3E%3D14-green?logo=node.js" alt="Node">
+  <img src="https://img.shields.io/badge/node-%3E%3D18-green?logo=node.js" alt="Node">
   <br><br>
 </p>
 
@@ -50,12 +50,12 @@
 - **JWT 認証** — Bearer トークンログイン、リフレッシュトークンの自動ローテーション、ポート分離 Cookie 永続化（`dream_studio_admin_token_{port}` で同一ホストのポート間衝突を回避）、同時リクエストキューイング
 - **ロールベースのアクセス制御** — Vuex + Vue Router 4 によるユーザーロール別の動的ルートフィルタリング
 - **エンティティイントロスペクション** — バックエンド `/system/entities` に問い合わせてフィールド型、null 許容、リレーションを自動推論
-- **動的フィルタとソート** — 設定駆動の検索 UI からサーバーサイドフィルタ式を生成（`@filter`、`@sort`、`@order`）
+- **動的フィルタとソート** — 設定駆動の検索 UI からサーバーサイドフィルタ式を生成（`@filter`、`@order`）
 - **エンタープライズダッシュボード** — リアルタイムの注文/商品/ユーザー指標、SVG スパークラインチャート、位置情報天気ウィジェット
 - **レスポンシブレイアウト** — 折りたたみ可能なサイドバー（SVG アイコン）、パンくずナビゲーション、固定ヘッダーオプション
 - **コード分割とビルド最適化** — Vite によるチャンク分割とツリーシェイキング
 - **サーバーヘルスモニター** — ナビゲーションバーのステータスドットが `GET /health/live`、`/health/ready`、`/metrics` をポーリング
-- **Vitest ユニットテスト** — 78 スペックファイル・1041 テスト、`src/easyadmin/ui/vue` に 100% カバレッジ閾値
+- **Vitest ユニットテスト** — 101 スペックファイル・1330 テスト、`src/easyadmin/{ui/vue,core,application,adapters/crudskeleton}` に 100% カバレッジ閾値
 - **追跡対象のロックファイル** — 再現可能なインストールのため `package-lock.json` をコミット
 
 
@@ -94,16 +94,31 @@
 .
 ├── src/
 │   ├── main.js                      # エントリ：createApp、プラグインインストール、マウント
+│   ├── App.vue                      # ルートコンポーネント（<router-view />）
 │   ├── permission.js                # ナビゲーションガード（認証 + ロールチェック）
-│   ├── easyadmin/ui/vue/        # ⭐ コア CRUD UI
-│   │   ├── FormAdmin.vue            # 動的フォームビルダー
-│   │   ├── ListAdmin.vue            # 動的リスト/テーブルビルダー
-│   │   ├── DetailAdmin.vue          # 設定可能なレコード詳細ページ
-│   │   ├── SearchFilter.vue         # 動的フィルタ UI
-│   │   └── plugins/
-│   │       ├── form/                # 21 のフィールド型プラグイン
-│   │       ├── list/                # 10 のリストレンダリングプラグイン
-│   │       └── detail/              # 2 の詳細専用プラグイン
+│   ├── settings.js                  # アプリタイトル、レイアウトオプション
+│   ├── config.js                    # 宣言的設定の再エクスポート
+│   ├── api/                         # エンドポイント定義（prefix、user/auth）
+│   ├── assets/                      # 静的画像（ログイン背景、404）
+│   ├── components/                  # 共有 UI（Breadcrumb、Hamburger、SvgIcon、Tinymce）
+│   ├── easyadmin/                   # ⭐ 設定駆動 CRUD エンジン
+│   │   ├── core/query/              # 純粋クエリモデル（AdminQuery、FilterNode、ソート、ページネーション、DQL ヘルパー）
+│   │   ├── core/model/              # エンティティ識別子、レコード、フィールド設定、管理メタデータ
+│   │   ├── core/ports/              # リポジトリ、メタデータ、コンパイラインターフェース
+│   │   ├── application/query/       # AdminQuery ビルダー + URL クエリ同期
+│   │   ├── application/usecases/    # 保存、削除、バッチ、エクスポート、リレーション、バッチフィールドヘルパー
+│   │   ├── adapters/crudskeleton/   # アダプター、メタデータプロバイダー、CSQE クエリコンパイラ
+│   │   ├── adapters/graphql/        # 予約プレースホルダー（バックエンド契約なし）
+│   │   └── ui/vue/                  # Vue UI：List/Form/Detail/SearchFilter + プラグイン
+│   │       ├── FormAdmin.vue        # 動的フォームビルダー
+│   │       ├── ListAdmin.vue        # 動的リスト/テーブルビルダー
+│   │       ├── DetailAdmin.vue      # 設定可能なレコード詳細ページ
+│   │       ├── SearchFilter.vue     # 動的フィルタ UI
+│   │       ├── feedback.ts          # Element Plus メッセージ/ローディングヘルパー
+│   │       └── plugins/
+│   │           ├── form/            # 21 のフィールド型プラグイン
+│   │           ├── list/            # 10 のリストレンダリングプラグイン
+│   │           └── detail/          # 3 の詳細専用プラグイン
 │   ├── configs/                     # 宣言的エンティティ設定
 │   │   ├── routes.js                # メニュー/ルート定義
 │   │   ├── entities.js              # 自動ローダー（import.meta.glob）
@@ -115,16 +130,23 @@
 │   ├── router/                      # Vue Router 4 + r()/g() ジェネレータ
 │   ├── store/                       # Vuex 4（modules/ を自動ロード）
 │   ├── styles/                      # グローバル SCSS（サイドバー、トランジション、オーバーライド）
-│   ├── utils/                       # auth.js、entity.ts、request.ts など
+│   ├── types/                       # TypeScript 定義（admin、api）
+│   ├── utils/                       # auth.js、request.ts など
 │   └── views/                       # ページビュー
 │       ├── admin/                   # 汎用 CRUD（list + form + detail）
 │       ├── dashboard/               # エンタープライズダッシュボード
 │       └── login/                   # ログインページ
-├── tests/unit/                      # 1041 の Vitest テスト（78 スペックファイル）
-├── docs/                            # 設計契約 + AI コンテキスト
-│   └── ai/context.md                # AI アシスタントリファレンス
+├── tests/unit/                      # 1330 の Vitest テスト（101 スペックファイル）
+│   ├── components/                  # コンポーネント + プラグインテスト
+│   ├── easyadmin/                   # core/application/adapter/golden/config テスト
+│   └── store/、router/、utils/      # ストア、ルーター、ユーティリティテスト
+├── docs/                            # design/、manual/、plan/、tasks/、ai/context.md
+├── mock/                            # レガシー開発 API モック（Vite ビルド未配線）
+├── public/                          # favicon.ico、.htaccess
+├── index.html                       # Vite エントリ HTML
+├── .env.development/.staging/.production
 ├── vite.config.ts                   # Vite 5 + Vue 3 + JSX 設定
-├── vitest.config.ts                 # Vitest 設定
+├── vitest.config.ts                 # Vitest 設定（easyadmin パスに 100% 閾値）
 ├── tsconfig.json
 └── package.json
 ```
@@ -133,8 +155,8 @@
 
 ### 前提条件
 
-- **Node.js** >= 14.18
-- **npm** >= 6.0.0
+- **Node.js** >= 18.0
+- **npm** >= 9.0.0
 
 ### 1) クローン
 
@@ -151,10 +173,11 @@ npm install
 
 ### 3) 環境設定
 
-開発環境ファイルをコピーして編集：
+開発環境ファイルを編集（`.env.development` にローカル既定値がコミット済み、`.env.example` はありません）：
 
 ```bash
-cp .env.example .env.development
+# .env.development — プロキシをバックエンドに向ける
+VITE_PROXY_TARGET=http://127.0.0.1:8000
 ```
 
 主要変数：
@@ -165,6 +188,7 @@ VITE_PROXY_TARGET=http://127.0.0.1:8000
 VITE_API_PREFIX=/api/v1
 VITE_AUTH_API_PREFIX=/api/auth
 VITE_SYSTEM_API_PREFIX=/system
+MEDIA_STORAGE_DEFAULT=local
 ```
 
 ### 4) 実行
@@ -197,6 +221,7 @@ npm run test         # Vitest
 | `VITE_AUTH_API_PREFIX` | 認証 API プレフィックス | `/api/auth` |
 | `VITE_SYSTEM_API_PREFIX` | システム API プレフィックス | `/system` |
 | `VITE_TINYMCE_SRC` | TinyMCE スクリプトソース | `''` |
+| `MEDIA_STORAGE_DEFAULT` | 既定アップロードストレージドライバ（`local` / `qiniu`） | `local` |
 
 ### ビルドカスタマイズ
 
@@ -226,28 +251,35 @@ flowchart LR
 
 ```js
 import { t } from '@/i18n'
+import axios from '@/utils/request'
+import { API_PREFIX, apiPath } from '@/api/prefix'
+import { orderByIdDesc } from '../helpers'
 
 export default {
   Content: {
     form: {
       fields: [
         'title',
-        { property: 'category', required: false },
-        { property: 'tags', required: false }
-      ]
+        { property: 'body', required: true },
+        { property: 'category', required: false, tab: `${t('Metadata')}` },
+        { property: 'tags', required: false, tab: `${t('Metadata')}` }
+      ],
+      batch_edit: {
+        fields: ['category', 'tags']
+      }
     },
     list: {
-      query: { '@order': 'entity.id|DESC' },
+      query: orderByIdDesc,
       list_filter: {
         title: t('Title'),
         'category.id': () => axios
-          .get('/api/v1/manage/categories')
+          .get(apiPath(API_PREFIX, 'manage/categories'))
           .then(res => Object.assign({ __label: t('Category') }, ...res.data.map(v => ({ [v.id]: v.name }))))
       },
-      list_display: ['id', 'title', 'category', 'tags', 'createdAt']
+      list_display: ['id', 'title', 'category', 'tags', 'createdAt', 'updatedAt']
     },
     detail: {
-      detail_display: ['id', 'title', 'category', 'tags', 'body', 'createdAt']
+      detail_display: '__all__'
     }
   }
 }
@@ -314,6 +346,7 @@ interface FieldOption {
   type_events?: object       // Events bound to the field plugin
   hidden?: boolean | string[]            // true/false or ['create']/['update']/['create','update'] (also 'edit' alias)
   relation_filter?: object   // Filter for relation queries
+  relation?: object         // Relation target override (entity, valueKey, cardinality)
   component?: object         // Custom component (JSX render function)
   help?: string              // Help text below the field
   full_width?: boolean       // Span full grid width (detail view)
@@ -407,7 +440,7 @@ FormAdmin は `field.rules` / `field.validator` を `el-form` のルールにマ
 
 ## テスト
 
-**78 スペックファイル・1041 テスト · Vitest 2.1 · `src/easyadmin/ui/vue` に 100% の statements/branches/lines 閾値**
+**101 スペックファイル・1330 テスト · Vitest 2.1 · `src/easyadmin/{ui/vue,core,application,adapters/crudskeleton}` に 100% の statements/branches/lines 閾値**
 
 ```bash
 npm run test              # 全テストを実行（CI ではウォッチモード OFF）
@@ -419,9 +452,9 @@ npm run test:ci           # CI（type-check + test）
 
 `tests/unit/` の構成：
 - **コンポーネントテスト**：Breadcrumb、Hamburger、SvgIcon、EasyAdmin フィードバック UI
-- **ユーティリティテスト**：`request.ts`、`validate.js`、`entity.ts`、`formatTime`、`parseTime`、`param2Obj`
+- **ユーティリティテスト**：`request.ts`、`validate.js`、`formatTime`、`parseTime`、`param2Obj`、EasyAdmin クエリ core/adapter golden テスト
 
-設定：`vitest.config.ts`（jsdom 環境、Vue 3 プラグイン；`src/easyadmin/ui/vue` に 100% の statements/branches/lines 閾値を適用）。
+設定：`vitest.config.ts`（jsdom 環境、Vue 3 プラグイン；`src/easyadmin/{ui/vue,core,application,adapters/crudskeleton}` に 100% の statements/branches/lines 閾値を適用）。
 
 CI：GitHub Actions で type-check とシャーディングされたユニットテスト、 coverage ジョブを実行します。ドキュメント/設定/i18n のみの変更はパスフィルタにより CI ジョブがスキップされます。
 
@@ -431,12 +464,12 @@ CI：GitHub Actions で type-check とシャーディングされたユニット
 
 ```
 dist/
-├── static/
-│   ├── css/
-│   ├── js/
-│   └── img/
+├── index.html
 ├── favicon.ico
-└── index.html
+└── static/
+    ├── index-[hash].js
+    ├── index-[hash].css
+    └── ...（コンテンツハッシュ付きの画像・フォント）
 ```
 
 ### デプロイ時の注意点
