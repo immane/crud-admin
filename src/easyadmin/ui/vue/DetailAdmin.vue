@@ -49,7 +49,7 @@ import { defineAsyncComponent, markRaw, toRaw } from 'vue'
 import CrudSkeletonAdapter from '@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter'
 import entities from '@/configs/entities'
 import { resolveRelation } from '@/utils/relation'
-import { createUiFeedback } from './ui/feedback'
+import { createUiFeedback } from './feedback'
 
 const detailPlugins = import.meta.glob('./plugins/detail/*.vue')
 const listPlugins = import.meta.glob('./plugins/list/*.vue')

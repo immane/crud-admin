@@ -330,7 +330,7 @@ import { resolveRelation } from '@/utils/relation'
 import SIP from '@/utils/simple-image-process'
 import SearchFilter from './SearchFilter.vue'
 import FormAdmin from './FormAdmin.vue'
-import { createUiFeedback } from './ui/feedback'
+import { createUiFeedback } from './feedback'
 import EditablePlain from './plugins/list/editable-plain.vue'
 import { compileCsqeQuery } from '@/easyadmin/adapters/crudskeleton/CrudSkeletonQueryCompiler'
 import {
@@ -343,6 +343,7 @@ import {
   collectBatchDeleteIds,
   collectBatchUpdateData
 } from '@/easyadmin/application/usecases/batch-update-records'
+import { summarizeSettledDeletions } from '@/easyadmin/application/usecases/delete-records'
 import { buildExportRequest } from '@/easyadmin/application/usecases/export-records'
 
 const listPlugins = import.meta.glob('./plugins/list/*.vue')
@@ -975,8 +976,7 @@ export default {
       const results = await this.em.deleteMany(ids)
       this.batchDeleting = false
 
-      const failed = results.filter(result => result.status === 'rejected').length
-      const deleted = ids.length - failed
+      const { deleted, failed } = summarizeSettledDeletions(results)
       if (deleted) this.notifySuccess(this.$t('Deleted {0} records successfully', deleted))
       if (failed) this.uiFeedback().warning(this.$t('Failed to delete {0} records', failed))
 

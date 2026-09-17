@@ -68,6 +68,7 @@
 import CrudSkeletonAdapter from '@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter'
 import entities from '@/configs/entities'
 import { loadRelationRecords, relationLabel, relationValue, resolveRelation } from '@/utils/relation'
+import { buildRelationListParams } from '@/easyadmin/application/usecases/relation-options'
 export default {
   props: {
     emPrefix: {
@@ -172,14 +173,7 @@ export default {
           prefix: this.relation?.prefix || this.emPrefix || undefined
         })
 
-        const currentFilter = Object.assign({}, relationFilter)
-
-        currentFilter['@display'] = 'reduce'
-        currentFilter['limit'] = 1e10
-
-        if (relationFilter['@filter'] && query) {
-          currentFilter['@filter'] = relationFilter['@filter'].replaceAll(':value', query)
-        }
+        const currentFilter = buildRelationListParams(relationFilter, query)
 
         const targetList = await em.list(currentFilter)
 

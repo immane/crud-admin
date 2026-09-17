@@ -8,7 +8,7 @@ vi.mock('element-plus', () => ({
   ElLoading: { service: mockElLoadingService }
 }))
 
-import { createUiFeedback } from '@/components/EasyAdmin/ui/feedback'
+import { createUiFeedback } from '@/easyadmin/ui/vue/feedback'
 
 describe('EasyAdmin ui feedback - extended', () => {
   beforeEach(() => {

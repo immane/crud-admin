@@ -131,7 +131,8 @@ import CrudSkeletonAdapter from '@/easyadmin/adapters/crudskeleton/CrudSkeletonA
 import entities from '@/configs/entities'
 import { relationValue, resolveRelation } from '@/utils/relation'
 import Tinymce from '@/components/Tinymce'
-import { createUiFeedback } from './ui/feedback'
+import { createUiFeedback } from './feedback'
+import { cleanBlankAttributes as cleanFormBlankAttributes, isUpdateOperation } from '@/easyadmin/application/usecases/save-record'
 
 const formPlugins = import.meta.glob('./plugins/form/*.vue')
 const formPluginCache = {}
@@ -534,18 +535,7 @@ export default {
     },
 
     cleanBlankAttributes(data) {
-      for (const propName in data) {
-        const value = data[propName]
-        if (value === null || value === undefined) {
-          delete data[propName]
-        } else if (Array.isArray(value)) {
-          value.forEach(item => {
-            if (item && typeof item === 'object' && !Array.isArray(item)) this.cleanBlankAttributes(item)
-          })
-        } else if (typeof value === 'object') {
-          this.cleanBlankAttributes(value)
-        }
-      }
+      cleanFormBlankAttributes(data)
     },
 
     onSubmit(success = (res) => {
@@ -560,7 +550,7 @@ export default {
           // Remove blank attributes
           this.cleanBlankAttributes(this.form)
 
-          if (this.id) {
+          if (isUpdateOperation(this.id)) {
             this.em.update(this.id, this.form)
               .then(res => success(res))
               .catch(err => { this.uiFeedback().error(err.message) })

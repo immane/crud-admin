@@ -25,7 +25,7 @@ describe('EasyAdmin ui feedback', () => {
       $loading: jest.fn(() => ({ close: jest.fn() }))
     }
 
-    const { createUiFeedback } = await import('@/components/EasyAdmin/ui/feedback')
+    const { createUiFeedback } = await import('@/easyadmin/ui/vue/feedback')
     const feedback = createUiFeedback(vm)
 
     feedback.success('ok')
@@ -40,7 +40,7 @@ describe('EasyAdmin ui feedback', () => {
   })
 
   it('falls back to Element Plus globals when vm is absent', async() => {
-    const { createUiFeedback } = await import('@/components/EasyAdmin/ui/feedback')
+    const { createUiFeedback } = await import('@/easyadmin/ui/vue/feedback')
     const feedback = createUiFeedback()
 
     feedback.success('ok')

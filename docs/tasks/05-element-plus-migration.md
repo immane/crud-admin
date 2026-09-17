@@ -9,7 +9,7 @@ Migrate from Element UI 2 to Element Plus, ensuring login, layout, forms, tables
 - `src/main.ts`
 - `src/permission.js`
 - `src/utils/request.ts`
-- `src/easyadmin/ui/vue/ui/feedback.ts`
+- `src/easyadmin/ui/vue/feedback.ts`
 - `src/views/**/*.vue`
 - `src/layout/**/*.vue`
 - `src/components/**/*.vue`

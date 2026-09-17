@@ -41,7 +41,7 @@ vi.mock('@/components/Tinymce', () => ({
   default: { name: 'Tinymce', template: '<div class="tinymce-stub" />' }
 }))
 
-vi.mock('@/components/EasyAdmin/ui/feedback', () => ({
+vi.mock('@/easyadmin/ui/vue/feedback', () => ({
   createUiFeedback: () => feedbackMocks
 }))
 

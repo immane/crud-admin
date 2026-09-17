@@ -11,7 +11,7 @@ Migrate the config-driven CRUD core capabilities, ensuring list, filter, paginat
 - `src/easyadmin/ui/vue/SearchFilter.vue`
 - `src/easyadmin/ui/vue/plugins/form/*.vue`
 - `src/easyadmin/ui/vue/plugins/list/editable-plain.vue`
-- `src/easyadmin/ui/vue/ui/feedback.ts`
+- `src/easyadmin/ui/vue/feedback.ts`
 - `src/views/admin/*.vue`
 - `src/views/user/*.vue`
 

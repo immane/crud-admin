@@ -67,7 +67,7 @@ only a reserved placeholder and must not introduce speculative behavior.
 
 ### Current Test Baseline
 
-- 100 test files and 1322 tests pass.
+- 101 test files and 1330 tests pass.
 - EasyAdmin UI, core, application, and CrudSkeleton adapter coverage has a 100%
   statements/branches/lines threshold.
 - Golden outputs use explicit `*.golden.json` plus `toEqual`; snapshots are not
@@ -371,16 +371,18 @@ Acceptance:
 
 ### Phase 5: Form, Detail, and Relation Boundaries
 
-Status: not started.
+Status: complete for save/delete/relation-request/feedback paths. `DetailAdmin`
+fetch orchestration and plugin micro-interactions remain UI-owned by design.
 
-1. Move form save/create/update and delete orchestration into application use
-   cases, preserving backend validation-message behavior.
-2. Route relation option loading through the repository port. Preserve
-   `@display=reduce`, `limit=1e10`, `relation_filter`, and remote `:value`
-   substitution.
-3. Keep plugin selection and Element Plus rendering in `ui/vue/plugins/`.
-4. Flatten `ui/vue/ui/feedback.ts` to `ui/vue/feedback.ts` when test imports are
-   migrated, then remove the Vitest old-path alias.
+1. Form save flows through `save-record` (`cleanBlankAttributes`,
+   `isUpdateOperation`); `FormAdmin` keeps validation, feedback, and routing.
+2. Batch deletion counts flow through `summarizeSettledDeletions()`.
+3. Relation option requests flow through `buildRelationListParams()`,
+   preserving `@display=reduce`, `limit=1e10`, `relation_filter`, and remote
+   `:value` substitution. The adapter instance remains constructed in the
+   plugin; port-level injection would require prop drilling and is deferred.
+4. Flattened `ui/vue/ui/feedback.ts` to `ui/vue/feedback.ts`; component and
+   test imports follow. The Vitest old-path alias moves in Phase 6.
 
 Acceptance:
 

@@ -148,7 +148,7 @@ Key changes:
 
 Goal: Replace Element UI 2, ensure page component behavior works.
 
-Files: `src/main.js`, `src/permission.js`, `src/utils/request.ts`, `src/easyadmin/ui/vue/ui/feedback.ts`, all `.vue` files using `el-*`
+Files: `src/main.js`, `src/permission.js`, `src/utils/request.ts`, `src/easyadmin/ui/vue/feedback.ts`, all `.vue` files using `el-*`
 
 API changes:
 
