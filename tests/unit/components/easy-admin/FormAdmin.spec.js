@@ -149,6 +149,36 @@ describe('FormAdmin.vue', () => {
   })
 
   describe('created flow without id', () => {
+    it('uses structureOverride without loading an entity structure', async() => {
+      const localStructure = {
+        email: { metadata: { type: 'email', nullable: false }, translation: 'Email' }
+      }
+      const { wrapper } = mountForm({
+        props: { fields: [{ property: 'email', default_value: 'store@example.com' }], structureOverride: localStructure, embedded: true }
+      })
+      await settled(wrapper)
+
+      expect(structureMock).not.toHaveBeenCalled()
+      expect(wrapper.vm.structure).toEqual(localStructure)
+      expect(wrapper.vm.form.email).toBe('store@example.com')
+      expect(wrapper.find('button').exists()).toBe(false)
+    })
+
+    it('syncs later modelValue changes into an embedded local form', async() => {
+      const { wrapper } = mountForm({
+        props: {
+          fields: [{ property: 'city' }],
+          structureOverride: { city: { metadata: { type: 'input', nullable: true }, translation: 'City' } },
+          embedded: true,
+          modelValue: {}
+        }
+      })
+      await settled(wrapper)
+      await wrapper.setProps({ modelValue: { city: 'Shanghai' } })
+
+      expect(wrapper.vm.form).toEqual({ city: 'Shanghai' })
+    })
+
     it('builds properties/plainFields and applies default values', async() => {
       const { wrapper } = mountForm({
         props: {
@@ -659,9 +689,23 @@ describe('FormAdmin.vue', () => {
       wrapper.vm.log('hi', 1)
       expect(spy).toHaveBeenCalledWith('hi', 1)
       spy.mockRestore()
-      const data = { a: 1, b: null, c: undefined, d: 0, e: '' }
+      const data = {
+        a: 1,
+        b: null,
+        c: undefined,
+        d: 0,
+        e: '',
+        schema: { phone: null, email: 'store@example.com' },
+        entries: [{ detail: null, city: 'Shanghai' }]
+      }
       wrapper.vm.cleanBlankAttributes(data)
-      expect(data).toEqual({ a: 1, d: 0, e: '' })
+      expect(data).toEqual({
+        a: 1,
+        d: 0,
+        e: '',
+        schema: { email: 'store@example.com' },
+        entries: [{ city: 'Shanghai' }]
+      })
     })
 
     it('provides registerFieldValidator and getFormAdmin', async() => {

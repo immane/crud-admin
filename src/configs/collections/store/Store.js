@@ -1,5 +1,7 @@
 import { t } from '@/i18n'
 import { orderByIdDesc } from '../helpers'
+import StoreAddressSchema from './StoreAddress.json'
+import StoreContactSchema from './StoreContact.json'
 
 export default {
   Store: {
@@ -22,8 +24,8 @@ export default {
           }
         },
         'timezone',
-        { property: 'contact', type: 'json', required: false, help: t('Store contact help') },
-        { property: 'address', type: 'json', required: false, help: t('Store address help') },
+        { property: 'contact', type: 'json_schema', required: false, type_options: { schema: StoreContactSchema }, help: t('Store contact help') },
+        { property: 'address', type: 'json_schema', required: false, type_options: { schema: StoreAddressSchema }, help: t('Store address help') },
         { property: 'settings', type: 'json', required: false, help: t('Store settings help') }
       ]
     },
@@ -52,7 +54,11 @@ export default {
       ]
     },
     detail: {
-      detail_display: '__all__'
+      detail_display: [
+        { property: 'contact', type: 'json_schema', type_options: { schema: StoreContactSchema }, full_width: true },
+        { property: 'address', type: 'json_schema', type_options: { schema: StoreAddressSchema }, full_width: true },
+        '__all__'
+      ]
     }
   }
 }

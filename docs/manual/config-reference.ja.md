@@ -217,6 +217,7 @@ interface FieldOption {
 | `file` | `<el-upload>` 単一ファイル | ファイルアップロード |
 | `code` | CodeMirror 6 エディタ | 行番号とシンタックスハイライト付きのコードスニペット |
 | `json` | `<jsoneditor>` ツリー/コードビュー | 構造化 JSON |
+| `json_schema` | ネスト生成 `<FormAdmin>` | Ajv 検証付き JSON Schema オブジェクトエディタ |
 | `json-custom` | ネストされた `<FormAdmin>` サブフォーム | 子オブジェクト編集 |
 | `array` | `<el-select multiple>` またはネストフォーム | 配列/リスト値 |
 | `RelationToOne` | `<el-select>` リモート検索 | 多対一 / 一対一 |
@@ -243,6 +244,81 @@ interface FieldOption {
 ```
 
 行番号、シンタックスハイライト、括弧の対応付け、アクティブ行のハイライト、元に戻す/やり直し、Tab インデントを備えています。
+
+#### JSON Schema フォーム
+
+確定したデータ契約を持つ JSON オブジェクトは、`json_schema` で Schema から通常のフォームコントロールを自動生成します。静的 Schema はエンティティ設定と同じディレクトリに配置することを推奨します：
+
+```js
+import StoreAddressSchema from './StoreAddress.json'
+
+{
+  property: 'address',
+  type: 'json_schema',
+  type_options: { schema: StoreAddressSchema }
+}
+```
+
+`type_options.schema` には `{ entity, id, property, form }` を受け取り、バックエンド生成の Schema を返す非同期関数も指定できます。フィールドの `title`・`description`・enum ラベルは自動的に `t()` を通過します。各 `src/i18n/*.js` に対応するキーを追加してください。
+
+このプラグインはオブジェクトのプロパティを既存のフォームコントロールにマッピングします。文字列、email/date/date-time 形式、整数/数値、真偽値、enum、プリミティブ配列、ネストされたオブジェクトに対応し、複雑な合成（`$ref`、`oneOf`、`anyOf`、`allOf`、`patternProperties`）は生の JSON エディタにフォールバックします。
+
+##### EasyAdmin フィールドのオーバーライド
+
+`type_options.fields` に通常の `FieldOption[]` を記述すると、Schema から自動生成されたフィールドの表示設定を上書きできます。順序・ウィジェット種別・ラベル・ヘルプテキスト・表示/非表示・プラグインオプション・追加の Element Plus バリデーションルールの制御に適しており、Schema 自体の変更は不要です。
+
+```js
+{
+  property: 'address',
+  type: 'json_schema',
+  type_options: {
+    schema: StoreAddressSchema,
+    fields: [
+      // 手書きフィールドが先に、この配列順で表示されます。
+      {
+        property: 'province',
+        field_options: { label: t('Province'), placeholder: t('Select province') },
+        type_options: { clearable: true }
+      },
+      {
+        property: 'latitude',
+        type: 'integer',
+        type_options: { precision: 6, step: 0.000001 }
+      },
+      {
+        property: 'geohash',
+        hidden: true
+      }
+    ]
+  }
+}
+```
+
+`schema.properties` に存在する `property` のみが使用されます。手書き項目は `fields` 順で先に表示され、残りの Schema フィールドは元の Schema 順で続きます。同名の `field_options` と `type_options` は置換ではなく、自動生成値とマージされます。
+
+ネストされたオブジェクトにも子フィールドを再帰的に設定できます：
+
+```js
+{
+  property: 'location',
+  type_options: {
+    fields: [
+      {
+        property: 'coordinates',
+        type_options: {
+          fields: [{ property: 'latitude', hidden: true }]
+        }
+      }
+    ]
+  }
+}
+```
+
+`hidden` は表示のみに影響し、Schema 検証は回避されません。JSON Schema は常に JSON データ検証の最終的な基準です。Schema で必須のプロパティを `required: false` で任意にすることはできず、手書きの `required: true` は EasyAdmin フォームの必須検証を追加するだけで、バックエンドの Schema 契約は変更しません。
+
+同じフィールド定義を `detail.detail_display` に配置すれば、詳細ページにも Schema 順でラベルと値を表示できます。Schema に定義されていない既存プロパティは追加行として保持され、未対応の Schema は標準の JSON 詳細表示にフォールバックします。
+
+Ajv は送信時に完全なオブジェクトを検証します（`required`、`pattern`、境界、形式、`additionalProperties`、`uniqueItems`、draft-07 `dependencies` を含む）。任意項目の空値は検証をスキップし、必須項目の空値は失敗します。`null` と `undefined` のオブジェクトプロパティは送信ペイロードから再帰的に除外されます。
 
 #### Currency オプション
 
@@ -720,6 +796,7 @@ detail: {
 |------|------|------|
 | `image.vue` | image | 枠線と影付きの全幅プレビュー |
 | `json.vue` | json | 2 スペースインデントの `<pre>`、折りたたみ可能、シンタックスハイライト |
+| `json_schema.vue` | json_schema | Schema 順のラベル/値行。未知プロパティを保持し、失敗時は `json.vue` にフォールバック |
 
 新しい詳細プラグインの追加：props `value`、`field`、`scope`、`em`、`struct` を持つ `plugins/detail/{type}.vue` を作成します。`import.meta.glob` で自動検出されます。
 
@@ -947,7 +1024,7 @@ export default {
 | 真偽値 | `boolean` |
 | 日付/時刻 | `date`、`datetime` |
 | メディア | `image`、`file` |
-| 構造化 | `json`、`json-custom`、`array` |
+| 構造化 | `json`、`json_schema`、`json-custom`、`array` |
 | リレーション | `RelationToOne`、`RelationToMany` |
 | 選択 | `select`、`transfer` |
 

@@ -217,6 +217,7 @@ interface FieldOption {
 | `file` | `<el-upload>` 單檔案 | 檔案上傳 |
 | `code` | CodeMirror 6 編輯器 | 帶行號和語法醒目提示的程式碼片段 |
 | `json` | `<jsoneditor>` 樹/程式碼檢視 | 結構化 JSON |
+| `json_schema` | 巢狀生成的 `<FormAdmin>` | 使用 Ajv 校驗的 JSON Schema 物件編輯器 |
 | `json-custom` | 巢狀 `<FormAdmin>` 子表單 | 子物件修改 |
 | `array` | `<el-select multiple>` 或巢狀表單 | 陣列/清單值 |
 | `RelationToOne` | `<el-select>` 遠端搜尋 | 多對一 / 一對一 |
@@ -243,6 +244,81 @@ interface FieldOption {
 ```
 
 內建行號、語法醒目提示、括號配對、目前行醒目提示、復原/重做和 Tab 縮排。
+
+#### JSON Schema 表單
+
+當 JSON 物件有確定的資料契約時，使用 `json_schema` 將 Schema 自動轉換為一般表單控制項。靜態 Schema 建議與實體配置放在同一目錄：
+
+```js
+import StoreAddressSchema from './StoreAddress.json'
+
+{
+  property: 'address',
+  type: 'json_schema',
+  type_options: { schema: StoreAddressSchema }
+}
+```
+
+`type_options.schema` 也可以是非同步函數，接收 `{ entity, id, property, form }` 並返回後端生成的 Schema。欄位 `title`、`description` 和列舉標籤會自動經過 `t()`；請將對應 key 補充到每個 `src/i18n/*.js` 語言檔案。
+
+此外掛會將物件屬性對映為現有表單控制項：字串、email/date/date-time 格式、整數/數字、布林、列舉、基礎類型陣列和巢狀物件。複雜組合（`$ref`、`oneOf`、`anyOf`、`allOf`、`patternProperties`）會降級為原始 JSON 編輯器。
+
+##### EasyAdmin 欄位覆寫
+
+透過 `type_options.fields` 寫入常規 `FieldOption[]`，即可覆寫 Schema 自動生成欄位的展示配置。它適合控制順序、控制項類型、標籤、說明文字、隱藏狀態、外掛參數和附加的 Element Plus 校驗規則，而無需修改 Schema。
+
+```js
+{
+  property: 'address',
+  type: 'json_schema',
+  type_options: {
+    schema: StoreAddressSchema,
+    fields: [
+      // 手寫欄位優先顯示，順序與此陣列一致。
+      {
+        property: 'province',
+        field_options: { label: t('Province'), placeholder: t('Select province') },
+        type_options: { clearable: true }
+      },
+      {
+        property: 'latitude',
+        type: 'integer',
+        type_options: { precision: 6, step: 0.000001 }
+      },
+      {
+        property: 'geohash',
+        hidden: true
+      }
+    ]
+  }
+}
+```
+
+僅使用 `property` 存在於 `schema.properties` 的覆寫項。手寫項按 `fields` 順序排在前面，其餘 Schema 欄位繼續按 Schema 原順序顯示；同名的 `field_options` 與 `type_options` 會和自動生成配置合併而非整體替換。
+
+巢狀物件同樣可以繼續配置子欄位：
+
+```js
+{
+  property: 'location',
+  type_options: {
+    fields: [
+      {
+        property: 'coordinates',
+        type_options: {
+          fields: [{ property: 'latitude', hidden: true }]
+        }
+      }
+    ]
+  }
+}
+```
+
+`hidden` 只影響介面渲染，不會繞過 Schema 校驗。JSON Schema 始終是 JSON 資料的最終校驗來源：Schema 標記為必填的欄位不能透過 `required: false` 變為可選；手寫 `required: true` 只額外啟用 EasyAdmin 表單必填校驗，不改變後端 Schema 契約。
+
+將相同欄位定義放入 `detail.detail_display`，即可在詳情頁按 Schema 順序渲染標籤/值檢視；Schema 未定義的既有屬性會作為額外列保留，不支援的 Schema 會降級為標準 JSON 詳情渲染。
+
+Ajv 會在提交時校驗完整物件，包括 `required`、`pattern`、邊界、格式、`additionalProperties`、`uniqueItems` 和 draft-07 `dependencies`。可選空值會跳過校驗，必填空值仍會失敗。`null` 和 `undefined` 物件屬性會從提交載荷中遞迴移除。
 
 #### Currency 選項
 
@@ -715,6 +791,7 @@ detail: {
 |------|------|------|
 | `image.vue` | image | 帶邊框和陰影的全寬預覽 |
 | `json.vue` | json | 帶 2 空格縮排的 `<pre>`，可折疊，語法高亮 |
+| `json_schema.vue` | json_schema | 按 Schema 順序的標籤/值列；保留未知屬性，失敗時降級為 `json.vue` |
 
 新增詳情外掛：建立 `plugins/detail/{type}.vue`，帶有 props `value`、`field`、`scope`、`em`、`struct`。透過 `import.meta.glob` 自動發現。
 
@@ -942,7 +1019,7 @@ export default {
 | 布林 | `boolean` |
 | 日期/時間 | `date`、`datetime` |
 | 媒體 | `image`、`file` |
-| 結構化 | `json`、`json-custom`、`array` |
+| 結構化 | `json`、`json_schema`、`json-custom`、`array` |
 | 關聯 | `RelationToOne`、`RelationToMany` |
 | 選擇 | `select`、`transfer` |
 

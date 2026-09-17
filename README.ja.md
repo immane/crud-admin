@@ -42,8 +42,9 @@
 ## 機能
 
 - **設定駆動型 CRUD エンジン（EasyAdmin）** — 設定でエンティティを宣言するだけで、リスト/フォーム/詳細/ルートを自動生成
-- **20 種類のプラグ可能なフォームフィールド** — input、textarea、select、boolean、integer、currency、date、datetime、image、file、JSON、リッチテキスト、リレーションピッカー、トランスファー、パスワード（二重入力＋強度ヒント）、メール（形式検証）など
+- **21 種類のプラグ可能なフォームフィールド** — input、textarea、select、boolean、integer、currency、date、datetime、image、file、JSON、JSON Schema、リッチテキスト、リレーションピッカー、トランスファー、パスワード（二重入力＋強度ヒント）、メール（形式検証）など
 - **フォームバリデーション** — 宣言的な `field.rules` / `field.validator` を `el-form` にマージし、プラグイン向けに `registerFieldValidator` を provide、有効になるまで送信をブロック
+- **JSON Schema フォーム** — JSON オブジェクトを国際化対応のネスト FormAdmin コントロールとして描画し、Ajv で検証；静的または非同期 Schema プロバイダーに対応
 - **フォールバックチェーン付き詳細ビュー** — フィールド型ごとに `detail/` → `list/` → プレーンテキストプラグイン
 - **国際化（i18n）** — 英語、簡体字中国語、繁体字中国語、日本語；ブラウザ言語自動検出；ナビゲーションバーの言語切替；`Accept-Language` ヘッダーと `_locale` パラメータを API リクエストに自動注入
 - **JWT 認証** — Bearer トークンログイン、リフレッシュトークンの自動ローテーション、ポート分離 Cookie 永続化（`dream_studio_admin_token_{port}` で同一ホストのポート間衝突を回避）、同時リクエストキューイング
@@ -100,7 +101,7 @@
 │   │   ├── DetailAdmin.vue          # 設定可能なレコード詳細ページ
 │   │   ├── SearchFilter.vue         # 動的フィルタ UI
 │   │   └── plugins/
-│   │       ├── form/                # 20 のフィールド型プラグイン
+│   │       ├── form/                # 21 のフィールド型プラグイン
 │   │       ├── list/                # 10 のリストレンダリングプラグイン
 │   │       └── detail/              # 2 の詳細専用プラグイン
 │   ├── configs/                     # 宣言的エンティティ設定
@@ -270,7 +271,7 @@ import { t } from '@/i18n'
 
 ### フィールド型プラグイン
 
-EasyAdmin には 20 のフィールド型プラグインが組み込まれており、エンティティメタデータから自動解決されます：
+EasyAdmin には 21 のフィールド型プラグインが組み込まれており、エンティティメタデータから自動解決されます：
 
 | プラグイン | 型 | 説明 |
 |--------|------|-------------|
@@ -286,6 +287,7 @@ EasyAdmin には 20 のフィールド型プラグインが組み込まれてお
 | `image.vue` | image | 画像アップロード/プレビュー |
 | `file.vue` | — | ファイルアップロード |
 | `json.vue` | — | JSON エディタ（コード/ツリービュー） |
+| `json_schema.vue` | `json_schema` | JSON Schema から生成されたネストフォーム（Ajv 検証付き） |
 | `json-custom.vue` | — | ネストされたサブオブジェクトエディタ |
 | `array.vue` | array | 配列エディタ（セレクトまたはネストフォーム） |
 | `RelationToOne.vue` | ManyToOne, OneToOne | リレーションピッカー（リモート検索付き） |
@@ -317,6 +319,23 @@ interface FieldOption {
   full_width?: boolean       // Span full grid width (detail view)
 }
 ```
+
+### JSON Schema フォーム
+
+確定したデータ契約を持つ JSON オブジェクトは、生の JSON エディタではなく `json_schema` で通常のフォームコントロールとして編集します。静的 Schema はエンティティ設定と同じディレクトリに配置します（例：`src/configs/collections/store/StoreAddress.json` と `StoreContact.json`）。
+
+```js
+import StoreAddressSchema from './StoreAddress.json'
+
+{
+  property: 'address',
+  type: 'json_schema',
+  required: false,
+  type_options: { schema: StoreAddressSchema }
+}
+```
+
+`schema` には `{ entity, id, property, form }` を受け取る非同期関数も指定でき、バックエンド生成 Schema 用に同じインターフェースを予約しています。Schema のラベル・説明・enum ラベルは自動的に `t()` を通過します。Ajv は送信時に JSON 全体を検証し、任意項目の空値は無視、必須項目は検証され、ネストオブジェクト内の `null` / `undefined` はリクエストに含まれません。同じフィールド定義を `detail.detail_display` に配置すれば、詳細ページにも Schema 順でラベルと値を表示できます。対応キーワードと複雑な Schema のフォールバックは[設定リファレンス](docs/manual/config-reference.ja.md)を参照してください。
 
 ### フォームバリデーション
 

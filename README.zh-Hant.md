@@ -43,8 +43,9 @@
 ## 功能特色
 
 - **配置驅動 CRUD 引擎（EasyAdmin）** — 在配置中宣告實體，即可自動獲得完整的列表/表單/詳情/路由
-- **20 種即插即用表單欄位** — input、textarea、select、boolean、integer、currency、date、datetime、image、file、JSON、富文字、關聯選擇器、transfer、password（雙輸入＋強度提示）、email（格式校驗）等
+- **21 種即插即用表單欄位** — input、textarea、select、boolean、integer、currency、date、datetime、image、file、JSON、JSON Schema、富文字、關聯選擇器、transfer、password（雙輸入＋強度提示）、email（格式校驗）等
 - **表單校驗** — 宣告式 `field.rules` / `field.validator` 合併至 `el-form`，外掛可透過 `registerFieldValidator` 注入校驗；未通過時阻斷提交
+- **JSON Schema 表單** — 將 JSON 物件渲染為已國際化的巢狀 FormAdmin 控制項，並使用 Ajv 校驗；支援靜態或非同步 Schema 提供者
 - **帶降級鏈的詳情視圖** — 依欄位類型按 `detail/` → `list/` → 純文字外掛逐級降級
 - **國際化（i18n）** — 英文、簡體中文、繁體中文、日文；瀏覽器語言自動偵測；導覽列語言切換器；`Accept-Language` 請求標頭和 `_locale` 參數自動注入 API 請求
 - **JWT 驗證** — Bearer token 登入，自動刷新 token 輪換，按埠隔離的 Cookie 持久化（`dream_studio_admin_token_{port}` 避免同主機跨埠衝突），並發請求排隊
@@ -101,7 +102,7 @@
 │   │   ├── DetailAdmin.vue          # 可配置記錄詳情頁
 │   │   ├── SearchFilter.vue         # 動態篩選 UI
 │   │   └── plugins/
-│   │       ├── form/                # 20 個欄位類型外掛
+│   │       ├── form/                # 21 個欄位類型外掛
 │   │       ├── list/                # 10 個列表渲染外掛
 │   │       └── detail/              # 2 個詳情專用外掛
 │   ├── configs/                     # 宣告式實體配置
@@ -271,7 +272,7 @@ import { t } from '@/i18n'
 
 ### 欄位類型外掛
 
-EasyAdmin 內建 20 種欄位類型外掛，根據實體元資料自動解析：
+EasyAdmin 內建 21 種欄位類型外掛，根據實體元資料自動解析：
 
 | 外掛 | 類型 | 描述 |
 |--------|------|-------------|
@@ -287,6 +288,7 @@ EasyAdmin 內建 20 種欄位類型外掛，根據實體元資料自動解析：
 | `image.vue` | image | 圖片上傳/預覽 |
 | `file.vue` | — | 檔案上傳 |
 | `json.vue` | — | JSON 編輯器（程式碼/樹視圖） |
+| `json_schema.vue` | `json_schema` | 由 JSON Schema 生成的巢狀表單，使用 Ajv 校驗 |
 | `json-custom.vue` | — | 巢狀子物件編輯器 |
 | `array.vue` | array | 陣列編輯器（選擇器或巢狀表單） |
 | `RelationToOne.vue` | ManyToOne、OneToOne | 單一關聯選擇器（含遠端搜尋） |
@@ -318,6 +320,24 @@ interface FieldOption {
   full_width?: boolean       // 詳情視圖中跨滿網格寬度
 }
 ```
+
+### JSON Schema 表單
+
+當 JSON 物件有確定的資料契約時，使用 `json_schema` 生成一般表單控制項，而不是使用原始 JSON 編輯器。靜態 Schema 應與實體配置放在同一目錄，例如
+`src/configs/collections/store/StoreAddress.json` 與 `StoreContact.json`。
+
+```js
+import StoreAddressSchema from './StoreAddress.json'
+
+{
+  property: 'address',
+  type: 'json_schema',
+  required: false,
+  type_options: { schema: StoreAddressSchema }
+}
+```
+
+`schema` 也可以是接收 `{ entity, id, property, form }` 的非同步函數，為後端生成的 Schema 預留相同介面。Schema 的標籤、描述和列舉標籤會自動經過 `t()`；Ajv 會在提交時校驗完整物件。可選空值不會參與校驗，必填項仍會校驗，巢狀物件中的 `null` / `undefined` 不會傳入請求。將相同欄位定義放入 `detail.detail_display`，即可在詳情頁按 Schema 順序顯示標籤和值。支援的關鍵字與複雜 Schema 的降級策略見[配置參考手冊](docs/manual/config-reference.zh-Hant.md)。
 
 ### 表單校驗
 
