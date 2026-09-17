@@ -121,12 +121,10 @@ export default {
           label: t('Is System'),
           type: 'boolean',
           expression: 'entity.isSystem() == :value'
-        },
-        uuid: t('UUID')
+        }
       },
       list_display: [
         'id',
-        { property: 'uuid', type: 'plain-text' },
         'code',
         'name',
         {

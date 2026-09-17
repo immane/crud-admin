@@ -24,13 +24,12 @@ export default {
           type: 'input',
           expression: 'entity.getOrder().getId() == :value'
         },
-        'product.name': t('Product'),
         specificationTitle: t('Specification')
       },
       list_display: [
         'id',
         'order',
-        'product',
+        { property: 'productSnapshot.name', label: t('Product') },
         'specificationTitle',
         'quantity',
         { property: 'unitPrice', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
@@ -44,7 +43,7 @@ export default {
         'id',
         'uuid',
         'order',
-        'product',
+        { property: 'productSnapshot.name', label: t('Product') },
         'specificationTitle',
         'quantity',
         { property: 'unitPrice', type: 'currency', type_options: { multiplier: 100, currency: 'CNY' }},
@@ -54,8 +53,7 @@ export default {
         { property: 'specSnapshot', type: 'json', full_width: true },
         { property: 'productSnapshot', type: 'json', full_width: true },
         { property: 'metadata', type: 'json', full_width: true },
-        'createdAt',
-        'updatedAt'
+        'createdAt'
       ]
     }
   }

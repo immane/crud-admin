@@ -112,7 +112,7 @@ export default {
       },
       list_display: [
         'id',
-        'actorUuid',
+        { property: 'actorUuid', relation: { entity: 'User', valueKey: 'uuid' }},
         'action',
         'targetType',
         'targetUuid',
@@ -124,7 +124,7 @@ export default {
     detail: {
       detail_display: [
         'id',
-        'actorUuid',
+        { property: 'actorUuid', relation: { entity: 'User', valueKey: 'uuid' }},
         'action',
         'targetType',
         'targetUuid',

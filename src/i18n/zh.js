@@ -361,6 +361,7 @@ export default {
   'PromotionTemplate fields help': '定义模板所需动态字段的 JSON 模式。',
   'User roles help': '从权限同步的角色分配 JSON 数组；请勿手动编辑，由授权管理。',
   'User password help': '创建时必填；编辑时留空则保持原密码不变（至少6个字符）。',
+  'User phoneVerified help': '批量更新手机号是否已验证。未勾选表示未验证。',
   'Confirm Password': '确认密码',
   'Password hint length': '至少6个字符',
   'Password hint letter': '包含字母',

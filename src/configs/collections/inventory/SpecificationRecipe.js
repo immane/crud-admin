@@ -35,7 +35,6 @@ export default {
       },
       list_display: [
         'id',
-        'uuid',
         'specificationUuid',
         'status',
         'createdAt',

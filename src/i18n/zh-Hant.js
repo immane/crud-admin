@@ -361,6 +361,7 @@ export default {
   'PromotionTemplate fields help': '定義範本所需動態欄位的 JSON 結構。',
   'User roles help': '從權限同步的角色指派 JSON 陣列；請勿手動編輯，由授權管理。',
   'User password help': '建立時必填；編輯時留空則保持原密碼不變（至少6個字元）。',
+  'User phoneVerified help': '批次更新手機號碼是否已驗證。未勾選表示未驗證。',
   'Confirm Password': '確認密碼',
   'Password hint length': '至少6個字元',
   'Password hint letter': '包含字母',
