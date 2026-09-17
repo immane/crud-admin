@@ -71,7 +71,7 @@ vi.mock('@codemirror/lang-html', () => ({ __esModule: true, html: () => ({ kind:
 vi.mock('@codemirror/lang-css', () => ({ __esModule: true, css: () => ({ kind: 'css' }) }))
 vi.mock('@codemirror/lang-sql', () => ({ __esModule: true, sql: () => ({ kind: 'sql' }) }))
 
-import CodePlugin from '@/components/EasyAdmin/plugins/form/code.vue'
+import CodePlugin from '@/easyadmin/ui/vue/plugins/form/code.vue'
 
 function makeWrapper(form, field) {
   return mount(CodePlugin, {

@@ -296,8 +296,8 @@ Acceptance:
 
 ### Phase 2: Replace `EntityManage` Behind a Port
 
-Status: consuming code switched; `utils/entity.ts` retained as a deprecated
-re-export until test imports migrate in Phase 6.
+Status: complete. `utils/entity.ts` is deleted; `tests/unit/utils/entity*.spec.js`
+now target the adapter directly.
 
 1. Defined `AdminRepository` and `MetaProvider` ports in `core/ports/`;
    `CrudSkeletonAdapter` implements both.
@@ -308,9 +308,8 @@ re-export until test imports migrate in Phase 6.
 3. Moved all production `EntityManage` consumers (`ListAdmin`, `FormAdmin`,
    `DetailAdmin`, `RelationToOne`, `utils/relation`, dashboard) to constructed
    `CrudSkeletonAdapter` instances.
-4. `src/utils/entity.ts` is now a deprecated re-export of the adapter; it will
-   be deleted in Phase 6 after `tests/unit/utils/entity*.spec.js` migrate.
-5. Component specs mock the adapter module path instead of `utils/entity`.
+4. Deleted `src/utils/entity.ts` after migrating `tests/unit/utils/entity*.spec.js`.
+5. Component specs mock the adapter module path.
 
 Acceptance:
 
@@ -393,20 +392,59 @@ Acceptance:
 
 ### Phase 6: Remove Migration Compatibility
 
-Status: deferred until Phases 2-5 complete.
+Status: complete.
 
-1. Update all tests from `@/components/EasyAdmin/...` to
-   `@/easyadmin/ui/vue/...`.
-2. Remove the Vitest-only `@/components/EasyAdmin` alias.
-3. Delete `utils/entity.ts` after adapter migration.
-4. Remove duplicate types and obsolete Vue-local query helpers.
-5. Update README, manual, design contracts, and this plan after each completed
-   phase; never document an unimplemented runtime contract as complete.
+1. Migrated all tests from `@/components/EasyAdmin/...` to
+   `@/easyadmin/ui/vue/...`, and `tests/unit/utils/entity*.spec.js` to the
+   adapter module.
+2. Removed the Vitest-only `@/components/EasyAdmin` alias.
+3. Deleted `utils/entity.ts` after adapter migration.
+4. Removed the duplicate `AdminQuery` re-export from `build-admin-query.ts`;
+   `field-config.ts` remains a single-source re-export of `types/admin.ts`
+   until consumers migrate.
+5. README, manual, design contracts, and this plan were updated with each
+   phase. Test-local mock identifiers (`MockEntityManage`, `EntityManageMock`)
+   were intentionally left untouched.
 
 ---
 
-## 7. Non-Goals
+## 7. Known Debt: CSQE Dialect Inside Core
 
+Status: recorded, not yet scheduled. Deliberately deferred: behavior is fully
+golden-locked, and the fix churns every fixture for modeling purity only.
+
+`src/easyadmin/core` currently emits and validates CrudSkeleton query syntax,
+contradicting the dependency rule that only `adapters/crudskeleton` may do so:
+
+1. `core/query/dql-ops.ts` renders DQL: `shorthandExpression()` produces
+   `` entity... matches ':value' `` / `` == ':value' `` strings,
+   `dottedKeyToExpression()` produces `.getX()` chains, and
+   `joinExpressions()` joins with parens + `&&`. `FilterNode` is therefore
+   backend-independent in name only — `cond(expression)` carries DQL payload.
+   (Historical cause: verbatim extraction from `SearchFilter` in Phase 0,
+   before a canonical node model existed.)
+2. `core/query/validate-dql-expression.ts` encodes backend parser knowledge
+   (`getX()` fast path, `&&`/`||`, `== null` ban). It belongs in
+   `adapters/crudskeleton/`.
+3. `core/query/sort-node.ts` leaks twice: `mapElementPlusSort()` knows Element
+   Plus vocabulary (belongs in `ui/vue` or application) and
+   `formatSortParam()` renders the CSQE `entity.field|DIR` dialect (belongs in
+   the compiler). Core should keep only the `SortNode { field, dir }` data type.
+4. Comment-level coupling in `core/query/admin-query.ts` and
+   `core/ports/admin-repository.ts` (mention CrudSkeleton by name).
+
+Remediation sketch (when scheduled): redefine `FilterNode` as data
+(`{ field, op, value }` leaves + `and` + `raw` escape hatch for hand-authored
+config DQL such as `datetime.get(...)`; UI generates AND only, so no full
+boolean tree), move DQL/`@order` rendering into the CrudSkeleton compiler,
+move the validator into `adapters/crudskeleton/`, and regenerate fixture
+`adminQuery.filter` shapes while keeping every `csqeParams`/`urlQueryString`
+byte-identical. Possibly co-move `normalizePaginator` (CSQE response shape)
+once paginator authority is audited.
+
+---
+
+## 8. Non-Goals
 - No GraphQL implementation until a backend contract exists.
 - No forced cursor pagination; current CrudSkeleton protocol is offset
   `page`/`limit`.
@@ -417,7 +455,7 @@ Status: deferred until Phases 2-5 complete.
 
 ---
 
-## 8. Required Verification Per Change
+## 9. Required Verification Per Change
 
 Every phase must run:
 

@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import ElementPlus, { ElSwitch, ElTag } from 'element-plus'
-import BooleanCell from '@/components/EasyAdmin/plugins/list/boolean.vue'
+import BooleanCell from '@/easyadmin/ui/vue/plugins/list/boolean.vue'
 
 const t = (key) => key
 

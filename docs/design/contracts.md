@@ -326,7 +326,7 @@ Props contract shared by both components:
 
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
-| `entityConf` | String \| Object | Yes | Entity name or EntityManage config |
+| `entityConf` | String \| Object | Yes | Entity name or entity identity config (`EntityConf`) |
 | `value` (v-model) | Object (Form) / Array (List) | No | Bound data |
 
 ### 7.2 FormAdmin-Specific Props

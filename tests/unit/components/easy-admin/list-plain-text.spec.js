@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import PlainText from '@/components/EasyAdmin/plugins/list/plain-text.vue'
+import PlainText from '@/easyadmin/ui/vue/plugins/list/plain-text.vue'
 
 function mountCell(value) {
   return mount(PlainText, {

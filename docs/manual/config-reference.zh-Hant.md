@@ -453,7 +453,7 @@ FormAdmin 會將 `field.rules` / `field.validator` 合併到 `el-form` 校驗中
 }
 ```
 
-外掛繪製一個帶遠端搜尋的 `<el-select>`。選項透過 `EntityManage.list()` 從目標實體取得。
+外掛繪製一個帶遠端搜尋的 `<el-select>`。選項透過 `CrudSkeletonAdapter.list()` 從目標實體取得。
 
 對於基於使用者輸入的動態篩選，設定 `remote: true`：
 

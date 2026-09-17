@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { reactive, nextTick } from 'vue'
 import ElementPlus, { ElInput } from 'element-plus'
-import InputPlugin from '@/components/EasyAdmin/plugins/form/input.vue'
+import InputPlugin from '@/easyadmin/ui/vue/plugins/form/input.vue'
 
 function mountInput(formData = { name: '' }, fieldData = { property: 'name' }) {
   const form = reactive(formData)

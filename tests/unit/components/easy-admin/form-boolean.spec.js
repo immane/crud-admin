@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { reactive, nextTick } from 'vue'
 import ElementPlus, { ElCheckbox } from 'element-plus'
-import BooleanPlugin from '@/components/EasyAdmin/plugins/form/boolean.vue'
+import BooleanPlugin from '@/easyadmin/ui/vue/plugins/form/boolean.vue'
 
 function mountBoolean(formData = { agree: false }, fieldData = { property: 'agree' }) {
   const form = reactive(formData)

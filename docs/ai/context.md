@@ -71,7 +71,6 @@ src/
 ├── types/                # TypeScript type definitions
 ├── utils/                # Utilities
 │   ├── auth.js           # Cookie token management
-│   ├── entity.ts         # EntityManage CRUD class (CRUD + deleteMany + batchUpdate)
 │   ├── request.ts        # Axios JWT instance
 │   └── upload.js         # Unified upload (host resolution, headers, path normalisation)
 └── views/                # Page views
@@ -372,7 +371,7 @@ for Vue 2's `v-set` pattern):
 - File/image upload plugins use `:on-exceed="handleExceed"` to replace existing files
   (clear files → handleStart → submit) since Element Plus limits upload by count.
 - Simple text input uses `.sync`-free pattern: `:model-value` + `@update:model-value`.
-- Relation plugins fetch options via `EntityManage.list()` and cache in local `data()`.
+- Relation plugins fetch options via `CrudSkeletonAdapter.list()` and cache in local `data()`.
 - JSON editor uses direct `import JSONEditor from 'jsoneditor'` (no Vue wrapper).
 
 ### Nested API Resources (e.g., Specifications under Products)
@@ -415,11 +414,11 @@ The `json.vue` form plugin uses the vanilla `jsoneditor` library directly from n
 #### Batch Delete
 
 - Button appears in the toolbar alongside a count badge when records are selected.
-- Uses `EntityManage.deleteMany(ids)` which calls `Promise.allSettled` on individual `DELETE /{plural}/{id}` calls.
+- Uses `CrudSkeletonAdapter.deleteMany(ids)` which calls `Promise.allSettled` on individual `DELETE /{plural}/{id}` calls.
 - Reports success count and, on partial failure, a warning with the failure count.
 - `disabled_actions` available: `'batch_delete'`, or inherits `'delete'` (if delete is disabled, batch delete hides too).
 
-#### Batch Edit (`EntityManage.batchUpdate`)
+#### Batch Edit (`CrudSkeletonAdapter.batchUpdate`)
 
 **Config location**: `form.batch_edit.fields` in entity config:
 ```js
@@ -446,7 +445,7 @@ Each record includes only `id` and the fields to update; omitted fields retain t
 - **Auto-selection**: When a user modifies a field value, the corresponding checkbox is automatically checked (except for empty arrays from `RelationToMany` initialisation).
 - Only checked fields with a value present in the form object (`Object.hasOwn(form, key)`) are included in the request.
 
-**`EntityManage` methods**:
+**`CrudSkeletonAdapter` methods**:
 ```ts
 deleteMany(pks: Array<number | string>): Promise<PromiseSettledResult<ApiResponse<unknown>>[]>
 batchUpdate(ids: Array<number | string>, data: Record<string, any>): Promise<ApiResponse<unknown>>
@@ -526,8 +525,8 @@ The i18n system uses **flat English strings as translation keys** instead of nes
 
 ### Dashboard
 
-- `src/views/dashboard/index.vue` fetches live data from `EntityManage` for
-  Order, Product, User, Transaction
+- `src/views/dashboard/index.vue` fetches live data from `CrudSkeletonAdapter` for
+  Order, Product, User, Transaction, Store, Material
 - SVG sparkline chart derived from order amounts (no chart library dependency)
 - Browser geolocation + Open-Meteo API for local weather; falls back to Beijing
 - All API calls are `.catch(() => ...)` — dashboard remains functional even when

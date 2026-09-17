@@ -1,6 +1,6 @@
 import { mount, flushPromises } from '@vue/test-utils'
 import ElementPlus, { ElInput } from 'element-plus'
-import PasswordField from '@/components/EasyAdmin/plugins/form/password.vue'
+import PasswordField from '@/easyadmin/ui/vue/plugins/form/password.vue'
 
 function mountPassword({ form = {}, field = { property: 'password' }, provide = {} } = {}) {
   return mount(PasswordField, {

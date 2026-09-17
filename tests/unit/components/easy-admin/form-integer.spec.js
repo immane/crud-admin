@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { reactive, nextTick } from 'vue'
 import ElementPlus, { ElInputNumber } from 'element-plus'
-import IntegerPlugin from '@/components/EasyAdmin/plugins/form/integer.vue'
+import IntegerPlugin from '@/easyadmin/ui/vue/plugins/form/integer.vue'
 
 function mountInteger(formData = { count: 0 }, fieldData = { property: 'count' }) {
   const form = reactive(formData)

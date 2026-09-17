@@ -17,7 +17,7 @@ vi.mock('jsoneditor', () => {
   return { __esModule: true, default: FakeJSONEditor }
 })
 
-import JsonPlugin from '@/components/EasyAdmin/plugins/form/json.vue'
+import JsonPlugin from '@/easyadmin/ui/vue/plugins/form/json.vue'
 
 function lastEditor() {
   const list = globalThis.__jsonInstances || []

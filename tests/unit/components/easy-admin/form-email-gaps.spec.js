@@ -1,6 +1,6 @@
 import { mount, flushPromises } from '@vue/test-utils'
 import ElementPlus from 'element-plus'
-import EmailField from '@/components/EasyAdmin/plugins/form/email.vue'
+import EmailField from '@/easyadmin/ui/vue/plugins/form/email.vue'
 
 function mountEmail({ form = {}, field = { property: 'email' }, provide = {} } = {}) {
   return mount(EmailField, {

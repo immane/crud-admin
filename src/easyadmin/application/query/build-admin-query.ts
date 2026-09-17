@@ -7,8 +7,6 @@ import { joinExpressions, shouldIncludeValue } from '../../core/query/dql-ops'
 import { normalizePage } from '../../core/query/pagination'
 import type { AdminQuery, AdminQueryInput } from '../../core/query/admin-query'
 
-export type { AdminQuery, AdminQueryInput }
-
 export function buildAdminQuery(input: AdminQueryInput): AdminQuery {
   const listFilterData = input.listFilterData ?? {}
   const filters = input.filters ?? {}

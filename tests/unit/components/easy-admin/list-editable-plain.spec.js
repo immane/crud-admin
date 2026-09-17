@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import ElementPlus, { ElInput } from 'element-plus'
-import EditablePlain from '@/components/EasyAdmin/plugins/list/editable-plain.vue'
+import EditablePlain from '@/easyadmin/ui/vue/plugins/list/editable-plain.vue'
 
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0))
 

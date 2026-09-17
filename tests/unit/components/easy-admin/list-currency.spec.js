@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import ElementPlus from 'element-plus'
-import CurrencyCell from '@/components/EasyAdmin/plugins/list/currency.vue'
+import CurrencyCell from '@/easyadmin/ui/vue/plugins/list/currency.vue'
 import { formatCurrency } from '@/utils/currency'
 
 function mountCell(value, field = {}) {

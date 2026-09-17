@@ -49,7 +49,7 @@ vi.mock('@/utils/request', () => ({
   default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() }
 }))
 
-import FormAdmin from '@/components/EasyAdmin/FormAdmin.vue'
+import FormAdmin from '@/easyadmin/ui/vue/FormAdmin.vue'
 
 const formValidateMock = vi.fn(cb => cb(true))
 

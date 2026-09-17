@@ -30,7 +30,7 @@ flowchart TB
         S6["settings - App Settings"]
     end
     subgraph Business ["Business Logic Layer"]
-        B1["src/utils/entity.ts - EntityManage CRUD Class"]
+        B1["src/easyadmin/adapters/crudskeleton - CrudSkeletonAdapter + MetaProvider"]
         B2["src/utils/request.ts - Axios Instance plus JWT Interceptor"]
         B3["src/api - API Endpoint Definitions"]
         B4["src/configs - Declarative Entity and Route Configs"]

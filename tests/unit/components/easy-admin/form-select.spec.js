@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { reactive, nextTick } from 'vue'
 import ElementPlus, { ElSelect, ElOption } from 'element-plus'
-import SelectPlugin from '@/components/EasyAdmin/plugins/form/select.vue'
+import SelectPlugin from '@/easyadmin/ui/vue/plugins/form/select.vue'
 
 const OPTIONS = [
   { value: 'v1', label: 'Label1' },

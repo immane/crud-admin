@@ -19,7 +19,7 @@ vi.mock('@/components/Tinymce', () => ({
   }
 }), { virtual: true })
 
-import TextPlugin from '@/components/EasyAdmin/plugins/form/text.vue'
+import TextPlugin from '@/easyadmin/ui/vue/plugins/form/text.vue'
 
 function editor(wrapper) {
   return wrapper.findComponent({ name: 'Tinymce' })

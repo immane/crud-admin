@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import ElementPlus from 'element-plus'
-import DateCell from '@/components/EasyAdmin/plugins/list/date.vue'
+import DateCell from '@/easyadmin/ui/vue/plugins/list/date.vue'
 
 function mountCell(value) {
   return mount(DateCell, {

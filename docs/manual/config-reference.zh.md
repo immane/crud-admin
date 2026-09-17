@@ -490,7 +490,7 @@ form: {
 }
 ```
 
-插件渲染一个带远程搜索的 `<el-select>`。选项通过 `EntityManage.list()` 从目标实体获取。
+插件渲染一个带远程搜索的 `<el-select>`。选项通过 `CrudSkeletonAdapter.list()` 从目标实体获取。
 
 对于基于用户输入的动态筛选，设置 `remote: true`：
 

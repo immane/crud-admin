@@ -7,7 +7,6 @@ export default defineConfig({
   plugins: [vue(), vueJsx({ include: [/\.[jt]sx?$/] })],
   resolve: {
     alias: {
-      '@/components/EasyAdmin': path.resolve(__dirname, 'src/easyadmin/ui/vue'),
       '@': path.resolve(__dirname, 'src')
     },
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']

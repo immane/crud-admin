@@ -30,7 +30,7 @@ jest.mock('@/store', () => ({
   default: mockStore
 }))
 
-describe('utils/entity.ts', () => {
+describe('adapters/crudskeleton/CrudSkeletonAdapter.ts', () => {
   beforeEach(() => {
     jest.resetModules()
     mockGet.mockReset()
@@ -47,8 +47,8 @@ describe('utils/entity.ts', () => {
       .mockResolvedValueOnce({ data: ['CommonBundle\\Entity\\User'] })
       .mockResolvedValueOnce({ data: { id: { metadata: { type: 'integer' } } } })
 
-    const { default: EntityManage } = await import('@/utils/entity')
-    const em = new EntityManage('User')
+    const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
+    const em = new CrudSkeletonAdapter('User')
     const structure = await em.structure()
 
     expect(mockGet).toHaveBeenNthCalledWith(1, '/system/entities')
@@ -66,8 +66,8 @@ describe('utils/entity.ts', () => {
       }
     }
 
-    const { default: EntityManage } = await import('@/utils/entity')
-    const em = new EntityManage('User')
+    const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
+    const em = new CrudSkeletonAdapter('User')
     const structure = await em.structure()
 
     expect(mockGet).not.toHaveBeenCalled()
@@ -80,8 +80,8 @@ describe('utils/entity.ts', () => {
     mockPut.mockResolvedValue({ data: { id: 1 } })
     mockDelete.mockResolvedValue({ data: true })
 
-    const { default: EntityManage } = await import('@/utils/entity')
-    const em = new EntityManage('User')
+    const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
+    const em = new CrudSkeletonAdapter('User')
 
     await em.list({ page: 1 })
     await em.create({ username: 'u' })
@@ -102,8 +102,8 @@ describe('utils/entity.ts', () => {
       .mockResolvedValueOnce({ data: true })
       .mockRejectedValueOnce(new Error('delete failed'))
 
-    const { default: EntityManage } = await import('@/utils/entity')
-    const results = await new EntityManage('User').deleteMany([1, 2])
+    const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
+    const results = await new CrudSkeletonAdapter('User').deleteMany([1, 2])
 
     expect(results.map(result => result.status)).toEqual(['fulfilled', 'rejected'])
   })
@@ -111,8 +111,8 @@ describe('utils/entity.ts', () => {
   it('sends batch update records with only the changed fields', async() => {
     mockPost.mockResolvedValue({ data: true })
 
-    const { default: EntityManage } = await import('@/utils/entity')
-    await new EntityManage('User').batchUpdate([1, 2], { enabled: true })
+    const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
+    await new CrudSkeletonAdapter('User').batchUpdate([1, 2], { enabled: true })
 
     expect(mockPost).toHaveBeenCalledWith(
       '/api/v1/manage/users/batch-update',

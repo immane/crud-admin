@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import ElementPlus from 'element-plus'
-import ListAdmin from '@/components/EasyAdmin/ListAdmin.vue'
+import ListAdmin from '@/easyadmin/ui/vue/ListAdmin.vue'
 
 vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => {
   const MockEntityManage = vi.fn(function (conf) {
@@ -47,7 +47,7 @@ vi.mock('@/utils/simple-image-process', () => ({
   default: { getPicture: (url) => url }
 }))
 
-vi.mock('@/components/EasyAdmin/FormAdmin.vue', async () => {
+vi.mock('@/easyadmin/ui/vue/FormAdmin.vue', async () => {
   const { h } = await import('vue')
   return {
     __esModule: true,

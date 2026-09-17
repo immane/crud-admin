@@ -523,7 +523,7 @@ form: {
 }
 ```
 
-The plugin renders an `<el-select>` with remote search. Options are fetched from the target entity via `EntityManage.list()`.
+The plugin renders an `<el-select>` with remote search. Options are fetched from the target entity via `CrudSkeletonAdapter.list()`.
 
 For dynamic filtering based on user input, set `remote: true`:
 

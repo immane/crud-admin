@@ -1,7 +1,7 @@
 import { mount, flushPromises } from '@vue/test-utils'
 import ElementPlus, { ElTransfer } from 'element-plus'
-import TransferField from '@/components/EasyAdmin/plugins/form/transfer.vue'
-import RelationToMany from '@/components/EasyAdmin/plugins/form/RelationToMany.vue'
+import TransferField from '@/easyadmin/ui/vue/plugins/form/transfer.vue'
+import RelationToMany from '@/easyadmin/ui/vue/plugins/form/RelationToMany.vue'
 
 const { listMock, loadMock, constructed } = vi.hoisted(() => ({
   listMock: vi.fn(),

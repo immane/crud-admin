@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import ElementPlus, { ElTag, ElTooltip } from 'element-plus'
-import ArrayCell from '@/components/EasyAdmin/plugins/list/array.vue'
+import ArrayCell from '@/easyadmin/ui/vue/plugins/list/array.vue'
 
 function mountCell(value) {
   return mount(ArrayCell, {
