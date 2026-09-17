@@ -9,9 +9,12 @@ import {
   collectBatchUpdateData,
   buildBatchUpdateBody
 } from '@/easyadmin/application/usecases/batch-update-records'
-import orderGolden from './__fixtures__/order.golden.json'
-import userGolden from './__fixtures__/user.golden.json'
-import productGolden from './__fixtures__/product-query.golden.json'
+
+// Load every golden fixture in __fixtures__ (keeps explicit toEqual, no snapshots).
+const goldenModules = import.meta.glob('./__fixtures__/*.golden.json', { eager: true })
+const CASES = Object.entries(goldenModules)
+  .map(([path, mod]) => [path, mod.default ?? mod])
+  .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
 
 // Rebuild the { key: { expression } } filters map from the entity list_filter
 // shorthand shapes (src/configs/collections/*), using the real
@@ -59,17 +62,49 @@ const FILTER_SHORTHANDS = {
   }
 }
 
-const CASES = [
-  ['Order', orderGolden],
-  ['User', userGolden],
-  ['Product', productGolden]
-]
+// Entities whose list_filter uses full-style inline expressions (no shorthand
+// derivation): the expression is the locked config shape, used as-is.
+const INLINE_FILTERS = {
+  // Assignment: falsy rule drops revokedAt:false / scopeUuid:'' from @filter
+  // (revokedAt has no ':value' placeholder, so substitution would leave
+  // `entity.getRevokedAt()` unchanged even when truthy).
+  Assignment: {
+    userUuid: { expression: `entity.getUserUuid() matches ':value'` },
+    roleId: { expression: `entity.getRole().getId() == ':value'` },
+    scopeType: { expression: `entity.getScopeType() == ':value'` },
+    scopeUuid: { expression: `entity.getScopeUuid() matches ':value'` },
+    revokedAt: { expression: 'entity.getRevokedAt()' }
+  },
+  // AuditLog: placeholder inside a quoted datetime.get(":value") call.
+  AuditLog: {
+    createdAt: { expression: `entity.getCreatedAt() >= datetime.get(":value")` }
+  },
+  // Role: `system` key maps to non-getter `entity.isSystem() == :value`
+  // (key-vs-expression mismatch, no-get method syntax).
+  Role: {
+    code: { expression: `entity.getCode() matches ':value'` },
+    system: { expression: 'entity.isSystem() == :value' }
+  },
+  Setting: {
+    key: { expression: `entity.getKey() matches ':value'` }
+  },
+  Stock: {
+    storeUuid: { expression: `entity.getStoreUuid() matches ':value'` }
+  }
+}
+
+function filtersFor(entity) {
+  if (FILTER_SHORTHANDS[entity]) return filtersFromShorthands(FILTER_SHORTHANDS[entity])
+  if (INLINE_FILTERS[entity]) return INLINE_FILTERS[entity]
+  throw new Error(`No filter definitions for entity "${entity}"`)
+}
 
 describe('golden/csqe-params', () => {
-  for (const [name, golden] of CASES) {
+  for (const [path, golden] of CASES) {
+    const name = `${golden.input.entity} (${path.split('/').pop()})`
     describe(`${name} fixture`, () => {
       const { input } = golden
-      const filters = filtersFromShorthands(FILTER_SHORTHANDS[input.entity])
+      const filters = filtersFor(input.entity)
       const adminQuery = buildAdminQuery({
         entity: input.entity,
         listFilterData: input.listFilterData,
