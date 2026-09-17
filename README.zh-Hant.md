@@ -239,11 +239,11 @@ EasyAdmin 是本專案的核心——一個**配置驅動引擎**，能夠根據
 
 ```mermaid
 flowchart LR
-    Config["實體配置<br/>(collections/)<br/>fields / list_display<br/>list_filter / detail_display"] --> Meta["後端 API<br/>/system/entities<br/>欄位類型、可空性、關聯關係"]
-    Meta --> List["ListAdmin（表格）"]
-    Meta --> Form["FormAdmin（表單）"]
-    List --> UI["渲染出的 UI"]
-    Form --> UI
+    Config["實體配置<br/>(collections/)<br/>fields / list_display<br/>list_filter / detail_display"] --> UI["ListAdmin / FormAdmin /<br/>DetailAdmin + SearchFilter"]
+    UI --> Query["應用層<br/>AdminQuery + 用例"]
+    Query --> CSQE["CrudSkeleton 適配器<br/>@filter / @order"]
+    Meta["後端 /system/entities<br/>欄位類型、可空性、關聯關係"] --> CSQE
+    CSQE --> API["CrudSkeleton REST API"]
 ```
 
 ### 第一步 — 定義實體配置
@@ -438,6 +438,7 @@ FormAdmin 會將 `field.rules` / `field.validator` 合併至 `el-form` 規則。
 - **[EasyAdmin 配置契約](docs/design/easyadmin-config-contract.md)** — 完整配置 Schema 參考
 - **[配置參考手冊](docs/manual/config-reference.md)** — EasyAdmin 配置完整指南，從入門到進階
 - **[AI 上下文](docs/ai/context.md)** — 面向 AI 輔助開發的快速參考
+- **[EasyAdmin 查詢適配器計畫](docs/plan/easyadmin-query-adapter-architecture.md)** — 分層查詢/編譯器/適配器架構與遷移階段
 - **[Vue 3 遷移計畫](docs/plan/vue3-tsx-vite-migration.md)** — 遷移說明及目前狀態
 
 ## 測試

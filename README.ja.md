@@ -238,11 +238,11 @@ EasyAdmin は本プロジェクトの中核です——宣言的なエンティ�
 
 ```mermaid
 flowchart LR
-    Config["エンティティ設定<br/>(collections/)<br/>fields / list_display<br/>list_filter / detail_display"] --> Meta["バックエンド API<br/>/system/entities<br/>field types, nullability, relations"]
-    Meta --> List["ListAdmin (table)"]
-    Meta --> Form["FormAdmin (form)"]
-    List --> UI["レンダリング UI"]
-    Form --> UI
+    Config["エンティティ設定<br/>(collections/)<br/>fields / list_display<br/>list_filter / detail_display"] --> UI["ListAdmin / FormAdmin /<br/>DetailAdmin + SearchFilter"]
+    UI --> Query["アプリケーション層<br/>AdminQuery + ユースケース"]
+    Query --> CSQE["CrudSkeleton アダプター<br/>@filter / @order"]
+    Meta["バックエンド /system/entities<br/>field types, nullability, relations"] --> CSQE
+    CSQE --> API["CrudSkeleton REST API"]
 ```
 
 ### ステップ 1 — エンティティ設定を定義
@@ -436,6 +436,7 @@ FormAdmin は `field.rules` / `field.validator` を `el-form` のルールにマ
 - **[EasyAdmin 設定契約](docs/design/easyadmin-config-contract.md)** — 完全な設定スキーマリファレンス
 - **[設定リファレンスマニュアル](docs/manual/config-reference.ja.md)** — 簡単なものから高度なものまで、EasyAdmin 設定の完全ガイド
 - **[AI コンテキスト](docs/ai/context.md)** — AI 支援開発のためのクイックリファレンス
+- **[EasyAdmin クエリアダプター計画](docs/plan/easyadmin-query-adapter-architecture.md)** — 層状クエリ/コンパイラ/アダプターのアーキテクチャと移行フェーズ
 - **[Vue 3 移行計画](docs/plan/vue3-tsx-vite-migration.md)** — 移行メモと現状
 
 ## テスト

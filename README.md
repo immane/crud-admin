@@ -238,11 +238,11 @@ EasyAdmin is the heart of this project — a configuration-driven engine that **
 
 ```mermaid
 flowchart LR
-    Config["Entity Config<br/>(collections/)<br/>fields / list_display<br/>list_filter / detail_display"] --> Meta["Backend API<br/>/system/entities<br/>field types, nullability, relations"]
-    Meta --> List["ListAdmin (table)"]
-    Meta --> Form["FormAdmin (form)"]
-    List --> UI["Rendered UI"]
-    Form --> UI
+    Config["Entity Config<br/>(collections/)<br/>fields / list_display<br/>list_filter / detail_display"] --> UI["ListAdmin / FormAdmin /<br/>DetailAdmin + SearchFilter"]
+    UI --> Query["Application<br/>AdminQuery + use cases"]
+    Query --> CSQE["CrudSkeleton adapter<br/>@filter / @order"]
+    Meta["Backend /system/entities<br/>field types, nullability, relations"] --> CSQE
+    CSQE --> API["CrudSkeleton REST API"]
 ```
 
 ### Step 1 — Define an Entity Config
@@ -447,6 +447,7 @@ Built-in validators live in `src/utils/validate.js` (`isPasswordCompliant`, `cre
 - **[EasyAdmin Config Contract](docs/design/easyadmin-config-contract.md)** — Complete config schema reference
 - **[Config Reference Manual](docs/manual/config-reference.md)** — Complete EasyAdmin config guide, from simple to advanced
 - **[AI Context](docs/ai/context.md)** — Quick reference for AI-assisted development
+- **[EasyAdmin Query Adapter Plan](docs/plan/easyadmin-query-adapter-architecture.md)** — Layered query/compiler/adapter architecture and migration phases
 - **[Vue 3 Migration Plan](docs/plan/vue3-tsx-vite-migration.md)** — Migration notes and current status
 
 ## Testing
