@@ -88,6 +88,13 @@
 </template>
 
 <script>
+import {
+  joinExpressions,
+  shorthandExpression,
+  shouldIncludeValue,
+  substituteValue
+} from '@/easyadmin/core/query/dql-ops'
+
 export default {
   name: 'SearchFilter',
 
@@ -256,46 +263,9 @@ export default {
       const filter = {}
       const isFunction = functionToCheck => functionToCheck && {}.toString.call(functionToCheck) === '[object Function]'
       const transform = (field, key) => {
-        if (
-          field === null || typeof field === 'string' ||
-          !Object.keys(field).includes('expression')
-        ) {
-          // transform
-          let expression = ''
-          const relationKeys = key.split('.')
-
-          relationKeys.forEach((value, index) => {
-            const capitalizeKey = value.charAt(0).toUpperCase() + value.slice(1)
-            expression += `.get${capitalizeKey}()`
-          })
-
-          filter[key] = {
-            data: typeof field === 'string' || field === null ? null : [],
-            type: typeof field === 'string' || field === null ? 'input' : 'select',
-            label: typeof field === 'string' ? field : '',
-            default: null,
-            expression: typeof field === 'string' || field === null
-              ? `entity${expression} matches ':value'`
-              : `entity${expression} == ':value'`
-          }
-
-          if (typeof field === 'object') {
-            for (const k in field) {
-              if (k === '__label') {
-                filter[key]['label'] = field[k]
-              } else if (k === '__default') {
-                filter[key]['default'] = field[k]
-              } else {
-                filter[key]['data'].push(
-                  { value: k, label: field[k] }
-                )
-              }
-            }
-          }
-        } else {
-          // full style
-          filter[key] = field
-        }
+        // Reduced styles derive their DQL expression from the core helper;
+        // full-style filters (with `expression`) pass through untouched.
+        filter[key] = shorthandExpression(key, field)
 
         this.filterData[key] = filter[key]['default']
       }
@@ -321,22 +291,22 @@ export default {
     },
 
     filterGenerate() {
-      const filter = {}
-      if (this.query && Object.keys(this.query).includes('@filter')) {
-        filter['@filter'] = this.query['@filter']
-      }
+      // The final `@filter` HTTP param is produced downstream by the
+      // CrudSkeleton compiler; here filter state becomes joined expressions
+      // through the core helpers (falsy values intentionally dropped).
+      const base = this.query && Object.keys(this.query).includes('@filter')
+        ? this.query['@filter']
+        : undefined
 
+      const expressions = []
       for (const key in this.filterData) {
         const value = this.filterData[key]
-        if (value) {
-          const expression = this.filters[key].expression.replaceAll(':value', value)
-          if (filter['@filter']) {
-            filter['@filter'] += ` && (${expression})`
-          } else {
-            filter['@filter'] = `(${expression})`
-          }
-        }
+        if (!shouldIncludeValue(value)) continue
+        expressions.push(substituteValue(this.filters[key].expression, value))
       }
+
+      const joined = joinExpressions(base, expressions)
+      const filter = joined ? { '@filter': joined } : {}
       this.$emit('update:modelValue', { ...this.filterData })
       this.$emit('update:filter', filter)
     },

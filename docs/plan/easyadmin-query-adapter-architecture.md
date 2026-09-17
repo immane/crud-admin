@@ -348,19 +348,20 @@ Acceptance:
 
 ### Phase 4: Move Filter Generation to Core Nodes
 
-Status: not started.
+Status: complete for `SearchFilter`; relation option loading moves in Phase 5.
 
-1. Let `SearchFilter` emit filter state or `FilterNode`, not a final `@filter`
-   string.
-2. Keep reduced-style configuration conversion and async filter factories in the
-   Vue/config boundary, but use `dql-ops.ts` for expression construction.
-3. Make `CrudSkeletonQueryCompiler` the only source of final `@filter` and
-   `@order` HTTP parameter strings.
-4. Preserve existing falsy semantics: `SearchFilter` currently drops `0`, `false`,
-   `''`, `null`, and `undefined` from DQL filtering. This is intentional legacy
-   behavior and is golden-tested; do not change it incidentally.
-5. Keep the known distinction: URL query serialization preserves `0` and `false`
-   while DQL filter generation drops them.
+1. `SearchFilter.filterProcess()` now derives reduced-style filters through
+   `dql-ops.shorthandExpression()`; full-style filters still pass through
+   untouched and async factories keep their resolve flow.
+2. `SearchFilter.filterGenerate()` now joins through `shouldIncludeValue()` /
+   `substituteValue()` / `joinExpressions()`; emitted `update:modelValue` and
+   `update:filter` shapes are unchanged.
+3. The final `@filter` HTTP param for list fetching is produced by
+   `CrudSkeletonQueryCompiler` (wired in Phase 3); relation option `@filter`
+   substitution in `RelationToOne` stays until Phase 5.
+4. Existing falsy semantics preserved and golden-tested: DQL generation drops
+   `0`, `false`, `''`, `null`, and `undefined`, while URL serialization keeps
+   `0` and `false`.
 
 Acceptance:
 
