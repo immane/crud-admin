@@ -180,7 +180,7 @@ export default {
         isDeleted: {
           label: t('Deleted'),
           type: 'boolean',
-          expression: 'entity.isDeleted() == :value'
+          expression: 'entity.getIsDeleted() == :value'
         }
       },
       list_display: ['id', 'name', 'status', 'isDeleted', 'createdAt', 'updatedAt']

@@ -399,6 +399,13 @@ Custom `expression` values must follow the crud-skeleton `ExpressionDqlParser` c
 - Join with `&&` / `||` (never `and` / `or`). Null tests use bare `entity.getX()` (`IS NOT NULL`) or `!entity.getX()` (`IS NULL`), never `== null`.
 - Sort with `@order` (`field|DIR`, comma-separated), never `@sort`.
 
+Every `list_filter.expression` and `relation_filter['@filter']` is checked by the
+config-wide DQL fast-path validator. Every entity's complete `list_filter` map,
+default query, URL state, and resolved REST identity is also locked in
+`tests/unit/easyadmin/golden/__fixtures__/all-config-query-matrix.golden.json`.
+Update that explicit JSON golden in the same change as a query-relevant config
+edit; snapshots are intentionally not used.
+
 ---
 
 ## 8. ActionButton

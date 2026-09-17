@@ -64,6 +64,20 @@ describe('adapters/crudskeleton/CrudSkeletonQueryCompiler', () => {
     ).toEqual({ '@order': 'entity.name|ASC, entity.id|DESC' })
   })
 
+  it('preserves a base @sort without creating it from UI sort state', () => {
+    expect(
+      compileCsqeQuery({
+        query: { '@sort': 'legacy-comparator' },
+        rawSortParam: 'entity.name|ASC'
+      })
+    ).toEqual({
+      '@sort': 'legacy-comparator',
+      '@order': 'entity.name|ASC'
+    })
+    expect(compileCsqeQuery({ sort: [{ field: 'id', dir: 'DESC' }] }))
+      .toEqual({ '@order': 'entity.id|DESC' })
+  })
+
   it('merges a numeric pager', () => {
     expect(
       compileCsqeQuery({ page: { page: 2, limit: 20 } })

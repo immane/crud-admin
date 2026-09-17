@@ -1,6 +1,6 @@
 # EasyAdmin Query Adapter Architecture Plan
 
-> Status: active
+> Status: active; query-contract baseline complete
 > Last updated: 2026-09-18
 > Scope: Move EasyAdmin toward a testable query core and CrudSkeleton adapter without changing existing CRUD behavior.
 
@@ -54,16 +54,20 @@ only a reserved placeholder and must not introduce speculative behavior.
 5. Added the CrudSkeleton boundary:
    - `adapters/crudskeleton/CrudSkeletonQueryCompiler.ts`
    - `adapters/crudskeleton/CrudSkeletonAdapter.ts`
-6. Added explicit JSON golden fixtures and config-matrix tests. The fixtures lock
-   the currently supported output for Order, User, Product, Assignment, AuditLog,
+6. Added explicit JSON golden fixtures and config-matrix tests. The focused
+   fixtures lock unusual output for Order, User, Product, Assignment, AuditLog,
    Role, Setting, and Stock configurations.
 7. Audited all EasyAdmin entity configs and the CrudSkeleton backend Core source.
 8. Corrected non-DQL-safe `entity.isSystem()` config expressions to
    `entity.getIsSystem()`.
+9. Added a direct all-config golden matrix for every real entity configuration.
+   It imports the actual config modules, resolves the Category/Content async
+   filter factories with deterministic mocked data, and compares exact
+   `AdminQuery`, CSQE params, URL state, and adapter identity to checked-in JSON.
 
 ### Current Test Baseline
 
-- 96 test files and 1271 tests pass.
+- 98 test files and 1312 tests pass.
 - EasyAdmin UI, core, application, and CrudSkeleton adapter coverage has a 100%
   statements/branches/lines threshold.
 - Golden outputs use explicit `*.golden.json` plus `toEqual`; snapshots are not
@@ -249,8 +253,18 @@ Existing fixture coverage:
 | Setting | three-key sort order |
 | Stock | custom prefix and non-default multi-key order |
 
+The focused fixtures are supplemented by
+`all-config-query-matrix.golden.json`. It has exactly one row per real PascalCase
+entity loaded by `configs/entities.js`. Each row includes every key from that
+entity's `list.list_filter`, plus the exact final `AdminQuery`, CSQE params, URL
+query string, and resolved `name`/`prefix`/`plural` identity. The matrix test
+fails when an entity is added, removed, or gains/removes a list filter without a
+deliberate golden update.
+
 When adding a config shape, add a fixture if it creates a new protocol output. Do
 not add snapshots; intentional contract changes must be visible as JSON diffs.
+The all-config matrix must be updated in the same commit as every entity config
+query/filter/identity change.
 
 ---
 

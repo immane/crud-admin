@@ -152,4 +152,17 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter', () => {
       { params: { '@basis': 'id', '@mode': 'update' } }
     )
   })
+
+  it('accepts an empty top-level batch array and preserves its empty response', async() => {
+    request.post.mockResolvedValue({ data: [] })
+
+    const response = await new CrudSkeletonAdapter('User').batchUpdate([], {})
+
+    expect(request.post).toHaveBeenCalledWith(
+      '/api/v1/manage/users/batch-update',
+      [],
+      { params: { '@basis': 'id', '@mode': 'update' } }
+    )
+    expect(response.data).toEqual([])
+  })
 })

@@ -1,0 +1,1490 @@
+[
+  {
+    "entity": "Assignment",
+    "listFilterData": {
+      "userUuid": "assignment-userUuid",
+      "roleId": "1",
+      "scopeType": "global",
+      "scopeUuid": "assignment-scopeUuid",
+      "revokedAt": true
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Assignment",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getUserUuid() matches 'assignment-userUuid') && (entity.getRole().getId() == 1) && (entity.getScopeType() == 'global') && (entity.getScopeUuid() matches 'assignment-scopeUuid') && (entity.getRevokedAt())"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getUserUuid() matches 'assignment-userUuid') && (entity.getRole().getId() == 1) && (entity.getScopeType() == 'global') && (entity.getScopeUuid() matches 'assignment-scopeUuid') && (entity.getRevokedAt())"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getUserUuid() matches 'assignment-userUuid') && (entity.getRole().getId() == 1) && (entity.getScopeType() == 'global') && (entity.getScopeUuid() matches 'assignment-scopeUuid') && (entity.getRevokedAt())",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "userUuid=assignment-userUuid&roleId=1&scopeType=global&scopeUuid=assignment-scopeUuid&revokedAt=true",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "assignments"
+    }
+  },
+  {
+    "entity": "AuditLog",
+    "listFilterData": {
+      "action": "role.created",
+      "targetType": "role",
+      "targetUuid": "auditlog-targetUuid",
+      "actorUuid": "auditlog-actorUuid",
+      "requestId": "auditlog-requestId",
+      "createdAt": "2020-01-02T03:04:05.000Z"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "AuditLog",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getAction() == 'role.created') && (entity.getTargetType() == 'role') && (entity.getTargetUuid() matches 'auditlog-targetUuid') && (entity.getActorUuid() matches 'auditlog-actorUuid') && (entity.getRequestId() matches 'auditlog-requestId') && (entity.getCreatedAt() >= datetime.get(\"2020-01-02T03:04:05.000Z\"))"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getAction() == 'role.created') && (entity.getTargetType() == 'role') && (entity.getTargetUuid() matches 'auditlog-targetUuid') && (entity.getActorUuid() matches 'auditlog-actorUuid') && (entity.getRequestId() matches 'auditlog-requestId') && (entity.getCreatedAt() >= datetime.get(\"2020-01-02T03:04:05.000Z\"))"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getAction() == 'role.created') && (entity.getTargetType() == 'role') && (entity.getTargetUuid() matches 'auditlog-targetUuid') && (entity.getActorUuid() matches 'auditlog-actorUuid') && (entity.getRequestId() matches 'auditlog-requestId') && (entity.getCreatedAt() >= datetime.get(\"2020-01-02T03:04:05.000Z\"))",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "action=role.created&targetType=role&targetUuid=auditlog-targetUuid&actorUuid=auditlog-actorUuid&requestId=auditlog-requestId&createdAt=2020-01-02T03%3A04%3A05.000Z",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "audit-logs"
+    }
+  },
+  {
+    "entity": "Permission",
+    "listFilterData": {
+      "code": "permission-code",
+      "module": "authorization",
+      "resource": "role",
+      "action": "manage",
+      "name": "permission-name",
+      "isSystem": true
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Permission",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getCode() matches 'permission-code') && (entity.getModule() == 'authorization') && (entity.getResource() == 'role') && (entity.getAction() == 'manage') && (entity.getName() matches 'permission-name') && (entity.getIsSystem() == true)"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getCode() matches 'permission-code') && (entity.getModule() == 'authorization') && (entity.getResource() == 'role') && (entity.getAction() == 'manage') && (entity.getName() matches 'permission-name') && (entity.getIsSystem() == true)"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getCode() matches 'permission-code') && (entity.getModule() == 'authorization') && (entity.getResource() == 'role') && (entity.getAction() == 'manage') && (entity.getName() matches 'permission-name') && (entity.getIsSystem() == true)",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "code=permission-code&module=authorization&resource=role&action=manage&name=permission-name&isSystem=true",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "permissions"
+    }
+  },
+  {
+    "entity": "Role",
+    "listFilterData": {
+      "code": "role-code",
+      "name": "role-name",
+      "scopeType": "global",
+      "system": true
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Role",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getCode() matches 'role-code') && (entity.getName() matches 'role-name') && (entity.getScopeType() == 'global') && (entity.getIsSystem() == true)"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "ASC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|ASC",
+      "rawFilterParam": "(entity.getCode() matches 'role-code') && (entity.getName() matches 'role-name') && (entity.getScopeType() == 'global') && (entity.getIsSystem() == true)"
+    },
+    "csqeParams": {
+      "@order": "entity.id|ASC",
+      "@filter": "(entity.getCode() matches 'role-code') && (entity.getName() matches 'role-name') && (entity.getScopeType() == 'global') && (entity.getIsSystem() == true)",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "code=role-code&name=role-name&scopeType=global&system=true",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "roles"
+    }
+  },
+  {
+    "entity": "RoleFieldGrant",
+    "listFilterData": {
+      "resource": "common:content",
+      "action": "create",
+      "role.code": "rolefieldgrant-role.code"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "RoleFieldGrant",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getResource() == 'common:content') && (entity.getAction() == 'create') && (entity.getRole().getCode() matches 'rolefieldgrant-role.code')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getResource() == 'common:content') && (entity.getAction() == 'create') && (entity.getRole().getCode() matches 'rolefieldgrant-role.code')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getResource() == 'common:content') && (entity.getAction() == 'create') && (entity.getRole().getCode() matches 'rolefieldgrant-role.code')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "resource=common%3Acontent&action=create&role.code=rolefieldgrant-role.code",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "role-field-grants"
+    }
+  },
+  {
+    "entity": "Category",
+    "listFilterData": {
+      "name": "category-name",
+      "slug": "category-slug",
+      "enabled": true,
+      "parent.id": "1"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Category",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getName() matches 'category-name') && (entity.getSlug() matches 'category-slug') && (entity.getEnabled() == true) && (entity.getParent().getId() == '1')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "sortOrder",
+          "dir": "ASC"
+        },
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.sortOrder|ASC, entity.id|DESC",
+      "rawFilterParam": "(entity.getName() matches 'category-name') && (entity.getSlug() matches 'category-slug') && (entity.getEnabled() == true) && (entity.getParent().getId() == '1')"
+    },
+    "csqeParams": {
+      "@order": "entity.sortOrder|ASC, entity.id|DESC",
+      "@filter": "(entity.getName() matches 'category-name') && (entity.getSlug() matches 'category-slug') && (entity.getEnabled() == true) && (entity.getParent().getId() == '1')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "name=category-name&slug=category-slug&enabled=true&parent.id=1",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "categories"
+    }
+  },
+  {
+    "entity": "Comment",
+    "listFilterData": {
+      "body": "comment-body",
+      "entityType": "comment-entityType",
+      "entityId": "comment-entityId",
+      "author.username": "comment-author.username",
+      "parent.id": "1",
+      "status": "pending"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Comment",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getBody() matches 'comment-body') && (entity.getEntityType() matches 'comment-entityType') && (entity.getEntityId() matches 'comment-entityId') && (entity.getAuthor().getUsername() matches 'comment-author.username') && (entity.getParent().getId() == 1) && (entity.getStatus() == 'pending')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getBody() matches 'comment-body') && (entity.getEntityType() matches 'comment-entityType') && (entity.getEntityId() matches 'comment-entityId') && (entity.getAuthor().getUsername() matches 'comment-author.username') && (entity.getParent().getId() == 1) && (entity.getStatus() == 'pending')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getBody() matches 'comment-body') && (entity.getEntityType() matches 'comment-entityType') && (entity.getEntityId() matches 'comment-entityId') && (entity.getAuthor().getUsername() matches 'comment-author.username') && (entity.getParent().getId() == 1) && (entity.getStatus() == 'pending')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "body=comment-body&entityType=comment-entityType&entityId=comment-entityId&author.username=comment-author.username&parent.id=1&status=pending",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "comments"
+    }
+  },
+  {
+    "entity": "Content",
+    "listFilterData": {
+      "title": "content-title",
+      "category.id": "1"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Content",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getTitle() matches 'content-title') && (entity.getCategory().getId() == '1')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getTitle() matches 'content-title') && (entity.getCategory().getId() == '1')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getTitle() matches 'content-title') && (entity.getCategory().getId() == '1')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "title=content-title&category.id=1",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "contents"
+    }
+  },
+  {
+    "entity": "Media",
+    "listFilterData": {
+      "filename": "media-filename",
+      "originalFilename": "media-originalFilename",
+      "mimeType": "media-mimeType"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Media",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getFilename() matches 'media-filename') && (entity.getOriginalFilename() matches 'media-originalFilename') && (entity.getMimeType() matches 'media-mimeType')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getFilename() matches 'media-filename') && (entity.getOriginalFilename() matches 'media-originalFilename') && (entity.getMimeType() matches 'media-mimeType')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getFilename() matches 'media-filename') && (entity.getOriginalFilename() matches 'media-originalFilename') && (entity.getMimeType() matches 'media-mimeType')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "filename=media-filename&originalFilename=media-originalFilename&mimeType=media-mimeType",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "media"
+    }
+  },
+  {
+    "entity": "Page",
+    "listFilterData": {
+      "title": "page-title",
+      "slug": "page-slug",
+      "status": "draft"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Page",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getTitle() matches 'page-title') && (entity.getSlug() matches 'page-slug') && (entity.getStatus() == 'draft')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getTitle() matches 'page-title') && (entity.getSlug() matches 'page-slug') && (entity.getStatus() == 'draft')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getTitle() matches 'page-title') && (entity.getSlug() matches 'page-slug') && (entity.getStatus() == 'draft')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "title=page-title&slug=page-slug&status=draft",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "pages"
+    }
+  },
+  {
+    "entity": "Picture",
+    "listFilterData": {
+      "title": "picture-title",
+      "user.username": "picture-user.username",
+      "category.name": "picture-category.name"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Picture",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getTitle() matches 'picture-title') && (entity.getUser().getUsername() matches 'picture-user.username') && (entity.getCategory().getName() matches 'picture-category.name')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getTitle() matches 'picture-title') && (entity.getUser().getUsername() matches 'picture-user.username') && (entity.getCategory().getName() matches 'picture-category.name')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getTitle() matches 'picture-title') && (entity.getUser().getUsername() matches 'picture-user.username') && (entity.getCategory().getName() matches 'picture-category.name')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "title=picture-title&user.username=picture-user.username&category.name=picture-category.name",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "pictures"
+    }
+  },
+  {
+    "entity": "Setting",
+    "listFilterData": {
+      "key": "setting-key",
+      "groupName": "setting-groupName",
+      "type": "setting-type"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Setting",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getKey() matches 'setting-key') && (entity.getGroupName() matches 'setting-groupName') && (entity.getType() matches 'setting-type')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "groupName",
+          "dir": "ASC"
+        },
+        {
+          "field": "sortOrder",
+          "dir": "ASC"
+        },
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.groupName|ASC, entity.sortOrder|ASC, entity.id|DESC",
+      "rawFilterParam": "(entity.getKey() matches 'setting-key') && (entity.getGroupName() matches 'setting-groupName') && (entity.getType() matches 'setting-type')"
+    },
+    "csqeParams": {
+      "@order": "entity.groupName|ASC, entity.sortOrder|ASC, entity.id|DESC",
+      "@filter": "(entity.getKey() matches 'setting-key') && (entity.getGroupName() matches 'setting-groupName') && (entity.getType() matches 'setting-type')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "key=setting-key&groupName=setting-groupName&type=setting-type",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "settings"
+    }
+  },
+  {
+    "entity": "Tag",
+    "listFilterData": {
+      "name": "tag-name",
+      "slug": "tag-slug"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Tag",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getName() matches 'tag-name') && (entity.getSlug() matches 'tag-slug')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getName() matches 'tag-name') && (entity.getSlug() matches 'tag-slug')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getName() matches 'tag-name') && (entity.getSlug() matches 'tag-slug')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "name=tag-name&slug=tag-slug",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "tags"
+    }
+  },
+  {
+    "entity": "User",
+    "listFilterData": {
+      "username": "user-username",
+      "email": "user-email",
+      "phone": "user-phone",
+      "phoneVerified": true
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "User",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getUsername() matches 'user-username') && (entity.getEmail() matches 'user-email') && (entity.getPhone() matches 'user-phone') && (entity.getPhoneVerified() == true)"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getUsername() matches 'user-username') && (entity.getEmail() matches 'user-email') && (entity.getPhone() matches 'user-phone') && (entity.getPhoneVerified() == true)"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getUsername() matches 'user-username') && (entity.getEmail() matches 'user-email') && (entity.getPhone() matches 'user-phone') && (entity.getPhoneVerified() == true)",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "username=user-username&email=user-email&phone=user-phone&phoneVerified=true",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "users"
+    }
+  },
+  {
+    "entity": "Profile",
+    "listFilterData": {
+      "nickname": "profile-nickname",
+      "level": "bronze"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Profile",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getNickname() matches 'profile-nickname') && (entity.getLevel() == 'bronze')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getNickname() matches 'profile-nickname') && (entity.getLevel() == 'bronze')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getNickname() matches 'profile-nickname') && (entity.getLevel() == 'bronze')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "nickname=profile-nickname&level=bronze",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "profiles"
+    }
+  },
+  {
+    "entity": "Stock",
+    "listFilterData": {
+      "storeUuid": "stock-storeUuid",
+      "material": "stock-material"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Stock",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getStoreUuid() matches 'stock-storeUuid') && (entity.getMaterial() matches 'stock-material')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "storeUuid",
+          "dir": "ASC"
+        },
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.storeUuid|ASC, entity.id|DESC",
+      "rawFilterParam": "(entity.getStoreUuid() matches 'stock-storeUuid') && (entity.getMaterial() matches 'stock-material')"
+    },
+    "csqeParams": {
+      "@order": "entity.storeUuid|ASC, entity.id|DESC",
+      "@filter": "(entity.getStoreUuid() matches 'stock-storeUuid') && (entity.getMaterial() matches 'stock-material')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "storeUuid=stock-storeUuid&material=stock-material",
+    "identity": {
+      "prefix": "/api/v1/manage/inventory",
+      "plural": "stocks"
+    }
+  },
+  {
+    "entity": "Material",
+    "listFilterData": {
+      "code": "material-code",
+      "name": "material-name",
+      "kind": "raw",
+      "status": "active"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Material",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getCode() matches 'material-code') && (entity.getName() matches 'material-name') && (entity.getKind() == 'raw') && (entity.getStatus() == 'active')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getCode() matches 'material-code') && (entity.getName() matches 'material-name') && (entity.getKind() == 'raw') && (entity.getStatus() == 'active')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getCode() matches 'material-code') && (entity.getName() matches 'material-name') && (entity.getKind() == 'raw') && (entity.getStatus() == 'active')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "code=material-code&name=material-name&kind=raw&status=active",
+    "identity": {
+      "prefix": "/api/v1/manage/inventory",
+      "plural": "materials"
+    }
+  },
+  {
+    "entity": "SpecificationRecipe",
+    "listFilterData": {
+      "specificationUuid": "specificationrecipe-specificationUuid",
+      "status": "active"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "SpecificationRecipe",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getSpecificationUuid() matches 'specificationrecipe-specificationUuid') && (entity.getStatus() == 'active')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getSpecificationUuid() matches 'specificationrecipe-specificationUuid') && (entity.getStatus() == 'active')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getSpecificationUuid() matches 'specificationrecipe-specificationUuid') && (entity.getStatus() == 'active')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "specificationUuid=specificationrecipe-specificationUuid&status=active",
+    "identity": {
+      "prefix": "/api/v1/manage/inventory",
+      "plural": "recipes"
+    }
+  },
+  {
+    "entity": "Invoice",
+    "listFilterData": {
+      "payer.username": "invoice-payer.username",
+      "status": "invoice-status",
+      "currency": "invoice-currency"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Invoice",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getPayer().getUsername() matches 'invoice-payer.username') && (entity.getStatus() matches 'invoice-status') && (entity.getCurrency() matches 'invoice-currency')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getPayer().getUsername() matches 'invoice-payer.username') && (entity.getStatus() matches 'invoice-status') && (entity.getCurrency() matches 'invoice-currency')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getPayer().getUsername() matches 'invoice-payer.username') && (entity.getStatus() matches 'invoice-status') && (entity.getCurrency() matches 'invoice-currency')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "payer.username=invoice-payer.username&status=invoice-status&currency=invoice-currency",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "invoices"
+    }
+  },
+  {
+    "entity": "Promotion",
+    "listFilterData": {
+      "name": "promotion-name",
+      "storeCode": "promotion-storeCode",
+      "enabled": true,
+      "conflictMode": "stackable"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Promotion",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getName() matches 'promotion-name') && (entity.getStoreCode() matches 'promotion-storeCode') && (entity.getEnabled() == true) && (entity.getConflictMode() == 'stackable')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getName() matches 'promotion-name') && (entity.getStoreCode() matches 'promotion-storeCode') && (entity.getEnabled() == true) && (entity.getConflictMode() == 'stackable')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getName() matches 'promotion-name') && (entity.getStoreCode() matches 'promotion-storeCode') && (entity.getEnabled() == true) && (entity.getConflictMode() == 'stackable')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "name=promotion-name&storeCode=promotion-storeCode&enabled=true&conflictMode=stackable",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "promotions"
+    }
+  },
+  {
+    "entity": "PromotionTemplate",
+    "listFilterData": {
+      "name": "promotiontemplate-name",
+      "type": "promotiontemplate-type",
+      "phase": "promotiontemplate-phase",
+      "enabled": true
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "PromotionTemplate",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getName() matches 'promotiontemplate-name') && (entity.getType() matches 'promotiontemplate-type') && (entity.getPhase() matches 'promotiontemplate-phase') && (entity.getEnabled() == true)"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getName() matches 'promotiontemplate-name') && (entity.getType() matches 'promotiontemplate-type') && (entity.getPhase() matches 'promotiontemplate-phase') && (entity.getEnabled() == true)"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getName() matches 'promotiontemplate-name') && (entity.getType() matches 'promotiontemplate-type') && (entity.getPhase() matches 'promotiontemplate-phase') && (entity.getEnabled() == true)",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "name=promotiontemplate-name&type=promotiontemplate-type&phase=promotiontemplate-phase&enabled=true",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "promotion-templates"
+    }
+  },
+  {
+    "entity": "Store",
+    "listFilterData": {
+      "code": "store-code",
+      "name": "store-name",
+      "timezone": "store-timezone",
+      "status": "activate"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Store",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getCode() matches 'store-code') && (entity.getName() matches 'store-name') && (entity.getTimezone() matches 'store-timezone') && (entity.getStatus() == 'activate')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getCode() matches 'store-code') && (entity.getName() matches 'store-name') && (entity.getTimezone() matches 'store-timezone') && (entity.getStatus() == 'activate')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getCode() matches 'store-code') && (entity.getName() matches 'store-name') && (entity.getTimezone() matches 'store-timezone') && (entity.getStatus() == 'activate')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "code=store-code&name=store-name&timezone=store-timezone&status=activate",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "stores"
+    }
+  },
+  {
+    "entity": "StoreOrder",
+    "listFilterData": {
+      "operationalStatus": "pending",
+      "storeCodeSnapshot": "storeorder-storeCodeSnapshot",
+      "customerUserUuid": "storeorder-customerUserUuid",
+      "currency": "storeorder-currency",
+      "rejectionCode": "storeorder-rejectionCode"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "StoreOrder",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getOperationalStatus() == 'pending') && (entity.getStoreCodeSnapshot() matches 'storeorder-storeCodeSnapshot') && (entity.getCustomerUserUuid() matches 'storeorder-customerUserUuid') && (entity.getCurrency() matches 'storeorder-currency') && (entity.getRejectionCode() matches 'storeorder-rejectionCode')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getOperationalStatus() == 'pending') && (entity.getStoreCodeSnapshot() matches 'storeorder-storeCodeSnapshot') && (entity.getCustomerUserUuid() matches 'storeorder-customerUserUuid') && (entity.getCurrency() matches 'storeorder-currency') && (entity.getRejectionCode() matches 'storeorder-rejectionCode')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getOperationalStatus() == 'pending') && (entity.getStoreCodeSnapshot() matches 'storeorder-storeCodeSnapshot') && (entity.getCustomerUserUuid() matches 'storeorder-customerUserUuid') && (entity.getCurrency() matches 'storeorder-currency') && (entity.getRejectionCode() matches 'storeorder-rejectionCode')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "operationalStatus=pending&storeCodeSnapshot=storeorder-storeCodeSnapshot&customerUserUuid=storeorder-customerUserUuid&currency=storeorder-currency&rejectionCode=storeorder-rejectionCode",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "store-orders"
+    }
+  },
+  {
+    "entity": "Order",
+    "listFilterData": {
+      "status": "draft",
+      "user.username": "order-user.username",
+      "currency": "order-currency",
+      "paymentMethod": "order-paymentMethod"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Order",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getStatus() == 'draft') && (entity.getUser().getUsername() matches 'order-user.username') && (entity.getCurrency() matches 'order-currency') && (entity.getPaymentMethod() matches 'order-paymentMethod')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getStatus() == 'draft') && (entity.getUser().getUsername() matches 'order-user.username') && (entity.getCurrency() matches 'order-currency') && (entity.getPaymentMethod() matches 'order-paymentMethod')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getStatus() == 'draft') && (entity.getUser().getUsername() matches 'order-user.username') && (entity.getCurrency() matches 'order-currency') && (entity.getPaymentMethod() matches 'order-paymentMethod')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "status=draft&user.username=order-user.username&currency=order-currency&paymentMethod=order-paymentMethod",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "orders"
+    }
+  },
+  {
+    "entity": "OrderItem",
+    "listFilterData": {
+      "order.id": "1",
+      "specificationTitle": "orderitem-specificationTitle"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "OrderItem",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getOrder().getId() == 1) && (entity.getSpecificationTitle() matches 'orderitem-specificationTitle')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getOrder().getId() == 1) && (entity.getSpecificationTitle() matches 'orderitem-specificationTitle')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getOrder().getId() == 1) && (entity.getSpecificationTitle() matches 'orderitem-specificationTitle')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "order.id=1&specificationTitle=orderitem-specificationTitle",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "order-items"
+    }
+  },
+  {
+    "entity": "Product",
+    "listFilterData": {
+      "name": "product-name",
+      "status": "active",
+      "isDeleted": true
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Product",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getName() matches 'product-name') && (entity.getStatus() == 'active') && (entity.getIsDeleted() == true)"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getName() matches 'product-name') && (entity.getStatus() == 'active') && (entity.getIsDeleted() == true)"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getName() matches 'product-name') && (entity.getStatus() == 'active') && (entity.getIsDeleted() == true)",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "name=product-name&status=active&isDeleted=true",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "products"
+    }
+  },
+  {
+    "entity": "Specification",
+    "listFilterData": {
+      "name": "specification-name",
+      "status": "active"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Specification",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getName() matches 'specification-name') && (entity.getStatus() == 'active')"
+          }
+        ]
+      },
+      "sort": [],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "",
+      "rawFilterParam": "(entity.getName() matches 'specification-name') && (entity.getStatus() == 'active')"
+    },
+    "csqeParams": {
+      "@filter": "(entity.getName() matches 'specification-name') && (entity.getStatus() == 'active')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "name=specification-name&status=active",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "specifications"
+    }
+  },
+  {
+    "entity": "Wallet",
+    "listFilterData": {
+      "user.username": "wallet-user.username",
+      "currency": "wallet-currency",
+      "label": "wallet-label",
+      "status": "active"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Wallet",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getUser().getUsername() matches 'wallet-user.username') && (entity.getCurrency() matches 'wallet-currency') && (entity.getLabel() matches 'wallet-label') && (entity.getStatus() == 'active')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getUser().getUsername() matches 'wallet-user.username') && (entity.getCurrency() matches 'wallet-currency') && (entity.getLabel() matches 'wallet-label') && (entity.getStatus() == 'active')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getUser().getUsername() matches 'wallet-user.username') && (entity.getCurrency() matches 'wallet-currency') && (entity.getLabel() matches 'wallet-label') && (entity.getStatus() == 'active')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "user.username=wallet-user.username&currency=wallet-currency&label=wallet-label&status=active",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "wallets"
+    }
+  },
+  {
+    "entity": "PaymentDeduction",
+    "listFilterData": {
+      "type": "deduction",
+      "status": "pending",
+      "invoiceNo": "paymentdeduction-invoiceNo",
+      "wallet.id": "1",
+      "referenceId": "paymentdeduction-referenceId"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "PaymentDeduction",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getType() == 'deduction') && (entity.getStatus() == 'pending') && (entity.getInvoiceNo() matches 'paymentdeduction-invoiceNo') && (entity.getWallet().getId() == 1) && (entity.getReferenceId() matches 'paymentdeduction-referenceId')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getType() == 'deduction') && (entity.getStatus() == 'pending') && (entity.getInvoiceNo() matches 'paymentdeduction-invoiceNo') && (entity.getWallet().getId() == 1) && (entity.getReferenceId() matches 'paymentdeduction-referenceId')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getType() == 'deduction') && (entity.getStatus() == 'pending') && (entity.getInvoiceNo() matches 'paymentdeduction-invoiceNo') && (entity.getWallet().getId() == 1) && (entity.getReferenceId() matches 'paymentdeduction-referenceId')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "type=deduction&status=pending&invoiceNo=paymentdeduction-invoiceNo&wallet.id=1&referenceId=paymentdeduction-referenceId",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "payment-deductions"
+    }
+  },
+  {
+    "entity": "Transaction",
+    "listFilterData": {
+      "type": "deposit",
+      "status": "pending",
+      "fromWallet.id": "1",
+      "toWallet.id": "1",
+      "referenceId": "transaction-referenceId"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "Transaction",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getType() == 'deposit') && (entity.getStatus() == 'pending') && (entity.getFromWallet().getId() == 1) && (entity.getToWallet().getId() == 1) && (entity.getReferenceId() matches 'transaction-referenceId')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getType() == 'deposit') && (entity.getStatus() == 'pending') && (entity.getFromWallet().getId() == 1) && (entity.getToWallet().getId() == 1) && (entity.getReferenceId() matches 'transaction-referenceId')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getType() == 'deposit') && (entity.getStatus() == 'pending') && (entity.getFromWallet().getId() == 1) && (entity.getToWallet().getId() == 1) && (entity.getReferenceId() matches 'transaction-referenceId')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "type=deposit&status=pending&fromWallet.id=1&toWallet.id=1&referenceId=transaction-referenceId",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "transactions"
+    }
+  },
+  {
+    "entity": "WechatUser",
+    "listFilterData": {
+      "user.username": "wechatuser-user.username",
+      "openid": "wechatuser-openid",
+      "unionid": "wechatuser-unionid",
+      "nickname": "wechatuser-nickname",
+      "appType": "wechatuser-appType"
+    },
+    "pager": {
+      "page": 1,
+      "limit": 20
+    },
+    "adminQuery": {
+      "entity": "WechatUser",
+      "filter": {
+        "kind": "and",
+        "children": [
+          {
+            "kind": "cond",
+            "expression": "(entity.getUser().getUsername() matches 'wechatuser-user.username') && (entity.getOpenid() matches 'wechatuser-openid') && (entity.getUnionid() matches 'wechatuser-unionid') && (entity.getNickname() matches 'wechatuser-nickname') && (entity.getAppType() matches 'wechatuser-appType')"
+          }
+        ]
+      },
+      "sort": [
+        {
+          "field": "id",
+          "dir": "DESC"
+        }
+      ],
+      "page": {
+        "page": 1,
+        "limit": 20
+      },
+      "rawSortParam": "entity.id|DESC",
+      "rawFilterParam": "(entity.getUser().getUsername() matches 'wechatuser-user.username') && (entity.getOpenid() matches 'wechatuser-openid') && (entity.getUnionid() matches 'wechatuser-unionid') && (entity.getNickname() matches 'wechatuser-nickname') && (entity.getAppType() matches 'wechatuser-appType')"
+    },
+    "csqeParams": {
+      "@order": "entity.id|DESC",
+      "@filter": "(entity.getUser().getUsername() matches 'wechatuser-user.username') && (entity.getOpenid() matches 'wechatuser-openid') && (entity.getUnionid() matches 'wechatuser-unionid') && (entity.getNickname() matches 'wechatuser-nickname') && (entity.getAppType() matches 'wechatuser-appType')",
+      "page": 1,
+      "limit": 20
+    },
+    "urlQueryString": "user.username=wechatuser-user.username&openid=wechatuser-openid&unionid=wechatuser-unionid&nickname=wechatuser-nickname&appType=wechatuser-appType",
+    "identity": {
+      "prefix": "/api/v1/manage",
+      "plural": "wechat-users"
+    }
+  }
+]

@@ -7,6 +7,7 @@ vi.mock('@/i18n', () => ({ t: (k) => k }))
 import entities from '@/configs/entities'
 import CategoryModule from '@/configs/collections/common/Category'
 import ContentModule from '@/configs/collections/common/Content'
+import { validateDqlExpression } from '@/easyadmin/core/query/validate-dql-expression'
 
 const KNOWN_ACTIONS = ['new', 'detail', 'edit', 'delete', 'batch_edit', 'batch_delete', 'lines', 'pager', 'export']
 
@@ -65,6 +66,29 @@ describe('configs entity shapes', () => {
           'type' in filterValue ||
           keys.length > 0
         expect(shaped, label).toBe(true)
+      }
+    }
+  })
+
+  it('keeps full-style and relation DQL filters on the backend fast path', () => {
+    for (const [entityName, config] of realEntries()) {
+      const filters = config?.list?.list_filter
+      if (filters) {
+        for (const [filterKey, filterValue] of Object.entries(filters)) {
+          if (typeof filterValue?.expression === 'string') {
+            expect(validateDqlExpression(filterValue.expression), `${entityName}.${filterKey}`)
+              .toEqual([])
+          }
+        }
+      }
+
+      const relationFilters = []
+      collectAll(config, 'relation_filter', relationFilters)
+      for (const relationFilter of relationFilters) {
+        if (typeof relationFilter?.['@filter'] === 'string') {
+          expect(validateDqlExpression(relationFilter['@filter']), `${entityName}.relation_filter`)
+            .toEqual([])
+        }
       }
     }
   })

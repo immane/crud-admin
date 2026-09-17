@@ -13,6 +13,7 @@ import {
 // Load every golden fixture in __fixtures__ (keeps explicit toEqual, no snapshots).
 const goldenModules = import.meta.glob('./__fixtures__/*.golden.json', { eager: true })
 const CASES = Object.entries(goldenModules)
+  .filter(([path]) => !path.endsWith('/all-config-query-matrix.golden.json'))
   .map(([path, mod]) => [path, mod.default ?? mod])
   .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
 
