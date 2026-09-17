@@ -55,7 +55,7 @@
 - **响应式布局** — 可折叠侧边栏（SVG 图标）、面包屑导航、可选固定顶栏
 - **代码分割与构建优化** — Vite 驱动的 chunk 分割和 tree-shaking
 - **服务端健康监控** — 导航栏状态点轮询 `GET /health/live`、`/health/ready` 和 `/metrics`
-- **Vitest 单元测试** — 78 个 spec 文件共 1041 项测试，`src/components/EasyAdmin` 上强制 100% 覆盖率阈值
+- **Vitest 单元测试** — 78 个 spec 文件共 1041 项测试，`src/easyadmin/ui/vue` 上强制 100% 覆盖率阈值
 - **锁定文件已提交** — `package-lock.json` 已提交以保证可复现安装
 
 
@@ -95,7 +95,7 @@
 ├── src/
 │   ├── main.js                      # 应用入口：createApp、安装插件、挂载
 │   ├── permission.js                # 路由守卫（认证 + 角色检查）
-│   ├── components/EasyAdmin/        # ⭐ 核心 CRUD 引擎
+│   ├── easyadmin/ui/vue/        # ⭐ 核心 CRUD UI
 │   │   ├── FormAdmin.vue            # 动态表单生成器
 │   │   ├── ListAdmin.vue            # 动态列表/表格生成器
 │   │   ├── DetailAdmin.vue          # 可配置记录详情页
@@ -408,7 +408,7 @@ FormAdmin 会将 `field.rules` / `field.validator` 合并到 `el-form` 校验中
 
 ## 测试
 
-**1041 项测试，共 78 个 spec 文件 · Vitest 2.1 · `src/components/EasyAdmin` 上 100% statements/branches/lines 覆盖率阈值**
+**1041 项测试，共 78 个 spec 文件 · Vitest 2.1 · `src/easyadmin/ui/vue` 上 100% statements/branches/lines 覆盖率阈值**
 
 ```bash
 npm run test              # 运行全部测试（CI 中关闭 watch 模式）
@@ -422,7 +422,7 @@ npm run test:ci           # CI（类型检查 + 测试）
 - **组件测试**：Breadcrumb、Hamburger、SvgIcon、EasyAdmin feedback UI
 - **工具函数测试**：`request.ts`、`validate.js`、`entity.ts`、`formatTime`、`parseTime`、`param2Obj`
 
-配置文件：`vitest.config.ts`（jsdom 环境，Vue 3 插件；`src/components/EasyAdmin` 上强制 100% statements/branches/lines 阈值）。
+配置文件：`vitest.config.ts`（jsdom 环境，Vue 3 插件；`src/easyadmin/ui/vue` 上强制 100% statements/branches/lines 阈值）。
 
 CI：GitHub Actions 运行类型检查、分片单元测试和覆盖率任务。仅文档/配置/i18n 变更会被路径过滤跳过 CI 任务。
 

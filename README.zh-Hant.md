@@ -56,7 +56,7 @@
 - **響應式佈局** — 可折疊側邊欄（SVG 圖示）、麵包屑導覽、可選固定頂欄
 - **程式碼分割與建置最佳化** — Vite 驅動的 chunk 分割與 tree-shaking
 - **伺服器健康監控** — 導覽列狀態燈輪詢 `GET /health/live`、`/health/ready` 與 `/metrics`
-- **Vitest 單元測試** — 78 個 spec 檔案共 1041 項測試，`src/components/EasyAdmin` 強制 100% 覆蓋率門檻
+- **Vitest 單元測試** — 78 個 spec 檔案共 1041 項測試，`src/easyadmin/ui/vue` 強制 100% 覆蓋率門檻
 - **受控的 Lockfile** — 提交 `package-lock.json`，確保依賴安裝可重現
 
 
@@ -96,7 +96,7 @@
 ├── src/
 │   ├── main.js                      # 應用入口：createApp、安裝外掛、掛載
 │   ├── permission.js                # 路由守衛（驗證＋角色檢查）
-│   ├── components/EasyAdmin/        # ⭐ 核心 CRUD 引擎
+│   ├── easyadmin/ui/vue/        # ⭐ 核心 CRUD UI
 │   │   ├── FormAdmin.vue            # 動態表單生成器
 │   │   ├── ListAdmin.vue            # 動態列表/表格生成器
 │   │   ├── DetailAdmin.vue          # 可配置記錄詳情頁
@@ -409,7 +409,7 @@ FormAdmin 會將 `field.rules` / `field.validator` 合併至 `el-form` 規則。
 
 ## 測試
 
-**78 個 spec 檔案共 1041 項測試 · Vitest 2.1 · `src/components/EasyAdmin` 強制 100% statements/branches/lines 門檻**
+**78 個 spec 檔案共 1041 項測試 · Vitest 2.1 · `src/easyadmin/ui/vue` 強制 100% statements/branches/lines 門檻**
 
 ```bash
 npm run test              # 執行全部測試（CI 中關閉 watch 模式）
@@ -423,7 +423,7 @@ npm run test:ci           # CI（類型檢查＋測試）
 - **元件測試**：Breadcrumb、Hamburger、SvgIcon、EasyAdmin 回饋 UI
 - **工具函數測試**：`request.ts`、`validate.js`、`entity.ts`、`formatTime`、`parseTime`、`param2Obj`
 
-配置：`vitest.config.ts`（jsdom 環境、Vue 3 外掛；`src/components/EasyAdmin` 強制 100% statements/branches/lines 門檻）。
+配置：`vitest.config.ts`（jsdom 環境、Vue 3 外掛；`src/easyadmin/ui/vue` 強制 100% statements/branches/lines 門檻）。
 
 CI：GitHub Actions 執行類型檢查＋分片單元測試與覆蓋率任務。僅文件/配置/i18n 變更時透過路徑過濾跳過 CI 任務。
 

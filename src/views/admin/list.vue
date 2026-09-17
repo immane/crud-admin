@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import ListAdmin from '@/components/EasyAdmin/ListAdmin'
+import ListAdmin from '@/easyadmin/ui/vue/ListAdmin'
 import admin from '@/config'
 import inflectFactory from 'i'
 

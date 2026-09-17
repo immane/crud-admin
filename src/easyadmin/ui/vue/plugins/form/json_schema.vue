@@ -15,7 +15,7 @@
 <script>
 import Ajv from 'ajv'
 import addFormats from 'ajv-formats'
-import FormAdmin from '@/components/EasyAdmin/FormAdmin'
+import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
 import JsonEditor from './json.vue'
 import { applySchemaDefaults, createSchemaForm, valueForSchemaValidation } from '@/utils/json-schema-form'
 

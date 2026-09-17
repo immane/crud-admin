@@ -44,7 +44,7 @@ src/
 ├── api/                  # API endpoint definitions
 │   ├── prefix.ts         # VITE_* prefix constants
 │   └── user.ts           # login(), getInfo(), logout()
-├── components/EasyAdmin/  # ⭐ Core CRUD Engine
+├── easyadmin/ui/vue/      # ⭐ Core CRUD UI
 │   ├── FormAdmin.vue     # Dynamic form builder
 │   ├── ListAdmin.vue     # Dynamic list builder
 │   ├── DetailAdmin.vue   # Configurable record detail page
@@ -280,13 +280,13 @@ Adding a new detail plugin: create `plugins/detail/{type}.vue` with the same pro
 
 ### Adding a New Detail Plugin
 
-1. Create `src/components/EasyAdmin/plugins/detail/{type}.vue` with props: `value`, `field`, `scope`, `em`, `struct`
+1. Create `src/easyadmin/ui/vue/plugins/detail/{type}.vue` with props: `value`, `field`, `scope`, `em`, `struct`
 2. Add the type name to `getListPluginType()` in `DetailAdmin.vue` (if not already present)
 3. Done — priority over list plugins, auto-discovered via `import.meta.glob`
 
 ### Adding a New List Plugin
 
-1. Create `src/components/EasyAdmin/plugins/list/{type}.vue` with props: `value`, `field`, `scope`, `em`, `struct`
+1. Create `src/easyadmin/ui/vue/plugins/list/{type}.vue` with props: `value`, `field`, `scope`, `em`, `struct`
 2. Add the type name to `getListPluginType()` in `ListAdmin.vue`
 3. Done — auto-discovered via `import.meta.glob`
 

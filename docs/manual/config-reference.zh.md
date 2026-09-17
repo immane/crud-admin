@@ -562,8 +562,8 @@ form: {
 ### 7.2 JSX 配置组件（如 Product.jsx 中的 SpecificationManager）
 
 ```js
-import ListAdmin from '@/components/EasyAdmin/ListAdmin'
-import FormAdmin from '@/components/EasyAdmin/FormAdmin'
+import ListAdmin from '@/easyadmin/ui/vue/ListAdmin'
+import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
 
 const SpecificationManager = {
   components: { ListAdmin, FormAdmin },

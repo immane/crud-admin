@@ -525,7 +525,7 @@ export default {
          *  List filter example
          *
          * @reference
-         *  @/components/EasyAdmin/SearchFilter.vue
+          *  @/easyadmin/ui/vue/SearchFilter.vue
          */
       }
     },

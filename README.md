@@ -55,7 +55,7 @@
 - **Responsive Layout** — Collapsible sidebar with SVG icons, breadcrumb navigation, fixed header option
 - **Code Splitting & Build Optimization** — Vite-powered chunk splitting with tree-shaking
 - **Server Health Monitor** — navbar status dot polling `GET /health/live`, `/health/ready` and `/metrics`
-- **Vitest Unit Testing** — 1041 tests across 78 spec files with 100% coverage thresholds on `src/components/EasyAdmin`
+- **Vitest Unit Testing** — 1041 tests across 78 spec files with 100% coverage thresholds on `src/easyadmin/ui/vue`
 - **Tracked Lockfile** — `package-lock.json` is committed for reproducible installs
 
 
@@ -95,7 +95,7 @@ Translation keys use the English string directly (flat format), e.g. `$t('New / 
 ├── src/
 │   ├── main.js                      # App entry: createApp, install plugins, mount
 │   ├── permission.js                # Navigation guard (auth + role check)
-│   ├── components/EasyAdmin/        # ⭐ Core CRUD Engine
+│   ├── easyadmin/ui/vue/            # ⭐ Core CRUD UI
 │   │   ├── FormAdmin.vue            # Dynamic form builder
 │   │   ├── ListAdmin.vue            # Dynamic list/table builder
 │   │   ├── DetailAdmin.vue          # Configurable record detail page
@@ -418,7 +418,7 @@ Built-in validators live in `src/utils/validate.js` (`isPasswordCompliant`, `cre
 
 ## Testing
 
-**1041 tests across 78 spec files · Vitest 2.1 · 100% statements/branches/lines thresholds on `src/components/EasyAdmin`**
+**1041 tests across 78 spec files · Vitest 2.1 · 100% statements/branches/lines thresholds on `src/easyadmin/ui/vue`**
 
 ```bash
 npm run test              # Run all tests (watch mode off in CI)
@@ -432,7 +432,7 @@ Tests organized in `tests/unit/`:
 - **Component tests**: Breadcrumb, Hamburger, SvgIcon, EasyAdmin feedback UI
 - **Utility tests**: `request.ts`, `validate.js`, `entity.ts`, `formatTime`, `parseTime`, `param2Obj`
 
-Configuration: `vitest.config.ts` (jsdom environment, Vue 3 plugin; 100% statements/branches/lines thresholds enforced on `src/components/EasyAdmin`).
+Configuration: `vitest.config.ts` (jsdom environment, Vue 3 plugin; 100% statements/branches/lines thresholds enforced on `src/easyadmin/ui/vue`).
 
 CI: GitHub Actions runs type-check plus sharded unit tests and a coverage job. Docs/config/i18n-only changes are path-filtered so CI jobs are skipped.
 

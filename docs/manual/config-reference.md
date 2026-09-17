@@ -595,8 +595,8 @@ The component receives props: `data` (the current field value), `form` (the full
 ### 7.2 JSX Config Components (e.g. SpecificationManager in Product.jsx)
 
 ```js
-import ListAdmin from '@/components/EasyAdmin/ListAdmin'
-import FormAdmin from '@/components/EasyAdmin/FormAdmin'
+import ListAdmin from '@/easyadmin/ui/vue/ListAdmin'
+import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
 
 const SpecificationManager = {
   components: { ListAdmin, FormAdmin },

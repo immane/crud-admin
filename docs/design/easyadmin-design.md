@@ -299,7 +299,7 @@ structure():
 ### 8.4 Custom Field Plugins
 
 ```
-src/components/EasyAdmin/plugins/form/my-custom.vue
+src/easyadmin/ui/vue/plugins/form/my-custom.vue
 ```
 
 As long as the plugin follows the Plugin Props Contract, it will be automatically discovered and loaded by `import.meta.glob`.
@@ -313,6 +313,6 @@ As long as the plugin follows the Plugin Props Contract, it will be automaticall
 ### 8.4 自定义字段插件
 
 ```
-src/components/EasyAdmin/plugins/form/my-custom.vue
+src/easyadmin/ui/vue/plugins/form/my-custom.vue
 ```
 只要遵循 plugin props 契约即可自动被 `import.meta.glob` 发现并加载。

@@ -26,7 +26,7 @@
   }
 */
 
-import FormAdmin from '@/components/EasyAdmin/FormAdmin'
+import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
 
 export default {
   components: { FormAdmin },

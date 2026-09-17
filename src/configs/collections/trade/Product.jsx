@@ -1,7 +1,7 @@
 import { t } from '@/i18n'
 import { orderByIdDesc, statusFilterLabel } from '../helpers'
-import ListAdmin from '@/components/EasyAdmin/ListAdmin'
-import FormAdmin from '@/components/EasyAdmin/FormAdmin'
+import ListAdmin from '@/easyadmin/ui/vue/ListAdmin'
+import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
 import specificationConfig from './Specification'
 
 const SpecificationManager = {

@@ -55,7 +55,7 @@
 - **レスポンシブレイアウト** — 折りたたみ可能なサイドバー（SVG アイコン）、パンくずナビゲーション、固定ヘッダーオプション
 - **コード分割とビルド最適化** — Vite によるチャンク分割とツリーシェイキング
 - **サーバーヘルスモニター** — ナビゲーションバーのステータスドットが `GET /health/live`、`/health/ready`、`/metrics` をポーリング
-- **Vitest ユニットテスト** — 78 スペックファイル・1041 テスト、`src/components/EasyAdmin` に 100% カバレッジ閾値
+- **Vitest ユニットテスト** — 78 スペックファイル・1041 テスト、`src/easyadmin/ui/vue` に 100% カバレッジ閾値
 - **追跡対象のロックファイル** — 再現可能なインストールのため `package-lock.json` をコミット
 
 
@@ -95,7 +95,7 @@
 ├── src/
 │   ├── main.js                      # エントリ：createApp、プラグインインストール、マウント
 │   ├── permission.js                # ナビゲーションガード（認証 + ロールチェック）
-│   ├── components/EasyAdmin/        # ⭐ コア CRUD エンジン
+│   ├── easyadmin/ui/vue/        # ⭐ コア CRUD UI
 │   │   ├── FormAdmin.vue            # 動的フォームビルダー
 │   │   ├── ListAdmin.vue            # 動的リスト/テーブルビルダー
 │   │   ├── DetailAdmin.vue          # 設定可能なレコード詳細ページ
@@ -407,7 +407,7 @@ FormAdmin は `field.rules` / `field.validator` を `el-form` のルールにマ
 
 ## テスト
 
-**78 スペックファイル・1041 テスト · Vitest 2.1 · `src/components/EasyAdmin` に 100% の statements/branches/lines 閾値**
+**78 スペックファイル・1041 テスト · Vitest 2.1 · `src/easyadmin/ui/vue` に 100% の statements/branches/lines 閾値**
 
 ```bash
 npm run test              # 全テストを実行（CI ではウォッチモード OFF）
@@ -421,7 +421,7 @@ npm run test:ci           # CI（type-check + test）
 - **コンポーネントテスト**：Breadcrumb、Hamburger、SvgIcon、EasyAdmin フィードバック UI
 - **ユーティリティテスト**：`request.ts`、`validate.js`、`entity.ts`、`formatTime`、`parseTime`、`param2Obj`
 
-設定：`vitest.config.ts`（jsdom 環境、Vue 3 プラグイン；`src/components/EasyAdmin` に 100% の statements/branches/lines 閾値を適用）。
+設定：`vitest.config.ts`（jsdom 環境、Vue 3 プラグイン；`src/easyadmin/ui/vue` に 100% の statements/branches/lines 閾値を適用）。
 
 CI：GitHub Actions で type-check とシャーディングされたユニットテスト、 coverage ジョブを実行します。ドキュメント/設定/i18n のみの変更はパスフィルタにより CI ジョブがスキップされます。
 

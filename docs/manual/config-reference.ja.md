@@ -530,8 +530,8 @@ FormAdmin は `field.rules` / `field.validator` を `el-form` ルールにマー
 ### 7.2 JSX 設定コンポーネント（Product.jsx の SpecificationManager など）
 
 ```js
-import ListAdmin from '@/components/EasyAdmin/ListAdmin'
-import FormAdmin from '@/components/EasyAdmin/FormAdmin'
+import ListAdmin from '@/easyadmin/ui/vue/ListAdmin'
+import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
 
 const SpecificationManager = {
   components: { ListAdmin, FormAdmin },

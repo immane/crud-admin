@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import FormAdmin from '@/components/EasyAdmin/FormAdmin'
+import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
 import admin from '@/config'
 import inflectFactory from 'i'
 

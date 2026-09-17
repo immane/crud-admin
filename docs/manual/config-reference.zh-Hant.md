@@ -525,8 +525,8 @@ FormAdmin 會將 `field.rules` / `field.validator` 合併到 `el-form` 校驗中
 ### 7.2 JSX 設定組件（如 Product.jsx 中的 SpecificationManager）
 
 ```js
-import ListAdmin from '@/components/EasyAdmin/ListAdmin'
-import FormAdmin from '@/components/EasyAdmin/FormAdmin'
+import ListAdmin from '@/easyadmin/ui/vue/ListAdmin'
+import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
 
 const SpecificationManager = {
   components: { ListAdmin, FormAdmin },

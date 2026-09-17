@@ -6,12 +6,12 @@ Migrate the config-driven CRUD core capabilities, ensuring list, filter, paginat
 
 ## Scope
 
-- `src/components/EasyAdmin/ListAdmin.vue`
-- `src/components/EasyAdmin/FormAdmin.vue`
-- `src/components/EasyAdmin/SearchFilter.vue`
-- `src/components/EasyAdmin/plugins/form/*.vue`
-- `src/components/EasyAdmin/plugins/list/editable-plain.vue`
-- `src/components/EasyAdmin/ui/feedback.ts`
+- `src/easyadmin/ui/vue/ListAdmin.vue`
+- `src/easyadmin/ui/vue/FormAdmin.vue`
+- `src/easyadmin/ui/vue/SearchFilter.vue`
+- `src/easyadmin/ui/vue/plugins/form/*.vue`
+- `src/easyadmin/ui/vue/plugins/list/editable-plain.vue`
+- `src/easyadmin/ui/vue/ui/feedback.ts`
 - `src/views/admin/*.vue`
 - `src/views/user/*.vue`
 
