@@ -4,8 +4,8 @@
     entity-conf="Option"
     :fields="fields"
   >
-    <template v-slot:title><span /></template>
-    <template v-slot:action><span /></template>
+    <template #title><span /></template>
+    <template #action><span /></template>
   </form-admin>
 </template>
 
@@ -27,6 +27,7 @@
 */
 
 import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
+import { t } from '@/i18n'
 
 export default {
   components: { FormAdmin },
@@ -43,7 +44,7 @@ export default {
   data() {
     return {
       fields: this.field?.type_options?.fields ??
-        [{ property: 'common', type: 'input', field_options: { label: $t('Default') }}]
+        [{ property: 'common', type: 'input', field_options: { label: t('Default') }}]
     }
   },
   created() {

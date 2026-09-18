@@ -1,7 +1,7 @@
 # EasyAdmin Config Contract
 
 > Vue Admin Skeleton — EasyAdmin Config Contract (Complete Reference)  
-> Last updated: 2026-07-03
+> Last updated: 2026-09-18
 
 ---
 
@@ -12,23 +12,29 @@ src/configs/
 ├── index.js                  # Aggregated export { routes, entities }
 ├── routes.js                 # Menu/route declarations (using r() generator)
 ├── entities.js               # Auto-loader (import.meta.glob)
+├── schema/                   # Machine-checkable entity config schema
 └── collections/
-    └── common/
-        └── index.js          # ⭐ All entity CRUD configs
+    ├── helpers.js            # Shared constants (orderByIdDesc, statusFilterLabel)
+    ├── store/Store.js        # Per-bundle, per-entity files…
+    ├── trade/Product.jsx     # …(.jsx when a custom component is embedded)
+    └── …
 ```
+
+Each entity lives in its own file (`{bundle}/{Entity}.js[x]`); there is no
+single aggregated config file. See also §11: collection files must never
+statically import UI components.
 
 ---
 
 ## 2. Top-Level Config Structure
 
-File: `src/configs/collections/common/index.js`
+Each collection file exports `Record<string, EntityConfig>` (usually one
+entity per file):
 
-```typescript
-// Top-level export: Record<string, EntityConfig>
+```js
+// src/configs/collections/trade/Specification.js
 export default {
-  Product: { /* EntityConfig */ },
-  Order:   { /* EntityConfig */ },
-  // ...
+  Specification: { /* EntityConfig */ }
 }
 ```
 
@@ -91,10 +97,13 @@ export default {
 interface FormConfig {
   /**
    * Form field list
-   * 
-   * string[]: Simple property name list
-   * FieldOption[]: Detailed field configs
-   * '__all__': Use all fields from the backend API
+   *
+   * FieldConfig[]: string items are property names; explicit items first.
+   * The special item '__all__' means "all remaining fields here": explicit
+   * configs render first, then every field not explicitly configured
+   * (e.g. Store detail renders two explicit json_schema fields + '__all__').
+   * A top-level '__all__' string (all structure fields) is also accepted;
+   * current configs use the string form in detail.detail_display.
    */
   fields: FieldConfig[] | '__all__'
 
@@ -143,17 +152,25 @@ interface FieldOption {
   /** Override display label (default uses backend translation) */
   label?: string
 
-  /** 
+  /**
    * Force field type plugin
-   * Priority: field.type > API metadata.type > 'input'
-   * 
+   * Resolution order: field.relation (+resolveRelation) > field.type >
+   * backend metadata.type (allowlisted) > 'input'
+   *
    * Available values:
-   *   'input' | 'text' | 'textarea' | 'select' | 'boolean' |
-   *   'integer' | 'float' | 'decimal' |
+   *   'input' | 'text' (rich text) | 'textarea' | 'select' | 'boolean' |
+   *   'integer' | 'currency' | 'password' | 'email' |
    *   'date' | 'datetime' | 'time' |
    *   'image' | 'images' | 'file' |
    *   'code' | 'json' | 'json_schema' | 'json-custom' | 'array' | 'transfer' |
    *   'RelationToOne' | 'RelationToMany'
+   *
+   * Note: 'text' renders the Tinymce rich-text editor (not a plain textarea);
+   * 'currency' displays yuan and stores cents via type_options.multiplier.
+   * Backend metadata only maps the allowlist (array, boolean, code, date,
+   * datetime, image(s), integer, json, text, textarea, transfer); anything
+   * else from metadata falls back to 'input', so metadata alone never yields
+   * select/password/email/currency/json_schema.
    */
   type?: string
 
@@ -162,7 +179,16 @@ interface FieldOption {
   /** Override backend metadata nullability (true = required) */
   required?: boolean
 
-  /** Read-only in edit mode */
+  /** Custom validation rules merged into el-form rules (array or single rule) */
+  rules?: object | object[]
+
+  /** Custom validator function(s); wrapped with a default blur trigger */
+  validator?: Function | Function[]
+
+  /** Hide the field: boolean, mode ('create'/'update'/'edit'), mode array, or (form, id) => boolean */
+  hidden?: boolean | string | string[] | Function
+
+  /** Enable inline editing in list cells (string/integer/float/decimal fields only, never id/image) */
   editable?: boolean
 
   /** Group into a named tab (same tab value = same tab) */
@@ -179,7 +205,10 @@ interface FieldOption {
   /** Events bound to el-form-item */
   field_events?: Record<string, Function>
 
-  /** Props passed to the field plugin */
+  /** Props passed to the field plugin. Per-type shapes include:
+   *  select: { options: [{ value, label }] }, integer: { min, max },
+   *  relation: { remote, options }, currency: { multiplier, currency },
+   *  upload: { storage, ... }, json_schema: { schema, fields } */
   type_options?: Record<string, unknown>
 
   /** Events bound to the field plugin */
@@ -187,10 +216,22 @@ interface FieldOption {
 
   // ─── Relation Fields Only ──────────────────────
 
+  /**
+   * Relation target override (checked BEFORE field.type by resolvePluginType).
+   * { entity: 'User', multiple?: boolean, valueKey?: 'uuid' } — valueKey
+   * selects which key of the related object becomes the form value.
+   */
+  relation?: {
+    entity?: string
+    target?: string
+    multiple?: boolean
+    valueKey?: string
+  }
+
   /** Relation query filter */
   relation_filter?: {
     '@filter'?: string     // DQL expression
-    '@order'?: string       // Sort order
+    '@order'?: string      // Sort order
   }
 
   /** Link to create related entity */
@@ -293,9 +334,20 @@ interface ListConfig {
 
   /**
    * Hide default actions
-   * Available: 'new' | 'detail' | 'edit' | 'delete' | 'batch_edit' | 'batch_delete' | 'lines' | 'pager' | 'export'
+   * Available: 'new' | 'detail' | 'edit' | 'delete' | 'batch_edit' |
+   * 'batch_delete' | 'lines' | 'pager' | 'export'
+   * (disabling 'delete' also hides 'batch_delete')
    */
   disabled_actions?: string[]
+
+  /** CSV export config (query params + column label mapping).
+   *  The toolbar export button appears only when this is set; exportData
+   *  merges list query + current filter + export.query.
+   *  (The `export` component prop is a dummy — config is the real source.) */
+  export?: {
+    query?: Record<string, string>   // Export query params
+    label?: Record<string, string>   // Column label mapping
+  }
 
   /** Custom data fetch function (overrides default em.list()) */
   data_processor?: (context: ListAdmin) => Promise<void>
@@ -389,6 +441,11 @@ list_filter: {
 }
 ```
 
+`__default` is optional (omit it for no pre-selection). Beyond `==` filters,
+expressions also cover `matches ":value"` (backend substring LIKE, do not
+pre-wrap `%`) and datetime comparisons such as
+`entity.getCreatedAt() >= ":value"`.
+
 Auto-conversion rule: In the `Promise` result, `__label` is the label, `__default` is the default value, and the remaining key-value pairs are options.
 
 ### 7.4 DQL Expression Rules (backend-verified)
@@ -425,6 +482,7 @@ interface ActionButton {
 ```typescript
 import { r } from '@/router/generator'
 import Layout from '@/layout'
+import { t } from '@/i18n'
 
 export default [
   {
@@ -432,12 +490,12 @@ export default [
     name: 'CatalogManage',       // Route name (unique)
     component: Layout,           // Layout component
     meta: {
-      title: 'Product Management',  // Menu display name
+      title: t('Product Management'),  // Menu display name (translated)
       icon: 'el-icon-goods',     // Element UI icon
       roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']  // Role whitelist
     },
     children: [
-      ...r('Product', 'Product')  // Auto-generates list/create/edit routes
+      ...r('Product', t('Product'))  // Auto-generates list/create/edit/detail routes
     ]
   }
 ]
@@ -447,37 +505,46 @@ export default [
 
 ```js
 r('Product', 'Product')
-// Generates:
+// Generates 4 routes (Create/Update/Detail/List):
 [
   {
     path: '/dummy/product/create',
-    redirect: '/product/create',
+    redirect: '/product/create',            // string redirect
     name: 'ProductCreate',
     meta: { title: 'Product' },
     hidden: true
   },
   {
     path: '/dummy/product/:id/update',
-    redirect: '/product/:id/update',
+    redirect: to => `/product/${to.params.id}/update`,  // function redirect
     name: 'ProductUpdate',
-    meta: { title: 'Product' },
+    hidden: true
+  },
+  {
+    path: '/dummy/product/:id/detail',
+    redirect: to => `/product/${to.params.id}/detail`,  // function redirect
+    name: 'ProductDetail',
     hidden: true
   },
   {
     path: '/dummy/product/list',
-    redirect: '/product/list',
+    redirect: '/product/list',              // string redirect
     name: 'ProductList',
-    meta: { title: 'Product' }
+    meta: { title: 'Product' }              // only List carries meta
   }
 ]
 ```
+
+`routes.js` currently wires only `r()`; `g()` (direct-component routes passing
+`entityParam` as props) is available but unused. When `meta` is omitted, `r()`
+defaults it to `{ title, icon: 'el-icon-caret-right' }`.
 
 ---
 
 ## 10. Complete Example
 
 ```js
-// src/configs/collections/common/index.js
+// src/configs/collections/common/Category.js
 
 export default {
   Content: {
@@ -552,43 +619,33 @@ export default {
 }
 ```
 
-    list: {
-      query: { '@order': 'entity.id|DESC' },
+---
 
-      list_filter: {
-        'category.id': () => axios.get('/api/categories', {
-          params: { '@filter': 'entity.getType().getSlug() == "content"' }
-        }).then(res => ({
-          __label: '分类',
-          ...Object.fromEntries(res.data.map(v => [v.id, v.name]))
-        })),
-        status: {
-          __label: '状态',
-          published: '已发布',
-          draft: '草稿'
-        }
-      },
+## 11. Config Module Import Rule
 
-      list_display: [
-        'id',
-        { property: 'cover', type: 'image' },
-        'category',
-        'title',
-        {
-          property: 'status',
-          component: {
-            props: ['data'],
-            render(h) {
-              const color = this.data === 'published' ? 'success' : 'info'
-              return <el-tag type={color}>{this.data}</el-tag>
-            }
-          }
-        },
-        'createdTime'
-      ],
+`configs/entities.js` eagerly loads every module under `collections/`
+(`import.meta.glob(..., { eager: true })`), and `FormAdmin`/`ListAdmin` both
+import `entities`. Therefore a collection file must **never statically import
+UI components** (`@/easyadmin/ui/**`, `@/views/**`): it closes the eager cycle
+`FormAdmin → entities → <collection> → ListAdmin → FormAdmin`, which fails
+with `Cannot access 'FormAdmin' before initialization` depending on module
+evaluation order (survives fresh loads, detonates after HMR or import-graph
+changes) and blanks async chunks such as the `json_schema` plugins.
 
-      disabled_actions: ['export']
-    }
-  }
-}
+Custom field components that need admin UI (e.g. `SpecificationManager` in
+`trade/Product.jsx`) must resolve it lazily:
+
+```js
+const ListAdmin = defineAsyncComponent(() => import('@/easyadmin/ui/vue/ListAdmin'))
+const FormAdmin = defineAsyncComponent(() => import('@/easyadmin/ui/vue/FormAdmin'))
 ```
+
+The async wrapper supports the same props/slots; `$parent` walks (e.g. for
+`productId`) keep working because they skip wrapper nodes until the real
+`FormAdmin` ancestor. Guarded by
+`tests/unit/easyadmin/configs/product-async-admin.spec.js`.
+
+A custom `component:` that embeds `FormAdmin` counts toward the nesting depth
+guard (top-level form = 1, limit 10, placeholder past it — see EasyAdmin
+Design §9.3). Never configure a form to embed itself, directly or through an
+array sub-form/dialog: it renders the depth placeholder instead of recursing.

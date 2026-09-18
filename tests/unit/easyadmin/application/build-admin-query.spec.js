@@ -63,14 +63,14 @@ describe('application/query/build-admin-query', () => {
     const q = buildAdminQuery({
       entity: 'Post',
       listFilterData: { name: 0, status: false, other: '', nil: null, undef: undefined },
-      filters: { ...filters, other: { expression: 'x' }, nil: { expression: 'y' }, undef: { expression: 'z' } }
+      filters: { ...filters, other: { expression: 'x' }, nil: { expression: 'y' }, undef: { expression: 'z' }}
     })
     expect(q.filter).toEqual({ kind: 'empty' })
     expect(q.rawFilterParam).toBeUndefined()
   })
 
   it('parses a single sort entry', () => {
-    const q = buildAdminQuery({ entity: 'Post', sort: { '@order': 'entity.id|DESC' } })
+    const q = buildAdminQuery({ entity: 'Post', sort: { '@order': 'entity.id|DESC' }})
     expect(q.sort).toEqual([{ field: 'id', dir: 'DESC' }])
     expect(q.rawSortParam).toBe('entity.id|DESC')
   })
@@ -88,8 +88,8 @@ describe('application/query/build-admin-query', () => {
 
   it('returns empty sort for missing/empty @order', () => {
     expect(buildAdminQuery({ entity: 'Post' }).sort).toEqual([])
-    expect(buildAdminQuery({ entity: 'Post', sort: { '@order': '' } }).sort).toEqual([])
-    expect(buildAdminQuery({ entity: 'Post', sort: {} }).rawSortParam).toBe('')
+    expect(buildAdminQuery({ entity: 'Post', sort: { '@order': '' }}).sort).toEqual([])
+    expect(buildAdminQuery({ entity: 'Post', sort: {}}).rawSortParam).toBe('')
   })
 
   it('skips keys with no filter definition', () => {
@@ -99,12 +99,12 @@ describe('application/query/build-admin-query', () => {
   })
 
   it('skips empty/invalid sort segments', () => {
-    const q = buildAdminQuery({ entity: 'Post', sort: { '@order': ' , entity.id|DESC,, entity.x|UP, entity.y, entity.z| ASC ' } })
+    const q = buildAdminQuery({ entity: 'Post', sort: { '@order': ' , entity.id|DESC,, entity.x|UP, entity.y, entity.z| ASC ' }})
     expect(q.sort).toEqual([{ field: 'id', dir: 'DESC' }, { field: 'z', dir: 'ASC' }])
   })
 
   it('normalizes the pager', () => {
-    expect(buildAdminQuery({ entity: 'Post', pager: { page: 2, limit: 10 } }).page).toEqual({
+    expect(buildAdminQuery({ entity: 'Post', pager: { page: 2, limit: 10 }}).page).toEqual({
       page: 2,
       limit: 10
     })

@@ -198,5 +198,14 @@ module.exports = {
       objectsInObjects: false
     }],
     'array-bracket-spacing': [2, 'never']
-  }
+  },
+  overrides: [
+    {
+      // Unit tests run under vitest globals (no new dependency needed:
+      // jest env covers describe/it/expect/hooks, vi comes from globals).
+      files: ['tests/**/*.js'],
+      env: { jest: true },
+      globals: { vi: 'readonly', globalThis: 'readonly' }
+    }
+  ]
 }

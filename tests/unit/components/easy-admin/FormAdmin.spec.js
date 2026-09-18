@@ -34,7 +34,7 @@ vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => {
 })
 
 vi.mock('@/configs/entities', () => ({
-  default: { Role: {}, User: {}, Store: {} }
+  default: { Role: {}, User: {}, Store: {}}
 }))
 
 vi.mock('@/components/Tinymce', () => ({
@@ -80,18 +80,18 @@ function mountForm({ props = {}, structure, retrieveData } = {}) {
     global: {
       mocks: {
         $t: key => key,
-        $route: { meta: { title: 'Product' } },
+        $route: { meta: { title: 'Product' }},
         $router,
         $message: { error: vi.fn() },
         $loading: vi.fn(() => ({ close: vi.fn() }))
       },
-      directives: { loading: {} },
+      directives: { loading: {}},
       stubs: {
         'el-row': { template: '<div><slot /></div>' },
         'el-col': { template: '<div><slot /></div>' },
         'el-tabs': { template: '<div><slot /></div>' },
         'el-tab-pane': { template: '<div><slot /></div>' },
-        'el-form': { template: '<div><slot /></div>', methods: { validate: formValidateMock } },
+        'el-form': { template: '<div><slot /></div>', methods: { validate: formValidateMock }},
         'el-form-item': { template: '<div><slot /></div>' },
         'el-button': { template: '<button><slot /></button>' },
         'el-icon': { template: '<span><slot /></span>' },
@@ -117,10 +117,10 @@ function stubValidate(wrapper, valid = true) {
 beforeEach(() => {
   vi.clearAllMocks()
   structureMock.mockResolvedValue(baseStructure())
-  retrieveMock.mockResolvedValue({ data: {} })
+  retrieveMock.mockResolvedValue({ data: {}})
   listMock.mockResolvedValue({ data: [] })
-  createMock.mockResolvedValue({ data: { id: 1 } })
-  updateMock.mockResolvedValue({ data: { id: 1 } })
+  createMock.mockResolvedValue({ data: { id: 1 }})
+  updateMock.mockResolvedValue({ data: { id: 1 }})
   setValidate(true)
 })
 
@@ -168,13 +168,13 @@ describe('FormAdmin.vue', () => {
       const { wrapper } = mountForm({
         props: {
           fields: [{ property: 'city' }],
-          structureOverride: { city: { metadata: { type: 'input', nullable: true }, translation: 'City' } },
+          structureOverride: { city: { metadata: { type: 'input', nullable: true }, translation: 'City' }},
           embedded: true,
           modelValue: {}
         }
       })
       await settled(wrapper)
-      await wrapper.setProps({ modelValue: { city: 'Shanghai' } })
+      await wrapper.setProps({ modelValue: { city: 'Shanghai' }})
 
       expect(wrapper.vm.form).toEqual({ city: 'Shanghai' })
     })
@@ -198,7 +198,7 @@ describe('FormAdmin.vue', () => {
     })
 
     it('emits input after setDefaultData and update:modelValue on form change', async() => {
-      const { wrapper } = mountForm({ props: { fields: ['name'] } })
+      const { wrapper } = mountForm({ props: { fields: ['name'] }})
       await settled(wrapper)
       expect(wrapper.emitted('input')).toBeTruthy()
       expect(wrapper.emitted('input')[0][0]).toEqual({ name: null })
@@ -211,14 +211,14 @@ describe('FormAdmin.vue', () => {
 
     it('merges modelValue into default form data', async() => {
       const { wrapper } = mountForm({
-        props: { fields: ['name', 'description'], modelValue: { name: 'preset' } }
+        props: { fields: ['name', 'description'], modelValue: { name: 'preset' }}
       })
       await settled(wrapper)
       expect(wrapper.vm.form).toEqual({ name: 'preset', description: null })
     })
 
     it('supports __all__ string fields', async() => {
-      const { wrapper } = mountForm({ props: { fields: '__all__' } })
+      const { wrapper } = mountForm({ props: { fields: '__all__' }})
       await settled(wrapper)
       expect(wrapper.vm.plainFields).toEqual(['name', 'description', 'enabled'])
       expect(wrapper.vm.form).toEqual({ name: null, description: null, enabled: null })
@@ -279,7 +279,7 @@ describe('FormAdmin.vue', () => {
       // would surface as an unhandled rejection by design in the source.
       // A pending promise exercises the same observable stuck-loading state.
       structureMock.mockImplementationOnce(() => new Promise(() => {}))
-      const { wrapper } = mountForm({ props: { fields: ['name'] } })
+      const { wrapper } = mountForm({ props: { fields: ['name'] }})
       await settled(wrapper)
       expect(wrapper.vm.loading).toBe(true)
       expect(wrapper.vm.properties).toEqual([])
@@ -293,10 +293,10 @@ describe('FormAdmin.vue', () => {
       const { wrapper } = mountForm()
       await settled(wrapper)
       expect(wrapper.vm.resolvePluginType(
-        { property: 'owner', relation: { target: 'User' } }, {}, {}
+        { property: 'owner', relation: { target: 'User' }}, {}, {}
       )).toBe('RelationToOne')
       expect(wrapper.vm.resolvePluginType(
-        { property: 'owners', relation: { target: 'User', multiple: true } }, {}, {}
+        { property: 'owners', relation: { target: 'User', multiple: true }}, {}, {}
       )).toBe('RelationToMany')
     })
 
@@ -305,7 +305,7 @@ describe('FormAdmin.vue', () => {
       await settled(wrapper)
       expect(wrapper.vm.resolvePluginType(
         { property: 'cover', type: 'image' },
-        { metadata: { type: 'text' } }
+        { metadata: { type: 'text' }}
       )).toBe('image')
     })
 
@@ -321,7 +321,7 @@ describe('FormAdmin.vue', () => {
       const { wrapper } = mountForm()
       await settled(wrapper)
       expect(wrapper.vm.resolvePluginType(
-        { property: 'author' }, { metadata: { type } }
+        { property: 'author' }, { metadata: { type }}
       )).toBe(expected)
     })
 
@@ -331,15 +331,15 @@ describe('FormAdmin.vue', () => {
       // conventional targetEntity, single
       expect(wrapper.vm.resolvePluginType(
         { property: 'role' },
-        { metadata: { type: 'text', targetEntity: 'App\\Entity\\Role' } },
-        { Role: {} }
+        { metadata: { type: 'text', targetEntity: 'App\\Entity\\Role' }},
+        { Role: {}}
       )).toBe('RelationToOne')
       // Uuid-suffix inference, multiple (metadata type itself is not relational,
       // so the trailing relation fallback decides)
       expect(wrapper.vm.resolvePluginType(
         { property: 'userUuids' },
-        { metadata: { type: 'text' } },
-        { User: {} }
+        { metadata: { type: 'text' }},
+        { User: {}}
       )).toBe('RelationToMany')
     })
 
@@ -347,15 +347,15 @@ describe('FormAdmin.vue', () => {
       const { wrapper } = mountForm()
       await settled(wrapper)
       for (const type of ['array', 'boolean', 'code', 'date', 'datetime', 'datetime_immutable', 'file', 'image', 'images', 'integer', 'json', 'text', 'textarea', 'transfer']) {
-        expect(wrapper.vm.resolvePluginType({ property: 'f' }, { metadata: { type } })).toBe(type)
+        expect(wrapper.vm.resolvePluginType({ property: 'f' }, { metadata: { type }})).toBe(type)
       }
     })
 
     it('falls back to input for unknown, empty or select-like scalars', async() => {
       const { wrapper } = mountForm()
       await settled(wrapper)
-      expect(wrapper.vm.resolvePluginType({ property: 'f' }, { metadata: { type: 'string' } })).toBe('input')
-      expect(wrapper.vm.resolvePluginType({ property: 'f' }, { metadata: { type: 'select' } })).toBe('input')
+      expect(wrapper.vm.resolvePluginType({ property: 'f' }, { metadata: { type: 'string' }})).toBe('input')
+      expect(wrapper.vm.resolvePluginType({ property: 'f' }, { metadata: { type: 'select' }})).toBe('input')
       expect(wrapper.vm.resolvePluginType({ property: 'f' }, {})).toBe('input')
       expect(wrapper.vm.resolvePluginType({ property: 'f' })).toBe('input')
     })
@@ -404,7 +404,7 @@ describe('FormAdmin.vue', () => {
 
   describe('fetchData branches', () => {
     async function fetchWrapper({ properties, structure, data }) {
-      const { wrapper } = mountForm({ props: { id: 1, fields: properties.map(p => p.property) } })
+      const { wrapper } = mountForm({ props: { id: 1, fields: properties.map(p => p.property) }})
       await settled(wrapper)
       wrapper.vm.properties = properties
       wrapper.vm.plainFields = properties.map(p => p.property)
@@ -419,7 +419,7 @@ describe('FormAdmin.vue', () => {
       const payload = { id: 1, __toString: 'x' }
       const wrapper = await fetchWrapper({
         properties: [{ property: 'meta', type: 'json' }],
-        structure: { meta: { metadata: { type: 'json' } } },
+        structure: { meta: { metadata: { type: 'json' }}},
         data: { meta: payload }
       })
       // assigned form state is reactive, so compare structurally: the object
@@ -431,25 +431,25 @@ describe('FormAdmin.vue', () => {
 
     it('maps single relation objects via relation value', async() => {
       const wrapper = await fetchWrapper({
-        properties: [{ property: 'owner', relation: { target: 'User' } }],
+        properties: [{ property: 'owner', relation: { target: 'User' }}],
         structure: {},
-        data: { owner: { id: 42, username: 'alice' } }
+        data: { owner: { id: 42, username: 'alice' }}
       })
       expect(wrapper.vm.form.owner).toBe(42)
     })
 
     it('maps uuid relation objects via uuid value key', async() => {
       const wrapper = await fetchWrapper({
-        properties: [{ property: 'ownerUuid', relation: { target: 'User', valueKey: 'uuid' } }],
+        properties: [{ property: 'ownerUuid', relation: { target: 'User', valueKey: 'uuid' }}],
         structure: {},
-        data: { ownerUuid: { id: 1, uuid: 'uuid-1' } }
+        data: { ownerUuid: { id: 1, uuid: 'uuid-1' }}
       })
       expect(wrapper.vm.form.ownerUuid).toBe('uuid-1')
     })
 
     it('maps relation object arrays', async() => {
       const wrapper = await fetchWrapper({
-        properties: [{ property: 'owners', relation: { target: 'User', multiple: true } }],
+        properties: [{ property: 'owners', relation: { target: 'User', multiple: true }}],
         structure: {},
         data: { owners: [{ id: 1 }, { id: 2 }] }
       })
@@ -483,7 +483,7 @@ describe('FormAdmin.vue', () => {
 
   describe('validation rules', () => {
     it('generates required rules from metadata nullability', async() => {
-      const { wrapper } = mountForm({ props: { fields: ['name', 'description'] } })
+      const { wrapper } = mountForm({ props: { fields: ['name', 'description'] }})
       await settled(wrapper)
       expect(wrapper.vm.rules.name[0]).toMatchObject({ required: true })
       expect(wrapper.vm.rules.description[0]).toMatchObject({ required: false })
@@ -502,7 +502,7 @@ describe('FormAdmin.vue', () => {
         props: {
           fields: [
             { property: 'name', rules: [{ min: 2, max: 5, message: 'len', trigger: 'blur' }] },
-            { property: 'description', rules: { min: 1, message: 'one', trigger: 'blur' } }
+            { property: 'description', rules: { min: 1, message: 'one', trigger: 'blur' }}
           ]
         }
       })
@@ -569,13 +569,13 @@ describe('FormAdmin.vue', () => {
       ['string mismatch', { property: 'a', hidden: 'create' }, 5, false],
       ['unknown string', { property: 'a', hidden: 'other' }, 0, false]
     ])('%s', async(_label, field, id, expected) => {
-      const { wrapper } = mountForm({ props: { id, fields: ['name'] } })
+      const { wrapper } = mountForm({ props: { id, fields: ['name'] }})
       await settled(wrapper)
       expect(wrapper.vm.isHidden(field)).toBe(expected)
     })
 
     it('supports predicate functions and swallows predicate errors', async() => {
-      const { wrapper } = mountForm({ props: { fields: ['name'] } })
+      const { wrapper } = mountForm({ props: { fields: ['name'] }})
       await settled(wrapper)
       expect(wrapper.vm.isHidden({ property: 'a', hidden: () => true })).toBe(true)
       expect(wrapper.vm.isHidden({ property: 'a', hidden: (form, id) => id === 0 && form !== undefined })).toBe(true)
@@ -586,7 +586,7 @@ describe('FormAdmin.vue', () => {
 
   describe('registerFieldValidator', () => {
     it('registers validators and ignores duplicates and invalid input', async() => {
-      const { wrapper } = mountForm({ props: { fields: ['name'] } })
+      const { wrapper } = mountForm({ props: { fields: ['name'] }})
       await settled(wrapper)
       const fn = vi.fn()
       wrapper.vm.registerFieldValidator('name', fn)
@@ -603,7 +603,7 @@ describe('FormAdmin.vue', () => {
 
   describe('onSubmit', () => {
     it('creates on valid form in create mode and runs the default success flow', async() => {
-      const { wrapper, $router } = mountForm({ props: { fields: ['name'] } })
+      const { wrapper, $router } = mountForm({ props: { fields: ['name'] }})
       await settled(wrapper)
       wrapper.vm.form = { name: 'n' }
       stubValidate(wrapper, true)
@@ -626,11 +626,11 @@ describe('FormAdmin.vue', () => {
       wrapper.vm.onSubmit(success)
       await flushPromises()
       expect(updateMock).toHaveBeenCalledWith(3, { name: 'new' })
-      expect(success).toHaveBeenCalledWith({ data: { id: 1 } })
+      expect(success).toHaveBeenCalledWith({ data: { id: 1 }})
     })
 
     it('warns and skips api calls when validation fails', async() => {
-      const { wrapper } = mountForm({ props: { fields: ['name'] } })
+      const { wrapper } = mountForm({ props: { fields: ['name'] }})
       await settled(wrapper)
       stubValidate(wrapper, false)
       // NOTE: `return false` in the source belongs to the validate callback,
@@ -646,7 +646,7 @@ describe('FormAdmin.vue', () => {
 
     it('reports create errors via feedback', async() => {
       createMock.mockRejectedValueOnce(new Error('create failed'))
-      const { wrapper } = mountForm({ props: { fields: ['name'] } })
+      const { wrapper } = mountForm({ props: { fields: ['name'] }})
       await settled(wrapper)
       stubValidate(wrapper, true)
       wrapper.vm.onSubmit()
@@ -668,7 +668,7 @@ describe('FormAdmin.vue', () => {
     })
 
     it('strips blank attributes before submit', async() => {
-      const { wrapper } = mountForm({ props: { fields: ['name'] } })
+      const { wrapper } = mountForm({ props: { fields: ['name'] }})
       await settled(wrapper)
       wrapper.vm.form = { name: 'n', dropped: null, alsoDropped: undefined, kept: 0 }
       stubValidate(wrapper, true)
@@ -682,7 +682,7 @@ describe('FormAdmin.vue', () => {
     it('exposes getMetadataType, log and cleanBlankAttributes', async() => {
       const { wrapper } = mountForm()
       await settled(wrapper)
-      expect(wrapper.vm.getMetadataType({ metadata: { type: 'text' } })).toBe('text')
+      expect(wrapper.vm.getMetadataType({ metadata: { type: 'text' }})).toBe('text')
       expect(wrapper.vm.getMetadataType({})).toBeUndefined()
       expect(wrapper.vm.getMetadataType()).toBeUndefined()
       const spy = vi.spyOn(console, 'log').mockImplementation(() => {})
@@ -762,7 +762,7 @@ describe('FormAdmin.vue', () => {
 
   describe('plugin stub sanity', () => {
     it('renders the dynamic plugin slot without network access', async() => {
-      const { wrapper } = mountForm({ props: { fields: ['name', 'description'] } })
+      const { wrapper } = mountForm({ props: { fields: ['name', 'description'] }})
       await settled(wrapper)
       expect(wrapper.vm.loadPlugin('input')).toBeTruthy()
       expect(structureMock).toHaveBeenCalled()

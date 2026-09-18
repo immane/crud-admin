@@ -48,7 +48,7 @@ function makeWrapper(form, field) {
   return mount(ImagePlugin, {
     props: { form, field },
     global: {
-      mocks: { $t: (k) => k, $message: { error: vi.fn() } },
+      mocks: { $t: (k) => k, $message: { error: vi.fn() }},
       stubs: { 'el-upload': UploadStub, 'el-button': ButtonStub }
     }
   })
@@ -78,7 +78,7 @@ describe('form-image plugin', () => {
     const form = reactive({ cover: '' })
     const field = reactive({
       property: 'cover', type: 'image',
-      type_options: { storage: 's3', data: { foo: 'bar' }, headers: { 'X-Custom': '1' } }
+      type_options: { storage: 's3', data: { foo: 'bar' }, headers: { 'X-Custom': '1' }}
     })
     const wrapper = makeWrapper(form, field)
     const u = upload(wrapper)
@@ -127,27 +127,27 @@ describe('form-image plugin', () => {
 
   it('honours custom accept from type_options', () => {
     const form = reactive({ cover: '' })
-    const field = reactive({ property: 'cover', type: 'image', type_options: { accept: '.png' } })
+    const field = reactive({ property: 'cover', type: 'image', type_options: { accept: '.png' }})
     const wrapper = makeWrapper(form, field)
     expect(upload(wrapper).props('accept')).toBe('.png')
     wrapper.unmount()
   })
 
-  it('handleSuccess sets single image path via el-upload on-success event', async () => {
+  it('handleSuccess sets single image path via el-upload on-success event', async() => {
     const form = reactive({ cover: '' })
     const field = reactive({ property: 'cover', type: 'image' })
     const wrapper = makeWrapper(form, field)
-    await upload(wrapper).props('onSuccess')({ data: { path: 'new.jpg' } })
+    await upload(wrapper).props('onSuccess')({ data: { path: 'new.jpg' }})
     expect(uploadMocks.resolveUploadPath).toHaveBeenCalled()
     expect(form.cover).toBe('https://cdn.test/new.jpg')
     wrapper.unmount()
   })
 
-  it('handleSuccess appends to images array and initialises non-array', async () => {
+  it('handleSuccess appends to images array and initialises non-array', async() => {
     const form = reactive({ photos: ['old.jpg'] })
     const field = reactive({ property: 'photos', type: 'images' })
     const wrapper = makeWrapper(form, field)
-    await upload(wrapper).props('onSuccess')({ data: { path: 'new.jpg' } })
+    await upload(wrapper).props('onSuccess')({ data: { path: 'new.jpg' }})
     expect(form.photos).toEqual(['old.jpg', 'https://cdn.test/new.jpg'])
 
     const form2 = reactive({ photos: '' })
@@ -158,7 +158,7 @@ describe('form-image plugin', () => {
     wrapper2.unmount()
   })
 
-  it('handleSuccess ignores responses with no resolvable path', async () => {
+  it('handleSuccess ignores responses with no resolvable path', async() => {
     const form = reactive({ cover: 'keep.jpg' })
     const field = reactive({ property: 'cover', type: 'image' })
     const wrapper = makeWrapper(form, field)
@@ -167,7 +167,7 @@ describe('form-image plugin', () => {
     wrapper.unmount()
   })
 
-  it('handleError surfaces message via $message.error on el-upload on-error event', async () => {
+  it('handleError surfaces message via $message.error on el-upload on-error event', async() => {
     const form = reactive({ cover: '' })
     const field = reactive({ property: 'cover', type: 'image' })
     const wrapper = makeWrapper(form, field)
@@ -179,7 +179,7 @@ describe('form-image plugin', () => {
     wrapper.unmount()
   })
 
-  it('handleExceed resets value and restarts upload via $refs on el-upload on-exceed event', async () => {
+  it('handleExceed resets value and restarts upload via $refs on el-upload on-exceed event', async() => {
     const form = reactive({ cover: 'old.jpg' })
     const field = reactive({ property: 'cover', type: 'image' })
     const wrapper = makeWrapper(form, field)
@@ -198,7 +198,7 @@ describe('form-image plugin', () => {
     wrapper.unmount()
   })
 
-  it('on-remove clears single image and maps images fileList names', async () => {
+  it('on-remove clears single image and maps images fileList names', async() => {
     const form = reactive({ cover: 'a.jpg' })
     const field = reactive({ property: 'cover', type: 'image' })
     const wrapper = makeWrapper(form, field)
@@ -214,7 +214,7 @@ describe('form-image plugin', () => {
     wrapper2.unmount()
   })
 
-  it('validates parent form field after success when ancestor exposes validateField', async () => {
+  it('validates parent form field after success when ancestor exposes validateField', async() => {
     const validateField = vi.fn()
     const form = reactive({ cover: '' })
     const field = reactive({ property: 'cover', type: 'image' })
@@ -226,12 +226,12 @@ describe('form-image plugin', () => {
     }
     const parent = mount(ParentHarness, {
       global: {
-        mocks: { $t: (k) => k, $message: { error: vi.fn() } },
+        mocks: { $t: (k) => k, $message: { error: vi.fn() }},
         stubs: { 'el-upload': UploadStub, 'el-button': ButtonStub }
       }
     })
     const childUpload = parent.findComponent(UploadStub)
-    await childUpload.props('onSuccess')({ data: { path: 'v.jpg' } })
+    await childUpload.props('onSuccess')({ data: { path: 'v.jpg' }})
     await nextTick()
     await nextTick()
     expect(form.cover).toBe('https://cdn.test/v.jpg')

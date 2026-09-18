@@ -125,6 +125,7 @@ export default {
   'Loading data...': '数据加载中...',
   'No data': '暂无数据',
   'New / Edit': '新增 / 修改',
+  'Form nesting too deep — check for circular form references': '表单嵌套过深——请检查是否存在循环嵌套的表单引用',
   'Default': '默认',
   'Delete this record?': '确定删除当前记录？',
   'Batch Delete': '批量删除',

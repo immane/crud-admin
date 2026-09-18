@@ -77,7 +77,7 @@ export class CrudSkeletonAdapter implements AdminRepository, MetaProvider {
     return await request.post(
       apiPath(this.prefix, `${this.plural}/batch-update`),
       records,
-      { params: { '@basis': 'id', '@mode': 'update' } }
+      { params: { '@basis': 'id', '@mode': 'update' }}
     )
   }
 }

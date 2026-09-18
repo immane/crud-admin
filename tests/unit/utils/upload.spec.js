@@ -45,7 +45,7 @@ describe('Utils:upload', () => {
       expect(host).not.toBe('https://proxy.example.com')
     })
 
-    it('falls back to VITE_PROXY_TARGET when window undefined', async () => {
+    it('falls back to VITE_PROXY_TARGET when window undefined', async() => {
       vi.resetModules()
       const savedWindow = globalThis.window
       // @ts-ignore
@@ -61,7 +61,7 @@ describe('Utils:upload', () => {
       await import('@/utils/upload')
     })
 
-    it('trims VITE_PROXY_TARGET when window undefined', async () => {
+    it('trims VITE_PROXY_TARGET when window undefined', async() => {
       vi.resetModules()
       const savedWindow = globalThis.window
       delete globalThis.window
@@ -74,7 +74,7 @@ describe('Utils:upload', () => {
       await import('@/utils/upload')
     })
 
-    it('returns empty string when no env and window undefined', async () => {
+    it('returns empty string when no env and window undefined', async() => {
       vi.resetModules()
       const savedWindow = globalThis.window
       delete globalThis.window
@@ -87,7 +87,7 @@ describe('Utils:upload', () => {
       await import('@/utils/upload')
     })
 
-    it('returns empty string when VITE_PROXY_TARGET whitespace only and window undefined', async () => {
+    it('returns empty string when VITE_PROXY_TARGET whitespace only and window undefined', async() => {
       vi.resetModules()
       const savedWindow = globalThis.window
       delete globalThis.window
@@ -235,15 +235,15 @@ describe('Utils:upload', () => {
     })
 
     it('handles object data with path', () => {
-      expect(resolveUploadPath({ data: { path: 'b.jpg' } })).toBe('https://api.example.com/uploads/images/b.jpg')
-      expect(resolveUploadPath({ data: { path: '/custom/b.jpg' } })).toBe('https://api.example.com/custom/b.jpg')
+      expect(resolveUploadPath({ data: { path: 'b.jpg' }})).toBe('https://api.example.com/uploads/images/b.jpg')
+      expect(resolveUploadPath({ data: { path: '/custom/b.jpg' }})).toBe('https://api.example.com/custom/b.jpg')
     })
 
     it('returns null when object data has no path', () => {
-      expect(resolveUploadPath({ data: {} })).toBeNull()
-      expect(resolveUploadPath({ data: { path: '' } })).toBeNull()
-      expect(resolveUploadPath({ data: { path: null } })).toBeNull()
-      expect(resolveUploadPath({ data: { url: 'a.jpg' } })).toBeNull()
+      expect(resolveUploadPath({ data: {}})).toBeNull()
+      expect(resolveUploadPath({ data: { path: '' }})).toBeNull()
+      expect(resolveUploadPath({ data: { path: null }})).toBeNull()
+      expect(resolveUploadPath({ data: { url: 'a.jpg' }})).toBeNull()
     })
   })
 })

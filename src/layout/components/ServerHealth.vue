@@ -40,52 +40,52 @@
         <admin-skeleton v-if="loading && !checkedAt" :rows="5" />
         <template v-else>
           <section class="server-health-dialog__probes">
-          <article class="health-probe">
-            <div class="health-probe__label">{{ $t('Liveness') }}</div>
-            <el-tag :type="tagType(liveness.status)" effect="light">{{ displayStatus(liveness.status) }}</el-tag>
-            <p>{{ $t('Process serving status') }}</p>
-            <p v-if="liveness.error" class="health-probe__error">{{ liveness.error }}</p>
-          </article>
-          <article class="health-probe">
-            <div class="health-probe__label">{{ $t('Readiness') }}</div>
-            <el-tag :type="tagType(readiness.status)" effect="light">{{ displayStatus(readiness.status) }}</el-tag>
-            <p>{{ $t('Database required, Redis optional') }}</p>
-            <p v-if="readiness.error" class="health-probe__error">{{ readiness.error }}</p>
-            <div v-if="Object.keys(readiness.checks).length" class="health-probe__checks">
-              <span v-for="(value, name) in readiness.checks" :key="name">
-                <strong>{{ checkLabel(name) }}</strong>
-                <el-tag size="small" :type="tagType(checkStatus(value))" effect="plain">{{ displayStatus(checkStatus(value)) }}</el-tag>
-              </span>
+            <article class="health-probe">
+              <div class="health-probe__label">{{ $t('Liveness') }}</div>
+              <el-tag :type="tagType(liveness.status)" effect="light">{{ displayStatus(liveness.status) }}</el-tag>
+              <p>{{ $t('Process serving status') }}</p>
+              <p v-if="liveness.error" class="health-probe__error">{{ liveness.error }}</p>
+            </article>
+            <article class="health-probe">
+              <div class="health-probe__label">{{ $t('Readiness') }}</div>
+              <el-tag :type="tagType(readiness.status)" effect="light">{{ displayStatus(readiness.status) }}</el-tag>
+              <p>{{ $t('Database required, Redis optional') }}</p>
+              <p v-if="readiness.error" class="health-probe__error">{{ readiness.error }}</p>
+              <div v-if="Object.keys(readiness.checks).length" class="health-probe__checks">
+                <span v-for="(value, name) in readiness.checks" :key="name">
+                  <strong>{{ checkLabel(name) }}</strong>
+                  <el-tag size="small" :type="tagType(checkStatus(value))" effect="plain">{{ displayStatus(checkStatus(value)) }}</el-tag>
+                </span>
+              </div>
+            </article>
+          </section>
+
+          <section class="server-health-dialog__metrics">
+            <div class="server-health-dialog__section-header">
+              <div>
+                <h3>{{ $t('Metrics') }}</h3>
+                <p>{{ $t('{0} metric samples', metricRows.length) }}</p>
+              </div>
             </div>
-          </article>
-        </section>
 
-        <section class="server-health-dialog__metrics">
-          <div class="server-health-dialog__section-header">
-            <div>
-              <h3>{{ $t('Metrics') }}</h3>
-              <p>{{ $t('{0} metric samples', metricRows.length) }}</p>
-            </div>
-          </div>
+            <el-alert v-if="metricsError" :title="metricsError" type="warning" :closable="false" show-icon />
+            <el-empty v-else-if="!metricRows.length && !loading" :description="$t('No metrics available')" :image-size="76" />
+            <el-table v-else :data="metricRows" max-height="380" size="small" stripe>
+              <el-table-column prop="name" :label="$t('Metric')" min-width="260" />
+              <el-table-column :label="$t('Labels')" min-width="260">
+                <template #default="{ row }"><code>{{ row.labels || '-' }}</code></template>
+              </el-table-column>
+              <el-table-column :label="$t('Value')" width="180" align="right">
+                <template #default="{ row }"><code>{{ formatMetricValue(row.value) }}</code></template>
+              </el-table-column>
+            </el-table>
 
-          <el-alert v-if="metricsError" :title="metricsError" type="warning" :closable="false" show-icon />
-          <el-empty v-else-if="!metricRows.length && !loading" :description="$t('No metrics available')" :image-size="76" />
-          <el-table v-else :data="metricRows" max-height="380" size="small" stripe>
-            <el-table-column prop="name" :label="$t('Metric')" min-width="260" />
-            <el-table-column :label="$t('Labels')" min-width="260">
-              <template #default="{ row }"><code>{{ row.labels || '-' }}</code></template>
-            </el-table-column>
-            <el-table-column :label="$t('Value')" width="180" align="right">
-              <template #default="{ row }"><code>{{ formatMetricValue(row.value) }}</code></template>
-            </el-table-column>
-          </el-table>
-
-          <el-collapse v-if="metricsText" class="server-health-dialog__raw">
-            <el-collapse-item :title="$t('Raw metrics')" name="raw">
-              <pre>{{ metricsText }}</pre>
-            </el-collapse-item>
-          </el-collapse>
-        </section>
+            <el-collapse v-if="metricsText" class="server-health-dialog__raw">
+              <el-collapse-item :title="$t('Raw metrics')" name="raw">
+                <pre>{{ metricsText }}</pre>
+              </el-collapse-item>
+            </el-collapse>
+          </section>
         </template>
       </div>
     </el-dialog>

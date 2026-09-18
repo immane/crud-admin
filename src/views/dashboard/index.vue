@@ -38,25 +38,25 @@
         <admin-skeleton v-if="showSkeleton" :rows="3" />
         <template v-else>
           <div v-if="orderSeries.length" class="chart">
-          <div class="chart__summary">
-            <strong>{{ formatAmount(orderTotal) }}</strong>
-            <span>{{ $t('Current sample total') }}</span>
+            <div class="chart__summary">
+              <strong>{{ formatAmount(orderTotal) }}</strong>
+              <span>{{ $t('Current sample total') }}</span>
+            </div>
+            <svg class="chart__svg" viewBox="0 0 560 190" preserveAspectRatio="none" role="img" aria-label="Recent order amount trend">
+              <defs>
+                <linearGradient id="orderArea" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#39a47a" stop-opacity=".34" />
+                  <stop offset="100%" stop-color="#39a47a" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <line v-for="point in [35, 85, 135]" :key="point" x1="0" x2="560" :y1="point" :y2="point" class="chart__grid-line" />
+              <path :d="areaPath" fill="url(#orderArea)" />
+              <path :d="linePath" class="chart__line" />
+              <circle v-for="(point, index) in chartPoints" :key="index" :cx="point.x" :cy="point.y" r="4" class="chart__point" />
+            </svg>
+            <div class="chart__axis"><span>{{ $t('Earlier') }}</span><span>{{ $t('Now') }}</span></div>
           </div>
-          <svg class="chart__svg" viewBox="0 0 560 190" preserveAspectRatio="none" role="img" aria-label="Recent order amount trend">
-            <defs>
-              <linearGradient id="orderArea" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stop-color="#39a47a" stop-opacity=".34" />
-                <stop offset="100%" stop-color="#39a47a" stop-opacity="0" />
-              </linearGradient>
-            </defs>
-            <line v-for="point in [35, 85, 135]" :key="point" x1="0" x2="560" :y1="point" :y2="point" class="chart__grid-line" />
-            <path :d="areaPath" fill="url(#orderArea)" />
-            <path :d="linePath" class="chart__line" />
-            <circle v-for="(point, index) in chartPoints" :key="index" :cx="point.x" :cy="point.y" r="4" class="chart__point" />
-          </svg>
-          <div class="chart__axis"><span>{{ $t('Earlier') }}</span><span>{{ $t('Now') }}</span></div>
-        </div>
-        <div v-else class="panel__empty">{{ $t('No order amount data available for analysis') }}</div>
+          <div v-else class="panel__empty">{{ $t('No order amount data available for analysis') }}</div>
         </template>
       </article>
 
@@ -86,13 +86,13 @@
         <admin-skeleton v-if="showSkeleton" :rows="4" />
         <template v-else>
           <div v-if="recentOrders.length" class="order-list">
-          <div v-for="order in recentOrders" :key="order.id" class="order-row">
-            <div class="order-row__identity"><span class="order-row__avatar">{{ orderInitial(order) }}</span><div><b>#{{ order.id }}</b><small>{{ order.user?.__toString || order.user?.username || order.uuid || $t('Guest order') }}</small></div></div>
-            <span>{{ formatAmount(order.totalAmount) }}</span>
-            <el-tag size="small" effect="plain" :type="statusType(order.status)">{{ statusLabel(order.status) }}</el-tag>
+            <div v-for="order in recentOrders" :key="order.id" class="order-row">
+              <div class="order-row__identity"><span class="order-row__avatar">{{ orderInitial(order) }}</span><div><b>#{{ order.id }}</b><small>{{ order.user?.__toString || order.user?.username || order.uuid || $t('Guest order') }}</small></div></div>
+              <span>{{ formatAmount(order.totalAmount) }}</span>
+              <el-tag size="small" effect="plain" :type="statusType(order.status)">{{ statusLabel(order.status) }}</el-tag>
+            </div>
           </div>
-        </div>
-        <div v-else class="panel__empty">{{ $t('No order data') }}</div>
+          <div v-else class="panel__empty">{{ $t('No order data') }}</div>
         </template>
       </article>
 
@@ -101,13 +101,13 @@
         <admin-skeleton v-if="showSkeleton" :rows="4" />
         <template v-else>
           <div v-if="recentTransactions.length" class="activity-list">
-          <div v-for="transaction in recentTransactions" :key="transaction.id" class="activity-row">
-            <span class="activity-row__icon"><el-icon><component :is="transactionIcon(transaction.type)" /></el-icon></span>
-            <div><b>{{ transactionLabel(transaction.type) }}</b><small>{{ transaction.referenceId || transaction.uuid || `Transaction #${transaction.id}` }}</small></div>
-            <span class="activity-row__amount" :class="{ 'activity-row__amount--negative': transaction.type === 'withdrawal' || transaction.type === 'fee' }">{{ transaction.amount == null ? '-' : formatAmount(transaction.amount) }}</span>
+            <div v-for="transaction in recentTransactions" :key="transaction.id" class="activity-row">
+              <span class="activity-row__icon"><el-icon><component :is="transactionIcon(transaction.type)" /></el-icon></span>
+              <div><b>{{ transactionLabel(transaction.type) }}</b><small>{{ transaction.referenceId || transaction.uuid || `Transaction #${transaction.id}` }}</small></div>
+              <span class="activity-row__amount" :class="{ 'activity-row__amount--negative': transaction.type === 'withdrawal' || transaction.type === 'fee' }">{{ transaction.amount == null ? '-' : formatAmount(transaction.amount) }}</span>
+            </div>
           </div>
-        </div>
-        <div v-else class="panel__empty">{{ $t('No transaction data') }}</div>
+          <div v-else class="panel__empty">{{ $t('No transaction data') }}</div>
         </template>
       </article>
     </section>

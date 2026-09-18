@@ -35,7 +35,7 @@ export function applyQueryParams(query: Record<string, any>): {
   }
   if (!Object.hasOwn(query, 'page')) page = 1
   if (!Object.hasOwn(query, 'limit')) limit = 20
-  return { filterData, pager: { page, limit } }
+  return { filterData, pager: { page, limit }}
 }
 
 export function buildUrlSearch(params: Record<string, any>): string {

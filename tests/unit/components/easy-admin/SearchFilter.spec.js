@@ -1,7 +1,7 @@
 import { mount, shallowMount, flushPromises } from '@vue/test-utils'
 import SearchFilter from '@/easyadmin/ui/vue/SearchFilter.vue'
 
-const tick = async (wrapper) => {
+const tick = async(wrapper) => {
   await flushPromises()
   await wrapper.vm.$nextTick()
 }
@@ -17,8 +17,8 @@ function shallowFilter(props = {}) {
 }
 
 describe('SearchFilter.vue props & defaults', () => {
-  it('has expected default prop values', async () => {
-    const wrapper = shallowFilter({ listFilter: {} })
+  it('has expected default prop values', async() => {
+    const wrapper = shallowFilter({ listFilter: {}})
     await tick(wrapper)
     expect(wrapper.props('refreshing')).toBe(false)
     expect(wrapper.props('modelValue')).toEqual({})
@@ -29,8 +29,8 @@ describe('SearchFilter.vue props & defaults', () => {
     expect(typeof wrapper.props('fetchDataFunc')).toBe('function')
   })
 
-  it('default fetchDataFunc is a safe no-op returning a function', async () => {
-    const wrapper = shallowMount(SearchFilter, { props: { listFilter: {} } })
+  it('default fetchDataFunc is a safe no-op returning a function', async() => {
+    const wrapper = shallowMount(SearchFilter, { props: { listFilter: {}}})
     await tick(wrapper)
     expect(() => wrapper.vm.fetchData(true)).not.toThrow()
     expect(() => wrapper.vm.fetchData(false)).not.toThrow()
@@ -38,8 +38,8 @@ describe('SearchFilter.vue props & defaults', () => {
     expect(typeof ret).toBe('function')
   })
 
-  it('initialises data with empty filters/filterData/list', async () => {
-    const wrapper = shallowFilter({ listFilter: {} })
+  it('initialises data with empty filters/filterData/list', async() => {
+    const wrapper = shallowFilter({ listFilter: {}})
     await tick(wrapper)
     expect(wrapper.vm.list).toEqual([])
     expect(wrapper.vm.filters).toEqual({})
@@ -48,8 +48,8 @@ describe('SearchFilter.vue props & defaults', () => {
 })
 
 describe('SearchFilter.vue filterProcess - field shapes', () => {
-  it('transforms string field into input/matches expression', async () => {
-    const wrapper = shallowFilter({ listFilter: { nickname: 'Nickname here' } })
+  it('transforms string field into input/matches expression', async() => {
+    const wrapper = shallowFilter({ listFilter: { nickname: 'Nickname here' }})
     await tick(wrapper)
     expect(wrapper.vm.filters.nickname).toEqual({
       data: null,
@@ -61,8 +61,8 @@ describe('SearchFilter.vue filterProcess - field shapes', () => {
     expect(wrapper.vm.filterData.nickname).toBeNull()
   })
 
-  it('transforms null field into input with empty label', async () => {
-    const wrapper = shallowFilter({ listFilter: { keyword: null } })
+  it('transforms null field into input with empty label', async() => {
+    const wrapper = shallowFilter({ listFilter: { keyword: null }})
     await tick(wrapper)
     expect(wrapper.vm.filters.keyword).toEqual({
       data: null,
@@ -74,7 +74,7 @@ describe('SearchFilter.vue filterProcess - field shapes', () => {
     expect(wrapper.vm.filterData.keyword).toBeNull()
   })
 
-  it('transforms reduced object shorthand into select/== expression with data', async () => {
+  it('transforms reduced object shorthand into select/== expression with data', async() => {
     const wrapper = shallowFilter({
       listFilter: {
         status: { __label: 'Status', __default: 0, 0: 'Pending', 1: 'Paid', 2: 'Completed' }
@@ -94,8 +94,8 @@ describe('SearchFilter.vue filterProcess - field shapes', () => {
     expect(wrapper.vm.filterData.status).toBe(0)
   })
 
-  it('transforms reduced object without meta keys into select with null default', async () => {
-    const wrapper = shallowFilter({ listFilter: { kind: { a: 'A', b: 'B' } } })
+  it('transforms reduced object without meta keys into select with null default', async() => {
+    const wrapper = shallowFilter({ listFilter: { kind: { a: 'A', b: 'B' }}})
     await tick(wrapper)
     const f = wrapper.vm.filters.kind
     expect(f.label).toBe('')
@@ -108,17 +108,17 @@ describe('SearchFilter.vue filterProcess - field shapes', () => {
     expect(wrapper.vm.filterData.kind).toBeNull()
   })
 
-  it('builds relation expression for dotted keys (string => matches)', async () => {
-    const wrapper = shallowFilter({ listFilter: { 'user.username': 'Username' } })
+  it('builds relation expression for dotted keys (string => matches)', async() => {
+    const wrapper = shallowFilter({ listFilter: { 'user.username': 'Username' }})
     await tick(wrapper)
     expect(wrapper.vm.filters['user.username'].expression).toBe(
       'entity.getUser().getUsername() matches \':value\''
     )
   })
 
-  it('builds relation expression for dotted keys (object => ==)', async () => {
+  it('builds relation expression for dotted keys (object => ==)', async() => {
     const wrapper = shallowFilter({
-      listFilter: { 'user.status': { __label: 'S', 0: 'x', 1: 'y' } }
+      listFilter: { 'user.status': { __label: 'S', 0: 'x', 1: 'y' }}
     })
     await tick(wrapper)
     expect(wrapper.vm.filters['user.status'].expression).toBe(
@@ -126,35 +126,35 @@ describe('SearchFilter.vue filterProcess - field shapes', () => {
     )
   })
 
-  it('passes full-style filters through untouched and seeds default', async () => {
+  it('passes full-style filters through untouched and seeds default', async() => {
     const full = {
       expression: 'entity.getUser().getUsername() matches ":value"',
       label: 'Username',
       type: 'input',
       default: 'Rin'
     }
-    const wrapper = shallowFilter({ listFilter: { 'user.username': full } })
+    const wrapper = shallowFilter({ listFilter: { 'user.username': full }})
     await tick(wrapper)
     expect(wrapper.vm.filters['user.username']).toEqual(full)
     expect(wrapper.vm.filterData['user.username']).toBe('Rin')
   })
 
-  it('seeds undefined when full-style has no default key', async () => {
+  it('seeds undefined when full-style has no default key', async() => {
     const full = {
       expression: 'entity.getId() == :value',
       label: 'Id',
       type: 'select',
       data: [{ value: 'a', label: 'A' }]
     }
-    const wrapper = shallowFilter({ listFilter: { id: full } })
+    const wrapper = shallowFilter({ listFilter: { id: full }})
     await tick(wrapper)
     expect(wrapper.vm.filters.id).toEqual(full)
     expect(wrapper.vm.filterData.id).toBeUndefined()
   })
 
-  it('resolves async function filters returning a promise', async () => {
+  it('resolves async function filters returning a promise', async() => {
     const asyncField = () => Promise.resolve({ __label: 'Category', __default: 1, 1: 'Book', 2: 'Paper' })
-    const wrapper = shallowFilter({ listFilter: { 'category.id': asyncField } })
+    const wrapper = shallowFilter({ listFilter: { 'category.id': asyncField }})
     await tick(wrapper)
     const f = wrapper.vm.filters['category.id']
     expect(f.label).toBe('Category')
@@ -168,9 +168,9 @@ describe('SearchFilter.vue filterProcess - field shapes', () => {
     expect(wrapper.vm.filterData['category.id']).toBe(1)
   })
 
-  it('invokes async filter factory twice (guard + await) and uses resolved value', async () => {
+  it('invokes async filter factory twice (guard + await) and uses resolved value', async() => {
     const factory = vi.fn(() => Promise.resolve({ __label: 'C', 5: 'Five' }))
-    const wrapper = shallowFilter({ listFilter: { cat: factory } })
+    const wrapper = shallowFilter({ listFilter: { cat: factory }})
     await tick(wrapper)
     // Implementation calls listFilter[key]() once to check instanceof Promise
     // and a second time to await. Lock this behaviour.
@@ -178,14 +178,14 @@ describe('SearchFilter.vue filterProcess - field shapes', () => {
     expect(wrapper.vm.filters.cat.label).toBe('C')
   })
 
-  it('throws when async filter factory does not return a promise', async () => {
-    const wrapper = shallowFilter({ listFilter: {} })
+  it('throws when async filter factory does not return a promise', async() => {
+    const wrapper = shallowFilter({ listFilter: {}})
     await tick(wrapper)
-    await wrapper.setProps({ listFilter: { bad: () => ({ __label: 'x' }) } })
+    await wrapper.setProps({ listFilter: { bad: () => ({ __label: 'x' }) }})
     await expect(wrapper.vm.filterProcess()).rejects.toThrow('Async filter must return promise object!')
   })
 
-  it('mixes sync and async filters in one listFilter', async () => {
+  it('mixes sync and async filters in one listFilter', async() => {
     const wrapper = shallowFilter({
       listFilter: {
         name: 'Name',
@@ -200,9 +200,9 @@ describe('SearchFilter.vue filterProcess - field shapes', () => {
 })
 
 describe('SearchFilter.vue created()', () => {
-  it('restores non-empty modelValue entries into filterData', async () => {
+  it('restores non-empty modelValue entries into filterData', async() => {
     const wrapper = shallowFilter({
-      listFilter: { name: 'Name', status: { __label: 'S', __default: 0, 0: 'a', 1: 'b' } },
+      listFilter: { name: 'Name', status: { __label: 'S', __default: 0, 0: 'a', 1: 'b' }},
       modelValue: { name: 'Rin', status: 1 }
     })
     await tick(wrapper)
@@ -210,9 +210,9 @@ describe('SearchFilter.vue created()', () => {
     expect(wrapper.vm.filterData.status).toBe(1)
   })
 
-  it('ignores null/empty-string modelValue entries during restore', async () => {
+  it('ignores null/empty-string modelValue entries during restore', async() => {
     const wrapper = shallowFilter({
-      listFilter: { name: 'Name', status: { __label: 'S', __default: 0, 0: 'a', 1: 'b' } },
+      listFilter: { name: 'Name', status: { __label: 'S', __default: 0, 0: 'a', 1: 'b' }},
       modelValue: { name: '', status: null }
     })
     await tick(wrapper)
@@ -221,14 +221,14 @@ describe('SearchFilter.vue created()', () => {
     expect(wrapper.vm.filterData.status).toBe(0)
   })
 
-  it('emits update:modelValue and update:filter on created via filterGenerate', async () => {
-    const wrapper = shallowFilter({ listFilter: { name: 'Name' } })
+  it('emits update:modelValue and update:filter on created via filterGenerate', async() => {
+    const wrapper = shallowFilter({ listFilter: { name: 'Name' }})
     await tick(wrapper)
     expect(wrapper.emitted('update:modelValue')).toBeTruthy()
     expect(wrapper.emitted('update:filter')).toBeTruthy()
   })
 
-  it('calls fetchDataFunc with (vm, false) on created', async () => {
+  it('calls fetchDataFunc with (vm, false) on created', async() => {
     const fetchDataFunc = vi.fn()
     const wrapper = shallowFilter({ listFilter: {}, fetchDataFunc })
     await tick(wrapper)
@@ -239,8 +239,8 @@ describe('SearchFilter.vue created()', () => {
 })
 
 describe('SearchFilter.vue filterGenerate', () => {
-  it('emits empty filter object when no values are set', async () => {
-    const wrapper = shallowFilter({ listFilter: { name: 'Name' } })
+  it('emits empty filter object when no values are set', async() => {
+    const wrapper = shallowFilter({ listFilter: { name: 'Name' }})
     await tick(wrapper)
     wrapper.vm.filterData = { name: null }
     wrapper.vm.filterGenerate()
@@ -250,8 +250,8 @@ describe('SearchFilter.vue filterGenerate', () => {
     expect(modelEmits[modelEmits.length - 1][0]).toEqual({ name: null })
   })
 
-  it('builds single expression with value substitution', async () => {
-    const wrapper = shallowFilter({ listFilter: { name: 'Name' } })
+  it('builds single expression with value substitution', async() => {
+    const wrapper = shallowFilter({ listFilter: { name: 'Name' }})
     await tick(wrapper)
     wrapper.vm.filterData = { name: 'Rin' }
     wrapper.vm.filterGenerate()
@@ -261,7 +261,7 @@ describe('SearchFilter.vue filterGenerate', () => {
     })
   })
 
-  it('joins multiple expressions with &&', async () => {
+  it('joins multiple expressions with &&', async() => {
     const wrapper = shallowFilter({
       listFilter: {
         name: 'Name',
@@ -277,7 +277,7 @@ describe('SearchFilter.vue filterGenerate', () => {
     })
   })
 
-  it('merges with existing query @filter', async () => {
+  it('merges with existing query @filter', async() => {
     const wrapper = shallowFilter({
       listFilter: { name: 'Name' },
       query: { '@filter': 'entity.getId() > 5' }
@@ -291,7 +291,7 @@ describe('SearchFilter.vue filterGenerate', () => {
     })
   })
 
-  it('preserves query @filter when no field values are set', async () => {
+  it('preserves query @filter when no field values are set', async() => {
     const wrapper = shallowFilter({
       listFilter: { name: 'Name' },
       query: { '@filter': 'base' }
@@ -303,7 +303,7 @@ describe('SearchFilter.vue filterGenerate', () => {
     expect(emitted[emitted.length - 1][0]).toEqual({ '@filter': 'base' })
   })
 
-  it('skips empty/falsy values (null, "", undefined, 0, false)', async () => {
+  it('skips empty/falsy values (null, "", undefined, 0, false)', async() => {
     const wrapper = shallowFilter({
       listFilter: {
         a: 'A',
@@ -321,14 +321,14 @@ describe('SearchFilter.vue filterGenerate', () => {
     expect(emitted[emitted.length - 1][0]).toEqual({})
   })
 
-  it('replaces all :value occurrences (replaceAll)', async () => {
+  it('replaces all :value occurrences (replaceAll)', async() => {
     const full = {
       expression: ':value - :value',
       label: 'X',
       type: 'input',
       default: null
     }
-    const wrapper = shallowFilter({ listFilter: { x: full } })
+    const wrapper = shallowFilter({ listFilter: { x: full }})
     await tick(wrapper)
     wrapper.vm.filterData = { x: 'V' }
     wrapper.vm.filterGenerate()
@@ -338,7 +338,7 @@ describe('SearchFilter.vue filterGenerate', () => {
 })
 
 describe('SearchFilter.vue reset & fetchData', () => {
-  it('reset restores defaults, regenerates filter and emits reset', async () => {
+  it('reset restores defaults, regenerates filter and emits reset', async() => {
     const wrapper = shallowFilter({
       listFilter: {
         name: 'Name',
@@ -356,8 +356,8 @@ describe('SearchFilter.vue reset & fetchData', () => {
     expect(wrapper.emitted('reset')).toHaveLength(1)
   })
 
-  it('reset with all-null defaults emits empty filter', async () => {
-    const wrapper = shallowFilter({ listFilter: { name: 'Name' } })
+  it('reset with all-null defaults emits empty filter', async() => {
+    const wrapper = shallowFilter({ listFilter: { name: 'Name' }})
     await tick(wrapper)
     wrapper.vm.filterData = { name: 'x' }
     wrapper.vm.reset()
@@ -366,7 +366,7 @@ describe('SearchFilter.vue reset & fetchData', () => {
     expect(filterEmits[filterEmits.length - 1][0]).toEqual({})
   })
 
-  it('fetchData defaults resetPage to true and forwards (vm, resetPage)', async () => {
+  it('fetchData defaults resetPage to true and forwards (vm, resetPage)', async() => {
     const fetchDataFunc = vi.fn()
     const wrapper = shallowFilter({ listFilter: {}, fetchDataFunc })
     await tick(wrapper)
@@ -379,18 +379,18 @@ describe('SearchFilter.vue reset & fetchData', () => {
     expect(fetchDataFunc).toHaveBeenCalledWith(wrapper.vm, true)
   })
 
-  it('_console returns global console', async () => {
-    const wrapper = shallowFilter({ listFilter: {} })
+  it('_console returns global console', async() => {
+    const wrapper = shallowFilter({ listFilter: {}})
     await tick(wrapper)
     expect(wrapper.vm._console()).toBe(console)
   })
 })
 
 describe('SearchFilter.vue watcher', () => {
-  it('syncs filterData when modelValue changes (deep)', async () => {
-    const wrapper = shallowFilter({ listFilter: { name: 'Name' }, modelValue: {} })
+  it('syncs filterData when modelValue changes (deep)', async() => {
+    const wrapper = shallowFilter({ listFilter: { name: 'Name' }, modelValue: {}})
     await tick(wrapper)
-    await wrapper.setProps({ modelValue: { name: 'hello' } })
+    await wrapper.setProps({ modelValue: { name: 'hello' }})
     await wrapper.vm.$nextTick()
     expect(wrapper.vm.filterData).toEqual({ name: 'hello' })
     // mutating to a new object also syncs (deep copy, not reference)
@@ -421,8 +421,8 @@ describe('SearchFilter.vue template branches', () => {
     })
   }
 
-  it('renders input branch for type=input', async () => {
-    const wrapper = mountTemplate({ name: { expression: 'entity.getName() matches ":value"', label: 'Name', type: 'input', default: null } })
+  it('renders input branch for type=input', async() => {
+    const wrapper = mountTemplate({ name: { expression: 'entity.getName() matches ":value"', label: 'Name', type: 'input', default: null }})
     await tick(wrapper)
     expect(wrapper.find('.stub-input').exists()).toBe(true)
     expect(wrapper.find('.stub-select').exists()).toBe(false)
@@ -430,7 +430,7 @@ describe('SearchFilter.vue template branches', () => {
     expect(wrapper.find('.stub-date').exists()).toBe(false)
   })
 
-  it('renders select branch (v-else) for type=select with options', async () => {
+  it('renders select branch (v-else) for type=select with options', async() => {
     const wrapper = mountTemplate({
       status: {
         expression: 'entity.getStatus() == ":value"',
@@ -445,14 +445,14 @@ describe('SearchFilter.vue template branches', () => {
     expect(wrapper.findAll('.stub-option')).toHaveLength(2)
   })
 
-  it('renders select branch for reduced shorthand object', async () => {
-    const wrapper = mountTemplate({ status: { __label: 'S', 0: 'a', 1: 'b' } })
+  it('renders select branch for reduced shorthand object', async() => {
+    const wrapper = mountTemplate({ status: { __label: 'S', 0: 'a', 1: 'b' }})
     await tick(wrapper)
     expect(wrapper.find('.stub-select').exists()).toBe(true)
     expect(wrapper.findAll('.stub-option')).toHaveLength(2)
   })
 
-  it('renders select with filterable=false when data length <= 8 (short list)', async () => {
+  it('renders select with filterable=false when data length <= 8 (short list)', async() => {
     const wrapper = mountTemplate({
       status: {
         expression: 'e == ":value"',
@@ -466,7 +466,7 @@ describe('SearchFilter.vue template branches', () => {
     expect(wrapper.find('.stub-select').exists()).toBe(true)
   })
 
-  it('renders boolean branch for type=boolean', async () => {
+  it('renders boolean branch for type=boolean', async() => {
     const wrapper = mountTemplate({
       enabled: { expression: 'entity.getEnabled() == :value', label: 'Enabled', type: 'boolean', default: true }
     })
@@ -476,7 +476,7 @@ describe('SearchFilter.vue template branches', () => {
     expect(wrapper.find('.stub-date').exists()).toBe(false)
   })
 
-  it.each(['datetime', 'date', 'time'])('renders date-picker branch for type=%s', async (type) => {
+  it.each(['datetime', 'date', 'time'])('renders date-picker branch for type=%s', async(type) => {
     const wrapper = mountTemplate({
       when: { expression: 'entity.getWhen() >= ":value"', label: 'When', type, default: null }
     })
@@ -484,7 +484,7 @@ describe('SearchFilter.vue template branches', () => {
     expect(wrapper.find('.stub-date').exists()).toBe(true)
   })
 
-  it('renders custom component branch when filter has component key', async () => {
+  it('renders custom component branch when filter has component key', async() => {
     const Custom = { name: 'Custom', props: ['modelValue'], template: '<div class="custom-comp" />' }
     const wrapper = mountTemplate({
       custom: { expression: 'entity.getX() == ":value"', label: 'X', component: Custom, default: null }
@@ -493,7 +493,7 @@ describe('SearchFilter.vue template branches', () => {
     expect(wrapper.find('.custom-comp').exists()).toBe(true)
   })
 
-  it('hides actions bar when filters are empty, shows otherwise', async () => {
+  it('hides actions bar when filters are empty, shows otherwise', async() => {
     const empty = mountTemplate({})
     await tick(empty)
     expect(empty.find('.easy-admin-search-filter__actions').exists()).toBe(false)
@@ -503,7 +503,7 @@ describe('SearchFilter.vue template branches', () => {
     expect(filled.find('.easy-admin-search-filter__actions').exists()).toBe(true)
   })
 
-  it('clicking search button calls filterGenerate + fetchData', async () => {
+  it('clicking search button calls filterGenerate + fetchData', async() => {
     const fetchDataFunc = vi.fn()
     const wrapper = mount(SearchFilter, {
       props: { listFilter: { name: 'Name' }, fetchDataFunc },
@@ -521,7 +521,7 @@ describe('SearchFilter.vue template branches', () => {
     expect(fetchDataFunc.mock.calls[0][1]).toBe(true)
   })
 
-  it('clicking reset button calls reset and toggles refreshing class', async () => {
+  it('clicking reset button calls reset and toggles refreshing class', async() => {
     const wrapper = mountTemplate({ name: 'Name' }, { refreshing: false })
     await tick(wrapper)
     wrapper.vm.filterData = { name: 'dirty' }

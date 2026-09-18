@@ -80,7 +80,7 @@ describe('adapters/crudskeleton/CrudSkeletonQueryCompiler', () => {
 
   it('merges a numeric pager', () => {
     expect(
-      compileCsqeQuery({ page: { page: 2, limit: 20 } })
+      compileCsqeQuery({ page: { page: 2, limit: 20 }})
     ).toEqual({ page: 2, limit: 20 })
   })
 
@@ -93,27 +93,27 @@ describe('adapters/crudskeleton/CrudSkeletonQueryCompiler', () => {
   })
 
   it('omits @filter for empty and-children', () => {
-    expect(compileCsqeQuery({ filter: { kind: 'and', children: [] } })).toEqual({})
-    expect(compileCsqeQuery({ filter: { kind: 'and', children: [{ expression: '' }] } })).toEqual({})
-    expect(compileCsqeQuery({ filter: { kind: 'empty' } })).toEqual({})
+    expect(compileCsqeQuery({ filter: { kind: 'and', children: [] }})).toEqual({})
+    expect(compileCsqeQuery({ filter: { kind: 'and', children: [{ expression: '' }] }})).toEqual({})
+    expect(compileCsqeQuery({ filter: { kind: 'empty' }})).toEqual({})
   })
 
   it('passes through a pre-compiled sort object dropping empty values', () => {
-    expect(compileCsqeQuery({ sort: { '@order': 'entity.id|DESC', '@filter': '' } })).toEqual({ '@order': 'entity.id|DESC' })
-    expect(compileCsqeQuery({ sort: { '@order': '' } })).toEqual({})
+    expect(compileCsqeQuery({ sort: { '@order': 'entity.id|DESC', '@filter': '' }})).toEqual({ '@order': 'entity.id|DESC' })
+    expect(compileCsqeQuery({ sort: { '@order': '' }})).toEqual({})
   })
 
   it('omits non-numeric pager parts', () => {
-    expect(compileCsqeQuery({ page: {} })).toEqual({})
-    expect(compileCsqeQuery({ page: { page: '2', limit: '20' } })).toEqual({})
+    expect(compileCsqeQuery({ page: {}})).toEqual({})
+    expect(compileCsqeQuery({ page: { page: '2', limit: '20' }})).toEqual({})
   })
 
   it('handles nullish input and expression-less children', () => {
     expect(compileCsqeQuery(null)).toEqual({})
     expect(compileCsqeQuery(undefined)).toEqual({})
-    expect(compileCsqeQuery({ filter: { kind: 'and', children: [{}] } })).toEqual({})
+    expect(compileCsqeQuery({ filter: { kind: 'and', children: [{}] }})).toEqual({})
     // eslint-disable-next-line no-sparse-arrays
-    expect(compileCsqeQuery({ filter: { kind: 'and', children: [,] } })).toEqual({})
+    expect(compileCsqeQuery({ filter: { kind: 'and', children: [,] }})).toEqual({})
   })
 
   it('applies precedence query < filter < pager < sort like Object.assign', () => {

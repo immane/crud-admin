@@ -4,10 +4,10 @@ import RelationToMany from '@/easyadmin/ui/vue/plugins/list/RelationToMany.vue'
 import { loadRelationRecords } from '@/utils/relation'
 
 vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => ({ default: class { async list() { return [] } } }))
-vi.mock('@/configs/entities', () => ({ default: {} }))
-vi.mock('@/utils/relation', async (importOriginal) => {
+vi.mock('@/configs/entities', () => ({ default: {}}))
+vi.mock('@/utils/relation', async(importOriginal) => {
   const mod = await importOriginal()
-  return { ...mod, loadRelationRecords: vi.fn(async () => []) }
+  return { ...mod, loadRelationRecords: vi.fn(async() => []) }
 })
 
 const RouterLinkStub = {
@@ -15,15 +15,15 @@ const RouterLinkStub = {
   template: '<a class="stub-router-link"><slot /></a>'
 }
 
-const uuidField = { property: 'tagUuids', relation: { target: 'Tag', valueKey: 'uuid' } }
-const idField = { property: 'tagUuids', relation: { target: 'Tag', valueKey: 'id' } }
+const uuidField = { property: 'tagUuids', relation: { target: 'Tag', valueKey: 'uuid' }}
+const idField = { property: 'tagUuids', relation: { target: 'Tag', valueKey: 'id' }}
 
 function mountCell({ value = [], field = idField, hasRoute = true } = {}) {
   return mount(RelationToMany, {
-    props: { value, field, scope: {}, em: {}, struct: {} },
+    props: { value, field, scope: {}, em: {}, struct: {}},
     global: {
       plugins: [ElementPlus],
-      mocks: { $t: (key) => key, $router: { hasRoute: () => hasRoute } },
+      mocks: { $t: (key) => key, $router: { hasRoute: () => hasRoute }},
       stubs: { 'router-link': RouterLinkStub }
     }
   })
@@ -35,7 +35,7 @@ describe('list/RelationToMany.vue gaps', () => {
     vi.mocked(loadRelationRecords).mockResolvedValue([])
   })
 
-  it('covers value watcher (lines 65-66) on non-uuid field', async () => {
+  it('covers value watcher (lines 65-66) on non-uuid field', async() => {
     const wrapper = mountCell({ value: [{ id: 1, name: 'A' }], field: idField })
     await flushPromises()
     expect(loadRelationRecords).not.toHaveBeenCalled()
@@ -46,7 +46,7 @@ describe('list/RelationToMany.vue gaps', () => {
     expect(wrapper.vm.visibleItems).toEqual([{ id: 2, name: 'B' }])
   })
 
-  it('covers value watcher with uuid strings triggering a reload', async () => {
+  it('covers value watcher with uuid strings triggering a reload', async() => {
     vi.mocked(loadRelationRecords).mockResolvedValue([
       { uuid: 'u-1', name: 'One' },
       { uuid: 'u-2', name: 'Two' }

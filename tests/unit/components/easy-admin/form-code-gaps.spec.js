@@ -28,7 +28,7 @@ vi.mock('@codemirror/view', () => {
     dispatch({ changes }) {
       const cur = this.state.doc.toString()
       const next = cur.slice(0, changes.from) + changes.insert + cur.slice(changes.to)
-      this.state = { ...this.state, doc: { toString: () => next, length: next.length } }
+      this.state = { ...this.state, doc: { toString: () => next, length: next.length }}
     }
     destroy() {
       this.destroyed = true
@@ -76,7 +76,7 @@ import CodePlugin from '@/easyadmin/ui/vue/plugins/form/code.vue'
 function makeWrapper(form, field) {
   return mount(CodePlugin, {
     props: { form, field },
-    global: { mocks: { $t: (k) => k } }
+    global: { mocks: { $t: (k) => k }}
   })
 }
 
@@ -87,7 +87,7 @@ describe('form/code.vue gaps', () => {
     delete globalThis.__cmListener
   })
 
-  it('covers nullish modelValue branch (line 70 true) with dispatch to empty', async () => {
+  it('covers nullish modelValue branch (line 70 true) with dispatch to empty', async() => {
     const form = reactive({ script: 'hello' })
     const field = reactive({ property: 'script' })
     const wrapper = makeWrapper(form, field)
@@ -101,7 +101,7 @@ describe('form/code.vue gaps', () => {
     wrapper.unmount()
   })
 
-  it('covers nullish modelValue matching doc (lines 70-71 early return)', async () => {
+  it('covers nullish modelValue matching doc (lines 70-71 early return)', async() => {
     const form = reactive({ script: null })
     const field = reactive({ property: 'script' })
     const wrapper = makeWrapper(form, field)
@@ -117,7 +117,7 @@ describe('form/code.vue gaps', () => {
   it('covers language aliases js/ts/typescript/html/css/sql/json', () => {
     const form = reactive({ script: '' })
     for (const language of ['js', 'ts', 'typescript', 'html', 'css', 'sql', 'json', 'javascript']) {
-      const wrapper = makeWrapper(form, reactive({ property: 'script', type_options: { language } }))
+      const wrapper = makeWrapper(form, reactive({ property: 'script', type_options: { language }}))
       expect(wrapper.vm.language).toBe(language)
       wrapper.unmount()
     }

@@ -46,7 +46,7 @@ describe('form/textarea.vue', () => {
   it('allows type_options to override autosize and set placeholder/rows', () => {
     const { wrapper } = mountTextarea(
       { bio: '' },
-      { property: 'bio', type_options: { autosize: { minRows: 4, maxRows: 8 }, placeholder: 'Tell us more' } }
+      { property: 'bio', type_options: { autosize: { minRows: 4, maxRows: 8 }, placeholder: 'Tell us more' }}
     )
     const input = wrapper.findComponent(ElInput)
     expect(input.props('autosize')).toEqual({ minRows: 4, maxRows: 8 })
@@ -58,7 +58,7 @@ describe('form/textarea.vue', () => {
     const onChange = vi.fn()
     const { wrapper } = mountTextarea(
       { bio: '' },
-      { property: 'bio', type_events: { blur: onBlur, change: onChange } }
+      { property: 'bio', type_events: { blur: onBlur, change: onChange }}
     )
     const input = wrapper.findComponent(ElInput)
     input.vm.$emit('blur', new FocusEvent('blur'))

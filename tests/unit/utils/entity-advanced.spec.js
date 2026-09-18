@@ -41,7 +41,7 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
   })
 
   describe('constructor', () => {
-    it('parameterizes string name to plural dasherized', async () => {
+    it('parameterizes string name to plural dasherized', async() => {
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       expect(em.name).toBe('User')
@@ -49,46 +49,46 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
       expect(em.prefix).toBe('/api/v1/manage')
     })
 
-    it('dasherizes camelCase via underscore + pluralize', async () => {
+    it('dasherizes camelCase via underscore + pluralize', async() => {
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('BlogPost')
       expect(em.plural).toBe('blog-posts')
     })
 
-    it('handles irregular plural', async () => {
+    it('handles irregular plural', async() => {
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('Person')
       // i pluralizes Person -> People -> people
       expect(em.plural).toBe('people')
     })
 
-    it('object form with custom plural preserves it', async () => {
+    it('object form with custom plural preserves it', async() => {
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter({ name: 'User', plural: 'custom-users' })
       expect(em.plural).toBe('custom-users')
       expect(em.name).toBe('User')
     })
 
-    it('object form without plural derives parameterized', async () => {
+    it('object form without plural derives parameterized', async() => {
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter({ name: 'BlogPost' })
       expect(em.plural).toBe('blog-posts')
       expect(em.prefix).toBe('/api/v1/manage')
     })
 
-    it('object form with custom prefix overrides default', async () => {
+    it('object form with custom prefix overrides default', async() => {
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter({ name: 'User', prefix: '/custom' })
       expect(em.prefix).toBe('/custom')
     })
 
-    it('object form without prefix falls back to default', async () => {
+    it('object form without prefix falls back to default', async() => {
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter({ name: 'User', plural: 'users' })
       expect(em.prefix).toBe('/api/v1/manage')
     })
 
-    it('object form with empty prefix keeps default', async () => {
+    it('object form with empty prefix keeps default', async() => {
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter({ name: 'User', prefix: '' })
       // empty string falsy -> fallback to default via || this.prefix
@@ -97,8 +97,8 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
   })
 
   describe('structure()', () => {
-    it('fetches entities when cache empty (null)', async () => {
-      mockGet.mockResolvedValueOnce({ data: ['App\\Entity\\User'] }).mockResolvedValueOnce({ data: { id: {} } })
+    it('fetches entities when cache empty (null)', async() => {
+      mockGet.mockResolvedValueOnce({ data: ['App\\Entity\\User'] }).mockResolvedValueOnce({ data: { id: {}}})
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       await em.structure()
@@ -106,19 +106,19 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
       expect(mockDispatch).toHaveBeenCalledWith('entity/set_entities', ['App\\Entity\\User'])
     })
 
-    it('fetches entities when cache is empty array', async () => {
+    it('fetches entities when cache is empty array', async() => {
       mockStoreGetters.entity.entities = []
-      mockGet.mockResolvedValueOnce({ data: ['App\\Entity\\User'] }).mockResolvedValueOnce({ data: { id: {} } })
+      mockGet.mockResolvedValueOnce({ data: ['App\\Entity\\User'] }).mockResolvedValueOnce({ data: { id: {}}})
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       await em.structure()
       expect(mockGet).toHaveBeenCalledWith('/system/entities')
     })
 
-    it('uses cached entities when present and does not fetch list', async () => {
+    it('uses cached entities when present and does not fetch list', async() => {
       mockStoreGetters.entity.entities = ['App\\Entity\\User']
       mockStoreGetters.entity.structures = null
-      mockGet.mockResolvedValueOnce({ data: { id: {} } })
+      mockGet.mockResolvedValueOnce({ data: { id: {}}})
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       await em.structure()
@@ -126,27 +126,27 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
       expect(mockGet).toHaveBeenCalledWith('/system/entities/App\\Entity\\User')
     })
 
-    it('filters by name using backslash pop', async () => {
+    it('filters by name using backslash pop', async() => {
       mockStoreGetters.entity.entities = ['App\\Entity\\User', 'App\\Entity\\Post']
-      mockGet.mockResolvedValueOnce({ data: { id: {} } })
+      mockGet.mockResolvedValueOnce({ data: { id: {}}})
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       await em.structure()
       expect(mockGet).toHaveBeenCalledWith('/system/entities/App\\Entity\\User')
     })
 
-    it('picks first match when multiple entities share same short name', async () => {
+    it('picks first match when multiple entities share same short name', async() => {
       mockStoreGetters.entity.entities = ['BundleA\\Entity\\User', 'BundleB\\Entity\\User']
-      mockGet.mockResolvedValueOnce({ data: { id: {} } })
+      mockGet.mockResolvedValueOnce({ data: { id: {}}})
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
-      const s = await em.structure()
+      await em.structure()
       expect(mockGet).toHaveBeenCalledWith('/system/entities/BundleA\\Entity\\User')
       expect(mockDispatch).toHaveBeenCalledWith('entity/set_structures', expect.objectContaining({ entity: 'BundleA\\Entity\\User' }))
     })
 
-    it('returns cached structure without second fetch', async () => {
-      const cached = { id: { metadata: { type: 'integer' } } }
+    it('returns cached structure without second fetch', async() => {
+      const cached = { id: { metadata: { type: 'integer' }}}
       mockStoreGetters.entity.entities = ['App\\Entity\\User']
       mockStoreGetters.entity.structures = { 'App\\Entity\\User': cached }
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
@@ -156,19 +156,19 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
       expect(out).toEqual(cached)
     })
 
-    it('fetches structure and dispatches when not cached', async () => {
+    it('fetches structure and dispatches when not cached', async() => {
       mockStoreGetters.entity.entities = ['App\\Entity\\User']
       mockStoreGetters.entity.structures = {}
-      mockGet.mockResolvedValueOnce({ data: { username: {} } })
+      mockGet.mockResolvedValueOnce({ data: { username: {}}})
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       const out = await em.structure()
       expect(mockGet).toHaveBeenCalledWith('/system/entities/App\\Entity\\User')
-      expect(mockDispatch).toHaveBeenCalledWith('entity/set_structures', { entity: 'App\\Entity\\User', structure: { username: {} } })
-      expect(out).toEqual({ username: {} })
+      expect(mockDispatch).toHaveBeenCalledWith('entity/set_structures', { entity: 'App\\Entity\\User', structure: { username: {}}})
+      expect(out).toEqual({ username: {}})
     })
 
-    it('throws when no entity matches', async () => {
+    it('throws when no entity matches', async() => {
       mockStoreGetters.entity.entities = ['App\\Entity\\Post']
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
@@ -176,17 +176,17 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
       expect(mockGet).not.toHaveBeenCalledWith(expect.stringContaining('/system/entities/App'))
     })
 
-    it('throws when fetched entities contain no match', async () => {
+    it('throws when fetched entities contain no match', async() => {
       mockGet.mockResolvedValueOnce({ data: ['App\\Entity\\Post'] })
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       await expect(em.structure()).rejects.toThrow('No entity was found.')
     })
 
-    it('handles structures null as cache miss', async () => {
+    it('handles structures null as cache miss', async() => {
       mockStoreGetters.entity.entities = ['App\\Entity\\User']
       mockStoreGetters.entity.structures = null
-      mockGet.mockResolvedValueOnce({ data: { foo: {} } })
+      mockGet.mockResolvedValueOnce({ data: { foo: {}}})
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       await em.structure()
@@ -195,8 +195,8 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
   })
 
   describe('CRUD path building', () => {
-    it('retrieve builds correct path', async () => {
-      mockGet.mockResolvedValue({ data: {} })
+    it('retrieve builds correct path', async() => {
+      mockGet.mockResolvedValue({ data: {}})
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       await em.retrieve(1)
@@ -205,33 +205,33 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
       expect(mockGet).toHaveBeenLastCalledWith('/api/v1/manage/users/abc')
     })
 
-    it('list uses plural with params', async () => {
+    it('list uses plural with params', async() => {
       mockGet.mockResolvedValue({ data: [] })
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       await em.list({ page: 2 })
-      expect(mockGet).toHaveBeenCalledWith('/api/v1/manage/users', { params: { page: 2 } })
+      expect(mockGet).toHaveBeenCalledWith('/api/v1/manage/users', { params: { page: 2 }})
       await em.list()
       expect(mockGet).toHaveBeenLastCalledWith('/api/v1/manage/users', { params: undefined })
     })
 
-    it('create posts to plural', async () => {
-      mockPost.mockResolvedValue({ data: {} })
+    it('create posts to plural', async() => {
+      mockPost.mockResolvedValue({ data: {}})
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       await em.create({ name: 'a' })
       expect(mockPost).toHaveBeenCalledWith('/api/v1/manage/users', { name: 'a' })
     })
 
-    it('update puts to plural/pk', async () => {
-      mockPut.mockResolvedValue({ data: {} })
+    it('update puts to plural/pk', async() => {
+      mockPut.mockResolvedValue({ data: {}})
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       await em.update(5, { name: 'b' })
       expect(mockPut).toHaveBeenCalledWith('/api/v1/manage/users/5', { name: 'b' })
     })
 
-    it('delete deletes plural/pk', async () => {
+    it('delete deletes plural/pk', async() => {
       mockDelete.mockResolvedValue({ data: true })
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
@@ -239,9 +239,9 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
       expect(mockDelete).toHaveBeenCalledWith('/api/v1/manage/users/7')
     })
 
-    it('respects custom prefix and plural for CRUD', async () => {
-      mockGet.mockResolvedValue({ data: {} })
-      mockPost.mockResolvedValue({ data: {} })
+    it('respects custom prefix and plural for CRUD', async() => {
+      mockGet.mockResolvedValue({ data: {}})
+      mockPost.mockResolvedValue({ data: {}})
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter({ name: 'User', prefix: '/custom', plural: 'members' })
       await em.list()
@@ -252,8 +252,8 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
       expect(mockPost).toHaveBeenCalledWith('/custom/members', { x: 1 })
     })
 
-    it('handles BlogPost dasherized plural in paths', async () => {
-      mockGet.mockResolvedValue({ data: {} })
+    it('handles BlogPost dasherized plural in paths', async() => {
+      mockGet.mockResolvedValue({ data: {}})
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('BlogPost')
       await em.list()
@@ -262,7 +262,7 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
   })
 
   describe('deleteMany', () => {
-    it('resolves empty array without calling delete', async () => {
+    it('resolves empty array without calling delete', async() => {
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       const res = await em.deleteMany([])
@@ -270,7 +270,7 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
       expect(mockDelete).not.toHaveBeenCalled()
     })
 
-    it('resolves all fulfilled when all succeed', async () => {
+    it('resolves all fulfilled when all succeed', async() => {
       mockDelete.mockResolvedValue({ data: true })
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
@@ -279,7 +279,7 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
       expect(mockDelete).toHaveBeenCalledTimes(3)
     })
 
-    it('reports partial failure via allSettled', async () => {
+    it('reports partial failure via allSettled', async() => {
       mockDelete.mockResolvedValueOnce({ data: true }).mockRejectedValueOnce(new Error('fail')).mockResolvedValueOnce({ data: true })
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
@@ -287,7 +287,7 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
       expect(res.map(r => r.status)).toEqual(['fulfilled', 'rejected', 'fulfilled'])
     })
 
-    it('all rejected', async () => {
+    it('all rejected', async() => {
       mockDelete.mockRejectedValue(new Error('fail'))
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
@@ -297,36 +297,36 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts advanced', () => {
   })
 
   describe('batchUpdate', () => {
-    it('posts empty records when ids empty', async () => {
+    it('posts empty records when ids empty', async() => {
       mockPost.mockResolvedValue({ data: true })
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       await em.batchUpdate([], { enabled: true })
-      expect(mockPost).toHaveBeenCalledWith('/api/v1/manage/users/batch-update', [], { params: { '@basis': 'id', '@mode': 'update' } })
+      expect(mockPost).toHaveBeenCalledWith('/api/v1/manage/users/batch-update', [], { params: { '@basis': 'id', '@mode': 'update' }})
     })
 
-    it('assembles records with id spread and fixed params', async () => {
+    it('assembles records with id spread and fixed params', async() => {
       mockPost.mockResolvedValue({ data: true })
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       await em.batchUpdate([1, 2], { enabled: true })
-      expect(mockPost).toHaveBeenCalledWith('/api/v1/manage/users/batch-update', [{ id: 1, enabled: true }, { id: 2, enabled: true }], { params: { '@basis': 'id', '@mode': 'update' } })
+      expect(mockPost).toHaveBeenCalledWith('/api/v1/manage/users/batch-update', [{ id: 1, enabled: true }, { id: 2, enabled: true }], { params: { '@basis': 'id', '@mode': 'update' }})
     })
 
-    it('merges data correctly for multiple fields', async () => {
+    it('merges data correctly for multiple fields', async() => {
       mockPost.mockResolvedValue({ data: true })
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter('User')
       await em.batchUpdate([10], { enabled: false, role: 'admin' })
-      expect(mockPost).toHaveBeenCalledWith('/api/v1/manage/users/batch-update', [{ id: 10, enabled: false, role: 'admin' }], { params: { '@basis': 'id', '@mode': 'update' } })
+      expect(mockPost).toHaveBeenCalledWith('/api/v1/manage/users/batch-update', [{ id: 10, enabled: false, role: 'admin' }], { params: { '@basis': 'id', '@mode': 'update' }})
     })
 
-    it('uses dasherized plural with custom prefix', async () => {
+    it('uses dasherized plural with custom prefix', async() => {
       mockPost.mockResolvedValue({ data: true })
       const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
       const em = new CrudSkeletonAdapter({ name: 'BlogPost', prefix: '/custom' })
       await em.batchUpdate([1], { title: 'x' })
-      expect(mockPost).toHaveBeenCalledWith('/custom/blog-posts/batch-update', [{ id: 1, title: 'x' }], { params: { '@basis': 'id', '@mode': 'update' } })
+      expect(mockPost).toHaveBeenCalledWith('/custom/blog-posts/batch-update', [{ id: 1, title: 'x' }], { params: { '@basis': 'id', '@mode': 'update' }})
     })
   })
 })

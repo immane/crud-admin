@@ -48,7 +48,7 @@ function makeWrapper(form, field) {
   return mount(FilePlugin, {
     props: { form, field },
     global: {
-      mocks: { $t: (k) => k, $message: { error: vi.fn() } },
+      mocks: { $t: (k) => k, $message: { error: vi.fn() }},
       stubs: { 'el-upload': UploadStub, 'el-button': ButtonStub }
     }
   })
@@ -78,7 +78,7 @@ describe('form-file plugin', () => {
     const form = reactive({ attachment: 'doc.pdf' })
     const field = reactive({
       property: 'attachment', type: 'file',
-      type_options: { storage: 's3', data: { foo: 'bar' }, headers: { 'X-Custom': '1' } }
+      type_options: { storage: 's3', data: { foo: 'bar' }, headers: { 'X-Custom': '1' }}
     })
     const wrapper = makeWrapper(form, field)
     const u = upload(wrapper)
@@ -101,16 +101,16 @@ describe('form-file plugin', () => {
     wrapper.unmount()
   })
 
-  it('handleSuccess writes resolved path via el-upload on-success event', async () => {
+  it('handleSuccess writes resolved path via el-upload on-success event', async() => {
     const form = reactive({ attachment: '' })
     const field = reactive({ property: 'attachment', type: 'file' })
     const wrapper = makeWrapper(form, field)
-    await upload(wrapper).props('onSuccess')({ data: { path: 'report.pdf' } })
+    await upload(wrapper).props('onSuccess')({ data: { path: 'report.pdf' }})
     expect(form.attachment).toBe('https://cdn.test/report.pdf')
     wrapper.unmount()
   })
 
-  it('handleSuccess falls back to empty string when path is unresolvable', async () => {
+  it('handleSuccess falls back to empty string when path is unresolvable', async() => {
     const form = reactive({ attachment: 'old.pdf' })
     const field = reactive({ property: 'attachment', type: 'file' })
     const wrapper = makeWrapper(form, field)
@@ -119,7 +119,7 @@ describe('form-file plugin', () => {
     wrapper.unmount()
   })
 
-  it('handleError surfaces message via $message.error on el-upload on-error event', async () => {
+  it('handleError surfaces message via $message.error on el-upload on-error event', async() => {
     const form = reactive({ attachment: '' })
     const field = reactive({ property: 'attachment', type: 'file' })
     const wrapper = makeWrapper(form, field)
@@ -131,7 +131,7 @@ describe('form-file plugin', () => {
     wrapper.unmount()
   })
 
-  it('handleExceed resets value and restarts upload via $refs on el-upload on-exceed event', async () => {
+  it('handleExceed resets value and restarts upload via $refs on el-upload on-exceed event', async() => {
     const form = reactive({ attachment: 'old.pdf' })
     const field = reactive({ property: 'attachment', type: 'file' })
     const wrapper = makeWrapper(form, field)
@@ -150,7 +150,7 @@ describe('form-file plugin', () => {
     wrapper.unmount()
   })
 
-  it('on-remove clears the file value via el-upload on-remove event', async () => {
+  it('on-remove clears the file value via el-upload on-remove event', async() => {
     const form = reactive({ attachment: 'doc.pdf' })
     const field = reactive({ property: 'attachment', type: 'file' })
     const wrapper = makeWrapper(form, field)
@@ -159,7 +159,7 @@ describe('form-file plugin', () => {
     wrapper.unmount()
   })
 
-  it('validates parent form field after success when ancestor exposes validateField', async () => {
+  it('validates parent form field after success when ancestor exposes validateField', async() => {
     const validateField = vi.fn()
     const form = reactive({ attachment: '' })
     const field = reactive({ property: 'attachment', type: 'file' })
@@ -171,12 +171,12 @@ describe('form-file plugin', () => {
     }
     const parent = mount(ParentHarness, {
       global: {
-        mocks: { $t: (k) => k, $message: { error: vi.fn() } },
+        mocks: { $t: (k) => k, $message: { error: vi.fn() }},
         stubs: { 'el-upload': UploadStub, 'el-button': ButtonStub }
       }
     })
     const childUpload = parent.findComponent(UploadStub)
-    await childUpload.props('onSuccess')({ data: { path: 'v.pdf' } })
+    await childUpload.props('onSuccess')({ data: { path: 'v.pdf' }})
     await nextTick()
     await nextTick()
     expect(form.attachment).toBe('https://cdn.test/v.pdf')

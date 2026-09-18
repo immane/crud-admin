@@ -4,7 +4,7 @@ const mockRouter = vi.hoisted(() => ({
     {
       path: '/product',
       meta: { roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] },
-      children: [{ path: 'list', meta: { roles: ['ROLE_ADMIN'] } }]
+      children: [{ path: 'list', meta: { roles: ['ROLE_ADMIN'] }}]
     },
     {
       path: '/order',
@@ -19,8 +19,8 @@ const mockRouter = vi.hoisted(() => ({
     {
       path: '/mixed',
       children: [
-        { path: 'admin', meta: { roles: ['ROLE_ADMIN'] } },
-        { path: 'user', meta: { roles: ['ROLE_USER'] } },
+        { path: 'admin', meta: { roles: ['ROLE_ADMIN'] }},
+        { path: 'user', meta: { roles: ['ROLE_USER'] }},
         { path: 'open' }
       ]
     }
@@ -44,8 +44,8 @@ describe('store/modules/permission', () => {
 
     it('filters by role: allows matching role', () => {
       const routes = [
-        { path: '/admin', meta: { roles: ['ROLE_ADMIN'] } },
-        { path: '/user', meta: { roles: ['ROLE_USER'] } },
+        { path: '/admin', meta: { roles: ['ROLE_ADMIN'] }},
+        { path: '/user', meta: { roles: ['ROLE_USER'] }},
         { path: '/open' }
       ]
       const result = filterAsyncRoutes(routes, ['ROLE_ADMIN'])
@@ -53,7 +53,7 @@ describe('store/modules/permission', () => {
     })
 
     it('allows route when roles includes one of meta.roles', () => {
-      const routes = [{ path: '/mixed', meta: { roles: ['ROLE_ADMIN', 'ROLE_USER'] } }]
+      const routes = [{ path: '/mixed', meta: { roles: ['ROLE_ADMIN', 'ROLE_USER'] }}]
       expect(filterAsyncRoutes(routes, ['ROLE_USER'])).toHaveLength(1)
       expect(filterAsyncRoutes(routes, ['ROLE_GUEST'])).toHaveLength(0)
     })
@@ -64,8 +64,8 @@ describe('store/modules/permission', () => {
           path: '/parent',
           meta: { roles: ['ROLE_ADMIN'] },
           children: [
-            { path: 'child1', meta: { roles: ['ROLE_ADMIN'] } },
-            { path: 'child2', meta: { roles: ['ROLE_USER'] } },
+            { path: 'child1', meta: { roles: ['ROLE_ADMIN'] }},
+            { path: 'child2', meta: { roles: ['ROLE_USER'] }},
             { path: 'child3' }
           ]
         }
@@ -79,7 +79,7 @@ describe('store/modules/permission', () => {
         {
           path: '/parent',
           meta: { roles: ['ROLE_ADMIN'] },
-          children: [{ path: 'c', meta: { roles: ['ROLE_USER'] } }]
+          children: [{ path: 'c', meta: { roles: ['ROLE_USER'] }}]
         }
       ]
       const copy = JSON.parse(JSON.stringify(routes))
@@ -89,8 +89,8 @@ describe('store/modules/permission', () => {
 
     it('returns empty when no routes match', () => {
       const routes = [
-        { path: '/admin', meta: { roles: ['ROLE_ADMIN'] } },
-        { path: '/super', meta: { roles: ['ROLE_SUPER_ADMIN'] } }
+        { path: '/admin', meta: { roles: ['ROLE_ADMIN'] }},
+        { path: '/super', meta: { roles: ['ROLE_SUPER_ADMIN'] }}
       ]
       expect(filterAsyncRoutes(routes, ['ROLE_USER'])).toEqual([])
     })
@@ -106,7 +106,7 @@ describe('store/modules/permission', () => {
           meta: { roles: ['ROLE_ADMIN'] },
           children: [
             { path: 'open' },
-            { path: 'user-only', meta: { roles: ['ROLE_USER'] } }
+            { path: 'user-only', meta: { roles: ['ROLE_USER'] }}
           ]
         }
       ]
@@ -155,27 +155,27 @@ describe('store/modules/permission', () => {
   })
 
   describe('actions.generateRoutes', () => {
-    it('for ROLE_SUPER_ADMIN returns all asyncRoutes', async () => {
+    it('for ROLE_SUPER_ADMIN returns all asyncRoutes', async() => {
       const commit = vi.fn()
       const result = await permission.actions.generateRoutes({ commit }, ['ROLE_SUPER_ADMIN'])
       expect(result).toEqual(mockRouter.asyncRoutes)
       expect(commit).toHaveBeenCalledWith('SET_ROUTES', mockRouter.asyncRoutes)
     })
 
-    it('for ROLE_ADMIN returns all asyncRoutes (not filtered)', async () => {
+    it('for ROLE_ADMIN returns all asyncRoutes (not filtered)', async() => {
       const commit = vi.fn()
       const result = await permission.actions.generateRoutes({ commit }, ['ROLE_ADMIN'])
       expect(result).toEqual(mockRouter.asyncRoutes)
       expect(commit).toHaveBeenCalledWith('SET_ROUTES', mockRouter.asyncRoutes)
     })
 
-    it('for ROLE_SUPER_ADMIN with extra role still returns all', async () => {
+    it('for ROLE_SUPER_ADMIN with extra role still returns all', async() => {
       const commit = vi.fn()
       const result = await permission.actions.generateRoutes({ commit }, ['ROLE_USER', 'ROLE_SUPER_ADMIN'])
       expect(result).toEqual(mockRouter.asyncRoutes)
     })
 
-    it('for normal role filters routes', async () => {
+    it('for normal role filters routes', async() => {
       const commit = vi.fn()
       const result = await permission.actions.generateRoutes({ commit }, ['ROLE_USER'])
       const expected = filterAsyncRoutes(mockRouter.asyncRoutes, ['ROLE_USER'])
@@ -184,14 +184,14 @@ describe('store/modules/permission', () => {
       expect(result.length).toBeLessThan(mockRouter.asyncRoutes.length)
     })
 
-    it('for empty roles filters to only public routes', async () => {
+    it('for empty roles filters to only public routes', async() => {
       const commit = vi.fn()
       const result = await permission.actions.generateRoutes({ commit }, [])
       const expected = filterAsyncRoutes(mockRouter.asyncRoutes, [])
       expect(result).toEqual(expected)
     })
 
-    it('for unknown role returns only routes without meta', async () => {
+    it('for unknown role returns only routes without meta', async() => {
       const commit = vi.fn()
       const result = await permission.actions.generateRoutes({ commit }, ['UNKNOWN'])
       // only /public and /mixed/open ? but /mixed parent has no meta, so it passes, children filtered
@@ -199,7 +199,7 @@ describe('store/modules/permission', () => {
       expect(result.some(r => r.path === '/product')).toBe(false)
     })
 
-    it('handles asyncRoutes null/undefined fallback to [] for admin', async () => {
+    it('handles asyncRoutes null/undefined fallback to [] for admin', async() => {
       // temporarily patch
       const original = mockRouter.asyncRoutes
       mockRouter.asyncRoutes = null

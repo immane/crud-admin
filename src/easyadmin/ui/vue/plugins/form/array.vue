@@ -46,8 +46,8 @@
           entity-conf="Option"
           :fields="fields"
         >
-          <template v-slot:title><span /></template>
-          <template v-slot:action><span /></template>
+          <template #title><span /></template>
+          <template #action><span /></template>
         </form-admin>
 
         <p circle style="text-align: right">

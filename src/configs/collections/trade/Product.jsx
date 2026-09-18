@@ -1,7 +1,13 @@
+import { defineAsyncComponent } from 'vue'
 import { t } from '@/i18n'
 import { orderByIdDesc, statusFilterLabel } from '../helpers'
-import ListAdmin from '@/easyadmin/ui/vue/ListAdmin'
-import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
+// Lazily resolve the admin UI here: this config module is eagerly pulled into
+// every FormAdmin through `@/configs/entities`, so static SFC imports would
+// close an eager cycle (FormAdmin -> entities -> Product.jsx -> ListAdmin ->
+// FormAdmin) and blow up with "Cannot access 'FormAdmin' before
+// initialization" depending on module evaluation order.
+const ListAdmin = defineAsyncComponent(() => import('@/easyadmin/ui/vue/ListAdmin'))
+const FormAdmin = defineAsyncComponent(() => import('@/easyadmin/ui/vue/FormAdmin'))
 import specificationConfig from './Specification'
 
 const SpecificationManager = {

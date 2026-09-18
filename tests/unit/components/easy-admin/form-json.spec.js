@@ -33,7 +33,7 @@ async function flush() {
 function makeWrapper(form, field) {
   return mount(JsonPlugin, {
     props: { form, field },
-    global: { mocks: { $t: (k) => k } }
+    global: { mocks: { $t: (k) => k }}
   })
 }
 
@@ -42,8 +42,8 @@ describe('form-json plugin', () => {
     globalThis.__jsonInstances = []
   })
 
-  it('initialises editor with default mode and modes', async () => {
-    const form = reactive({ payload: { a: 1 } })
+  it('initialises editor with default mode and modes', async() => {
+    const form = reactive({ payload: { a: 1 }})
     const field = reactive({ property: 'payload', type: 'json' })
     const wrapper = makeWrapper(form, field)
     await flush()
@@ -55,9 +55,9 @@ describe('form-json plugin', () => {
     wrapper.unmount()
   })
 
-  it('respects custom mode and modes from type_options', async () => {
-    const form = reactive({ payload: { a: 1 } })
-    const field = reactive({ property: 'payload', type_options: { mode: 'tree', modes: ['tree', 'view'] } })
+  it('respects custom mode and modes from type_options', async() => {
+    const form = reactive({ payload: { a: 1 }})
+    const field = reactive({ property: 'payload', type_options: { mode: 'tree', modes: ['tree', 'view'] }})
     const wrapper = makeWrapper(form, field)
     await flush()
     const editor = lastEditor()
@@ -66,7 +66,7 @@ describe('form-json plugin', () => {
     wrapper.unmount()
   })
 
-  it('parses string JSON values into the editor', async () => {
+  it('parses string JSON values into the editor', async() => {
     const form = reactive({ payload: '{"x":10}' })
     const field = reactive({ property: 'payload' })
     const wrapper = makeWrapper(form, field)
@@ -75,7 +75,7 @@ describe('form-json plugin', () => {
     wrapper.unmount()
   })
 
-  it('keeps invalid JSON strings as-is without throwing', async () => {
+  it('keeps invalid JSON strings as-is without throwing', async() => {
     const form = reactive({ payload: '{broken' })
     const field = reactive({ property: 'payload' })
     const wrapper = makeWrapper(form, field)
@@ -84,7 +84,7 @@ describe('form-json plugin', () => {
     wrapper.unmount()
   })
 
-  it('initialises nullish values to empty object', async () => {
+  it('initialises nullish values to empty object', async() => {
     const form = reactive({ payload: null })
     const field = reactive({ property: 'payload' })
     const wrapper = makeWrapper(form, field)
@@ -93,8 +93,8 @@ describe('form-json plugin', () => {
     wrapper.unmount()
   })
 
-  it('pushes external form changes into the editor via set', async () => {
-    const form = reactive({ payload: { a: 1 } })
+  it('pushes external form changes into the editor via set', async() => {
+    const form = reactive({ payload: { a: 1 }})
     const field = reactive({ property: 'payload' })
     const wrapper = makeWrapper(form, field)
     await flush()
@@ -106,8 +106,8 @@ describe('form-json plugin', () => {
     wrapper.unmount()
   })
 
-  it('does not reset editor when change originates from the editor itself', async () => {
-    const form = reactive({ payload: { a: 1 } })
+  it('does not reset editor when change originates from the editor itself', async() => {
+    const form = reactive({ payload: { a: 1 }})
     const field = reactive({ property: 'payload' })
     const wrapper = makeWrapper(form, field)
     await flush()
@@ -122,8 +122,8 @@ describe('form-json plugin', () => {
     wrapper.unmount()
   })
 
-  it('writes editor get() result back to the form on change', async () => {
-    const form = reactive({ payload: { a: 1 } })
+  it('writes editor get() result back to the form on change', async() => {
+    const form = reactive({ payload: { a: 1 }})
     const field = reactive({ property: 'payload' })
     const wrapper = makeWrapper(form, field)
     await flush()
@@ -135,8 +135,8 @@ describe('form-json plugin', () => {
     wrapper.unmount()
   })
 
-  it('keeps existing value when editor get() throws (invalid JSON)', async () => {
-    const form = reactive({ payload: { a: 1 } })
+  it('keeps existing value when editor get() throws (invalid JSON)', async() => {
+    const form = reactive({ payload: { a: 1 }})
     const field = reactive({ property: 'payload' })
     const wrapper = makeWrapper(form, field)
     await flush()
@@ -148,8 +148,8 @@ describe('form-json plugin', () => {
     wrapper.unmount()
   })
 
-  it('destroys the editor on unmount and clears reference', async () => {
-    const form = reactive({ payload: { a: 1 } })
+  it('destroys the editor on unmount and clears reference', async() => {
+    const form = reactive({ payload: { a: 1 }})
     const field = reactive({ property: 'payload' })
     const wrapper = makeWrapper(form, field)
     await flush()

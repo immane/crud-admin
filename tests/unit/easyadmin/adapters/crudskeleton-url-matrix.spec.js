@@ -64,7 +64,7 @@ describe('adapters/crudskeleton URL matrix (entity configs)', () => {
   })
 
   it('retrieves through the custom inventory prefix (Stock)', async() => {
-    request.get.mockResolvedValue({ data: { id: 'a' } })
+    request.get.mockResolvedValue({ data: { id: 'a' }})
     await new CrudSkeletonAdapter({ name: 'Stock', prefix: '/api/v1/manage/inventory', plural: 'stocks' }).retrieve('a')
     expect(request.get).toHaveBeenCalledWith(`${INVENTORY_PREFIX}/stocks/a`)
   })
@@ -75,7 +75,7 @@ describe('adapters/crudskeleton URL matrix (entity configs)', () => {
     expect(request.post).toHaveBeenCalledWith(
       `${DEFAULT_PREFIX}/store-orders/batch-update`,
       [{ id: 1, operationalStatus: 'accepted' }, { id: 2, operationalStatus: 'accepted' }],
-      { params: { '@basis': 'id', '@mode': 'update' } }
+      { params: { '@basis': 'id', '@mode': 'update' }}
     )
   })
 })

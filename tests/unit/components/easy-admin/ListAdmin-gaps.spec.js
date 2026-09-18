@@ -3,14 +3,14 @@ import ElementPlus from 'element-plus'
 import ListAdmin from '@/easyadmin/ui/vue/ListAdmin.vue'
 
 vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => {
-  const MockEntityManage = vi.fn(function (conf) {
+  const MockEntityManage = vi.fn(function(conf) {
     this.entityConf = conf
     this.name = typeof conf === 'string' ? conf : (conf && conf.name) || 'TestEntity'
     this.prefix = '/api'
     this.plural = 'tests'
     this.structure = vi.fn().mockResolvedValue({})
-    this.list = vi.fn().mockResolvedValue({ data: [], paginator: { totalCount: 0 } })
-    this.retrieve = vi.fn().mockResolvedValue({ data: {} })
+    this.list = vi.fn().mockResolvedValue({ data: [], paginator: { totalCount: 0 }})
+    this.retrieve = vi.fn().mockResolvedValue({ data: {}})
     this.delete = vi.fn().mockResolvedValue({})
     this.deleteMany = vi.fn().mockResolvedValue([])
     this.batchUpdate = vi.fn().mockResolvedValue({})
@@ -18,7 +18,7 @@ vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => {
   return { __esModule: true, default: MockEntityManage }
 })
 
-vi.mock('@/configs/entities', () => ({ __esModule: true, default: {} }))
+vi.mock('@/configs/entities', () => ({ __esModule: true, default: {}}))
 
 vi.mock('@/router', () => ({
   __esModule: true,
@@ -27,13 +27,13 @@ vi.mock('@/router', () => ({
     {
       path: '/parent',
       children: [
-        { path: 'other', redirect: '/elsewhere', meta: { title: 'Elsewhere' } },
-        { path: 'users', redirect: '/users', meta: { title: 'User List' } }
+        { path: 'other', redirect: '/elsewhere', meta: { title: 'Elsewhere' }},
+        { path: 'users', redirect: '/users', meta: { title: 'User List' }}
       ]
     },
     {
       path: '/tail',
-      children: [{ path: 'x', redirect: '/never', meta: { title: 'Never' } }]
+      children: [{ path: 'x', redirect: '/never', meta: { title: 'Never' }}]
     }
   ],
   constantRoutes: [],
@@ -47,7 +47,7 @@ vi.mock('@/utils/simple-image-process', () => ({
   default: { getPicture: (url) => url }
 }))
 
-vi.mock('@/easyadmin/ui/vue/FormAdmin.vue', async () => {
+vi.mock('@/easyadmin/ui/vue/FormAdmin.vue', async() => {
   const { h } = await import('vue')
   return {
     __esModule: true,
@@ -114,12 +114,12 @@ describe('ListAdmin.vue gaps', () => {
 
   describe('routeProcess (lines 924-935, branches 923/933)', () => {
     it('resolves titleText from a matching child redirect', () => {
-      const { wrapper } = mountList({}, { $route: { query: {}, path: '/users', meta: {}, fullPath: '/users' } })
+      const { wrapper } = mountList({}, { $route: { query: {}, path: '/users', meta: {}, fullPath: '/users' }})
       expect(wrapper.vm.titleText).toBe('User List')
     })
 
     it('leaves titleText empty when nothing matches', () => {
-      const { wrapper } = mountList({}, { $route: { query: {}, path: '/nomatch', meta: {}, fullPath: '/nomatch' } })
+      const { wrapper } = mountList({}, { $route: { query: {}, path: '/nomatch', meta: {}, fullPath: '/nomatch' }})
       expect(wrapper.vm.titleText).toBe('')
     })
   })
@@ -128,7 +128,7 @@ describe('ListAdmin.vue gaps', () => {
     it('restores filter data and pager from $route.query', () => {
       const { wrapper } = mountList(
         {},
-        { $route: { query: { name: 'abc', page: '2', limit: '50' }, path: '/', meta: {}, fullPath: '/?name=abc' } }
+        { $route: { query: { name: 'abc', page: '2', limit: '50' }, path: '/', meta: {}, fullPath: '/?name=abc' }}
       )
       expect(wrapper.vm.listFilterData).toEqual({ name: 'abc' })
       expect(wrapper.vm.pager).toEqual({ page: 2, limit: 50 })
@@ -136,14 +136,14 @@ describe('ListAdmin.vue gaps', () => {
   })
 
   describe('$route.query watcher (lines 735-740)', () => {
-    it('applies params and refetches without a searchFilter ref', async () => {
+    it('applies params and refetches without a searchFilter ref', async() => {
       // rendering a custom filter slot leaves $refs.searchFilter undefined,
       // covering the `?.` short-circuit in the watcher
       const mocks = baseMocks()
       const wrapper = mount(ListAdmin, {
         props: { entityConf: 'TestEntity', listDisplay: [], actions: [], disabledActions: [] },
         slots: { filter: '<div class="no-filter" />' },
-        global: { plugins: [ElementPlus], mocks, stubs: { SearchFilter: true, FormAdmin: true } }
+        global: { plugins: [ElementPlus], mocks, stubs: { SearchFilter: true, FormAdmin: true }}
       })
       expect(wrapper.vm.$refs.searchFilter).toBeUndefined()
       const fetchSpy = vi.spyOn(wrapper.vm, 'fetchData').mockImplementation(() => {})
@@ -156,7 +156,7 @@ describe('ListAdmin.vue gaps', () => {
       expect(fetchSpy).toHaveBeenCalledTimes(1)
     })
 
-    it('calls through to a real searchFilter ref when present', async () => {
+    it('calls through to a real searchFilter ref when present', async() => {
       const mocks = baseMocks()
       const wrapper = mount(ListAdmin, {
         props: { entityConf: 'TestEntity', listDisplay: [], actions: [], disabledActions: [] },
@@ -184,7 +184,7 @@ describe('ListAdmin.vue gaps', () => {
   })
 
   describe('beforeUnmount (line 745)', () => {
-    it('clears the pending url-sync timer on unmount', async () => {
+    it('clears the pending url-sync timer on unmount', async() => {
       const { wrapper } = mountList()
       wrapper.vm.syncToUrl()
       expect(wrapper.vm._syncTimer).toBeDefined()
@@ -194,7 +194,7 @@ describe('ListAdmin.vue gaps', () => {
   })
 
   describe('pagerTotal nullish chain (line 681)', () => {
-    it('prefers totalCount, then total, then zero', async () => {
+    it('prefers totalCount, then total, then zero', async() => {
       const { wrapper } = mountList()
       // NOTE: setData deep-merges, so replace the object directly here
       wrapper.vm.paginator = { totalCount: 5, total: 9 }
@@ -212,7 +212,7 @@ describe('ListAdmin.vue gaps', () => {
   describe('resolvedBatchFields branches (lines 695-696)', () => {
     it('maps string, plain-object and component batch fields', () => {
       const { wrapper } = mountList({
-        config: { form: { batch_edit: { fields: ['a', { property: 'b', label: 'B' }, { property: 'c', component: DummyComp }] } } }
+        config: { form: { batch_edit: { fields: ['a', { property: 'b', label: 'B' }, { property: 'c', component: DummyComp }] }}}
       })
       const resolved = wrapper.vm.resolvedBatchFields
       expect(resolved[0]).toEqual({ property: 'a' })
@@ -223,7 +223,7 @@ describe('ListAdmin.vue gaps', () => {
   })
 
   describe('syncToUrl replaceState guard (line 793)', () => {
-    it('skips history updates when the url already matches', async () => {
+    it('skips history updates when the url already matches', async() => {
       // drain debounce timers left over by earlier tests in this file
       await sleep(150)
       window.history.replaceState(null, '', '/')
@@ -241,12 +241,12 @@ describe('ListAdmin.vue gaps', () => {
       }
     })
 
-    it('writes the url when filters diverge', async () => {
+    it('writes the url when filters diverge', async() => {
       window.history.replaceState(null, '', '/')
       const { wrapper } = mountList()
       const spy = vi.spyOn(window.history, 'replaceState').mockImplementation(() => {})
       try {
-        await wrapper.setData({ listFilterData: { name: 'abc' } })
+        await wrapper.setData({ listFilterData: { name: 'abc' }})
         await sleep(80)
         expect(spy).toHaveBeenCalled()
       } finally {
@@ -270,9 +270,9 @@ describe('ListAdmin.vue gaps', () => {
   describe('getListPluginType struct fallback (line 853)', () => {
     it('uses struct metadata when the field has no type', () => {
       const { wrapper } = mountList()
-      expect(wrapper.vm.getListPluginType({ property: 'active' }, { metadata: { type: 'boolean' } }, null)).toBe('boolean')
-      expect(wrapper.vm.getListPluginType({ property: 'author' }, { metadata: { type: 'ManyToOne' } }, null)).toBe('RelationToOne')
-      expect(wrapper.vm.getListPluginType({ property: 'tags' }, { metadata: { type: 'ManyToMany' } }, null)).toBe('RelationToMany')
+      expect(wrapper.vm.getListPluginType({ property: 'active' }, { metadata: { type: 'boolean' }}, null)).toBe('boolean')
+      expect(wrapper.vm.getListPluginType({ property: 'author' }, { metadata: { type: 'ManyToOne' }}, null)).toBe('RelationToOne')
+      expect(wrapper.vm.getListPluginType({ property: 'tags' }, { metadata: { type: 'ManyToMany' }}, null)).toBe('RelationToMany')
     })
   })
 
@@ -286,8 +286,8 @@ describe('ListAdmin.vue gaps', () => {
   })
 
   describe('submitBatchEdit error fallback (line 1086)', () => {
-    it('falls back to a default message when the error has none', async () => {
-      const { wrapper, mocks } = mountList({ config: { form: { batch_edit: { fields: ['name'] } } } })
+    it('falls back to a default message when the error has none', async() => {
+      const { wrapper, mocks } = mountList({ config: { form: { batch_edit: { fields: ['name'] }}}})
       wrapper.vm.em.batchUpdate.mockRejectedValue({})
       await wrapper.setData({ selectedRecords: [{ id: 1 }] })
       wrapper.vm.batchEditDialog.show = true
@@ -301,21 +301,21 @@ describe('ListAdmin.vue gaps', () => {
   })
 
   describe('batch dialog label fallback (line 347)', () => {
-    it('prefers explicit labels over structure translations', async () => {
+    it('prefers explicit labels over structure translations', async() => {
       const { wrapper } = mountList({
-        config: { form: { batch_edit: { fields: [{ property: 'status', label: 'Status Label' }] } } }
+        config: { form: { batch_edit: { fields: [{ property: 'status', label: 'Status Label' }] }}}
       })
-      await wrapper.setData({ structure: { status: { translation: 'Status Trans' } } })
+      await wrapper.setData({ structure: { status: { translation: 'Status Trans' }}})
       wrapper.vm.openBatchEditDialog()
       await wrapper.vm.$nextTick()
       expect(wrapper.text()).toContain('Status Label')
     })
 
-    it('uses structure translations, then the property name', async () => {
+    it('uses structure translations, then the property name', async() => {
       const { wrapper } = mountList({
-        config: { form: { batch_edit: { fields: [{ property: 'status' }, { property: 'other' }] } } }
+        config: { form: { batch_edit: { fields: [{ property: 'status' }, { property: 'other' }] }}}
       })
-      await wrapper.setData({ structure: { status: { translation: 'Status Trans' } } })
+      await wrapper.setData({ structure: { status: { translation: 'Status Trans' }}})
       wrapper.vm.openBatchEditDialog()
       await wrapper.vm.$nextTick()
       expect(wrapper.text()).toContain('Status Trans')
@@ -324,7 +324,7 @@ describe('ListAdmin.vue gaps', () => {
   })
 
   describe('table template branches (line 207)', () => {
-    it('renders editable, plugin, plain and custom-component cells', async () => {
+    it('renders editable, plugin, plain and custom-component cells', async() => {
       const { wrapper } = mountList({
         listDisplay: [
           'id',
@@ -379,12 +379,12 @@ describe('ListAdmin.vue gaps', () => {
       expect(wrapper.vm.renderHelp('line one\nline two')).toContain('<br>')
     })
 
-    it('renders help blocks only for fields that declare help', async () => {
+    it('renders help blocks only for fields that declare help', async() => {
       const { wrapper } = mountList({
         config: { form: { batch_edit: { fields: [
           { property: 'phoneVerified', type: 'boolean', help: 'use `code` now' },
           { property: 'note' }
-        ] } } }
+        ] }}}
       })
       wrapper.vm.openBatchEditDialog()
       await wrapper.vm.$nextTick()

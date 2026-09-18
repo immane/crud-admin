@@ -34,7 +34,7 @@ describe('application/query/url-query-sync', () => {
 
   describe('applyQueryParams', () => {
     it('returns defaults and empty filterData for empty query', () => {
-      expect(applyQueryParams({})).toEqual({ filterData: {}, pager: { page: 1, limit: 20 } })
+      expect(applyQueryParams({})).toEqual({ filterData: {}, pager: { page: 1, limit: 20 }})
     })
 
     it('routes non-page/limit keys to filterData', () => {

@@ -23,7 +23,7 @@ vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => ({
 }))
 
 vi.mock('@/configs/entities', () => ({
-  default: { Role: {}, User: {}, Tag: {} }
+  default: { Role: {}, User: {}, Tag: {}}
 }))
 
 vi.mock('@/utils/relation', async(importOriginal) => {
@@ -36,9 +36,9 @@ const RouterLinkStub = {
   template: '<a class="stub-router-link"><slot /></a>'
 }
 
-const rolesField = () => ({ property: 'roles', relation: { entity: 'Role', valueKey: 'id' } })
+const rolesField = () => ({ property: 'roles', relation: { entity: 'Role', valueKey: 'id' }})
 
-function mountMany({ form, field = rolesField(), struct = {} } = {}) {
+function mountMany({ form, field = rolesField(), struct = {}} = {}) {
   return mount(RelationToMany, {
     props: { form: form ?? {}, field, struct, emPrefix: '' },
     global: {
@@ -128,7 +128,7 @@ describe('form/RelationToMany.vue', () => {
   it('skips preload on created when type_options.remote is true', async() => {
     const wrapper = mountMany({
       form: {},
-      field: { property: 'roles', relation: { entity: 'Role', valueKey: 'id' }, type_options: { remote: true } }
+      field: { property: 'roles', relation: { entity: 'Role', valueKey: 'id' }, type_options: { remote: true }}
     })
     await flushPromises()
 
@@ -149,7 +149,7 @@ describe('form/RelationToMany.vue', () => {
     await flushPromises()
     expect(wrapper.vm.options).toEqual([])
 
-    await wrapper.setProps({ form: { roles: [11, 12] } })
+    await wrapper.setProps({ form: { roles: [11, 12] }})
     await flushPromises()
 
     expect(wrapper.vm.options).toContainEqual({ value: 11, label: '11' })
@@ -161,7 +161,7 @@ describe('form/RelationToMany.vue', () => {
       { uuid: 'u-1', name: 'Alice' },
       { uuid: 'u-2', name: 'Bob' }
     ])
-    const wrapper = mountMany({ form: { userUuids: ['u-1', 'u-2'] }, field: { property: 'userUuids' } })
+    const wrapper = mountMany({ form: { userUuids: ['u-1', 'u-2'] }, field: { property: 'userUuids' }})
     await flushPromises()
     await flushPromises()
 
@@ -173,7 +173,7 @@ describe('form/RelationToMany.vue', () => {
   it('remoteSearch fetches with the query and clears on empty query', async() => {
     const wrapper = mountMany({
       form: {},
-      field: { property: 'roles', relation: { entity: 'Role', valueKey: 'id' }, type_options: { remote: true } }
+      field: { property: 'roles', relation: { entity: 'Role', valueKey: 'id' }, type_options: { remote: true }}
     })
     await flushPromises()
 
@@ -223,7 +223,7 @@ describe('form/RelationToMany.vue', () => {
   })
 
   it('shows a creation link only when field.creationUrl is set', () => {
-    const withUrl = mountMany({ form: {}, field: { ...rolesField(), creationUrl: '/roles/create' } })
+    const withUrl = mountMany({ form: {}, field: { ...rolesField(), creationUrl: '/roles/create' }})
     expect(withUrl.find('.stub-router-link').exists()).toBe(true)
 
     const without = mountMany({ form: {}, field: rolesField() })

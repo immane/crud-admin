@@ -58,7 +58,7 @@ describe('form/currency.vue', () => {
   it('supports a custom multiplier and currency code (e.g. JPY x1000)', async() => {
     const { wrapper, form } = mountCurrency(
       { price: 5000 },
-      { property: 'price', type_options: { multiplier: 1000, currency: 'jpy' } }
+      { property: 'price', type_options: { multiplier: 1000, currency: 'jpy' }}
     )
     expect(inputNumber(wrapper).props('modelValue')).toBe(5)
     expect(wrapper.find('.currency-input__code').text()).toBe('JPY')
@@ -69,7 +69,7 @@ describe('form/currency.vue', () => {
   it('falls back to multiplier 100 for invalid multipliers', () => {
     const { wrapper } = mountCurrency(
       { amount: 250 },
-      { property: 'amount', type_options: { multiplier: 0 } }
+      { property: 'amount', type_options: { multiplier: 0 }}
     )
     expect(inputNumber(wrapper).props('modelValue')).toBe(2.5)
   })
@@ -81,16 +81,16 @@ describe('form/currency.vue', () => {
   })
 
   it('uses 3 fraction digits for multiplier 1000 and 0 for multiplier 1', () => {
-    const m1000 = mountCurrency({ p: 1000 }, { property: 'p', type_options: { multiplier: 1000 } })
+    const m1000 = mountCurrency({ p: 1000 }, { property: 'p', type_options: { multiplier: 1000 }})
     expect(inputNumber(m1000.wrapper).props('precision')).toBe(3)
-    const m1 = mountCurrency({ p: 5 }, { property: 'p', type_options: { multiplier: 1 } })
+    const m1 = mountCurrency({ p: 5 }, { property: 'p', type_options: { multiplier: 1 }})
     expect(inputNumber(m1.wrapper).props('precision')).toBe(0)
   })
 
   it('respects explicit precision / step overrides from type_options', () => {
     const { wrapper } = mountCurrency(
       { amount: 100 },
-      { property: 'amount', type_options: { precision: 1, step: 0.5, min: 0 } }
+      { property: 'amount', type_options: { precision: 1, step: 0.5, min: 0 }}
     )
     const num = inputNumber(wrapper)
     expect(num.props('precision')).toBe(1)
@@ -101,7 +101,7 @@ describe('form/currency.vue', () => {
   it('strips multiplier/currency from the options passed to el-input-number', () => {
     const { wrapper } = mountCurrency(
       { amount: 100 },
-      { property: 'amount', type_options: { multiplier: 100, currency: 'CNY', min: 0 } }
+      { property: 'amount', type_options: { multiplier: 100, currency: 'CNY', min: 0 }}
     )
     const num = inputNumber(wrapper)
     expect(num.vm.$attrs.multiplier).toBeUndefined()
@@ -113,7 +113,7 @@ describe('form/currency.vue', () => {
     const onChange = vi.fn()
     const { wrapper } = mountCurrency(
       { amount: 100 },
-      { property: 'amount', type_events: { change: onChange } }
+      { property: 'amount', type_events: { change: onChange }}
     )
     inputNumber(wrapper).vm.$emit('change', 2, 1)
     await nextTick()

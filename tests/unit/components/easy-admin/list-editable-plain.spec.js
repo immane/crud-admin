@@ -9,10 +9,10 @@ function mountCell({ row = { id: 1, name: 'alpha' }, property = 'name', update =
   const success = vi.fn()
   const error = vi.fn()
   const wrapper = mount(EditablePlain, {
-    props: { em, scope: { row }, field: { property } },
+    props: { em, scope: { row }, field: { property }},
     global: {
       plugins: [ElementPlus],
-      mocks: { $t: (key) => key, $message: { success, error } }
+      mocks: { $t: (key) => key, $message: { success, error }}
     }
   })
   return { wrapper, em, success, error, row }
@@ -27,12 +27,12 @@ describe('list/editable-plain.vue', () => {
   })
 
   it('renders empty content for missing property', () => {
-    const { wrapper } = mountCell({ row: { id: 9 } })
+    const { wrapper } = mountCell({ row: { id: 9 }})
     expect(wrapper.findComponent(ElInput).exists()).toBe(false)
     expect(wrapper.text()).toBe('')
   })
 
-  it('double-click enters edit mode with the current value', async () => {
+  it('double-click enters edit mode with the current value', async() => {
     const { wrapper } = mountCell()
     await wrapper.trigger('dblclick')
     const input = wrapper.findComponent(ElInput)
@@ -41,7 +41,7 @@ describe('list/editable-plain.vue', () => {
     expect(wrapper.vm.editing.editable).toBe('1-name')
   })
 
-  it('blur cancels editing without persisting', async () => {
+  it('blur cancels editing without persisting', async() => {
     const { wrapper, em } = mountCell()
     await wrapper.trigger('dblclick')
     await wrapper.findComponent(ElInput).setValue('changed')
@@ -52,7 +52,7 @@ describe('list/editable-plain.vue', () => {
     expect(wrapper.text()).toContain('alpha')
   })
 
-  it('escape cancels editing without persisting', async () => {
+  it('escape cancels editing without persisting', async() => {
     const { wrapper, em } = mountCell()
     await wrapper.trigger('dblclick')
     await wrapper.findComponent(ElInput).setValue('changed')
@@ -62,7 +62,7 @@ describe('list/editable-plain.vue', () => {
     expect(wrapper.findComponent(ElInput).exists()).toBe(false)
   })
 
-  it('enter persists the edit, updates the row and exits edit mode', async () => {
+  it('enter persists the edit, updates the row and exits edit mode', async() => {
     const { wrapper, em, success, row } = mountCell()
     await wrapper.trigger('dblclick')
     await wrapper.findComponent(ElInput).setValue('beta')
@@ -76,7 +76,7 @@ describe('list/editable-plain.vue', () => {
     expect(wrapper.text()).toContain('beta')
   })
 
-  it('failed update shows an error and stays in edit mode', async () => {
+  it('failed update shows an error and stays in edit mode', async() => {
     const { wrapper, em, error } = mountCell({ update: () => Promise.reject(new Error('nope')) })
     await wrapper.trigger('dblclick')
     await wrapper.findComponent(ElInput).setValue('beta')
@@ -88,7 +88,7 @@ describe('list/editable-plain.vue', () => {
     expect(wrapper.findComponent(ElInput).exists()).toBe(true)
   })
 
-  it('saveEdit uses the editing key of the current row and property', async () => {
+  it('saveEdit uses the editing key of the current row and property', async() => {
     const { wrapper, em } = mountCell({ row: { id: 42, title: 't' }, property: 'title' })
     wrapper.vm.startEdit()
     await wrapper.vm.$nextTick()

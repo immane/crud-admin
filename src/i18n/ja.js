@@ -125,6 +125,7 @@ export default {
   'Loading data...': 'データを読み込み中...',
   'No data': 'データがありません',
   'New / Edit': '新規 / 編集',
+  'Form nesting too deep — check for circular form references': 'フォームのネストが深すぎます——循環参照がないか確認してください',
   'Default': 'デフォルト',
   'Delete this record?': 'このレコードを削除しますか？',
   'Batch Delete': '一括削除',

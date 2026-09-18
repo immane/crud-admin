@@ -137,6 +137,7 @@ export default {
   'Loading data...': 'Loading data...',
   'No data': 'No data',
   'New / Edit': 'New / Edit',
+  'Form nesting too deep — check for circular form references': 'Form nesting too deep — check for circular form references',
   'Default': 'Default',
   'Delete this record?': 'Delete this record?',
   'Batch Delete': 'Batch Delete',

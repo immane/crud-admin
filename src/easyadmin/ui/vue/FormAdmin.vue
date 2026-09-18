@@ -22,6 +22,16 @@
     </el-row>
 
     <admin-skeleton v-if="showSkeleton" :rows="skeletonRows" />
+    <div
+      v-else-if="nestingLimitExceeded"
+      class="form-nesting-guard"
+      role="alert"
+    >
+      <span class="form-nesting-guard__icon" aria-hidden="true">
+        <el-icon><el-icon-info /></el-icon>
+      </span>
+      <span>{{ $t('Form nesting too deep — check for circular form references') }}</span>
+    </div>
     <el-form
       v-else
       ref="form"
@@ -134,6 +144,7 @@ import Tinymce from '@/components/Tinymce'
 import AdminSkeleton from '@/components/AdminSkeleton.vue'
 import { createUiFeedback } from './feedback'
 import { cleanBlankAttributes as cleanFormBlankAttributes, isUpdateOperation } from '@/easyadmin/application/usecases/save-record'
+import { isDeepEqual as deepEqualFormValue } from '@/utils/json-schema-form'
 
 const formPlugins = import.meta.glob('./plugins/form/*.vue')
 const formPluginCache = {}
@@ -145,13 +156,26 @@ const resolveFormPlugin = path => {
   return formPluginCache[path]
 }
 
+// Safety net for runaway nesting: FormAdmin can embed FormAdmin (nested JSON
+// schemas, array sub-forms, dialogs, custom field components). A self-referencing
+// config would otherwise recurse forever, so nesting deeper than this renders a
+// placeholder instead. Genuine trees stay far below it (Store contact/address
+// nest at depth 2).
+const MAX_FORM_NESTING_DEPTH = 10
+
 export default {
   name: 'FormAdmin',
   components: { Tinymce, AdminSkeleton },
+  inject: {
+    parentFormDepth: { from: 'easyadminFormDepth', default: 0 }
+  },
   provide() {
     return {
       registerFieldValidator: this.registerFieldValidator,
-      getFormAdmin: () => this
+      getFormAdmin: () => this,
+      // Propagates through any intermediate components (plugins, dialogs,
+      // custom field components), so the depth survives custom nesting hops.
+      easyadminFormDepth: (this.parentFormDepth || 0) + 1
     }
   },
   props: {
@@ -251,10 +275,29 @@ export default {
       loaded: false
     }
   },
+  computed: {
+    // Depth of this form in the FormAdmin nesting tree (top-level form is 1).
+    nestingDepth() {
+      return (this.parentFormDepth || 0) + 1
+    },
+    nestingLimitExceeded() {
+      return this.nestingDepth > MAX_FORM_NESTING_DEPTH
+    },
+    // Skeleton covers the first paint; later refreshes keep content visible.
+    showSkeleton() {
+      return this.loading && !this.loaded
+    },
+    skeletonRows() {
+      return this.properties.length || 6
+    }
+  },
   watch: {
     modelValue(value) {
       // Schema-backed child forms mount before the parent finishes fetching edit data.
-      if (this.embedded && value && typeof value === 'object' && value !== this.form) {
+      // Guard with a deep comparison: the nested v-model echo always produces a new
+      // object reference, so a reference check alone ping-pongs forever between the
+      // parent and the embedded form and starves sibling schema forms on create.
+      if (this.embedded && value && typeof value === 'object' && !deepEqualFormValue(value, this.form)) {
         this.form = value
       }
     },
@@ -263,12 +306,26 @@ export default {
         // TODO: Is here need cleaning blank values?
         // this.cleanBlankAttributes(this.form)
 
-        this.$emit('update:modelValue', { ...this.modelValue, ...this.form })
+        // Skip the echo back to the parent when nothing actually changed.
+        // Without this, every embedded sync emits a fresh object copy which the
+        // parent feeds straight back into the child (infinite recursive updates).
+        const merged = { ...this.modelValue, ...this.form }
+        if (deepEqualFormValue(merged, this.modelValue)) return
+        this.$emit('update:modelValue', merged)
       },
       deep: true
     }
   },
   created() {
+    if (this.nestingLimitExceeded) {
+      console.warn(
+        `[EasyAdmin] FormAdmin nesting depth ${this.nestingDepth} exceeds the limit of ${MAX_FORM_NESTING_DEPTH}. ` +
+        'Check for circular form references. Rendering a placeholder instead.'
+      )
+      this.loading = false
+      this.loaded = true
+      return
+    }
     this.loading = true
 
     // Schema-backed nested forms provide their structure locally.
@@ -373,15 +430,6 @@ export default {
       this.loading = false
       this.loaded = true
     })
-  },
-  computed: {
-    // Skeleton covers the first paint; later refreshes keep content visible.
-    showSkeleton() {
-      return this.loading && !this.loaded
-    },
-    skeletonRows() {
-      return this.properties.length || 6
-    }
   },
   methods: {
     log(...arg) {
@@ -622,6 +670,38 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.form-nesting-guard {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: flex-start;
+  column-gap: 8px;
+  background: linear-gradient(90deg, #fef2f2 0%, #fffafa 100%);
+  border: 1px solid #fbc4c4;
+  border-radius: 5px;
+  padding: 7px 10px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #b42318;
+  word-break: break-word;
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    color: #f56c6c;
+    background: #fff;
+    border: 1px solid #fbc4c4;
+    border-radius: 50%;
+
+    .el-icon {
+      font-size: 12px;
+    }
+  }
+}
+
 .help-text {
   display: grid;
   grid-template-columns: 18px minmax(0, 1fr);

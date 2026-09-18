@@ -3,20 +3,20 @@ import ElementPlus from 'element-plus'
 import DetailAdmin from '@/easyadmin/ui/vue/DetailAdmin.vue'
 
 vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => {
-  const MockEntityManage = vi.fn(function (conf) {
+  const MockEntityManage = vi.fn(function(conf) {
     this.entityConf = conf
     this.name = typeof conf === 'string' ? conf : (conf && conf.name) || 'TestEntity'
     this.prefix = '/api'
     this.plural = 'tests'
     this.structure = vi.fn().mockResolvedValue({})
-    this.retrieve = vi.fn().mockResolvedValue({ data: {} })
-    this.list = vi.fn().mockResolvedValue({ data: [], paginator: { totalCount: 0 } })
+    this.retrieve = vi.fn().mockResolvedValue({ data: {}})
+    this.list = vi.fn().mockResolvedValue({ data: [], paginator: { totalCount: 0 }})
     this.delete = vi.fn().mockResolvedValue({})
   })
   return { __esModule: true, default: MockEntityManage }
 })
 
-vi.mock('@/configs/entities', () => ({ __esModule: true, default: {} }))
+vi.mock('@/configs/entities', () => ({ __esModule: true, default: {}}))
 
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0))
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -54,7 +54,7 @@ function mountDetail(props = {}, mockOverrides = {}) {
 
 describe('DetailAdmin.vue gaps', () => {
   describe('created component-field branch (line 88)', () => {
-    it('marks custom component fields raw via markRaw/toRaw', async () => {
+    it('marks custom component fields raw via markRaw/toRaw', async() => {
       const Custom = { name: 'CustomField', template: '<div class="custom-field">custom</div>' }
       const { wrapper } = mountDetail({ fields: [{ property: 'name', label: 'Name', component: Custom }] })
       expect(wrapper.vm.properties).toHaveLength(1)
@@ -69,10 +69,10 @@ describe('DetailAdmin.vue gaps', () => {
   })
 
   describe('resolvePlugin async loader (lines 61-62)', () => {
-    it('loads a detail plugin through the loader', async () => {
+    it('loads a detail plugin through the loader', async() => {
       const { wrapper } = mountDetail({ fields: [{ property: 'photo', type: 'image' }] })
-      wrapper.vm.em.structure.mockResolvedValue({ photo: { translation: 'Photo' } })
-      wrapper.vm.em.retrieve.mockResolvedValue({ data: { id: 1, photo: 'pic.png' } })
+      wrapper.vm.em.structure.mockResolvedValue({ photo: { translation: 'Photo' }})
+      wrapper.vm.em.retrieve.mockResolvedValue({ data: { id: 1, photo: 'pic.png' }})
       wrapper.vm.fetchData()
       await flushPromises()
       // first dynamic import also pays the vite transform cost
@@ -85,10 +85,10 @@ describe('DetailAdmin.vue gaps', () => {
       expect(wrapper.html()).toContain('el-image')
     })
 
-    it('loads a list fallback plugin through the loader', async () => {
+    it('loads a list fallback plugin through the loader', async() => {
       const { wrapper } = mountDetail({ fields: [{ property: 'active', type: 'boolean' }] })
-      wrapper.vm.em.structure.mockResolvedValue({ active: { translation: 'Active' } })
-      wrapper.vm.em.retrieve.mockResolvedValue({ data: { id: 1, active: true } })
+      wrapper.vm.em.structure.mockResolvedValue({ active: { translation: 'Active' }})
+      wrapper.vm.em.retrieve.mockResolvedValue({ data: { id: 1, active: true }})
       wrapper.vm.fetchData()
       await flushPromises()
       await sleep(800)
@@ -97,7 +97,7 @@ describe('DetailAdmin.vue gaps', () => {
       expect(wrapper.text()).toContain('Active')
     })
 
-    it('caches resolved plugins', async () => {
+    it('caches resolved plugins', async() => {
       const { wrapper } = mountDetail()
       await flush()
       expect(wrapper.vm.loadPlugin('image')).toBe(wrapper.vm.loadPlugin('image'))
@@ -108,17 +108,17 @@ describe('DetailAdmin.vue gaps', () => {
   describe('getListPluginType struct fallback (line 117)', () => {
     it('falls back to struct metadata type when field has no type', () => {
       const { wrapper } = mountDetail()
-      expect(wrapper.vm.getListPluginType({ property: 'active' }, { metadata: { type: 'boolean' } }, null)).toBe('boolean')
-      expect(wrapper.vm.getListPluginType({ property: 'author' }, { metadata: { type: 'ManyToOne' } }, null)).toBe('RelationToOne')
-      expect(wrapper.vm.getListPluginType({ property: 'tags' }, { metadata: { type: 'ManyToMany' } }, null)).toBe('RelationToMany')
+      expect(wrapper.vm.getListPluginType({ property: 'active' }, { metadata: { type: 'boolean' }}, null)).toBe('boolean')
+      expect(wrapper.vm.getListPluginType({ property: 'author' }, { metadata: { type: 'ManyToOne' }}, null)).toBe('RelationToOne')
+      expect(wrapper.vm.getListPluginType({ property: 'tags' }, { metadata: { type: 'ManyToMany' }}, null)).toBe('RelationToMany')
     })
 
     it('prefers field.type over struct metadata', () => {
       const { wrapper } = mountDetail()
-      expect(wrapper.vm.getListPluginType({ property: 'a', type: 'boolean' }, { metadata: { type: 'text' } }, null)).toBe('boolean')
+      expect(wrapper.vm.getListPluginType({ property: 'a', type: 'boolean' }, { metadata: { type: 'text' }}, null)).toBe('boolean')
     })
 
-    it('handles missing struct via optional chain', async () => {
+    it('handles missing struct via optional chain', async() => {
       const { wrapper } = mountDetail()
       await flush()
       expect(wrapper.vm.getListPluginType({ property: 'a' }, undefined, [1])).toBe('RelationToMany')

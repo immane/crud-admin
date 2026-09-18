@@ -96,8 +96,8 @@ describe('store/modules/user', () => {
   })
 
   describe('actions.login', () => {
-    it('trims username and calls login api with identifier', async () => {
-      apiMocks.login.mockResolvedValue({ data: { access_token: 'token123', refresh_token: 'refresh123' } })
+    it('trims username and calls login api with identifier', async() => {
+      apiMocks.login.mockResolvedValue({ data: { access_token: 'token123', refresh_token: 'refresh123' }})
       const commit = vi.fn()
       await user.actions.login({ commit }, { username: '  admin  ', password: 'pwd' })
       expect(apiMocks.login).toHaveBeenCalledWith({ identifier: 'admin', password: 'pwd' })
@@ -108,8 +108,8 @@ describe('store/modules/user', () => {
       expect(authMocks.removeRefreshToken).not.toHaveBeenCalled()
     })
 
-    it('handles missing refresh_token: calls removeRefreshToken', async () => {
-      apiMocks.login.mockResolvedValue({ data: { access_token: 't1' } })
+    it('handles missing refresh_token: calls removeRefreshToken', async() => {
+      apiMocks.login.mockResolvedValue({ data: { access_token: 't1' }})
       const commit = vi.fn()
       await user.actions.login({ commit }, { username: 'admin', password: 'pwd' })
       expect(commit).toHaveBeenCalledWith('SET_REFRESH_TOKEN', '')
@@ -117,14 +117,14 @@ describe('store/modules/user', () => {
       expect(authMocks.setRefreshToken).not.toHaveBeenCalled()
     })
 
-    it('handles empty refresh_token string', async () => {
-      apiMocks.login.mockResolvedValue({ data: { access_token: 't', refresh_token: '' } })
+    it('handles empty refresh_token string', async() => {
+      apiMocks.login.mockResolvedValue({ data: { access_token: 't', refresh_token: '' }})
       const commit = vi.fn()
       await user.actions.login({ commit }, { username: 'u', password: 'p' })
       expect(authMocks.removeRefreshToken).toHaveBeenCalled()
     })
 
-    it('rejects on login failure', async () => {
+    it('rejects on login failure', async() => {
       const err = new Error('fail')
       apiMocks.login.mockRejectedValue(err)
       const commit = vi.fn()
@@ -133,8 +133,8 @@ describe('store/modules/user', () => {
   })
 
   describe('actions.getInfo', () => {
-    it('resolves data and commits roles/name/avatar', async () => {
-      apiMocks.getInfo.mockResolvedValue({ data: { roles: ['ROLE_ADMIN'], username: 'admin', email: 'a@b.com' } })
+    it('resolves data and commits roles/name/avatar', async() => {
+      apiMocks.getInfo.mockResolvedValue({ data: { roles: ['ROLE_ADMIN'], username: 'admin', email: 'a@b.com' }})
       const commit = vi.fn()
       const state = { token: 't' }
       const data = await user.actions.getInfo({ commit, state })
@@ -145,48 +145,48 @@ describe('store/modules/user', () => {
       expect(data.roles).toEqual(['ROLE_ADMIN'])
     })
 
-    it('uses username fallback to email/identifier', async () => {
-      apiMocks.getInfo.mockResolvedValue({ data: { roles: ['R'], email: 'e@x.com' } })
+    it('uses username fallback to email/identifier', async() => {
+      apiMocks.getInfo.mockResolvedValue({ data: { roles: ['R'], email: 'e@x.com' }})
       const commit = vi.fn()
-      await user.actions.getInfo({ commit, state: {} })
+      await user.actions.getInfo({ commit, state: {}})
       expect(commit).toHaveBeenCalledWith('SET_NAME', 'e@x.com')
     })
 
-    it('uses identifier fallback', async () => {
-      apiMocks.getInfo.mockResolvedValue({ data: { roles: ['R'], identifier: 'user123' } })
+    it('uses identifier fallback', async() => {
+      apiMocks.getInfo.mockResolvedValue({ data: { roles: ['R'], identifier: 'user123' }})
       const commit = vi.fn()
-      await user.actions.getInfo({ commit, state: {} })
+      await user.actions.getInfo({ commit, state: {}})
       expect(commit).toHaveBeenCalledWith('SET_NAME', 'user123')
     })
 
-    it('rejects when data missing', async () => {
+    it('rejects when data missing', async() => {
       apiMocks.getInfo.mockResolvedValue({ data: null })
       const commit = vi.fn()
-      await expect(user.actions.getInfo({ commit, state: {} })).rejects.toBeDefined()
+      await expect(user.actions.getInfo({ commit, state: {}})).rejects.toBeDefined()
     })
 
-    it('rejects when roles empty', async () => {
-      apiMocks.getInfo.mockResolvedValue({ data: { roles: [], username: 'a' } })
+    it('rejects when roles empty', async() => {
+      apiMocks.getInfo.mockResolvedValue({ data: { roles: [], username: 'a' }})
       const commit = vi.fn()
-      await expect(user.actions.getInfo({ commit, state: {} })).rejects.toBeDefined()
+      await expect(user.actions.getInfo({ commit, state: {}})).rejects.toBeDefined()
     })
 
-    it('rejects when roles undefined', async () => {
-      apiMocks.getInfo.mockResolvedValue({ data: { username: 'a' } })
+    it('rejects when roles undefined', async() => {
+      apiMocks.getInfo.mockResolvedValue({ data: { username: 'a' }})
       const commit = vi.fn()
-      await expect(user.actions.getInfo({ commit, state: {} })).rejects.toBeDefined()
+      await expect(user.actions.getInfo({ commit, state: {}})).rejects.toBeDefined()
     })
 
-    it('rejects on api error', async () => {
+    it('rejects on api error', async() => {
       const err = new Error('net')
       apiMocks.getInfo.mockRejectedValue(err)
       const commit = vi.fn()
-      await expect(user.actions.getInfo({ commit, state: {} })).rejects.toBe(err)
+      await expect(user.actions.getInfo({ commit, state: {}})).rejects.toBe(err)
     })
   })
 
   describe('actions.logout', () => {
-    it('calls logout api with refreshToken, clears tokens, resets router, dispatches tagsView', async () => {
+    it('calls logout api with refreshToken, clears tokens, resets router, dispatches tagsView', async() => {
       apiMocks.logout.mockResolvedValue({})
       const commit = vi.fn()
       const dispatch = vi.fn()
@@ -202,7 +202,7 @@ describe('store/modules/user', () => {
       expect(dispatch).toHaveBeenCalledWith('tagsView/delAllViews', null, { root: true })
     })
 
-    it('rejects on logout failure', async () => {
+    it('rejects on logout failure', async() => {
       const err = new Error('fail')
       apiMocks.logout.mockRejectedValue(err)
       const commit = vi.fn()
@@ -212,7 +212,7 @@ describe('store/modules/user', () => {
   })
 
   describe('actions.resetToken', () => {
-    it('clears token/roles and removes cookies', async () => {
+    it('clears token/roles and removes cookies', async() => {
       const commit = vi.fn()
       await user.actions.resetToken({ commit })
       expect(commit).toHaveBeenCalledWith('SET_TOKEN', '')
@@ -224,7 +224,7 @@ describe('store/modules/user', () => {
   })
 
   describe('actions.changeRoles', () => {
-    it('changes roles: sets token, dispatches getInfo and permission/generateRoutes, adds routes', async () => {
+    it('changes roles: sets token, dispatches getInfo and permission/generateRoutes, adds routes', async() => {
       const commit = vi.fn()
       const dispatch = vi.fn()
         .mockImplementation((action, payload, opts) => {

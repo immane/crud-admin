@@ -33,7 +33,7 @@ async function flush() {
 function makeWrapper(form, field) {
   return mount(JsonPlugin, {
     props: { form, field },
-    global: { mocks: { $t: (k) => k } }
+    global: { mocks: { $t: (k) => k }}
   })
 }
 
@@ -42,7 +42,7 @@ describe('form/json.vue gaps', () => {
     globalThis.__jsonInstances = []
   })
 
-  it('covers JSON.stringify throw branch (lines 57-58) with circular value', async () => {
+  it('covers JSON.stringify throw branch (lines 57-58) with circular value', async() => {
     const circular = { a: 1 }
     circular.self = circular
     const form = reactive({ payload: circular })
@@ -58,10 +58,10 @@ describe('form/json.vue gaps', () => {
     wrapper.unmount()
   })
 
-  it('covers stringify-throw early return when next === internalValue', async () => {
+  it('covers stringify-throw early return when next === internalValue', async() => {
     const circular = { a: 1 }
     circular.self = circular
-    const form = reactive({ payload: { ok: true } })
+    const form = reactive({ payload: { ok: true }})
     const field = reactive({ property: 'payload' })
     const wrapper = makeWrapper(form, field)
     await flush()

@@ -6,7 +6,7 @@ vi.mock('@/utils/request', () => ({
     get: vi.fn(() => Promise.resolve({ data: [{ id: 1, name: 'One' }, { id: 2, name: 'Two' }] }))
   }
 }))
-vi.mock('@/store', () => ({ default: { getters: {}, dispatch: vi.fn() } }))
+vi.mock('@/store', () => ({ default: { getters: {}, dispatch: vi.fn() }}))
 
 import entities from '@/configs/entities'
 import golden from './__fixtures__/all-config-query-matrix.golden.json'
@@ -20,7 +20,7 @@ const realEntries = Object.entries(entities).filter(([name]) => /^[A-Z]/.test(na
 
 async function filtersFromConfig(config) {
   const fields = config.list?.list_filter || {}
-  return Object.fromEntries(await Promise.all(Object.entries(fields).map(async ([key, field]) => {
+  return Object.fromEntries(await Promise.all(Object.entries(fields).map(async([key, field]) => {
     const definition = typeof field === 'function' ? await field() : field
     return [key, { expression: shorthandExpression(key, definition).expression }]
   })))
@@ -32,7 +32,7 @@ describe('golden/all-config-query-matrix', () => {
   })
 
   for (const row of golden) {
-    it(`matches ${row.entity}`, async () => {
+    it(`matches ${row.entity}`, async() => {
       const config = entities[row.entity]
       expect(Object.keys(row.listFilterData).sort()).toEqual(
         Object.keys(config.list?.list_filter || {}).sort()

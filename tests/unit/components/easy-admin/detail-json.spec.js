@@ -4,8 +4,8 @@ import DetailJson from '@/easyadmin/ui/vue/plugins/detail/json.vue'
 
 function mountCell(value) {
   return mount(DetailJson, {
-    props: { value, field: {}, scope: {}, em: {}, struct: {} },
-    global: { plugins: [ElementPlus], mocks: { $t: (key) => key } }
+    props: { value, field: {}, scope: {}, em: {}, struct: {}},
+    global: { plugins: [ElementPlus], mocks: { $t: (key) => key }}
   })
 }
 
@@ -70,7 +70,7 @@ describe('detail/json.vue', () => {
     expect(wrapper.vm.visibleLines).toEqual(wrapper.vm.lines)
   })
 
-  it('collapses long payloads to 12 lines with an expand toggle', async () => {
+  it('collapses long payloads to 12 lines with an expand toggle', async() => {
     const wrapper = mountCell(bigObject(20))
     expect(wrapper.vm.lines.length).toBeGreaterThan(12)
     expect(wrapper.vm.visibleLines).toHaveLength(12)
@@ -79,7 +79,7 @@ describe('detail/json.vue', () => {
     expect(toggle.text()).toContain(`Expand all (${wrapper.vm.lines.length} lines)`)
   })
 
-  it('expands and collapses on toggle click', async () => {
+  it('expands and collapses on toggle click', async() => {
     const wrapper = mountCell(bigObject(20))
     const total = wrapper.vm.lines.length
     await wrapper.find('.detail-json__toggle').trigger('click')
