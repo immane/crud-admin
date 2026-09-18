@@ -345,7 +345,7 @@ interface FieldOption {
   field_events?: object      // 綁定到 el-form-item 的事件
   type_options?: object      // 傳遞給欄位外掛的 Props
   type_events?: object       // 綁定到欄位外掛的事件
-  hidden?: boolean | string[]            // true/false 或 ['create']/['update']/['create','update']（亦支援 'edit' 別名）
+  hidden?: boolean | string | string[] | Function  // true/false、'create'/'update'/'edit'、陣列或 (form, id) 判定函數
   relation_filter?: object   // 關聯查詢的篩選條件
   relation?: object         // 關聯目標覆寫（entity、valueKey、cardinality）
   component?: object         // 自訂元件（JSX 渲染函數）

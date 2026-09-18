@@ -344,7 +344,7 @@ interface FieldOption {
   field_events?: object      // Events bound to el-form-item
   type_options?: object      // Props passed to the field plugin
   type_events?: object       // Events bound to the field plugin
-  hidden?: boolean | string[]            // true/false or ['create']/['update']/['create','update'] (also 'edit' alias)
+  hidden?: boolean | string | string[] | Function  // true/false、'create'/'update'/'edit'、配列、または (form, id) 述語
   relation_filter?: object   // Filter for relation queries
   relation?: object         // Relation target override (entity, valueKey, cardinality)
   component?: object         // Custom component (JSX render function)

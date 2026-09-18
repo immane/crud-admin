@@ -344,7 +344,7 @@ interface FieldOption {
   field_events?: object      // 绑定到 el-form-item 的事件
   type_options?: object      // 传递给字段插件的 Props
   type_events?: object       // 绑定到字段插件的事件
-  hidden?: boolean | string[]            // true/false 或 ['create']/['update']/['create','update']（'edit' 别名）
+  hidden?: boolean | string | string[] | Function  // true/false、'create'/'update'/'edit'、数组或 (form, id) 判定函数
   relation_filter?: object   // 关联查询的筛选条件
   relation?: object         // 关联目标覆盖（entity、valueKey、cardinality）
   component?: object         // 自定义组件（JSX 渲染函数）

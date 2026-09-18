@@ -362,7 +362,7 @@ for Vue 2's `v-set` pattern):
 
 ### Form Field Visibility (`hidden`)
 
-- `FormAdmin` supports `field.hidden`: `true`/`false` or `[]`/`['create']`/`['update']`/`['create','update']` (also `'edit'` alias for `update`). Checked via `isHidden(field)` using `this.id` (create `!id` vs update `!!id`), hidden fields are excluded from `plainFields`/`rules`, not rendered, not validated, not submitted. Example Wallet: `user`/`currency` `hidden:['update']`, `balance` `hidden:true`.
+- `FormAdmin` supports `field.hidden`: `true`/`false`, a mode string (`'create'`/`'update'`/`'edit'` alias), an array of those, or a `(form, id) => boolean` predicate. Checked via `isHidden(field)` using `this.id` (create `!id` vs update `!!id`), hidden fields are excluded from `plainFields`/`rules`, not rendered, not validated, not submitted. Example Wallet: `user`/`currency` `hidden:['update']`, `balance` `hidden:true`; Assignment uses bare `hidden:'create'`.
 
 ### Form Plugins — Vue 3 Model Contract
 

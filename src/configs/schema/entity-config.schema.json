@@ -1,0 +1,167 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "EasyAdmin/EntityConfig",
+  "title": "EasyAdmin EntityConfig",
+  "description": "Machine-checkable contract for one EasyAdmin entity configuration (the value half of a collections entry: { EntityName: EntityConfig }). Function slots (async filter factories, component, data_processor, actions, is_locked, rules, validator) are permitted but not deep-validated; companion JS assertions cover their semantics. Follows the StoreAddress.json draft-07 conventions.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "entity": {
+      "description": "Entity identity: short name or explicit REST identity.",
+      "anyOf": [
+        { "type": "string", "minLength": 1 },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "prefix": { "type": "string", "minLength": 1 },
+            "plural": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    },
+    "form": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fields": {
+          "description": "Ordered form fields; '__all__' may appear as an array item meaning remaining API fields.",
+          "type": "array",
+          "items": { "$ref": "#/definitions/fieldConfig" }
+        },
+        "batch_edit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["fields"],
+          "properties": {
+            "fields": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#/definitions/fieldConfig" }
+            }
+          }
+        }
+      }
+    },
+    "list": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "list_display": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/fieldConfig" }
+        },
+        "list_filter": {
+          "description": "Filter declarations: string/null shorthand, select-shorthand objects, full-style expressions, or async factories (projected, not deep-validated).",
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "null" },
+              { "type": "object" }
+            ]
+          }
+        },
+        "query": {
+          "description": "Default list query params (e.g. '@order'). Free-form: keys are backend params.",
+          "type": "object"
+        },
+        "disabled_actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["new", "detail", "edit", "delete", "batch_edit", "batch_delete", "lines", "pager", "export"]
+          }
+        },
+        "data_processor": {
+          "description": "Custom fetch orchestration (function; permitted, not deep-validated)."
+        },
+        "actions": {
+          "description": "Custom toolbar/row actions (may embed components; permitted, not deep-validated).",
+          "type": "array"
+        },
+        "export": {
+          "description": "Export configuration (query/label overrides).",
+          "type": "object"
+        },
+        "is_locked": {
+          "description": "Row-lock predicate (function; permitted, not deep-validated)."
+        }
+      }
+    },
+    "detail": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "detail_display": {
+          "anyOf": [
+            { "const": "__all__" },
+            { "type": "array", "items": { "$ref": "#/definitions/fieldConfig" } }
+          ]
+        },
+        "disabled_actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["new", "detail", "edit", "delete", "batch_edit", "batch_delete", "lines", "pager", "export"]
+          }
+        }
+      }
+    },
+    "adapters": {
+      "description": "Reserved per-backend overrides. Accepted and ignored until a second-backend strategy is approved; no compiler reads it.",
+      "type": "object"
+    }
+  },
+  "definitions": {
+    "fieldConfig": {
+      "description": "One field: string shorthand (property name, '__all__' allowed as an array item) or a FieldOption object.",
+      "anyOf": [
+        { "type": "string", "minLength": 1 },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["property"],
+          "properties": {
+            "property": { "type": "string", "minLength": 1 },
+            "label": { "type": "string" },
+            "type": { "type": "string", "minLength": 1 },
+            "required": { "type": "boolean" },
+            "editable": { "type": "boolean" },
+            "tab": { "type": "string" },
+            "default_value": true,
+            "field_options": { "type": "object" },
+            "field_events": true,
+            "type_options": { "type": "object" },
+            "type_events": true,
+            "hidden": {
+              "description": "boolean | mode string ('create'/'update'/'edit') | mode array | predicate function (projected, not deep-validated). Mirrors FormAdmin.isHidden.",
+              "anyOf": [
+                { "type": "boolean" },
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } },
+                { "type": "object" }
+              ]
+            },
+            "relation_filter": { "type": "object" },
+            "relation": { "type": "object" },
+            "component": {
+              "description": "Custom Vue/JSX component (permitted, not deep-validated)."
+            },
+            "rules": {
+              "description": "Declarative or function validators (permitted, not deep-validated)."
+            },
+            "validator": {
+              "description": "Custom validator (permitted, not deep-validated)."
+            },
+            "help": { "type": "string" },
+            "full_width": { "type": "boolean" },
+            "span": { "type": "number" }
+          }
+        }
+      ]
+    }
+  }
+}

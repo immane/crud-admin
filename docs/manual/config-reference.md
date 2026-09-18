@@ -192,7 +192,7 @@ interface FieldOption {
   type_events?: Record<string, any>     // Events → field plugin component
   rules?: object[]                      // Custom el-form rules (merged)
   validator?: Function | Function[]        // Shorthand -> { validator, trigger:'blur' }
-  hidden?: boolean | string[]           // true/false or ['create'] / ['update'] / ['create','update'] (also 'edit' alias)
+  hidden?: boolean | string | string[] | Function  // true/false, 'create'/'update'/'edit', array, or (form, id) predicate
   relation_filter?: {                   // Only for relation fields
     '@filter'?: string                  // DQL expression
     '@order'?: string                   // Sort order
