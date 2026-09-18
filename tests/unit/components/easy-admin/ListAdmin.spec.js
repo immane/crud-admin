@@ -529,6 +529,15 @@ describe('ListAdmin.vue', () => {
       expect(wrapper.vm.pager.limit).toBe(1)
     })
 
+    it('shows loading empty text while refreshing', async () => {
+      const { wrapper } = mountList()
+      const table = () => wrapper.findComponent({ name: 'ElTable' })
+      await wrapper.setData({ refreshing: true })
+      expect(table().props('emptyText')).toBe('Loading data...')
+      await wrapper.setData({ refreshing: false })
+      expect(table().props('emptyText')).toBe('No data')
+    })
+
     it('syncToUrl debounces filter state into history.replaceState', async () => {
       const { wrapper } = mountList()
       vi.useFakeTimers()

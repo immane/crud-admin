@@ -30,14 +30,16 @@
             <div class="server-health-dialog__title">{{ $t('Server Health') }}</div>
             <div v-if="checkedAt" class="server-health-dialog__updated">{{ $t('Last checked') }} {{ checkedAt }}</div>
           </div>
-          <el-button :loading="loading" :title="$t('Refresh')" circle @click="refresh">
-            <el-icon><refresh /></el-icon>
+          <el-button :title="$t('Refresh')" circle @click="refresh">
+            <el-icon :class="{ 'server-health__refresh--spinning': loading }"><refresh /></el-icon>
           </el-button>
         </div>
       </template>
 
-      <div v-loading="loading" class="server-health-dialog__body">
-        <section class="server-health-dialog__probes">
+      <div class="server-health-dialog__body">
+        <admin-skeleton v-if="loading && !checkedAt" :rows="5" />
+        <template v-else>
+          <section class="server-health-dialog__probes">
           <article class="health-probe">
             <div class="health-probe__label">{{ $t('Liveness') }}</div>
             <el-tag :type="tagType(liveness.status)" effect="light">{{ displayStatus(liveness.status) }}</el-tag>
@@ -84,6 +86,7 @@
             </el-collapse-item>
           </el-collapse>
         </section>
+        </template>
       </div>
     </el-dialog>
   </span>
@@ -91,6 +94,7 @@
 
 <script>
 import axios from 'axios'
+import AdminSkeleton from '@/components/AdminSkeleton.vue'
 import { Monitor, Refresh } from '@element-plus/icons-vue'
 import { getToken } from '@/utils/auth'
 import { getLocale } from '@/i18n'
@@ -104,7 +108,7 @@ const emptyProbe = () => ({ status: 'unknown', checks: {}, error: '' })
 
 export default {
   name: 'ServerHealth',
-  components: { Monitor, Refresh },
+  components: { Monitor, Refresh, AdminSkeleton },
   data() {
     return {
       visible: false,
@@ -236,7 +240,10 @@ export default {
 .server-health__trigger { color: var(--text-secondary); }
 .server-health__trigger:hover { color: var(--accent); background: var(--control-hover); }
 .server-health__icon { position: relative; display: inline-flex; }
-.server-health__indicator { position: absolute; right: -4px; bottom: -3px; width: 8px; height: 8px; border: 2px solid var(--nav-bg); border-radius: 50%; background: #98a2b3; box-sizing: content-box; }
+// Refresh icon spins in place: transform never affects layout, so the
+// circle button content cannot shift while refreshing.
+.server-health__refresh--spinning svg { animation: server-health-spin 1s linear infinite; }
+@keyframes server-health-spin { to { transform: rotate(360deg); } }.server-health__indicator { position: absolute; right: -4px; bottom: -3px; width: 8px; height: 8px; border: 2px solid var(--nav-bg); border-radius: 50%; background: #98a2b3; box-sizing: content-box; }
 .server-health__indicator--healthy { background: var(--el-color-success); box-shadow: 0 0 0 2px color-mix(in srgb, var(--el-color-success) 18%, transparent); }
 .server-health__indicator--degraded { background: var(--el-color-warning); box-shadow: 0 0 0 2px color-mix(in srgb, var(--el-color-warning) 18%, transparent); }
 .server-health__indicator--down { background: var(--el-color-danger); box-shadow: 0 0 0 2px color-mix(in srgb, var(--el-color-danger) 18%, transparent); }

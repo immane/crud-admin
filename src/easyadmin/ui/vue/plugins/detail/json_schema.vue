@@ -1,6 +1,7 @@
 <template>
-  <div v-loading="loading" class="detail-json-schema">
-    <json-detail v-if="failed" :value="value" :field="field" :scope="scope" :em="em" :struct="struct" />
+  <div class="detail-json-schema">
+    <admin-skeleton v-if="loading" :rows="3" />
+    <json-detail v-else-if="failed" :value="value" :field="field" :scope="scope" :em="em" :struct="struct" />
     <div v-else-if="definition && parsed && typeof parsed === 'object' && !Array.isArray(parsed)">
       <div v-if="!rows.length" class="detail-json-schema__empty">-</div>
       <dl v-else class="detail-json-schema__list">
@@ -10,13 +11,14 @@
         </div>
       </dl>
     </div>
-    <div v-else-if="!loading" class="detail-json-schema__empty">-</div>
+    <div v-else class="detail-json-schema__empty">-</div>
   </div>
 </template>
 
 <script>
 import { t } from '@/i18n'
 import JsonDetail from './json.vue'
+import AdminSkeleton from '@/components/AdminSkeleton.vue'
 import { createSchemaForm } from '@/utils/json-schema-form'
 
 function parseValue(value) {
@@ -33,7 +35,7 @@ function labelFor(property) {
 }
 
 export default {
-  components: { JsonDetail },
+  components: { JsonDetail, AdminSkeleton },
   props: {
     value: { type: [String, Number, Boolean, Object, Array], default: null },
     field: { type: Object, default: () => ({}) },

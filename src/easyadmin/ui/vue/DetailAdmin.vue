@@ -1,5 +1,5 @@
 <template>
-  <section v-loading="loading" class="detail-admin" element-loading-text="Loading...">
+    <section class="detail-admin">
     <header class="detail-admin__header">
       <div>
         <p class="detail-admin__eyebrow">RECORD DETAIL</p>
@@ -14,7 +14,8 @@
       </div>
     </header>
 
-    <div class="detail-admin__grid">
+    <admin-skeleton v-if="showSkeleton" :rows="skeletonRows" :cols="2" />
+    <div v-else class="detail-admin__grid">
       <article v-for="field in properties" :key="field.property" class="detail-admin__field" :class="{ 'detail-admin__field--wide': field.span === 2 || field.full_width }">
         <div class="detail-admin__label">{{ getLabel(field) }}</div>
         <div class="detail-admin__value">
@@ -50,6 +51,7 @@ import CrudSkeletonAdapter from '@/easyadmin/adapters/crudskeleton/CrudSkeletonA
 import entities from '@/configs/entities'
 import { resolveRelation } from '@/utils/relation'
 import { createUiFeedback } from './feedback'
+import AdminSkeleton from '@/components/AdminSkeleton.vue'
 
 const detailPlugins = import.meta.glob('./plugins/detail/*.vue')
 const listPlugins = import.meta.glob('./plugins/list/*.vue')
@@ -67,6 +69,7 @@ const resolvePlugin = path => {
 
 export default {
   name: 'DetailAdmin',
+  components: { AdminSkeleton },
   props: {
     id: { type: [Number, String], required: true },
     entityConf: { type: [Object, String], required: true },
@@ -80,7 +83,9 @@ export default {
       structure: {},
       record: {},
       properties: [],
-      loading: true
+      loading: true,
+      // First successful fetch flips this; skeleton covers only the first paint.
+      loaded: false
     }
   },
   created() {
@@ -88,6 +93,15 @@ export default {
       typeof field === 'string' ? { property: field } : (field.component ? { ...field, component: markRaw(toRaw(field.component)) } : field)
     )
     this.fetchData()
+  },
+  computed: {
+    // Skeleton covers the first paint; refetches keep stale content visible.
+    showSkeleton() {
+      return this.loading && !this.loaded
+    },
+    skeletonRows() {
+      return this.properties.length || 6
+    }
   },
   methods: {
     fetchData() {
@@ -106,7 +120,7 @@ export default {
           }
         })
         .catch(error => createUiFeedback(this).error(error.message || this.$t('Failed to load record')))
-        .finally(() => { this.loading = false })
+        .finally(() => { this.loading = false; this.loaded = true })
     },
     getLabel(field) {
       return field.label || field.field_options?.label || this.structure[field.property]?.translation || field.property

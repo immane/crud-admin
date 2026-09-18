@@ -122,6 +122,8 @@ export default {
   'Export': '匯出',
   'Actions': '操作',
   'Loading...': '載入中...',
+  'Loading data...': '資料載入中...',
+  'No data': '暫無資料',
   'New / Edit': '新增 / 修改',
   'Default': '預設',
   'Delete this record?': '確定刪除目前記錄？',

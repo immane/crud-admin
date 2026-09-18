@@ -1,7 +1,8 @@
 <template>
-  <div v-loading="loading">
+  <div>
+    <admin-skeleton v-if="loading" :rows="3" />
     <form-admin
-      v-if="definition"
+      v-else-if="definition"
       v-model="form[field.property]"
       embedded
       :entity-conf="{ name: 'JsonSchema' }"
@@ -16,6 +17,7 @@
 import Ajv from 'ajv'
 import addFormats from 'ajv-formats'
 import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
+import AdminSkeleton from '@/components/AdminSkeleton.vue'
 import JsonEditor from './json.vue'
 import { applySchemaDefaults, createSchemaForm, valueForSchemaValidation } from '@/utils/json-schema-form'
 
@@ -23,7 +25,7 @@ const ajv = new Ajv({ allErrors: true, strict: false })
 addFormats(ajv)
 
 export default {
-  components: { FormAdmin, JsonEditor },
+  components: { FormAdmin, JsonEditor, AdminSkeleton },
   inject: ['getFormAdmin'],
   props: {
     form: { type: Object, default: () => ({}) },

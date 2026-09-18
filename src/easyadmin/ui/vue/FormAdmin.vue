@@ -21,13 +21,13 @@
       </el-col>
     </el-row>
 
+    <admin-skeleton v-if="showSkeleton" :rows="skeletonRows" />
     <el-form
+      v-else
       ref="form"
-      v-loading="loading"
       :model="form"
       :rules="rules"
       label-width="120px"
-      element-loading-text="Loading..."
     >
       <el-tabs
         v-model="activeTab"
@@ -131,6 +131,7 @@ import CrudSkeletonAdapter from '@/easyadmin/adapters/crudskeleton/CrudSkeletonA
 import entities from '@/configs/entities'
 import { relationValue, resolveRelation } from '@/utils/relation'
 import Tinymce from '@/components/Tinymce'
+import AdminSkeleton from '@/components/AdminSkeleton.vue'
 import { createUiFeedback } from './feedback'
 import { cleanBlankAttributes as cleanFormBlankAttributes, isUpdateOperation } from '@/easyadmin/application/usecases/save-record'
 
@@ -146,7 +147,7 @@ const resolveFormPlugin = path => {
 
 export default {
   name: 'FormAdmin',
-  components: { Tinymce },
+  components: { Tinymce, AdminSkeleton },
   provide() {
     return {
       registerFieldValidator: this.registerFieldValidator,
@@ -245,7 +246,9 @@ export default {
       properties: [],
 
       // loading
-      loading: true
+      loading: true,
+      // First paint is covered by the skeleton; later refreshes keep content.
+      loaded: false
     }
   },
   watch: {
@@ -368,7 +371,17 @@ export default {
       }
 
       this.loading = false
+      this.loaded = true
     })
+  },
+  computed: {
+    // Skeleton covers the first paint; later refreshes keep content visible.
+    showSkeleton() {
+      return this.loading && !this.loaded
+    },
+    skeletonRows() {
+      return this.properties.length || 6
+    }
   },
   methods: {
     log(...arg) {

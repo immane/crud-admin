@@ -97,6 +97,7 @@
       <el-table
         :key="refreshTable"
         :data="list"
+        :empty-text="refreshing ? $t('Loading data...') : $t('No data')"
         fit
         lazy
         stripe
@@ -542,7 +543,7 @@ export default {
     dataProcessor: {
       type: Function,
       default: (context, dataProcessor = {}) => {
-        // All loads reuse Reset search icon (no table overlay, keep table-layout auto stable)
+        // All loads reuse Reset search icon (no content mask, keep table-layout auto stable)
         context.refreshing = true
         // Keep loading false to avoid v-loading flicker; initial empty state shows table with no data
         context.loading = false
