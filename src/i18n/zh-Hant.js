@@ -125,6 +125,7 @@ export default {
   'Loading data...': '資料載入中...',
   'No data': '暫無資料',
   'New / Edit': '新增 / 修改',
+  'Form nesting too deep — check for circular form references': '表單巢狀過深——請檢查是否存在循環巢狀的表單引用',
   'Default': '預設',
   'Delete this record?': '確定刪除目前記錄？',
   'Batch Delete': '批量刪除',
