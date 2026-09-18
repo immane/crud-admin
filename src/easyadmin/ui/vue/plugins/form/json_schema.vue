@@ -32,7 +32,24 @@ export default {
     field: { type: Object, default: () => ({}) }
   },
   data() {
-    return { loading: true, failed: false, definition: null, schema: null, validateValue: null }
+    return { loading: true, failed: false, definition: null, schema: null, validateValue: null, validatedOnce: false }
+  },
+  computed: {
+    schemaValue() {
+      return this.form[this.field.property]
+    }
+  },
+  watch: {
+    schemaValue: {
+      deep: true,
+      handler() {
+        // Nested inputs only notify the inner form items, so without an explicit
+        // refresh the outer error state would stay red forever after the first
+        // failure. Skip pristine fields: only refresh after a validation ran.
+        if (!this.validatedOnce) return
+        this.triggerValidate()
+      }
+    }
   },
   async created() {
     try {
@@ -56,7 +73,34 @@ export default {
     }
   },
   methods: {
+    triggerValidate() {
+      let formAdmin = null
+      if (this.getFormAdmin) {
+        try {
+          const inst = this.getFormAdmin()
+          if (inst && inst.$refs) formAdmin = inst
+        } catch (_) {
+          // ignore and fall back to the component ancestors
+        }
+      }
+      if (!formAdmin) {
+        let parent = this.$parent
+        while (parent && !(parent.$refs && parent.$refs.form)) parent = parent.$parent
+        formAdmin = parent
+      }
+      if (!formAdmin || !formAdmin.$refs || !formAdmin.$refs.form) return
+      const fieldName = this.field.property
+      this.$nextTick(() => {
+        try {
+          const ret = formAdmin.$refs.form.validateField(fieldName)
+          if (ret && typeof ret.catch === 'function') ret.catch(() => {})
+        } catch (_) {
+          // el-form stub or unmounted: nothing to refresh
+        }
+      })
+    },
     validateSchema(_rule, value, callback) {
+      this.validatedOnce = true
       if (value === undefined || value === null || value === '') {
         if (this.field.required) return callback(new Error(`${this.field.property} is required`))
         if (!this.schema?.required?.length || this.validateValue({})) return callback()

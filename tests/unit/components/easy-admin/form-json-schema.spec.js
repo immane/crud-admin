@@ -180,4 +180,118 @@ describe('form-json-schema plugin', () => {
     expect(wrapper.find('.json-editor-stub').exists()).toBe(true)
     wrapper.unmount()
   })
+
+  it('refreshes the outer validation state when the nested value changes after a validation', async () => {
+    const validateField = vi.fn()
+    const admin = { registerFieldValidator: vi.fn(), $refs: { form: { validateField } } }
+    const form = reactive({ value: null })
+    const wrapper = mountPlugin({ form, admin, schema })
+    await settled(wrapper)
+
+    admin.registerFieldValidator.mock.calls[0][1]({}, { email: 'store@example.com' }, () => {})
+    validateField.mockClear()
+    form.value.email = 'changed@example.com'
+    await settled(wrapper)
+    await settled(wrapper)
+
+    expect(validateField).toHaveBeenCalledWith('value')
+    wrapper.unmount()
+  })
+
+  it('leaves pristine fields alone until their first validation', async () => {
+    const validateField = vi.fn()
+    const admin = { registerFieldValidator: vi.fn(), $refs: { form: { validateField } } }
+    const form = reactive({ value: null })
+    const wrapper = mountPlugin({ form, admin, schema })
+    await settled(wrapper)
+
+    form.value.email = 'user@example.com'
+    await settled(wrapper)
+    await settled(wrapper)
+
+    expect(validateField).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('falls back to ancestor refs and swallows el-form failures', async () => {
+    const form = reactive({ value: null })
+    const field = reactive({ property: 'value', type_options: { schema } })
+    const admin = { registerFieldValidator: vi.fn() }
+    const validateField = vi.fn(() => { throw new Error('validate boom') })
+    const ParentHarness = {
+      components: { ChildPlugin: JsonSchemaPlugin },
+      data: () => ({ form, field }),
+      template: '<div><ChildPlugin :form="form" :field="field" /><div ref="form"></div></div>',
+      mounted() { this.$refs.form.validateField = validateField }
+    }
+    const parent = mount(ParentHarness, {
+      global: {
+        provide: { getFormAdmin: () => admin },
+        directives: { loading: {} }
+      }
+    })
+    await flushPromises()
+    await parent.vm.$nextTick()
+
+    admin.registerFieldValidator.mock.calls[0][1]({}, { email: 'store@example.com' }, () => {})
+    form.value.email = 'changed@example.com'
+    await flushPromises()
+    await parent.vm.$nextTick()
+    await flushPromises()
+    await parent.vm.$nextTick()
+
+    expect(validateField).toHaveBeenCalledWith('value')
+    parent.unmount()
+  })
+
+  it('swallows rejected outer validations without unhandled rejections', async () => {
+    const validateField = vi.fn(() => Promise.reject(new Error('still invalid')))
+    const admin = { registerFieldValidator: vi.fn(), $refs: { form: { validateField } } }
+    const form = reactive({ value: null })
+    const wrapper = mountPlugin({ form, admin, schema })
+    await settled(wrapper)
+
+    admin.registerFieldValidator.mock.calls[0][1]({}, { email: 'store@example.com' }, () => {})
+    form.value.email = 'changed@example.com'
+    await settled(wrapper)
+    await settled(wrapper)
+    await flushPromises()
+
+    expect(validateField).toHaveBeenCalledWith('value')
+    wrapper.unmount()
+  })
+
+  it('survives a throwing admin provider by falling back to ancestors', async () => {
+    let calls = 0
+    const admin = { registerFieldValidator: vi.fn() }
+    const field = reactive({ property: 'value', type_options: { schema } })
+    const wrapper = mount(JsonSchemaPlugin, {
+      props: { form: reactive({ value: null }), field },
+      global: {
+        provide: { getFormAdmin: () => { calls += 1; if (calls > 1) throw new Error('boom'); return admin } },
+        directives: { loading: {} }
+      }
+    })
+    await settled(wrapper)
+
+    admin.registerFieldValidator.mock.calls[0][1]({}, { email: 'store@example.com' }, () => {})
+    wrapper.vm.triggerValidate()
+    await settled(wrapper)
+
+    wrapper.unmount()
+  })
+
+  it('handles a missing admin provider without throwing', async () => {
+    const field = reactive({ property: 'value', type_options: { schema } })
+    const wrapper = mount(JsonSchemaPlugin, {
+      props: { form: reactive({ value: null }), field },
+      global: { directives: { loading: {} } }
+    })
+    await settled(wrapper)
+
+    wrapper.vm.triggerValidate()
+    await settled(wrapper)
+
+    wrapper.unmount()
+  })
 })
