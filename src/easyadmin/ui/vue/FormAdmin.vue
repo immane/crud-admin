@@ -134,6 +134,7 @@ import Tinymce from '@/components/Tinymce'
 import AdminSkeleton from '@/components/AdminSkeleton.vue'
 import { createUiFeedback } from './feedback'
 import { cleanBlankAttributes as cleanFormBlankAttributes, isUpdateOperation } from '@/easyadmin/application/usecases/save-record'
+import { isDeepEqual as deepEqualFormValue } from '@/utils/json-schema-form'
 
 const formPlugins = import.meta.glob('./plugins/form/*.vue')
 const formPluginCache = {}
@@ -254,7 +255,10 @@ export default {
   watch: {
     modelValue(value) {
       // Schema-backed child forms mount before the parent finishes fetching edit data.
-      if (this.embedded && value && typeof value === 'object' && value !== this.form) {
+      // Guard with a deep comparison: the nested v-model echo always produces a new
+      // object reference, so a reference check alone ping-pongs forever between the
+      // parent and the embedded form and starves sibling schema forms on create.
+      if (this.embedded && value && typeof value === 'object' && !deepEqualFormValue(value, this.form)) {
         this.form = value
       }
     },
@@ -263,7 +267,12 @@ export default {
         // TODO: Is here need cleaning blank values?
         // this.cleanBlankAttributes(this.form)
 
-        this.$emit('update:modelValue', { ...this.modelValue, ...this.form })
+        // Skip the echo back to the parent when nothing actually changed.
+        // Without this, every embedded sync emits a fresh object copy which the
+        // parent feeds straight back into the child (infinite recursive updates).
+        const merged = { ...this.modelValue, ...this.form }
+        if (deepEqualFormValue(merged, this.modelValue)) return
+        this.$emit('update:modelValue', merged)
       },
       deep: true
     }

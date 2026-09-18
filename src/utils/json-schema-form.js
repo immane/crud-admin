@@ -2,6 +2,31 @@ import { t } from '@/i18n'
 
 const supportedTypes = new Set(['string', 'number', 'integer', 'boolean', 'object', 'array'])
 
+// Order-insensitive deep equality for plain JSON form values.
+// Used to break the nested v-model echo between a parent form and its embedded
+// schema forms: every sync emits a fresh object copy, so a reference check alone
+// ping-pongs forever and starves sibling schema forms on create.
+export function isDeepEqual(a, b) {
+  if (a === b) return true
+  if (typeof a !== typeof b) return false
+  if (a && b && typeof a === 'object') {
+    const aIsArray = Array.isArray(a)
+    const bIsArray = Array.isArray(b)
+    if (aIsArray !== bIsArray) return false
+    if (aIsArray) {
+      if (a.length !== b.length) return false
+      return a.every((item, index) => isDeepEqual(item, b[index]))
+    }
+    const aKeys = Object.keys(a)
+    const bKeys = Object.keys(b)
+    if (aKeys.length !== bKeys.length) return false
+    return aKeys.every(
+      key => Object.prototype.hasOwnProperty.call(b, key) && isDeepEqual(a[key], b[key])
+    )
+  }
+  return Number.isNaN(a) && Number.isNaN(b)
+}
+
 function labelFor(property, schema) {
   const label = schema.title || property
     .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
