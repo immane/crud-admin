@@ -46,7 +46,7 @@ jest.mock('@/utils/auth', () => ({
 }))
 
 jest.mock('@/router', () => ({
-  default: { currentRoute: { value: { path: '/', fullPath: '/' } }, replace: jest.fn() }
+  default: { currentRoute: { value: { path: '/', fullPath: '/' }}, replace: jest.fn() }
 }))
 
 describe('utils/request.ts', () => {
@@ -61,7 +61,7 @@ describe('utils/request.ts', () => {
   it('injects Authorization bearer header when store has token', async() => {
     await import('@/utils/request')
 
-    const config = { headers: {} }
+    const config = { headers: {}}
     const output = requestSuccess(config)
 
     expect(output.headers.Authorization).toBe('Bearer token-1')
@@ -70,7 +70,7 @@ describe('utils/request.ts', () => {
   it('returns data when API response code is 0', async() => {
     await import('@/utils/request')
 
-    const response = { data: { code: 0, data: { id: 1 } } }
+    const response = { data: { code: 0, data: { id: 1 }}}
     const output = responseSuccess(response)
 
     expect(output).toEqual(response.data)
@@ -79,7 +79,7 @@ describe('utils/request.ts', () => {
   it('returns data when API response code is 200', async() => {
     await import('@/utils/request')
 
-    const response = { data: { code: 200, data: { id: 1 } } }
+    const response = { data: { code: 200, data: { id: 1 }}}
     const output = responseSuccess(response)
 
     expect(output).toEqual(response.data)
@@ -96,7 +96,7 @@ describe('utils/request.ts', () => {
   it('wraps successful raw JSON responses', async() => {
     await import('@/utils/request')
 
-    const output = responseSuccess({ status: 200, data: { access_token: 'token-1' } })
+    const output = responseSuccess({ status: 200, data: { access_token: 'token-1' }})
 
     expect(output).toEqual({ code: 0, data: { access_token: 'token-1' }, message: 'SUCCESS' })
   })
@@ -104,7 +104,7 @@ describe('utils/request.ts', () => {
   it('rejects and notifies when API response code is non-zero', async() => {
     await import('@/utils/request')
 
-    await expect(responseSuccess({ data: { code: 1, message: 'bad' } })).rejects.toThrow('bad')
+    await expect(responseSuccess({ data: { code: 1, message: 'bad' }})).rejects.toThrow('bad')
     expect(mockMessage).toHaveBeenCalledTimes(1)
   })
 

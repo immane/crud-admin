@@ -46,7 +46,7 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter', () => {
   it('loads entities and structure from server when cache is empty', async() => {
     request.get
       .mockResolvedValueOnce({ data: ['CommonBundle\\Entity\\User'] })
-      .mockResolvedValueOnce({ data: { id: { metadata: { type: 'integer' } } } })
+      .mockResolvedValueOnce({ data: { id: { metadata: { type: 'integer' }}}})
 
     const em = new CrudSkeletonAdapter('User')
     const structure = await em.structure()
@@ -62,7 +62,7 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter', () => {
     store.getters.entity.entities = ['CommonBundle\\Entity\\User']
     store.getters.entity.structures = {
       'CommonBundle\\Entity\\User': {
-        id: { metadata: { type: 'integer' } }
+        id: { metadata: { type: 'integer' }}
       }
     }
 
@@ -92,15 +92,15 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter', () => {
   })
 
   it('retrieves a single record', async() => {
-    request.get.mockResolvedValue({ data: { id: 1 } })
+    request.get.mockResolvedValue({ data: { id: 1 }})
     const res = await new CrudSkeletonAdapter('User').retrieve(1)
     expect(request.get).toHaveBeenCalledWith('/api/v1/manage/users/1')
-    expect(res).toEqual({ data: { id: 1 } })
+    expect(res).toEqual({ data: { id: 1 }})
   })
 
   it('falls back to empty plural path when plural is null', async() => {
     request.get.mockResolvedValue({ data: [] })
-    request.post.mockResolvedValue({ data: {} })
+    request.post.mockResolvedValue({ data: {}})
     const em = new CrudSkeletonAdapter('User')
     em.plural = null
     await em.list()
@@ -111,8 +111,8 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter', () => {
 
   it('proxies CRUD calls to request utility', async() => {
     request.get.mockResolvedValue({ data: [] })
-    request.post.mockResolvedValue({ data: { id: 1 } })
-    request.put.mockResolvedValue({ data: { id: 1 } })
+    request.post.mockResolvedValue({ data: { id: 1 }})
+    request.put.mockResolvedValue({ data: { id: 1 }})
     request.delete.mockResolvedValue({ data: true })
 
     const em = new CrudSkeletonAdapter('User')
@@ -123,7 +123,7 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter', () => {
     await em.delete(1)
     await em.deleteMany([2, 3])
 
-    expect(request.get).toHaveBeenCalledWith('/api/v1/manage/users', { params: { page: 1 } })
+    expect(request.get).toHaveBeenCalledWith('/api/v1/manage/users', { params: { page: 1 }})
     expect(request.post).toHaveBeenCalledWith('/api/v1/manage/users', { username: 'u' })
     expect(request.put).toHaveBeenCalledWith('/api/v1/manage/users/1', { username: 'u2' })
     expect(request.delete).toHaveBeenCalledWith('/api/v1/manage/users/1')
@@ -134,7 +134,7 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter', () => {
   it('delegates listEntities and getStructure to the meta provider', async() => {
     store.getters.entity.entities = ['CommonBundle\\Entity\\User']
     store.getters.entity.structures = {
-      'CommonBundle\\Entity\\User': { id: { metadata: { type: 'integer' } } }
+      'CommonBundle\\Entity\\User': { id: { metadata: { type: 'integer' }}}
     }
 
     const em = new CrudSkeletonAdapter('User')
@@ -164,7 +164,7 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter', () => {
     expect(request.post).toHaveBeenCalledWith(
       '/api/v1/manage/users/batch-update',
       [{ id: 1, enabled: true }, { id: 2, enabled: true }],
-      { params: { '@basis': 'id', '@mode': 'update' } }
+      { params: { '@basis': 'id', '@mode': 'update' }}
     )
   })
 
@@ -176,7 +176,7 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter', () => {
     expect(request.post).toHaveBeenCalledWith(
       '/api/v1/manage/users/batch-update',
       [],
-      { params: { '@basis': 'id', '@mode': 'update' } }
+      { params: { '@basis': 'id', '@mode': 'update' }}
     )
     expect(response.data).toEqual([])
   })

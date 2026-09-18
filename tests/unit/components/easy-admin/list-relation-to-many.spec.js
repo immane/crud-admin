@@ -4,10 +4,10 @@ import RelationToMany from '@/easyadmin/ui/vue/plugins/list/RelationToMany.vue'
 import { loadRelationRecords } from '@/utils/relation'
 
 vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => ({ default: class { async list() { return [] } } }))
-vi.mock('@/configs/entities', () => ({ default: {} }))
-vi.mock('@/utils/relation', async (importOriginal) => {
+vi.mock('@/configs/entities', () => ({ default: {}}))
+vi.mock('@/utils/relation', async(importOriginal) => {
   const mod = await importOriginal()
-  return { ...mod, loadRelationRecords: vi.fn(async () => []) }
+  return { ...mod, loadRelationRecords: vi.fn(async() => []) }
 })
 
 const RouterLinkStub = {
@@ -15,16 +15,16 @@ const RouterLinkStub = {
   template: '<a class="stub-router-link"><slot /></a>'
 }
 
-const idField = { property: 'tagUuids', relation: { target: 'Tag', valueKey: 'id' } }
-const uuidField = { property: 'tagUuids', relation: { target: 'Tag', valueKey: 'uuid' } }
+const idField = { property: 'tagUuids', relation: { target: 'Tag', valueKey: 'id' }}
+const uuidField = { property: 'tagUuids', relation: { target: 'Tag', valueKey: 'uuid' }}
 
 function mountCell({ value = [], field = idField, hasRoute = true } = {}) {
   const hasRouteFn = vi.fn(() => hasRoute)
   const wrapper = mount(RelationToMany, {
-    props: { value, field, scope: {}, em: {}, struct: {} },
+    props: { value, field, scope: {}, em: {}, struct: {}},
     global: {
       plugins: [ElementPlus],
-      mocks: { $t: (key) => key, $router: { hasRoute: hasRouteFn } },
+      mocks: { $t: (key) => key, $router: { hasRoute: hasRouteFn }},
       stubs: { 'router-link': RouterLinkStub }
     }
   })
@@ -47,7 +47,7 @@ describe('list/RelationToMany.vue', () => {
   it('wraps tags in router links when the detail route exists', () => {
     const { wrapper, hasRouteFn } = mountCell({ value: [{ id: 1, name: 'A' }], hasRoute: true })
     expect(wrapper.find('.stub-router-link').exists()).toBe(true)
-    expect(wrapper.vm.detailRoute({ id: 1, name: 'A' })).toEqual({ name: 'TagDetail', params: { id: 1 } })
+    expect(wrapper.vm.detailRoute({ id: 1, name: 'A' })).toEqual({ name: 'TagDetail', params: { id: 1 }})
     expect(hasRouteFn).toHaveBeenCalledWith('TagDetail')
   })
 
@@ -89,7 +89,7 @@ describe('list/RelationToMany.vue', () => {
     expect(wrapper.findComponent(ElTooltip).exists()).toBe(false)
   })
 
-  it('resolves uuid strings through loadRelationRecords', async () => {
+  it('resolves uuid strings through loadRelationRecords', async() => {
     vi.mocked(loadRelationRecords).mockResolvedValue([
       { uuid: 'u-1', name: 'One' },
       { uuid: 'u-2', name: 'Two' }
@@ -103,7 +103,7 @@ describe('list/RelationToMany.vue', () => {
     expect(wrapper.findAll('.stub-router-link')).toHaveLength(2)
   })
 
-  it('falls back to raw text for unresolved uuid strings', async () => {
+  it('falls back to raw text for unresolved uuid strings', async() => {
     vi.mocked(loadRelationRecords).mockResolvedValue([])
     const { wrapper } = mountCell({ value: ['ghost'], field: uuidField })
     await flushPromises()
@@ -112,7 +112,7 @@ describe('list/RelationToMany.vue', () => {
     expect(wrapper.find('.stub-router-link').exists()).toBe(false)
   })
 
-  it('skips loading when there are no string values', async () => {
+  it('skips loading when there are no string values', async() => {
     mountCell({ value: [{ id: 1, name: 'A' }], field: uuidField })
     await flushPromises()
     // objects only: uuid filter is empty so no fetch happens

@@ -38,7 +38,7 @@ describe('form-datetime plugin', () => {
     wrapper.unmount()
   })
 
-  it('updates form model when picker emits update:modelValue', async () => {
+  it('updates form model when picker emits update:modelValue', async() => {
     const form = reactive({ createdAt: '' })
     const field = reactive({ property: 'createdAt' })
     const wrapper = makeWrapper(form, field)
@@ -48,7 +48,7 @@ describe('form-datetime plugin', () => {
     wrapper.unmount()
   })
 
-  it('reflects external form changes in picker modelValue', async () => {
+  it('reflects external form changes in picker modelValue', async() => {
     const form = reactive({ createdAt: '2024-01-15 10:20:30' })
     const field = reactive({ property: 'createdAt' })
     const wrapper = makeWrapper(form, field)
@@ -58,7 +58,7 @@ describe('form-datetime plugin', () => {
     wrapper.unmount()
   })
 
-  it('preserves seconds precision in datetime strings', async () => {
+  it('preserves seconds precision in datetime strings', async() => {
     const form = reactive({ createdAt: '' })
     const field = reactive({ property: 'createdAt' })
     const wrapper = makeWrapper(form, field)
@@ -71,7 +71,7 @@ describe('form-datetime plugin', () => {
 
   it('forwards field.type_options onto the picker', () => {
     const form = reactive({ createdAt: '' })
-    const field = reactive({ property: 'createdAt', type_options: { disabled: true, clearable: false } })
+    const field = reactive({ property: 'createdAt', type_options: { disabled: true, clearable: false }})
     const wrapper = makeWrapper(form, field)
     const p = picker(wrapper)
     expect(p.props('disabled')).toBe(true)
@@ -79,10 +79,10 @@ describe('form-datetime plugin', () => {
     wrapper.unmount()
   })
 
-  it('forwards field.type_events handlers to the picker', async () => {
+  it('forwards field.type_events handlers to the picker', async() => {
     const form = reactive({ createdAt: '' })
     const onChange = vi.fn()
-    const field = reactive({ property: 'createdAt', type_events: { change: onChange } })
+    const field = reactive({ property: 'createdAt', type_events: { change: onChange }})
     const wrapper = makeWrapper(form, field)
     await picker(wrapper).vm.$emit('change', '2024-05-01 00:00:00')
     expect(onChange).toHaveBeenCalledTimes(1)
@@ -92,7 +92,7 @@ describe('form-datetime plugin', () => {
 
   it('mounts safely with default (empty) form/field props', () => {
     const wrapper = mount(DatetimePlugin, {
-      global: { plugins: [ElementPlus], mocks: { $t: (k) => k } }
+      global: { plugins: [ElementPlus], mocks: { $t: (k) => k }}
     })
     expect(picker(wrapper).exists()).toBe(true)
     wrapper.unmount()

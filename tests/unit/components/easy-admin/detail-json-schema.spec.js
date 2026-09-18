@@ -9,10 +9,10 @@ async function settled(wrapper) {
   await wrapper.vm.$nextTick()
 }
 
-function mountCell({ value, schema, scope = { row: { id: 3 } } }) {
+function mountCell({ value, schema, scope = { row: { id: 3 }}}) {
   return mount(DetailJsonSchema, {
-    props: { value, field: { property: 'contact', type_options: { schema } }, scope, em: { name: 'Store' }, struct: {} },
-    global: { directives: { loading: {} } }
+    props: { value, field: { property: 'contact', type_options: { schema }}, scope, em: { name: 'Store' }, struct: {}},
+    global: { directives: { loading: {}}}
   })
 }
 
@@ -22,11 +22,11 @@ describe('detail/json_schema.vue', () => {
     properties: {
       phone: { type: 'string', title: 'Phone' },
       enabled: { type: 'boolean', title: 'Enabled' },
-      tags: { type: 'array', title: 'Tags', items: { type: 'string' } }
+      tags: { type: 'array', title: 'Tags', items: { type: 'string' }}
     }
   }
 
-  it('renders known fields in schema order and preserves unknown values', async () => {
+  it('renders known fields in schema order and preserves unknown values', async() => {
     const wrapper = mountCell({ value: { enabled: true, phone: '13800000000', legacyCode: 'old', tags: ['a', 'b'] }, schema })
     await settled(wrapper)
 
@@ -37,7 +37,7 @@ describe('detail/json_schema.vue', () => {
     wrapper.unmount()
   })
 
-  it('parses a JSON string value', async () => {
+  it('parses a JSON string value', async() => {
     const wrapper = mountCell({ value: '{"phone":"13800000000"}', schema })
     await settled(wrapper)
 
@@ -45,7 +45,7 @@ describe('detail/json_schema.vue', () => {
     wrapper.unmount()
   })
 
-  it('handles empty, scalar, array, and invalid JSON detail values', async () => {
+  it('handles empty, scalar, array, and invalid JSON detail values', async() => {
     const empty = mountCell({ value: null, schema })
     await settled(empty)
     expect(empty.vm.parsed).toBeNull()
@@ -73,7 +73,7 @@ describe('detail/json_schema.vue', () => {
     invalidJson.unmount()
   })
 
-  it('formats empty, array, and object values', async () => {
+  it('formats empty, array, and object values', async() => {
     const wrapper = mountCell({ value: { phone: '13800000000' }, schema })
     await settled(wrapper)
 
@@ -83,7 +83,7 @@ describe('detail/json_schema.vue', () => {
     wrapper.unmount()
   })
 
-  it('passes record context to an asynchronous schema provider', async () => {
+  it('passes record context to an asynchronous schema provider', async() => {
     const provider = vi.fn(async context => {
       expect(context).toMatchObject({ entity: 'Store', id: 3, property: 'contact' })
       return schema
@@ -96,19 +96,19 @@ describe('detail/json_schema.vue', () => {
     wrapper.unmount()
   })
 
-  it('uses EasyAdmin field override ordering and labels', async () => {
+  it('uses EasyAdmin field override ordering and labels', async() => {
     const wrapper = mount(DetailJsonSchema, {
       props: {
         value: { phone: '13800000000', enabled: true },
         field: {
           property: 'contact',
-          type_options: { schema, fields: [{ property: 'enabled', field_options: { label: 'Custom enabled' } }] }
+          type_options: { schema, fields: [{ property: 'enabled', field_options: { label: 'Custom enabled' }}] }
         },
-        scope: { row: { id: 3 } },
+        scope: { row: { id: 3 }},
         em: { name: 'Store' },
         struct: {}
       },
-      global: { directives: { loading: {} } }
+      global: { directives: { loading: {}}}
     })
     await settled(wrapper)
 
@@ -116,8 +116,8 @@ describe('detail/json_schema.vue', () => {
     wrapper.unmount()
   })
 
-  it('falls back to the raw JSON detail renderer for unsupported schemas', async () => {
-    const wrapper = mountCell({ value: { phone: '13800000000' }, schema: { oneOf: [{ type: 'object' }] } })
+  it('falls back to the raw JSON detail renderer for unsupported schemas', async() => {
+    const wrapper = mountCell({ value: { phone: '13800000000' }, schema: { oneOf: [{ type: 'object' }] }})
     await settled(wrapper)
 
     expect(wrapper.find('.detail-json').exists()).toBe(true)

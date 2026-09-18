@@ -22,7 +22,7 @@ function mountSelect(formData = { status: '' }, fieldData = { property: 'status'
 }
 
 function withOptions(extra = {}) {
-  return { property: 'status', type_options: { options: OPTIONS, ...extra } }
+  return { property: 'status', type_options: { options: OPTIONS, ...extra }}
 }
 
 describe('form/select.vue', () => {
@@ -84,7 +84,7 @@ describe('form/select.vue', () => {
   it('supports integer option values', async() => {
     const { wrapper, form } = mountSelect(
       { level: 2 },
-      { property: 'level', type_options: { options: [{ value: 1, label: 'One' }, { value: 2, label: 'Two' }] } }
+      { property: 'level', type_options: { options: [{ value: 1, label: 'One' }, { value: 2, label: 'Two' }] }}
     )
     expect(wrapper.findComponent(ElSelect).props('modelValue')).toBe(2)
     await wrapper.findComponent(ElSelect).vm.$emit('update:modelValue', 1)
@@ -101,10 +101,10 @@ describe('form/select.vue', () => {
     const onChange = vi.fn()
     const { wrapper } = mountSelect(
       { status: '' },
-      withOptions({}),
+      withOptions({})
     )
     await wrapper.setProps({
-      field: { property: 'status', type_options: { options: OPTIONS }, type_events: { change: onChange } }
+      field: { property: 'status', type_options: { options: OPTIONS }, type_events: { change: onChange }}
     })
     wrapper.findComponent(ElSelect).vm.$emit('change', 'v2')
     await nextTick()

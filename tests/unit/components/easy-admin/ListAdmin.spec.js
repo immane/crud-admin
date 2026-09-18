@@ -3,14 +3,14 @@ import ElementPlus from 'element-plus'
 import ListAdmin from '@/easyadmin/ui/vue/ListAdmin.vue'
 
 vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => {
-  const MockEntityManage = vi.fn(function (conf) {
+  const MockEntityManage = vi.fn(function(conf) {
     this.entityConf = conf
     this.name = typeof conf === 'string' ? conf : (conf && conf.name) || 'TestEntity'
     this.prefix = '/api'
     this.plural = 'tests'
     this.structure = vi.fn().mockResolvedValue({})
-    this.list = vi.fn().mockResolvedValue({ data: [], paginator: { totalCount: 0 } })
-    this.retrieve = vi.fn().mockResolvedValue({ data: {} })
+    this.list = vi.fn().mockResolvedValue({ data: [], paginator: { totalCount: 0 }})
+    this.retrieve = vi.fn().mockResolvedValue({ data: {}})
     this.delete = vi.fn().mockResolvedValue({})
     this.deleteMany = vi.fn().mockResolvedValue([])
     this.batchUpdate = vi.fn().mockResolvedValue({})
@@ -18,7 +18,7 @@ vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => {
   return { __esModule: true, default: MockEntityManage }
 })
 
-vi.mock('@/configs/entities', () => ({ __esModule: true, default: {} }))
+vi.mock('@/configs/entities', () => ({ __esModule: true, default: {}}))
 
 vi.mock('@/router', () => ({
   __esModule: true,
@@ -34,7 +34,7 @@ vi.mock('@/utils/simple-image-process', () => ({
   default: { getPicture: (url) => url }
 }))
 
-vi.mock('@/easyadmin/ui/vue/FormAdmin.vue', async () => {
+vi.mock('@/easyadmin/ui/vue/FormAdmin.vue', async() => {
   const { h } = await import('vue')
   return {
     __esModule: true,
@@ -105,10 +105,10 @@ describe('ListAdmin.vue', () => {
       expect(wrapper.vm.em.name).toBe('TestEntity')
     })
 
-    it('computes pagerTotal as 0 without paginator and normalizes total/totalCount', async () => {
+    it('computes pagerTotal as 0 without paginator and normalizes total/totalCount', async() => {
       const { wrapper } = mountList()
       expect(wrapper.vm.pagerTotal).toBe(0)
-      await wrapper.setData({ paginator: { totalCount: '7' } })
+      await wrapper.setData({ paginator: { totalCount: '7' }})
       expect(wrapper.vm.pagerTotal).toBe(7)
       wrapper.vm.paginator = { total: 3 }
       await wrapper.vm.$nextTick()
@@ -129,10 +129,10 @@ describe('ListAdmin.vue', () => {
       expect(wrapper.vm.properties).toEqual([{ property: 'id' }, { property: 'name', label: 'Name' }])
     })
 
-    it('expands __all__ from structure keys', async () => {
+    it('expands __all__ from structure keys', async() => {
       const { wrapper } = mountList({ listDisplay: '__all__' })
       expect(wrapper.vm.properties).toEqual([])
-      await wrapper.setData({ structure: { id: {}, name: {} } })
+      await wrapper.setData({ structure: { id: {}, name: {}}})
       wrapper.vm.propertieProcess()
       expect(wrapper.vm.properties).toEqual([{ property: 'id' }, { property: 'name' }])
     })
@@ -152,12 +152,12 @@ describe('ListAdmin.vue', () => {
       expect(dataProcessor).toHaveBeenCalledWith(wrapper.vm)
     })
 
-    it('default dataProcessor merges query/filter/pager/sort and assigns list + paginator', async () => {
+    it('default dataProcessor merges query/filter/pager/sort and assigns list + paginator', async() => {
       const defaultProcessor = ListAdmin.props.dataProcessor.default
       const ctx = {
         em: {
-          structure: vi.fn().mockResolvedValue({ id: {} }),
-          list: vi.fn().mockResolvedValue({ data: [{ id: 1 }], paginator: { total: 5 } })
+          structure: vi.fn().mockResolvedValue({ id: {}}),
+          list: vi.fn().mockResolvedValue({ data: [{ id: 1 }], paginator: { total: 5 }})
         },
         query: { a: 1 },
         filter: { '@filter': 'x' },
@@ -177,16 +177,16 @@ describe('ListAdmin.vue', () => {
       expect(ctx.em.list).toHaveBeenCalledWith({ a: 1, '@filter': 'x', page: 2, limit: 20, '@order': 'entity.id|ASC' })
       expect(ctx.list).toEqual([{ id: 1 }])
       expect(ctx.paginator).toEqual({ total: 5, totalCount: 5 })
-      expect(ctx.structure).toEqual({ id: {} })
+      expect(ctx.structure).toEqual({ id: {}})
       expect(ctx.refreshing).toBe(false)
     })
 
-    it('default dataProcessor still clears refreshing when a request fails', async () => {
+    it('default dataProcessor still clears refreshing when a request fails', async() => {
       const defaultProcessor = ListAdmin.props.dataProcessor.default
       const ctx = {
         em: {
           structure: vi.fn().mockRejectedValue(new Error('nope')),
-          list: vi.fn().mockResolvedValue({ data: [], paginator: {} })
+          list: vi.fn().mockResolvedValue({ data: [], paginator: {}})
         },
         query: {},
         filter: {},
@@ -266,7 +266,7 @@ describe('ListAdmin.vue', () => {
   })
 
   describe('single delete flow', () => {
-    it('removeAction deletes, notifies and refetches', async () => {
+    it('removeAction deletes, notifies and refetches', async() => {
       const { wrapper, mocks } = mountList()
       const notifySpy = vi.spyOn(wrapper.vm, 'notifySuccess').mockImplementation(() => {})
       const fetchSpy = vi.spyOn(wrapper.vm, 'fetchData').mockImplementation(() => {})
@@ -286,14 +286,14 @@ describe('ListAdmin.vue', () => {
       expect(mountList({ disabledActions: ['batch_delete'] }).wrapper.vm.hasBatchDelete).toBe(false)
     })
 
-    it('removeSelected does nothing without selectable ids', async () => {
+    it('removeSelected does nothing without selectable ids', async() => {
       const { wrapper } = mountList()
       await wrapper.setData({ selectedRecords: [{ name: 'no-id' }] })
       await wrapper.vm.removeSelected()
       expect(wrapper.vm.em.deleteMany).not.toHaveBeenCalled()
     })
 
-    it('removeSelected deletes all ids, notifies, clears selection and refetches', async () => {
+    it('removeSelected deletes all ids, notifies, clears selection and refetches', async() => {
       const { wrapper } = mountList()
       const notifySpy = vi.spyOn(wrapper.vm, 'notifySuccess').mockImplementation(() => {})
       const fetchSpy = vi.spyOn(wrapper.vm, 'fetchData').mockImplementation(() => {})
@@ -307,7 +307,7 @@ describe('ListAdmin.vue', () => {
       expect(fetchSpy).toHaveBeenCalledTimes(1)
     })
 
-    it('removeSelected warns about failures while keeping successes', async () => {
+    it('removeSelected warns about failures while keeping successes', async() => {
       const { wrapper, mocks } = mountList()
       const notifySpy = vi.spyOn(wrapper.vm, 'notifySuccess').mockImplementation(() => {})
       wrapper.vm.em.deleteMany.mockResolvedValue([{ status: 'fulfilled' }, { status: 'rejected' }])
@@ -322,7 +322,7 @@ describe('ListAdmin.vue', () => {
   })
 
   describe('batch edit flow', () => {
-    const batchConfig = { form: { batch_edit: { fields: ['name'] } } }
+    const batchConfig = { form: { batch_edit: { fields: ['name'] }}}
 
     it('hasBatchEdit requires batch fields and enabled edit actions', () => {
       expect(mountList().wrapper.vm.hasBatchEdit).toBeFalsy()
@@ -334,7 +334,7 @@ describe('ListAdmin.vue', () => {
         mountList({ config: batchConfig, disabledActions: ['batch_edit'] }).wrapper.vm.hasBatchEdit
       ).toBe(false)
       expect(
-        mountList({ config: { form: { batch_edit: { fields: [] } } } }).wrapper.vm.hasBatchEdit
+        mountList({ config: { form: { batch_edit: { fields: [] }}}}).wrapper.vm.hasBatchEdit
       ).toBeFalsy()
     })
 
@@ -364,14 +364,14 @@ describe('ListAdmin.vue', () => {
       expect(wrapper.vm.batchEditDialog.selectedFields).toEqual([])
     })
 
-    it('submitBatchEdit does nothing without selected ids', async () => {
+    it('submitBatchEdit does nothing without selected ids', async() => {
       const { wrapper } = mountList({ config: batchConfig })
       await wrapper.setData({ selectedRecords: [] })
       await wrapper.vm.submitBatchEdit()
       expect(wrapper.vm.em.batchUpdate).not.toHaveBeenCalled()
     })
 
-    it('submitBatchEdit warns when no fields are selected', async () => {
+    it('submitBatchEdit warns when no fields are selected', async() => {
       const { wrapper, mocks } = mountList({ config: batchConfig })
       await wrapper.setData({ selectedRecords: [{ id: 1 }] })
       wrapper.vm.batchEditDialog.form = { name: 'x' }
@@ -381,7 +381,7 @@ describe('ListAdmin.vue', () => {
       expect(mocks.$message).toHaveBeenCalledWith(expect.objectContaining({ type: 'warning' }))
     })
 
-    it('submitBatchEdit sends only selected batch fields and closes the dialog', async () => {
+    it('submitBatchEdit sends only selected batch fields and closes the dialog', async() => {
       const { wrapper } = mountList({ config: batchConfig })
       const notifySpy = vi.spyOn(wrapper.vm, 'notifySuccess').mockImplementation(() => {})
       const fetchSpy = vi.spyOn(wrapper.vm, 'fetchData').mockImplementation(() => {})
@@ -398,7 +398,7 @@ describe('ListAdmin.vue', () => {
       expect(fetchSpy).toHaveBeenCalledTimes(1)
     })
 
-    it('submitBatchEdit reports batchUpdate errors and resets the editing flag', async () => {
+    it('submitBatchEdit reports batchUpdate errors and resets the editing flag', async() => {
       const { wrapper, mocks } = mountList({ config: batchConfig })
       wrapper.vm.em.batchUpdate.mockRejectedValue(new Error('boom'))
       await wrapper.setData({ selectedRecords: [{ id: 1 }] })
@@ -411,7 +411,7 @@ describe('ListAdmin.vue', () => {
       expect(wrapper.vm.batchEditDialog.show).toBe(true)
     })
 
-    it('auto-selects touched batch fields in the form watcher', async () => {
+    it('auto-selects touched batch fields in the form watcher', async() => {
       const { wrapper } = mountList({ config: batchConfig })
       wrapper.vm.openBatchEditDialog()
       wrapper.vm.batchEditDialog.form = { name: 'x' }
@@ -419,8 +419,8 @@ describe('ListAdmin.vue', () => {
       expect(wrapper.vm.batchEditDialog.selectedFields).toContain('name')
     })
 
-    it('ignores empty relation arrays initialized by form plugins', async () => {
-      const { wrapper } = mountList({ config: { form: { batch_edit: { fields: ['tags'] } } } })
+    it('ignores empty relation arrays initialized by form plugins', async() => {
+      const { wrapper } = mountList({ config: { form: { batch_edit: { fields: ['tags'] }}}})
       wrapper.vm.openBatchEditDialog()
       wrapper.vm.batchEditDialog.form = { tags: [] }
       await wrapper.vm.$nextTick()
@@ -434,19 +434,19 @@ describe('ListAdmin.vue', () => {
       expect(wrapper.vm.resolveBatchPluginType({ property: 'x', type: 'text' })).toBe('text')
     })
 
-    it('resolveBatchPluginType maps relation metadata types', async () => {
+    it('resolveBatchPluginType maps relation metadata types', async() => {
       const { wrapper } = mountList()
-      await wrapper.setData({ structure: { author: { metadata: { type: 'ManyToOne' } } } })
+      await wrapper.setData({ structure: { author: { metadata: { type: 'ManyToOne' }}}})
       expect(wrapper.vm.resolveBatchPluginType({ property: 'author' })).toBe('RelationToOne')
-      await wrapper.setData({ structure: { tags: { metadata: { type: 'ManyToMany' } } } })
+      await wrapper.setData({ structure: { tags: { metadata: { type: 'ManyToMany' }}}})
       expect(wrapper.vm.resolveBatchPluginType({ property: 'tags' })).toBe('RelationToMany')
     })
 
-    it('resolveBatchPluginType falls back to supported metadata types or input', async () => {
+    it('resolveBatchPluginType falls back to supported metadata types or input', async() => {
       const { wrapper } = mountList()
-      await wrapper.setData({ structure: { active: { metadata: { type: 'boolean' } } } })
+      await wrapper.setData({ structure: { active: { metadata: { type: 'boolean' }}}})
       expect(wrapper.vm.resolveBatchPluginType({ property: 'active' })).toBe('boolean')
-      await wrapper.setData({ structure: { weird: { metadata: { type: 'unknown-thing' } } } })
+      await wrapper.setData({ structure: { weird: { metadata: { type: 'unknown-thing' }}}})
       expect(wrapper.vm.resolveBatchPluginType({ property: 'weird' })).toBe('input')
       expect(wrapper.vm.resolveBatchPluginType({ property: 'missing' })).toBe('input')
     })
@@ -467,7 +467,7 @@ describe('ListAdmin.vue', () => {
     it('loadDialogComponent stores dialog data and bumps refresh', () => {
       const { wrapper } = mountList()
       const before = wrapper.vm.dialog.refresh
-      wrapper.vm.loadDialogComponent({ entityConf: 'TestEntity', fields: [], config: {} })
+      wrapper.vm.loadDialogComponent({ entityConf: 'TestEntity', fields: [], config: {}})
       expect(wrapper.vm.dialog.data.entityConf).toBe('TestEntity')
       expect(wrapper.vm.dialog.refresh).toBe(before + 1)
     })
@@ -491,7 +491,7 @@ describe('ListAdmin.vue', () => {
       expect(wrapper.vm.dialog.show).toBe(false)
     })
 
-    it('New button opens a blank record dialog', async () => {
+    it('New button opens a blank record dialog', async() => {
       const { wrapper } = mountList({ listDisplay: ['name'] })
       const button = findButton(wrapper, 'New')
       expect(button).not.toBeNull()
@@ -529,7 +529,7 @@ describe('ListAdmin.vue', () => {
       expect(wrapper.vm.pager.limit).toBe(1)
     })
 
-    it('shows loading empty text while refreshing', async () => {
+    it('shows loading empty text while refreshing', async() => {
       const { wrapper } = mountList()
       const table = () => wrapper.findComponent({ name: 'ElTable' })
       await wrapper.setData({ refreshing: true })
@@ -538,7 +538,7 @@ describe('ListAdmin.vue', () => {
       expect(table().props('emptyText')).toBe('No data')
     })
 
-    it('syncToUrl debounces filter state into history.replaceState', async () => {
+    it('syncToUrl debounces filter state into history.replaceState', async() => {
       const { wrapper } = mountList()
       vi.useFakeTimers()
       try {
@@ -557,7 +557,7 @@ describe('ListAdmin.vue', () => {
   describe('field helpers', () => {
     it('extractFields resolves dotted paths and degrades to null', () => {
       const { wrapper } = mountList()
-      expect(wrapper.vm.extractFields({ a: { b: { c: 1 } } }, 'a.b.c')).toBe(1)
+      expect(wrapper.vm.extractFields({ a: { b: { c: 1 }}}, 'a.b.c')).toBe(1)
       expect(wrapper.vm.extractFields({ a: 1 }, 'a.missing')).toBeNull()
       expect(wrapper.vm.extractFields(null, 'a')).toBeNull()
     })
@@ -571,7 +571,7 @@ describe('ListAdmin.vue', () => {
 
     it('checkMetadataType matches metadata types only', () => {
       const { wrapper } = mountList()
-      expect(wrapper.vm.checkMetadataType({ metadata: { type: 'string' } }, 'string')).toBe(true)
+      expect(wrapper.vm.checkMetadataType({ metadata: { type: 'string' }}, 'string')).toBe(true)
       expect(wrapper.vm.checkMetadataType({}, 'string')).toBe(false)
       expect(wrapper.vm.checkMetadataType(null, 'string')).toBeFalsy()
     })
@@ -607,7 +607,7 @@ describe('ListAdmin.vue', () => {
       expect(wrapper.vm.isEditableField({ property: 'name', type: 'string' }, {})).toBe(false)
       expect(wrapper.vm.isEditableField({ property: 'name', type: 'string', editable: true }, {})).toBe(true)
       expect(
-        wrapper.vm.isEditableField({ property: 'age', editable: true }, { metadata: { type: 'integer' } })
+        wrapper.vm.isEditableField({ property: 'age', editable: true }, { metadata: { type: 'integer' }})
       ).toBe(true)
       expect(wrapper.vm.isEditableField({ property: 'x', editable: true, type: 'object' }, {})).toBe(false)
       expect(wrapper.vm.isEditableField({ property: 'y', editable: true }, null)).toBe(false)
@@ -616,10 +616,10 @@ describe('ListAdmin.vue', () => {
     it('getListPluginType resolves relations and scalar types', () => {
       const { wrapper } = mountList()
       expect(
-        wrapper.vm.getListPluginType({ property: 'author', relation: { target: 'User' } }, {}, {})
+        wrapper.vm.getListPluginType({ property: 'author', relation: { target: 'User' }}, {}, {})
       ).toBe('RelationToOne')
       expect(
-        wrapper.vm.getListPluginType({ property: 'tags', relation: { target: 'Tag', multiple: true } }, {}, {})
+        wrapper.vm.getListPluginType({ property: 'tags', relation: { target: 'Tag', multiple: true }}, {}, {})
       ).toBe('RelationToMany')
       expect(wrapper.vm.getListPluginType({ property: 'a', type: 'boolean' }, {}, null)).toBe('boolean')
       expect(wrapper.vm.getListPluginType({ property: 'a', type: 'ManyToOne' }, {}, null)).toBe('RelationToOne')
@@ -639,7 +639,7 @@ describe('ListAdmin.vue', () => {
   })
 
   describe('disabledActions branches', () => {
-    const exportConfig = { form: { fields: [] }, list: { export: {}, query: {} } }
+    const exportConfig = { form: { fields: [] }, list: { export: {}, query: {}}}
 
     it('shows the export button only when enabled and configured', () => {
       expect(findButton(mountList({ config: exportConfig }).wrapper, 'Export')).not.toBeNull()
@@ -647,7 +647,7 @@ describe('ListAdmin.vue', () => {
         findButton(mountList({ config: exportConfig, disabledActions: ['export'] }).wrapper, 'Export')
       ).toBeNull()
       expect(findButton(mountList().wrapper, 'Export')).toBeNull()
-      expect(findButton(mountList({ config: { form: { fields: [] } } }).wrapper, 'Export')).toBeNull()
+      expect(findButton(mountList({ config: { form: { fields: [] }}}).wrapper, 'Export')).toBeNull()
     })
 
     it('hides the New button when new is disabled', () => {
@@ -660,7 +660,7 @@ describe('ListAdmin.vue', () => {
       expect(mountList({ disabledActions: ['pager'] }).wrapper.find('.pager').exists()).toBe(false)
     })
 
-    it('hides the actions column when lines are disabled', async () => {
+    it('hides the actions column when lines are disabled', async() => {
       const enabled = mountList()
       const disabled = mountList({ disabledActions: ['lines'] })
       await enabled.wrapper.vm.$nextTick()
@@ -670,7 +670,7 @@ describe('ListAdmin.vue', () => {
       expect(disabled.wrapper.html()).not.toContain('Actions')
     })
 
-    it('shows the selection count only when batch actions are available', async () => {
+    it('shows the selection count only when batch actions are available', async() => {
       const { wrapper } = mountList()
       expect(wrapper.find('.easy-admin-selection-count').exists()).toBe(false)
       await wrapper.setData({ selectedRecords: [{ id: 1 }] })
@@ -682,12 +682,12 @@ describe('ListAdmin.vue', () => {
   })
 
   describe('export flow', () => {
-    it('exports current list data with merged query, labels and filename', async () => {
+    it('exports current list data with merged query, labels and filename', async() => {
       const { wrapper, mocks } = mountList({
         config: {
           form: { fields: [] },
           list: {
-            export: { query: { '@display': 'e' }, label: { name: 'Name' } },
+            export: { query: { '@display': 'e' }, label: { name: 'Name' }},
             query: { limit: 20 }
           }
         }
@@ -697,7 +697,7 @@ describe('ListAdmin.vue', () => {
       wrapper.vm.filter = { '@filter': 'f' }
       wrapper.vm.em.list.mockResolvedValue({
         data: [
-          { id: 1, name: '<b>A</b>', meta: { __toString: 'M' }, plain: { a: 1 } }
+          { id: 1, name: '<b>A</b>', meta: { __toString: 'M' }, plain: { a: 1 }}
         ]
       })
       const button = findButton(wrapper, 'Export')
@@ -716,8 +716,8 @@ describe('ListAdmin.vue', () => {
       expect(data[0].plain).toBe('[Object]')
     })
 
-    it('derives labels from data keys when no export labels are configured', async () => {
-      const { wrapper, mocks } = mountList({ config: { form: { fields: [] }, list: { export: {} } } })
+    it('derives labels from data keys when no export labels are configured', async() => {
+      const { wrapper, mocks } = mountList({ config: { form: { fields: [] }, list: { export: {}}}})
       mocks.$loading.mockReturnValue({ close: vi.fn() })
       wrapper.vm.em.list.mockResolvedValue({ data: [{ id: 1, name: 'A' }] })
       await findButton(wrapper, 'Export').trigger('click')
@@ -728,13 +728,13 @@ describe('ListAdmin.vue', () => {
   })
 
   describe('model watchers', () => {
-    it('mirrors modelValue into list', async () => {
+    it('mirrors modelValue into list', async() => {
       const { wrapper } = mountList()
       await wrapper.setProps({ modelValue: [{ id: 1 }] })
       expect(wrapper.vm.list).toEqual([{ id: 1 }])
     })
 
-    it('emits update:modelValue when list changes', async () => {
+    it('emits update:modelValue when list changes', async() => {
       const { wrapper } = mountList()
       await wrapper.setData({ list: [{ id: 2 }] })
       expect(wrapper.emitted('update:modelValue')).toBeTruthy()

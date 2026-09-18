@@ -13,7 +13,7 @@ describe('Utils:exportExcelCsv', () => {
   beforeEach(() => {
     // Mock Blob
     originalBlob = globalThis.Blob
-    globalThis.Blob = jest.fn(function (content, options) {
+    globalThis.Blob = jest.fn(function(content, options) {
       this.content = content
       this.options = options
     })

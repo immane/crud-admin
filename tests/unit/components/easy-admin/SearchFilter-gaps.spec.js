@@ -1,19 +1,9 @@
-import { mount, shallowMount, flushPromises } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 import SearchFilter from '@/easyadmin/ui/vue/SearchFilter.vue'
 
-const tick = async (wrapper) => {
+const tick = async(wrapper) => {
   await flushPromises()
   await wrapper.vm.$nextTick()
-}
-
-function shallowFilter(props = {}) {
-  return shallowMount(SearchFilter, {
-    props: {
-      listFilter: {},
-      fetchDataFunc: () => {},
-      ...props
-    }
-  })
 }
 
 const elStubs = {
@@ -36,7 +26,7 @@ function mountTemplate(listFilter, extraProps = {}) {
 
 describe('SearchFilter.vue gaps', () => {
   describe('date placeholder label fallback (line 18)', () => {
-    it('uses the label when present', async () => {
+    it('uses the label when present', async() => {
       const wrapper = mountTemplate({
         when: { expression: 'entity.getWhen() >= ":value"', label: 'When', type: 'date', default: null }
       })
@@ -45,7 +35,7 @@ describe('SearchFilter.vue gaps', () => {
       expect(wrapper.find('.stub-date').attributes('placeholder')).toBe('When')
     })
 
-    it('falls back to the filter key when the label is empty', async () => {
+    it('falls back to the filter key when the label is empty', async() => {
       const wrapper = mountTemplate({
         when: { expression: 'entity.getWhen() >= ":value"', label: '', type: 'date', default: null }
       })
@@ -54,7 +44,7 @@ describe('SearchFilter.vue gaps', () => {
       expect(wrapper.find('.stub-date').attributes('placeholder')).toBe('when')
     })
 
-    it('falls back to the filter key when no label key exists', async () => {
+    it('falls back to the filter key when no label key exists', async() => {
       const wrapper = mountTemplate({
         when: { expression: 'entity.getWhen() >= ":value"', type: 'datetime', default: null }
       })
@@ -65,7 +55,7 @@ describe('SearchFilter.vue gaps', () => {
   })
 
   describe('template v-model update handlers', () => {
-    it('writes input updates into filterData', async () => {
+    it('writes input updates into filterData', async() => {
       const wrapper = mountTemplate({
         name: { expression: 'entity.getName() matches ":value"', label: 'Name', type: 'input', default: null }
       })
@@ -75,7 +65,7 @@ describe('SearchFilter.vue gaps', () => {
       expect(wrapper.vm.filterData.name).toBe('hello')
     })
 
-    it('writes select updates into filterData', async () => {
+    it('writes select updates into filterData', async() => {
       const wrapper = mountTemplate({
         status: {
           expression: 'entity.getStatus() == ":value"',
@@ -91,7 +81,7 @@ describe('SearchFilter.vue gaps', () => {
       expect(wrapper.vm.filterData.status).toBe('a')
     })
 
-    it('writes date-picker updates into filterData', async () => {
+    it('writes date-picker updates into filterData', async() => {
       const wrapper = mountTemplate({
         when: { expression: 'entity.getWhen() >= ":value"', label: 'When', type: 'date', default: null }
       })
@@ -101,7 +91,7 @@ describe('SearchFilter.vue gaps', () => {
       expect(wrapper.vm.filterData.when).toBe('2024-01-01')
     })
 
-    it('writes switch updates into filterData', async () => {
+    it('writes switch updates into filterData', async() => {
       const wrapper = mountTemplate({
         enabled: { expression: 'entity.getEnabled() == :value', label: 'Enabled', type: 'boolean', default: false }
       })
@@ -111,7 +101,7 @@ describe('SearchFilter.vue gaps', () => {
       expect(wrapper.vm.filterData.enabled).toBe(true)
     })
 
-    it('writes custom-component updates into filterData', async () => {
+    it('writes custom-component updates into filterData', async() => {
       const Custom = { name: 'CustomGap', props: ['modelValue'], template: '<div class="custom-gap" />' }
       const wrapper = mountTemplate({
         custom: { expression: 'entity.getX() == ":value"', label: 'X', component: Custom, default: null }

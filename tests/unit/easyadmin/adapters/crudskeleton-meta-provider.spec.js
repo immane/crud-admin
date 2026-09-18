@@ -60,7 +60,7 @@ describe('adapters/crudskeleton/CrudSkeletonMetaProvider', () => {
   })
 
   it('fetches structure from server when cache misses', async() => {
-    request.get.mockResolvedValueOnce({ data: { id: { metadata: { type: 'integer' } } } })
+    request.get.mockResolvedValueOnce({ data: { id: { metadata: { type: 'integer' }}}})
 
     const structure = await new CrudSkeletonMetaProvider().getStructure('CommonBundle\\Entity\\User')
 
@@ -74,7 +74,7 @@ describe('adapters/crudskeleton/CrudSkeletonMetaProvider', () => {
 
   it('uses cached structure when available', async() => {
     store.getters.entity.structures = {
-      'CommonBundle\\Entity\\User': { id: { metadata: { type: 'integer' } } }
+      'CommonBundle\\Entity\\User': { id: { metadata: { type: 'integer' }}}
     }
 
     const structure = await new CrudSkeletonMetaProvider().getStructure('CommonBundle\\Entity\\User')

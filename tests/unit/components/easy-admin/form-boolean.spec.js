@@ -46,7 +46,7 @@ describe('form/boolean.vue', () => {
   it('passes type_options (label / disabled) through to el-checkbox', () => {
     const { wrapper } = mountBoolean(
       { agree: false },
-      { property: 'agree', type_options: { label: 'I agree', disabled: true } }
+      { property: 'agree', type_options: { label: 'I agree', disabled: true }}
     )
     const checkbox = wrapper.findComponent(ElCheckbox)
     expect(checkbox.props('label')).toBe('I agree')
@@ -58,7 +58,7 @@ describe('form/boolean.vue', () => {
     const onChange = vi.fn()
     const { wrapper } = mountBoolean(
       { agree: false },
-      { property: 'agree', type_events: { change: onChange } }
+      { property: 'agree', type_events: { change: onChange }}
     )
     wrapper.findComponent(ElCheckbox).vm.$emit('change', true)
     await nextTick()

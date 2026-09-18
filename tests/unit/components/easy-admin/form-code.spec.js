@@ -28,7 +28,7 @@ vi.mock('@codemirror/view', () => {
     dispatch({ changes }) {
       const cur = this.state.doc.toString()
       const next = cur.slice(0, changes.from) + changes.insert + cur.slice(changes.to)
-      this.state = { ...this.state, doc: { toString: () => next, length: next.length } }
+      this.state = { ...this.state, doc: { toString: () => next, length: next.length }}
     }
     destroy() {
       this.destroyed = true
@@ -76,12 +76,12 @@ import CodePlugin from '@/easyadmin/ui/vue/plugins/form/code.vue'
 function makeWrapper(form, field) {
   return mount(CodePlugin, {
     props: { form, field },
-    global: { mocks: { $t: (k) => k } }
+    global: { mocks: { $t: (k) => k }}
   })
 }
 
 function simulateEditorInput(text) {
-  return globalThis.__cmListener({ docChanged: true, state: { doc: { toString: () => text } } })
+  return globalThis.__cmListener({ docChanged: true, state: { doc: { toString: () => text }}})
 }
 
 describe('form-code plugin', () => {
@@ -93,7 +93,7 @@ describe('form-code plugin', () => {
 
   it('mounts CodeMirror with initial doc from form value', () => {
     const form = reactive({ script: 'const a = 1' })
-    const field = reactive({ property: 'script', type: 'code', type_options: { language: 'javascript' } })
+    const field = reactive({ property: 'script', type: 'code', type_options: { language: 'javascript' }})
     const wrapper = makeWrapper(form, field)
     expect(globalThis.__cmLastStateArgs.doc).toBe('const a = 1')
     expect(wrapper.vm.view).toBeDefined()
@@ -110,7 +110,7 @@ describe('form-code plugin', () => {
     wrapper.unmount()
   })
 
-  it('propagates editor changes to the form model and fires type_events', async () => {
+  it('propagates editor changes to the form model and fires type_events', async() => {
     const form = reactive({ script: 'old' })
     const onInput = vi.fn()
     const onUpdate = vi.fn()
@@ -129,17 +129,17 @@ describe('form-code plugin', () => {
     wrapper.unmount()
   })
 
-  it('ignores editor updates without doc changes and works without type_events', async () => {
+  it('ignores editor updates without doc changes and works without type_events', async() => {
     const form = reactive({ script: 'keep' })
     const field = reactive({ property: 'script' })
     const wrapper = makeWrapper(form, field)
-    globalThis.__cmListener({ docChanged: false, state: { doc: { toString: () => 'other' } } })
+    globalThis.__cmListener({ docChanged: false, state: { doc: { toString: () => 'other' }}})
     await nextTick()
     expect(form.script).toBe('keep')
     wrapper.unmount()
   })
 
-  it('dispatches external model changes into the editor doc', async () => {
+  it('dispatches external model changes into the editor doc', async() => {
     const form = reactive({ script: 'a' })
     const field = reactive({ property: 'script' })
     const wrapper = makeWrapper(form, field)
@@ -151,7 +151,7 @@ describe('form-code plugin', () => {
     wrapper.unmount()
   })
 
-  it('skips dispatch when external value already matches editor doc', async () => {
+  it('skips dispatch when external value already matches editor doc', async() => {
     const form = reactive({ script: 'same' })
     const field = reactive({ property: 'script' })
     const wrapper = makeWrapper(form, field)
@@ -164,10 +164,10 @@ describe('form-code plugin', () => {
 
   it('computes editor height from numeric, string and default options', () => {
     const form = reactive({ script: '' })
-    const numeric = makeWrapper(form, reactive({ property: 'script', type_options: { height: 320 } }))
+    const numeric = makeWrapper(form, reactive({ property: 'script', type_options: { height: 320 }}))
     expect(numeric.vm.editorHeight).toBe('320px')
     expect(numeric.find('.code-editor').attributes('style')).toContain('320px')
-    const str = makeWrapper(form, reactive({ property: 'script', type_options: { height: '50vh' } }))
+    const str = makeWrapper(form, reactive({ property: 'script', type_options: { height: '50vh' }}))
     expect(str.vm.editorHeight).toBe('50vh')
     const def = makeWrapper(form, reactive({ property: 'script' }))
     expect(def.vm.editorHeight).toBe('280px')
@@ -178,7 +178,7 @@ describe('form-code plugin', () => {
 
   it('normalises language names case-insensitively', () => {
     const form = reactive({ script: '' })
-    const wrapper = makeWrapper(form, reactive({ property: 'script', type_options: { language: 'JSON' } }))
+    const wrapper = makeWrapper(form, reactive({ property: 'script', type_options: { language: 'JSON' }}))
     expect(wrapper.vm.language).toBe('json')
     wrapper.unmount()
   })

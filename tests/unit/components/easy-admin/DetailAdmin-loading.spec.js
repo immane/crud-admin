@@ -4,16 +4,16 @@ import DetailAdmin from '@/easyadmin/ui/vue/DetailAdmin.vue'
 import AdminSkeleton from '@/components/AdminSkeleton.vue'
 
 vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => {
-  const MockEntityManage = vi.fn(function (conf) {
+  const MockEntityManage = vi.fn(function(conf) {
     this.entityConf = conf
     this.name = typeof conf === 'string' ? conf : (conf && conf.name) || 'TestEntity'
     this.structure = vi.fn().mockResolvedValue({})
-    this.retrieve = vi.fn().mockResolvedValue({ data: {} })
+    this.retrieve = vi.fn().mockResolvedValue({ data: {}})
   })
   return { __esModule: true, default: MockEntityManage }
 })
 
-vi.mock('@/configs/entities', () => ({ __esModule: true, default: {} }))
+vi.mock('@/configs/entities', () => ({ __esModule: true, default: {}}))
 
 function mountDetail(props = {}) {
   return mount(DetailAdmin, {
@@ -26,7 +26,7 @@ function mountDetail(props = {}) {
 }
 
 describe('DetailAdmin.vue skeleton loading', () => {
-  it('shows the skeleton on first paint and content after load', async () => {
+  it('shows the skeleton on first paint and content after load', async() => {
     const wrapper = mountDetail()
     expect(wrapper.vm.showSkeleton).toBe(true)
     expect(wrapper.findComponent(AdminSkeleton).exists()).toBe(true)
@@ -40,7 +40,7 @@ describe('DetailAdmin.vue skeleton loading', () => {
     wrapper.unmount()
   })
 
-  it('keeps stale content visible on refetch instead of masking', async () => {
+  it('keeps stale content visible on refetch instead of masking', async() => {
     const wrapper = mountDetail()
     await flushPromises()
     await wrapper.vm.$nextTick()
@@ -56,7 +56,7 @@ describe('DetailAdmin.vue skeleton loading', () => {
     await flushPromises()
   })
 
-  it('derives skeleton rows from properties with a fallback', async () => {
+  it('derives skeleton rows from properties with a fallback', async() => {
     const wrapper = mountDetail()
     expect(wrapper.vm.skeletonRows).toBe(1)
     await flushPromises()

@@ -23,7 +23,7 @@ vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => ({
 }))
 
 vi.mock('@/configs/entities', () => ({
-  default: { Tag: {}, User: {} }
+  default: { Tag: {}, User: {}}
 }))
 
 vi.mock('@/utils/relation', async(importOriginal) => {
@@ -31,7 +31,7 @@ vi.mock('@/utils/relation', async(importOriginal) => {
   return { ...mod, loadRelationRecords: (...args) => loadMock(...args) }
 })
 
-const tagsField = () => ({ property: 'tags', relation: { entity: 'Tag', valueKey: 'id' } })
+const tagsField = () => ({ property: 'tags', relation: { entity: 'Tag', valueKey: 'id' }})
 
 function mountTransfer({ form, field = tagsField() } = {}) {
   return mount(TransferField, {
@@ -109,11 +109,11 @@ describe('form/transfer.vue', () => {
   })
 
   it('adds late-arriving edit values through the watcher', async() => {
-    const wrapper = mountTransfer({ form: { tags: [] } })
+    const wrapper = mountTransfer({ form: { tags: [] }})
     await flushPromises()
     expect(wrapper.findComponent(ElTransfer).props('data')).toEqual([])
 
-    await wrapper.setProps({ form: { tags: [21] } })
+    await wrapper.setProps({ form: { tags: [21] }})
     await flushPromises()
 
     expect(wrapper.findComponent(ElTransfer).props('data')).toContainEqual({ value: 21, label: '21' })
@@ -122,7 +122,7 @@ describe('form/transfer.vue', () => {
   it('skips preload when type_options.remote is true and searches remotely', async() => {
     const wrapper = mountTransfer({
       form: {},
-      field: { property: 'tags', relation: { entity: 'Tag', valueKey: 'id' }, type_options: { remote: true } }
+      field: { property: 'tags', relation: { entity: 'Tag', valueKey: 'id' }, type_options: { remote: true }}
     })
     await flushPromises()
     expect(listMock).not.toHaveBeenCalled()
@@ -139,7 +139,7 @@ describe('form/transfer.vue', () => {
   })
 
   it('replaces :value placeholders in @filter with the query', async() => {
-    const wrapper = mountTransfer({ form: {} })
+    const wrapper = mountTransfer({ form: {}})
     await flushPromises()
     listMock.mockClear()
 
@@ -151,7 +151,7 @@ describe('form/transfer.vue', () => {
 
   it('hydrates uuid labels through loadRelationRecords', async() => {
     loadMock.mockResolvedValue([{ uuid: 'u-1', name: 'Alice' }])
-    const wrapper = mountTransfer({ form: { userUuids: ['u-1'] }, field: { property: 'userUuids' } })
+    const wrapper = mountTransfer({ form: { userUuids: ['u-1'] }, field: { property: 'userUuids' }})
     await flushPromises()
     await flushPromises()
 
@@ -160,7 +160,7 @@ describe('form/transfer.vue', () => {
   })
 
   it('swallows list errors without throwing', async() => {
-    const wrapper = mountTransfer({ form: {} })
+    const wrapper = mountTransfer({ form: {}})
     await flushPromises()
     listMock.mockRejectedValueOnce(new Error('boom'))
 

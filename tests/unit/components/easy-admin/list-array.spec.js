@@ -4,8 +4,8 @@ import ArrayCell from '@/easyadmin/ui/vue/plugins/list/array.vue'
 
 function mountCell(value) {
   return mount(ArrayCell, {
-    props: { value, field: {}, scope: {}, em: {}, struct: {} },
-    global: { plugins: [ElementPlus], mocks: { $t: (key) => key } }
+    props: { value, field: {}, scope: {}, em: {}, struct: {}},
+    global: { plugins: [ElementPlus], mocks: { $t: (key) => key }}
   })
 }
 

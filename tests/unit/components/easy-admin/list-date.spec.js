@@ -4,11 +4,11 @@ import DateCell from '@/easyadmin/ui/vue/plugins/list/date.vue'
 
 function mountCell(value) {
   return mount(DateCell, {
-    props: { value, field: {}, scope: {}, em: {}, struct: {} },
+    props: { value, field: {}, scope: {}, em: {}, struct: {}},
     global: {
       plugins: [ElementPlus],
       mocks: { $t: (key) => key },
-      stubs: { 'el-icon-time': { template: '<i class="stub-time-icon" />' } }
+      stubs: { 'el-icon-time': { template: '<i class="stub-time-icon" />' }}
     }
   })
 }

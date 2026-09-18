@@ -1,5 +1,3 @@
-import { vi } from 'vitest'
-
 const mockGetLocale = jest.fn(() => 'en')
 
 jest.mock('@/i18n', () => ({
@@ -18,34 +16,34 @@ describe('Utils:currency', () => {
     it('defaults to multiplier 100 and CNY', () => {
       expect(getCurrencyOptions()).toEqual({ multiplier: 100, currency: 'CNY' })
       expect(getCurrencyOptions({})).toEqual({ multiplier: 100, currency: 'CNY' })
-      expect(getCurrencyOptions({ type_options: {} })).toEqual({ multiplier: 100, currency: 'CNY' })
+      expect(getCurrencyOptions({ type_options: {}})).toEqual({ multiplier: 100, currency: 'CNY' })
     })
 
     it('parses valid multiplier string/number', () => {
-      expect(getCurrencyOptions({ type_options: { multiplier: 1 } }).multiplier).toBe(1)
-      expect(getCurrencyOptions({ type_options: { multiplier: '1000' } }).multiplier).toBe(1000)
-      expect(getCurrencyOptions({ type_options: { multiplier: 100 } }).multiplier).toBe(100)
+      expect(getCurrencyOptions({ type_options: { multiplier: 1 }}).multiplier).toBe(1)
+      expect(getCurrencyOptions({ type_options: { multiplier: '1000' }}).multiplier).toBe(1000)
+      expect(getCurrencyOptions({ type_options: { multiplier: 100 }}).multiplier).toBe(100)
     })
 
     it('falls back to 100 for invalid multiplier', () => {
-      expect(getCurrencyOptions({ type_options: { multiplier: 0 } }).multiplier).toBe(100)
-      expect(getCurrencyOptions({ type_options: { multiplier: -5 } }).multiplier).toBe(100)
-      expect(getCurrencyOptions({ type_options: { multiplier: NaN } }).multiplier).toBe(100)
-      expect(getCurrencyOptions({ type_options: { multiplier: Infinity } }).multiplier).toBe(100)
-      expect(getCurrencyOptions({ type_options: { multiplier: 'abc' } }).multiplier).toBe(100)
-      expect(getCurrencyOptions({ type_options: { multiplier: '' } }).multiplier).toBe(100)
+      expect(getCurrencyOptions({ type_options: { multiplier: 0 }}).multiplier).toBe(100)
+      expect(getCurrencyOptions({ type_options: { multiplier: -5 }}).multiplier).toBe(100)
+      expect(getCurrencyOptions({ type_options: { multiplier: NaN }}).multiplier).toBe(100)
+      expect(getCurrencyOptions({ type_options: { multiplier: Infinity }}).multiplier).toBe(100)
+      expect(getCurrencyOptions({ type_options: { multiplier: 'abc' }}).multiplier).toBe(100)
+      expect(getCurrencyOptions({ type_options: { multiplier: '' }}).multiplier).toBe(100)
     })
 
     it('uppercases currency and defaults to CNY', () => {
-      expect(getCurrencyOptions({ type_options: { currency: 'usd' } }).currency).toBe('USD')
-      expect(getCurrencyOptions({ type_options: { currency: 'jpy' } }).currency).toBe('JPY')
-      expect(getCurrencyOptions({ type_options: { currency: 'cny' } }).currency).toBe('CNY')
-      expect(getCurrencyOptions({ type_options: { currency: 'EUR' } }).currency).toBe('EUR')
+      expect(getCurrencyOptions({ type_options: { currency: 'usd' }}).currency).toBe('USD')
+      expect(getCurrencyOptions({ type_options: { currency: 'jpy' }}).currency).toBe('JPY')
+      expect(getCurrencyOptions({ type_options: { currency: 'cny' }}).currency).toBe('CNY')
+      expect(getCurrencyOptions({ type_options: { currency: 'EUR' }}).currency).toBe('EUR')
     })
 
     it('handles empty/undefined currency', () => {
-      expect(getCurrencyOptions({ type_options: { currency: '' } }).currency).toBe('CNY')
-      expect(getCurrencyOptions({ type_options: { currency: null } }).currency).toBe('CNY')
+      expect(getCurrencyOptions({ type_options: { currency: '' }}).currency).toBe('CNY')
+      expect(getCurrencyOptions({ type_options: { currency: null }}).currency).toBe('CNY')
     })
   })
 
@@ -125,7 +123,7 @@ describe('Utils:currency', () => {
 
     it('formats zero correctly', () => {
       // 0 / 100 = 0.00 with CNY
-      const result = formatCurrency(0, { type_options: { currency: 'CNY', multiplier: 100 } })
+      const result = formatCurrency(0, { type_options: { currency: 'CNY', multiplier: 100 }})
       expect(typeof result).toBe('string')
       expect(result).not.toBe('-')
     })
@@ -133,37 +131,37 @@ describe('Utils:currency', () => {
     it('formats with default multiplier 100', () => {
       mockGetLocale.mockReturnValue('en')
       // 12345 cents = 123.45
-      const result = formatCurrency(12345, { type_options: { currency: 'USD', multiplier: 100 } })
+      const result = formatCurrency(12345, { type_options: { currency: 'USD', multiplier: 100 }})
       expect(result).toContain('123.45')
     })
 
     it('formats string numeric value', () => {
       mockGetLocale.mockReturnValue('en')
-      const result = formatCurrency('5000', { type_options: { currency: 'USD', multiplier: 100 } })
+      const result = formatCurrency('5000', { type_options: { currency: 'USD', multiplier: 100 }})
       expect(result).toContain('50')
     })
 
     it('respects multiplier fraction digits', () => {
       mockGetLocale.mockReturnValue('en')
       // multiplier 1 => 0 digits
-      const r1 = formatCurrency(1234, { type_options: { currency: 'JPY', multiplier: 1 } })
+      const r1 = formatCurrency(1234, { type_options: { currency: 'JPY', multiplier: 1 }})
       expect(r1).toContain('1,234')
       // multiplier 1000 => 3 digits
-      const r3 = formatCurrency(1234567, { type_options: { currency: 'USD', multiplier: 1000 } })
+      const r3 = formatCurrency(1234567, { type_options: { currency: 'USD', multiplier: 1000 }})
       // 1234.567 => should contain 1,234.567
       expect(r3).toContain('1,234.567')
     })
 
     it('handles negative values', () => {
       mockGetLocale.mockReturnValue('en')
-      const result = formatCurrency(-5000, { type_options: { currency: 'USD', multiplier: 100 } })
+      const result = formatCurrency(-5000, { type_options: { currency: 'USD', multiplier: 100 }})
       expect(result).toContain('50')
       expect(result).toContain('-')
     })
 
     it('falls back gracefully on Intl error (invalid currency)', () => {
       mockGetLocale.mockReturnValue('en')
-      const result = formatCurrency(12345, { type_options: { currency: 'FAKE', multiplier: 100 } })
+      const result = formatCurrency(12345, { type_options: { currency: 'FAKE', multiplier: 100 }})
       // fallback is `${symbol}${(amount/multiplier).toFixed(digits)}` where symbol is currency itself
       expect(result).toContain('123.45')
       expect(result).toContain('FAKE')
@@ -171,7 +169,7 @@ describe('Utils:currency', () => {
 
     it('uses zh locale mapping', () => {
       mockGetLocale.mockReturnValue('zh')
-      const result = formatCurrency(10000, { type_options: { currency: 'CNY', multiplier: 100 } })
+      const result = formatCurrency(10000, { type_options: { currency: 'CNY', multiplier: 100 }})
       expect(typeof result).toBe('string')
       expect(result).toContain('100')
     })

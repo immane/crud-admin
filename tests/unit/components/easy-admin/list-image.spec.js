@@ -5,8 +5,8 @@ import SIP from '@/utils/simple-image-process'
 
 function mountCell(value) {
   return mount(ImageCell, {
-    props: { value, field: {}, scope: {}, em: {}, struct: {} },
-    global: { plugins: [ElementPlus], mocks: { $t: (key) => key } }
+    props: { value, field: {}, scope: {}, em: {}, struct: {}},
+    global: { plugins: [ElementPlus], mocks: { $t: (key) => key }}
   })
 }
 

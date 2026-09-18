@@ -1,7 +1,7 @@
 describe('Utils:theme', () => {
   let getTheme, applyTheme, THEME_STORAGE_KEY, themes
 
-  beforeEach(async () => {
+  beforeEach(async() => {
     localStorage.clear()
     document.documentElement.dataset.theme = ''
     vi.resetModules()

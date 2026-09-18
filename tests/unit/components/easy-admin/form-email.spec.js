@@ -2,9 +2,9 @@ import { mount, flushPromises } from '@vue/test-utils'
 import ElementPlus, { ElInput } from 'element-plus'
 import EmailField from '@/easyadmin/ui/vue/plugins/form/email.vue'
 
-function mountEmail({ form = {}, field = { property: 'email' }, provide = {} } = {}) {
+function mountEmail({ form = {}, field = { property: 'email' }, provide = {}} = {}) {
   return mount(EmailField, {
-    props: { form, field, struct: {} },
+    props: { form, field, struct: {}},
     global: {
       plugins: [ElementPlus],
       mocks: { $t: (key) => key },
@@ -17,9 +17,9 @@ const runValidator = (validatorFn, value) => new Promise((resolve) => {
   validatorFn({}, value, (err) => resolve(err))
 })
 
-function captureValidator({ form = {}, field = { property: 'email' } } = {}) {
+function captureValidator({ form = {}, field = { property: 'email' }} = {}) {
   let captured = null
-  const admin = { id: 0, rules: {}, $refs: { form: { validateField: vi.fn() } } }
+  const admin = { id: 0, rules: {}, $refs: { form: { validateField: vi.fn() }}}
   mountEmail({
     form,
     field,
@@ -33,7 +33,7 @@ function captureValidator({ form = {}, field = { property: 'email' } } = {}) {
 
 describe('form/email.vue', () => {
   it('hides the hint when the value is empty', () => {
-    const wrapper = mountEmail({ form: {} })
+    const wrapper = mountEmail({ form: {}})
     expect(wrapper.vm.val).toBe('')
     expect(wrapper.vm.showHint).toBe(false)
     expect(wrapper.find('.email-field__hint').exists()).toBe(false)
@@ -54,7 +54,7 @@ describe('form/email.vue', () => {
 
   it('shows an invalid hint for malformed addresses', async() => {
     for (const bad of ['nope', 'missing-at.com', 'a@', '@b.com', 'a @b.com', 'a@b c.com']) {
-      const wrapper = mountEmail({ form: { email: bad } })
+      const wrapper = mountEmail({ form: { email: bad }})
       await wrapper.vm.$nextTick()
       expect(wrapper.vm.isValid).toBe(false)
 
@@ -65,19 +65,19 @@ describe('form/email.vue', () => {
   })
 
   it('trims surrounding whitespace before validating', () => {
-    const wrapper = mountEmail({ form: { email: '  user@example.com  ' } })
+    const wrapper = mountEmail({ form: { email: '  user@example.com  ' }})
     expect(wrapper.vm.isValid).toBe(true)
   })
 
   it('treats null form values as empty', () => {
-    const wrapper = mountEmail({ form: { email: null } })
+    const wrapper = mountEmail({ form: { email: null }})
     expect(wrapper.vm.val).toBe('')
     expect(wrapper.vm.showHint).toBe(false)
     expect(wrapper.vm.isValid).toBe(false)
   })
 
   it('binds the form value to the input with email affordances', () => {
-    const wrapper = mountEmail({ form: { email: 'user@example.com' } })
+    const wrapper = mountEmail({ form: { email: 'user@example.com' }})
     const input = wrapper.findComponent(ElInput)
     expect(input.props('modelValue')).toBe('user@example.com')
     expect(input.props('type')).toBe('email')
@@ -87,7 +87,7 @@ describe('form/email.vue', () => {
   it('uses a custom placeholder from field_options when provided', () => {
     const wrapper = mountEmail({
       form: {},
-      field: { property: 'email', field_options: { placeholder: 'Work email' } }
+      field: { property: 'email', field_options: { placeholder: 'Work email' }}
     })
     expect(wrapper.findComponent(ElInput).props('placeholder')).toBe('Work email')
   })
@@ -116,7 +116,7 @@ describe('form/email.vue', () => {
     mountEmail({
       form: {},
       field: { property: 'email' },
-      provide: { registerFieldValidator, getFormAdmin: () => ({ id: 0, rules: {} }) }
+      provide: { registerFieldValidator, getFormAdmin: () => ({ id: 0, rules: {}}) }
     })
 
     expect(registerFieldValidator).toHaveBeenCalledTimes(1)
@@ -126,7 +126,7 @@ describe('form/email.vue', () => {
   })
 
   it('falls back to pushing the validator onto formAdmin.rules', () => {
-    const admin = { id: 0, rules: {} }
+    const admin = { id: 0, rules: {}}
     mountEmail({
       form: {},
       field: { property: 'email' },
@@ -139,18 +139,18 @@ describe('form/email.vue', () => {
   })
 
   it('mounts safely with no form admin available', () => {
-    expect(() => mountEmail({ form: {} })).not.toThrow()
+    expect(() => mountEmail({ form: {}})).not.toThrow()
   })
 
   it('passes empty values when the field is not required', async() => {
-    const { captured } = captureValidator({ field: { property: 'email' } })
+    const { captured } = captureValidator({ field: { property: 'email' }})
     expect(captured.name).toBe('email')
     await expect(runValidator(captured.validator, '')).resolves.toBeUndefined()
     await expect(runValidator(captured.validator, null)).resolves.toBeUndefined()
   })
 
   it('rejects empty values when the field is required', async() => {
-    const { captured } = captureValidator({ field: { property: 'email', required: true } })
+    const { captured } = captureValidator({ field: { property: 'email', required: true }})
     const error = await runValidator(captured.validator, '')
     expect(error).toBeInstanceOf(Error)
     expect(error.message).toBe('Email is required')
@@ -170,10 +170,10 @@ describe('form/email.vue', () => {
   })
 
   it('reads the live form value when no explicit value is passed', async() => {
-    const { captured } = captureValidator({ form: { email: 'live@example.com' } })
+    const { captured } = captureValidator({ form: { email: 'live@example.com' }})
     await expect(runValidator(captured.validator, undefined)).resolves.toBeUndefined()
 
-    const { captured: invalid } = captureValidator({ form: { email: 'bad' } })
+    const { captured: invalid } = captureValidator({ form: { email: 'bad' }})
     const error = await runValidator(invalid.validator, undefined)
     expect(error).toBeInstanceOf(Error)
   })
@@ -184,7 +184,7 @@ describe('form/email.vue', () => {
     const wrapper = mountEmail({
       form,
       field: { property: 'email' },
-      provide: { getFormAdmin: () => ({ id: 0, rules: {}, $refs: { form: { validateField } } }) }
+      provide: { getFormAdmin: () => ({ id: 0, rules: {}, $refs: { form: { validateField }}}) }
     })
 
     wrapper.vm.onUpdate('user@example.com')
@@ -194,7 +194,7 @@ describe('form/email.vue', () => {
   })
 
   it('triggerValidate is a safe no-op without a form admin', async() => {
-    const wrapper = mountEmail({ form: {} })
+    const wrapper = mountEmail({ form: {}})
     expect(() => wrapper.vm.triggerValidate()).not.toThrow()
     await flushPromises()
   })

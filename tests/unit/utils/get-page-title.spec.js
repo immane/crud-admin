@@ -24,7 +24,7 @@ describe('Utils:getPageTitle', () => {
     expect(getPageTitle('A & B')).toBe('A & B - Crud admin skeleton')
   })
 
-  it('falls back to Vue Admin Skeleton when settings title missing', async () => {
+  it('falls back to Vue Admin Skeleton when settings title missing', async() => {
     vi.resetModules()
     jest.resetModules()
 

@@ -22,7 +22,7 @@ vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => {
   return { default: EntityManageMock }
 })
 
-vi.mock('@/configs/entities', () => ({ default: {} }))
+vi.mock('@/configs/entities', () => ({ default: {}}))
 vi.mock('@/components/Tinymce', () => ({
   default: { name: 'Tinymce', template: '<div class="tinymce-stub" />' }
 }))
@@ -39,7 +39,7 @@ const stubs = {
   'el-col': { template: '<div><slot /></div>' },
   'el-tabs': { template: '<div><slot /></div>' },
   'el-tab-pane': { template: '<div><slot /></div>' },
-  'el-form': { template: '<div><slot /></div>', methods: { validate: cb => cb(true) } },
+  'el-form': { template: '<div><slot /></div>', methods: { validate: cb => cb(true) }},
   'el-form-item': { template: '<div><slot /></div>' },
   'el-button': { template: '<button><slot /></button>' },
   'el-icon': { template: '<span><slot /></span>' },
@@ -57,19 +57,19 @@ function mountStoreForm(props = {}) {
       entityConf: { name: 'Store' },
       id: 0,
       fields: [
-        { property: 'contact', type: 'json_schema', type_options: { schema: StoreContactSchema } },
-        { property: 'address', type: 'json_schema', type_options: { schema: StoreAddressSchema } }
+        { property: 'contact', type: 'json_schema', type_options: { schema: StoreContactSchema }},
+        { property: 'address', type: 'json_schema', type_options: { schema: StoreAddressSchema }}
       ],
       ...props
     },
     global: {
       mocks: {
         $t: key => key,
-        $route: { meta: { title: 'Store' } },
+        $route: { meta: { title: 'Store' }},
         $router: { go: vi.fn() },
         $message: { error: vi.fn() }
       },
-      directives: { loading: {} },
+      directives: { loading: {}},
       stubs
     }
   })
@@ -93,11 +93,11 @@ async function settle(wrapper, rounds = 8) {
 beforeEach(() => {
   vi.clearAllMocks()
   structureMock.mockResolvedValue({})
-  retrieveMock.mockResolvedValue({ data: {} })
+  retrieveMock.mockResolvedValue({ data: {}})
 })
 
 describe('form with two json_schema fields', () => {
-  it('populates both nested forms on create without recursive updates', async () => {
+  it('populates both nested forms on create without recursive updates', async() => {
     const onError = vi.fn()
     const wrapper = mountStoreForm()
     // Surface unexpected Vue errors (e.g. recursive updates) as test failures.

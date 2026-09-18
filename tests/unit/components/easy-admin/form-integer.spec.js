@@ -49,7 +49,7 @@ describe('form/integer.vue', () => {
   it('passes type_options (min / max / step / disabled) through to el-input-number', () => {
     const { wrapper } = mountInteger(
       { count: 5 },
-      { property: 'count', type_options: { min: 1, max: 10, step: 2, disabled: true } }
+      { property: 'count', type_options: { min: 1, max: 10, step: 2, disabled: true }}
     )
     const num = wrapper.findComponent(ElInputNumber)
     expect(num.props('min')).toBe(1)
@@ -62,7 +62,7 @@ describe('form/integer.vue', () => {
     const onChange = vi.fn()
     const { wrapper } = mountInteger(
       { count: 1 },
-      { property: 'count', type_events: { change: onChange } }
+      { property: 'count', type_events: { change: onChange }}
     )
     wrapper.findComponent(ElInputNumber).vm.$emit('change', 7, 1)
     await nextTick()

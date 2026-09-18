@@ -28,7 +28,7 @@ function editor(wrapper) {
 function mountText(formData = { content: '' }, fieldData = { property: 'content' }) {
   const form = reactive(formData)
   const field = reactive(fieldData)
-  const wrapper = mount(TextPlugin, { props: { form, field } })
+  const wrapper = mount(TextPlugin, { props: { form, field }})
   return { wrapper, form, field }
 }
 
@@ -53,7 +53,7 @@ describe('form/text.vue', () => {
   it('passes type_options through to Tinymce via attrs', () => {
     const { wrapper } = mountText(
       { content: '' },
-      { property: 'content', type_options: { menubar: 'file edit', toolbar: ['bold'] } }
+      { property: 'content', type_options: { menubar: 'file edit', toolbar: ['bold'] }}
     )
     const attrs = editor(wrapper).vm.$attrs
     expect(attrs.menubar).toBe('file edit')
@@ -64,7 +64,7 @@ describe('form/text.vue', () => {
     const onBlur = vi.fn()
     const { wrapper } = mountText(
       { content: '' },
-      { property: 'content', type_events: { blur: onBlur } }
+      { property: 'content', type_events: { blur: onBlur }}
     )
     await editor(wrapper).vm.$emit('blur', 'evt')
     expect(onBlur).toHaveBeenCalledWith('evt')

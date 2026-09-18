@@ -34,7 +34,7 @@ vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => {
 })
 
 vi.mock('@/configs/entities', () => ({
-  default: { Role: {}, User: {}, Store: {} }
+  default: { Role: {}, User: {}, Store: {}}
 }))
 
 vi.mock('@/components/Tinymce', () => ({
@@ -62,18 +62,18 @@ function mountForm({ props = {}, structure, retrieveData } = {}) {
     global: {
       mocks: {
         $t: key => key,
-        $route: { meta: { title: 'Product' } },
+        $route: { meta: { title: 'Product' }},
         $router,
         $message: { error: vi.fn() },
         $loading: vi.fn(() => ({ close: vi.fn() }))
       },
-      directives: { loading: {} },
+      directives: { loading: {}},
       stubs: {
         'el-row': { template: '<div><slot /></div>' },
         'el-col': { template: '<div><slot /></div>' },
         'el-tabs': { template: '<div><slot /></div>' },
         'el-tab-pane': { template: '<div><slot /></div>' },
-        'el-form': { template: '<div><slot /></div>', methods: { validate: formValidateMock } },
+        'el-form': { template: '<div><slot /></div>', methods: { validate: formValidateMock }},
         'el-form-item': { template: '<div><slot /></div>' },
         'el-button': { template: '<button><slot /></button>' },
         'el-icon': { template: '<span><slot /></span>' },
@@ -100,10 +100,10 @@ const baseStructure = () => ({
 beforeEach(() => {
   vi.clearAllMocks()
   structureMock.mockResolvedValue(baseStructure())
-  retrieveMock.mockResolvedValue({ data: {} })
+  retrieveMock.mockResolvedValue({ data: {}})
   listMock.mockResolvedValue({ data: [] })
-  createMock.mockResolvedValue({ data: { id: 1 } })
-  updateMock.mockResolvedValue({ data: { id: 1 } })
+  createMock.mockResolvedValue({ data: { id: 1 }})
+  updateMock.mockResolvedValue({ data: { id: 1 }})
   formValidateMock.mockReset()
   formValidateMock.mockImplementation(cb => cb(true))
 })
@@ -126,7 +126,7 @@ describe('FormAdmin.vue gaps', () => {
   })
 
   describe('customRules merge branches (lines 324, 327)', () => {
-    it('appends custom rules when metadata rules already exist (line 324 false side)', async () => {
+    it('appends custom rules when metadata rules already exist (line 324 false side)', async() => {
       const { wrapper } = mountForm({
         props: { fields: [{ property: 'name', rules: [{ min: 2, max: 5, message: 'len', trigger: 'blur' }] }] }
       })
@@ -137,7 +137,7 @@ describe('FormAdmin.vue gaps', () => {
       expect(wrapper.vm.rules.name[1]).toMatchObject({ min: 2, max: 5 })
     })
 
-    it('creates the rules array when no metadata rules exist (line 324 true side)', async () => {
+    it('creates the rules array when no metadata rules exist (line 324 true side)', async() => {
       const { wrapper } = mountForm({
         props: { fields: [{ property: 'ghost', rules: [{ min: 1, message: 'one', trigger: 'blur' }] }] },
         structure: {}
@@ -146,7 +146,7 @@ describe('FormAdmin.vue gaps', () => {
       expect(wrapper.vm.rules.ghost).toEqual([{ min: 1, message: 'one', trigger: 'blur' }])
     })
 
-    it('adds a blur trigger to validator rules without one (line 327 true side)', async () => {
+    it('adds a blur trigger to validator rules without one (line 327 true side)', async() => {
       const fn = () => true
       const { wrapper } = mountForm({
         props: { fields: [{ property: 'name', rules: [{ validator: fn }] }] }
@@ -155,7 +155,7 @@ describe('FormAdmin.vue gaps', () => {
       expect(wrapper.vm.rules.name).toContainEqual({ validator: fn, trigger: 'blur' })
     })
 
-    it('keeps explicit triggers on validator rules (line 327 false side)', async () => {
+    it('keeps explicit triggers on validator rules (line 327 false side)', async() => {
       const fn = () => true
       const { wrapper } = mountForm({
         props: { fields: [{ property: 'description', rules: [{ validator: fn, trigger: 'change' }] }] }
@@ -167,31 +167,31 @@ describe('FormAdmin.vue gaps', () => {
   })
 
   describe('fetchData branches (lines 484, 500-502)', () => {
-    it('falls back to a bare property when plainFields outlive properties (line 484)', async () => {
-      const { wrapper } = mountForm({ props: { id: 1, fields: ['name'] } })
+    it('falls back to a bare property when plainFields outlive properties (line 484)', async() => {
+      const { wrapper } = mountForm({ props: { id: 1, fields: ['name'] }})
       await settled(wrapper)
       wrapper.vm.plainFields = ['name', 'ghost']
       wrapper.vm.properties = [{ property: 'name' }]
       wrapper.vm.structure = {}
-      retrieveMock.mockResolvedValueOnce({ data: { name: 'n', ghost: 'g' } })
+      retrieveMock.mockResolvedValueOnce({ data: { name: 'n', ghost: 'g' }})
       wrapper.vm.fetchData(1)
       await settled(wrapper)
       expect(wrapper.vm.form).toEqual({ name: 'n', ghost: 'g' })
     })
 
-    it('swallows mapping errors for id-object arrays (lines 500-502)', async () => {
+    it('swallows mapping errors for id-object arrays (lines 500-502)', async() => {
       const evil = {}
       Object.defineProperty(evil, 'id', {
         enumerable: true,
         configurable: true,
         get() { throw new Error('boom') }
       })
-      const { wrapper } = mountForm({ props: { id: 1, fields: ['tags'] } })
+      const { wrapper } = mountForm({ props: { id: 1, fields: ['tags'] }})
       await settled(wrapper)
       wrapper.vm.properties = [{ property: 'tags' }]
       wrapper.vm.plainFields = ['tags']
       wrapper.vm.structure = {}
-      retrieveMock.mockResolvedValueOnce({ data: { tags: [evil] } })
+      retrieveMock.mockResolvedValueOnce({ data: { tags: [evil] }})
       wrapper.vm.fetchData(1)
       await settled(wrapper)
       // the throwing mapping is caught: the key is left unset, no rejection escapes

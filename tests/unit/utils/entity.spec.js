@@ -45,7 +45,7 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts', () => {
   it('loads entities and structure from server when cache is empty', async() => {
     mockGet
       .mockResolvedValueOnce({ data: ['CommonBundle\\Entity\\User'] })
-      .mockResolvedValueOnce({ data: { id: { metadata: { type: 'integer' } } } })
+      .mockResolvedValueOnce({ data: { id: { metadata: { type: 'integer' }}}})
 
     const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
     const em = new CrudSkeletonAdapter('User')
@@ -62,7 +62,7 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts', () => {
     mockStore.getters.entity.entities = ['CommonBundle\\Entity\\User']
     mockStore.getters.entity.structures = {
       'CommonBundle\\Entity\\User': {
-        id: { metadata: { type: 'integer' } }
+        id: { metadata: { type: 'integer' }}
       }
     }
 
@@ -76,8 +76,8 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts', () => {
 
   it('proxies CRUD calls to request utility', async() => {
     mockGet.mockResolvedValue({ data: [] })
-    mockPost.mockResolvedValue({ data: { id: 1 } })
-    mockPut.mockResolvedValue({ data: { id: 1 } })
+    mockPost.mockResolvedValue({ data: { id: 1 }})
+    mockPut.mockResolvedValue({ data: { id: 1 }})
     mockDelete.mockResolvedValue({ data: true })
 
     const { default: CrudSkeletonAdapter } = await import('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter')
@@ -89,7 +89,7 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts', () => {
     await em.delete(1)
     await em.deleteMany([2, 3])
 
-    expect(mockGet).toHaveBeenCalledWith('/api/v1/manage/users', { params: { page: 1 } })
+    expect(mockGet).toHaveBeenCalledWith('/api/v1/manage/users', { params: { page: 1 }})
     expect(mockPost).toHaveBeenCalledWith('/api/v1/manage/users', { username: 'u' })
     expect(mockPut).toHaveBeenCalledWith('/api/v1/manage/users/1', { username: 'u2' })
     expect(mockDelete).toHaveBeenCalledWith('/api/v1/manage/users/1')
@@ -117,7 +117,7 @@ describe('adapters/crudskeleton/CrudSkeletonAdapter.ts', () => {
     expect(mockPost).toHaveBeenCalledWith(
       '/api/v1/manage/users/batch-update',
       [{ id: 1, enabled: true }, { id: 2, enabled: true }],
-      { params: { '@basis': 'id', '@mode': 'update' } }
+      { params: { '@basis': 'id', '@mode': 'update' }}
     )
   })
 })

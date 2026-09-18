@@ -20,7 +20,7 @@ describe('store/modules/app', () => {
   })
 
   describe('state', () => {
-    it('has sidebar opened=true by default when no cookie', async () => {
+    it('has sidebar opened=true by default when no cookie', async() => {
       // app state is single instance imported already; we test shape
       expect(app.state).toBeDefined()
       expect(app.state.sidebar).toBeDefined()
@@ -114,21 +114,21 @@ describe('store/modules/app', () => {
   })
 
   describe('integration: Cookies.get initial value', () => {
-    it('when sidebarStatus=1 opened=true', async () => {
+    it('when sidebarStatus=1 opened=true', async() => {
       vi.resetModules()
       cookieMocks.get.mockReturnValue('1')
       const fresh = await import('@/store/modules/app')
       expect(fresh.default.state.sidebar.opened).toBe(true)
     })
 
-    it('when sidebarStatus=0 opened=false', async () => {
+    it('when sidebarStatus=0 opened=false', async() => {
       vi.resetModules()
       cookieMocks.get.mockReturnValue('0')
       const fresh = await import('@/store/modules/app')
       expect(fresh.default.state.sidebar.opened).toBe(false)
     })
 
-    it('when no cookie opened defaults true', async () => {
+    it('when no cookie opened defaults true', async() => {
       vi.resetModules()
       cookieMocks.get.mockReturnValue(undefined)
       const fresh = await import('@/store/modules/app')

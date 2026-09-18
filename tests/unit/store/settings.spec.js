@@ -85,7 +85,7 @@ describe('store/getters', () => {
   const mockState = {
     app: { sidebar: { opened: true, withoutAnimation: false }, device: 'desktop', size: 'medium' },
     user: { token: 't', avatar: 'av', name: 'n', roles: ['R'], introduction: 'intro' },
-    entity: { entities: [], structures: {} },
+    entity: { entities: [], structures: {}},
     tagsView: { visitedViews: [{ path: '/a' }], cachedViews: ['A'] },
     permission: { routes: [{ path: '/perm' }] },
     errorLog: { logs: [{ msg: 'err' }] }

@@ -4,8 +4,8 @@ import DetailJson from '@/easyadmin/ui/vue/plugins/detail/json.vue'
 
 function mountCell(value) {
   return mount(DetailJson, {
-    props: { value, field: {}, scope: {}, em: {}, struct: {} },
-    global: { plugins: [ElementPlus], mocks: { $t: (key) => key } }
+    props: { value, field: {}, scope: {}, em: {}, struct: {}},
+    global: { plugins: [ElementPlus], mocks: { $t: (key) => key }}
   })
 }
 

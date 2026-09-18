@@ -38,7 +38,7 @@ describe('form-date plugin', () => {
     wrapper.unmount()
   })
 
-  it('updates form model when picker emits update:modelValue', async () => {
+  it('updates form model when picker emits update:modelValue', async() => {
     const form = reactive({ birth: '' })
     const field = reactive({ property: 'birth' })
     const wrapper = makeWrapper(form, field)
@@ -49,7 +49,7 @@ describe('form-date plugin', () => {
     wrapper.unmount()
   })
 
-  it('reflects external form changes in picker modelValue', async () => {
+  it('reflects external form changes in picker modelValue', async() => {
     const form = reactive({ birth: '2024-01-15' })
     const field = reactive({ property: 'birth' })
     const wrapper = makeWrapper(form, field)
@@ -59,7 +59,7 @@ describe('form-date plugin', () => {
     wrapper.unmount()
   })
 
-  it('clears model to null when picker is cleared', async () => {
+  it('clears model to null when picker is cleared', async() => {
     const form = reactive({ birth: '2024-01-15' })
     const field = reactive({ property: 'birth' })
     const wrapper = makeWrapper(form, field)
@@ -71,7 +71,7 @@ describe('form-date plugin', () => {
 
   it('forwards field.type_options onto the picker', () => {
     const form = reactive({ birth: '' })
-    const field = reactive({ property: 'birth', type_options: { disabled: true, clearable: false } })
+    const field = reactive({ property: 'birth', type_options: { disabled: true, clearable: false }})
     const wrapper = makeWrapper(form, field)
     const p = picker(wrapper)
     expect(p.props('disabled')).toBe(true)
@@ -79,10 +79,10 @@ describe('form-date plugin', () => {
     wrapper.unmount()
   })
 
-  it('forwards field.type_events handlers to the picker', async () => {
+  it('forwards field.type_events handlers to the picker', async() => {
     const form = reactive({ birth: '' })
     const onChange = vi.fn()
-    const field = reactive({ property: 'birth', type_events: { change: onChange } })
+    const field = reactive({ property: 'birth', type_events: { change: onChange }})
     const wrapper = makeWrapper(form, field)
     await picker(wrapper).vm.$emit('change', '2024-05-01')
     expect(onChange).toHaveBeenCalledTimes(1)
@@ -92,7 +92,7 @@ describe('form-date plugin', () => {
 
   it('mounts safely with default (empty) form/field props', () => {
     const wrapper = mount(DatePlugin, {
-      global: { plugins: [ElementPlus], mocks: { $t: (k) => k } }
+      global: { plugins: [ElementPlus], mocks: { $t: (k) => k }}
     })
     expect(picker(wrapper).exists()).toBe(true)
     wrapper.unmount()

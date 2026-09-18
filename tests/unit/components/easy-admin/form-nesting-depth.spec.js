@@ -22,7 +22,7 @@ vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => {
   return { default: EntityManageMock }
 })
 
-vi.mock('@/configs/entities', () => ({ default: {} }))
+vi.mock('@/configs/entities', () => ({ default: {}}))
 vi.mock('@/components/Tinymce', () => ({
   default: { name: 'Tinymce', template: '<div class="tinymce-stub" />' }
 }))
@@ -42,7 +42,7 @@ const stubs = {
   'el-col': { template: '<div><slot /></div>' },
   'el-tabs': { template: '<div><slot /></div>' },
   'el-tab-pane': { template: '<div><slot /></div>' },
-  'el-form': { template: '<div><slot /></div>', methods: { validate: cb => cb(true) } },
+  'el-form': { template: '<div><slot /></div>', methods: { validate: cb => cb(true) }},
   'el-form-item': { template: '<div><slot /></div>' },
   'el-button': { template: '<button><slot /></button>' },
   'el-icon': { template: '<span><slot /></span>' },
@@ -68,11 +68,11 @@ function mountForm({ props = {}, provide } = {}) {
       ...(provide !== undefined ? { provide } : {}),
       mocks: {
         $t: key => key,
-        $route: { meta: { title: 'Product' } },
+        $route: { meta: { title: 'Product' }},
         $router: { go: vi.fn() },
         $message: { error: vi.fn() }
       },
-      directives: { loading: {} },
+      directives: { loading: {}},
       stubs
     }
   })
@@ -87,7 +87,7 @@ async function settled(wrapper) {
 beforeEach(() => {
   vi.clearAllMocks()
   structureMock.mockResolvedValue({})
-  retrieveMock.mockResolvedValue({ data: {} })
+  retrieveMock.mockResolvedValue({ data: {}})
 })
 
 describe('form nesting depth guard', () => {
@@ -103,7 +103,7 @@ describe('form nesting depth guard', () => {
   })
 
   it('counts depth through a provided ancestor', async() => {
-    const wrapper = mountForm({ provide: { easyadminFormDepth: 7 } })
+    const wrapper = mountForm({ provide: { easyadminFormDepth: 7 }})
     await settled(wrapper)
 
     expect(wrapper.vm.nestingDepth).toBe(8)
@@ -113,7 +113,7 @@ describe('form nesting depth guard', () => {
   })
 
   it('still renders at exactly the maximum depth', async() => {
-    const wrapper = mountForm({ provide: { easyadminFormDepth: 9 } })
+    const wrapper = mountForm({ provide: { easyadminFormDepth: 9 }})
     await settled(wrapper)
 
     expect(wrapper.vm.nestingDepth).toBe(10)
@@ -124,7 +124,7 @@ describe('form nesting depth guard', () => {
 
   it('renders a placeholder without fetching structure past the limit', async() => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-    const wrapper = mountForm({ provide: { easyadminFormDepth: 10 } })
+    const wrapper = mountForm({ provide: { easyadminFormDepth: 10 }})
     await settled(wrapper)
 
     expect(wrapper.vm.nestingDepth).toBe(11)
@@ -145,17 +145,17 @@ describe('form nesting depth guard', () => {
         entityConf: { name: 'Store' },
         id: 0,
         fields: [
-          { property: 'contact', type: 'json_schema', type_options: { schema: StoreContactSchema } }
+          { property: 'contact', type: 'json_schema', type_options: { schema: StoreContactSchema }}
         ]
       },
       global: {
         mocks: {
           $t: key => key,
-          $route: { meta: { title: 'Store' } },
+          $route: { meta: { title: 'Store' }},
           $router: { go: vi.fn() },
           $message: { error: vi.fn() }
         },
-        directives: { loading: {} },
+        directives: { loading: {}},
         stubs
       }
     })

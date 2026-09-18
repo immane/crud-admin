@@ -2,9 +2,9 @@ import { mount, flushPromises } from '@vue/test-utils'
 import ElementPlus from 'element-plus'
 import EmailField from '@/easyadmin/ui/vue/plugins/form/email.vue'
 
-function mountEmail({ form = {}, field = { property: 'email' }, provide = {} } = {}) {
+function mountEmail({ form = {}, field = { property: 'email' }, provide = {}} = {}) {
   return mount(EmailField, {
-    props: { form, field, struct: {} },
+    props: { form, field, struct: {}},
     global: {
       plugins: [ElementPlus],
       mocks: { $t: (key) => key },
@@ -27,20 +27,20 @@ describe('form/email.vue gaps', () => {
   })
 
   it('covers getFormAdmin throw with $parent rules fallback', () => {
-    const fakeAdmin = { rules: {} }
+    const fakeAdmin = { rules: {}}
     const wrapper = mountEmail({
       form: {},
       field: { property: 'email' },
       provide: {
         getFormAdmin: () => { throw new Error('boom') }
-      },
+      }
       // mount options cannot set $parent directly; verify catch path returns parent chain (null-safe)
     })
     expect(() => wrapper.vm.registerValidator()).not.toThrow()
     expect(fakeAdmin.rules.email).toBeUndefined()
   })
 
-  it('covers triggerValidate validateField throw branch (lines 100-101)', async () => {
+  it('covers triggerValidate validateField throw branch (lines 100-101)', async() => {
     const form = {}
     const wrapper = mountEmail({
       form,

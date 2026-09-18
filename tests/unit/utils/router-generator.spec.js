@@ -18,13 +18,13 @@ describe('router/generator', () => {
       // update with function redirect
       expect(routes[1].path).toBe('/dummy/product/:id/update')
       expect(typeof routes[1].redirect).toBe('function')
-      expect(routes[1].redirect({ params: { id: '123' } })).toBe('/product/123/update')
+      expect(routes[1].redirect({ params: { id: '123' }})).toBe('/product/123/update')
       expect(routes[1].name).toBe('ProductUpdate')
       expect(routes[1].hidden).toBe(true)
       // detail with function redirect
       expect(routes[2].path).toBe('/dummy/product/:id/detail')
       expect(typeof routes[2].redirect).toBe('function')
-      expect(routes[2].redirect({ params: { id: '456' } })).toBe('/product/456/detail')
+      expect(routes[2].redirect({ params: { id: '456' }})).toBe('/product/456/detail')
       expect(routes[2].name).toBe('ProductDetail')
       expect(routes[2].hidden).toBe(true)
       // list with meta
@@ -55,8 +55,8 @@ describe('router/generator', () => {
       expect(routes[2].path).toBe('/dummy/order-item/:id/detail')
       expect(routes[3].path).toBe('/dummy/order-item/list')
       expect(routes[0].redirect).toBe('/order-item/create')
-      expect(routes[1].redirect({ params: { id: '1' } })).toBe('/order-item/1/update')
-      expect(routes[2].redirect({ params: { id: '2' } })).toBe('/order-item/2/detail')
+      expect(routes[1].redirect({ params: { id: '1' }})).toBe('/order-item/1/update')
+      expect(routes[2].redirect({ params: { id: '2' }})).toBe('/order-item/2/detail')
       expect(routes[3].redirect).toBe('/order-item/list')
     })
 
@@ -115,8 +115,8 @@ describe('router/generator', () => {
 
     it('r redirect functions handle different id values', () => {
       const routes = r('Tag', 'Tag')
-      expect(routes[1].redirect({ params: { id: 0 } })).toBe('/tag/0/update')
-      expect(routes[2].redirect({ params: { id: 'abc-123' } })).toBe('/tag/abc-123/detail')
+      expect(routes[1].redirect({ params: { id: 0 }})).toBe('/tag/0/update')
+      expect(routes[2].redirect({ params: { id: 'abc-123' }})).toBe('/tag/abc-123/detail')
     })
   })
 
@@ -224,7 +224,6 @@ describe('router/generator', () => {
       const cases = ['Product', 'OrderItem', 'PromotionTemplate', 'StoreOrder']
       cases.forEach(name => {
         const routes = g(name, name)
-        const expected = name.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase().replace(/_/g, '-')
         // Use same inflect logic: underscore then dasherize; quick check
         expect(routes[2].props.entityParam).toBeDefined()
         // verify it matches manual transformation for those cases

@@ -65,7 +65,7 @@ describe('configs entity JSON schema', () => {
 
   it('rejects empty batch_edit.fields', () => {
     const bad = project(structuredCloneLike(entities.User))
-    bad.form = { ...bad.form, batch_edit: { fields: [] } }
+    bad.form = { ...bad.form, batch_edit: { fields: [] }}
     expect(validate(bad)).toBe(false)
   })
 

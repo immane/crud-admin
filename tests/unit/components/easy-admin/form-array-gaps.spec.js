@@ -13,7 +13,7 @@ vi.mock('@/easyadmin/ui/vue/FormAdmin', () => ({
 function mountWithDefaults(extra = {}) {
   return mount(ArrayField, {
     props: {},
-    global: { plugins: [ElementPlus], mocks: { $t: (key) => key } },
+    global: { plugins: [ElementPlus], mocks: { $t: (key) => key }},
     ...extra
   })
 }
@@ -29,8 +29,8 @@ describe('form/array.vue gaps', () => {
 
   it('covers field prop default factory (lines 107-108)', () => {
     const wrapper = mount(ArrayField, {
-      props: { form: { tags: [] } },
-      global: { plugins: [ElementPlus], mocks: { $t: (key) => key } }
+      props: { form: { tags: [] }},
+      global: { plugins: [ElementPlus], mocks: { $t: (key) => key }}
     })
     expect(wrapper.props('field')).toEqual({})
     expect(wrapper.vm.fields).toBeUndefined()
@@ -39,7 +39,7 @@ describe('form/array.vue gaps', () => {
 
   it('covers both defaults together without crashing created()', () => {
     const wrapper = mount(ArrayField, {
-      global: { plugins: [ElementPlus], mocks: { $t: (key) => key } }
+      global: { plugins: [ElementPlus], mocks: { $t: (key) => key }}
     })
     expect(wrapper.vm.fields).toBeUndefined()
     expect(wrapper.vm.options).toEqual([])

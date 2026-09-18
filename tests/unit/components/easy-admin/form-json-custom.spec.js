@@ -20,7 +20,7 @@ const FormAdminStubName = 'FormAdmin'
 function makeWrapper(form, field) {
   return mount(JsonCustomPlugin, {
     props: { form, field },
-    global: { mocks: { $t: (k) => k } }
+    global: { mocks: { $t: (k) => k }}
   })
 }
 
@@ -30,12 +30,12 @@ function formAdmin(wrapper) {
 
 describe('form-json-custom plugin', () => {
   it('renders nested FormAdmin with entity Option and configured fields', () => {
-    const form = reactive({ extra: {} })
+    const form = reactive({ extra: {}})
     const nested = [
-      { property: 'link', type: 'input', field_options: { label: 'Url' } },
-      { property: 'listOrder', type: 'input', field_options: { label: 'List order' } }
+      { property: 'link', type: 'input', field_options: { label: 'Url' }},
+      { property: 'listOrder', type: 'input', field_options: { label: 'List order' }}
     ]
-    const field = reactive({ property: 'extra', type_options: { fields: nested } })
+    const field = reactive({ property: 'extra', type_options: { fields: nested }})
     const wrapper = makeWrapper(form, field)
     const fa = formAdmin(wrapper)
     expect(fa.exists()).toBe(true)
@@ -44,8 +44,8 @@ describe('form-json-custom plugin', () => {
     wrapper.unmount()
   })
 
-  it('binds v-model to the nested form object', async () => {
-    const form = reactive({ extra: { link: 'a' } })
+  it('binds v-model to the nested form object', async() => {
+    const form = reactive({ extra: { link: 'a' }})
     const field = reactive({
       property: 'extra',
       type_options: { fields: [{ property: 'link', type: 'input' }] }
@@ -63,7 +63,7 @@ describe('form-json-custom plugin', () => {
     const field = reactive({ property: 'extra' })
     const wrapper = makeWrapper(form, field)
     expect(wrapper.vm.fields).toEqual([
-      { property: 'common', type: 'input', field_options: { label: 'Default' } }
+      { property: 'common', type: 'input', field_options: { label: 'Default' }}
     ])
     expect(formAdmin(wrapper).props('fields')).toEqual(wrapper.vm.fields)
     wrapper.unmount()
@@ -71,7 +71,7 @@ describe('form-json-custom plugin', () => {
 
   it('initialises missing nested value to an empty object on created', () => {
     const form = reactive({})
-    const field = reactive({ property: 'extra', type_options: { fields: [{ property: 'link', type: 'input' }] } })
+    const field = reactive({ property: 'extra', type_options: { fields: [{ property: 'link', type: 'input' }] }})
     const wrapper = makeWrapper(form, field)
     expect(form.extra).toEqual({})
     wrapper.unmount()
@@ -79,37 +79,37 @@ describe('form-json-custom plugin', () => {
 
   it('normalises array nested values to an empty object on created', () => {
     const form = reactive({ extra: [{ link: 'x' }] })
-    const field = reactive({ property: 'extra', type_options: { fields: [{ property: 'link', type: 'input' }] } })
+    const field = reactive({ property: 'extra', type_options: { fields: [{ property: 'link', type: 'input' }] }})
     const wrapper = makeWrapper(form, field)
     expect(form.extra).toEqual({})
     wrapper.unmount()
   })
 
   it('preserves an existing nested object on created', () => {
-    const form = reactive({ extra: { link: 'keep', listOrder: '1' } })
-    const field = reactive({ property: 'extra', type_options: { fields: [{ property: 'link', type: 'input' }] } })
+    const form = reactive({ extra: { link: 'keep', listOrder: '1' }})
+    const field = reactive({ property: 'extra', type_options: { fields: [{ property: 'link', type: 'input' }] }})
     const wrapper = makeWrapper(form, field)
     expect(form.extra).toEqual({ link: 'keep', listOrder: '1' })
     wrapper.unmount()
   })
 
   it('renders title and action slots without crashing', () => {
-    const form = reactive({ extra: {} })
-    const field = reactive({ property: 'extra', type_options: { fields: [{ property: 'link', type: 'input' }] } })
+    const form = reactive({ extra: {}})
+    const field = reactive({ property: 'extra', type_options: { fields: [{ property: 'link', type: 'input' }] }})
     const wrapper = makeWrapper(form, field)
     expect(wrapper.html()).toContain('form-admin-stub')
     wrapper.unmount()
   })
 
   it('supports multiple nested fields including image and input types', () => {
-    const form = reactive({ pictures: {} })
+    const form = reactive({ pictures: {}})
     const field = reactive({
       property: 'pictures',
       type_options: {
         fields: [
-          { property: 'picture', type: 'image', field_options: { label: 'Picture' } },
-          { property: 'link', type: 'input', field_options: { label: 'Url' } },
-          { property: 'listOrder', type: 'input', field_options: { label: 'List order' } }
+          { property: 'picture', type: 'image', field_options: { label: 'Picture' }},
+          { property: 'link', type: 'input', field_options: { label: 'Url' }},
+          { property: 'listOrder', type: 'input', field_options: { label: 'List order' }}
         ]
       }
     })

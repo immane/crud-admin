@@ -41,7 +41,7 @@ describe('form/input.vue', () => {
   it('passes type_options through to el-input', () => {
     const { wrapper } = mountInput(
       { name: 'x' },
-      { property: 'name', type_options: { placeholder: 'Enter name', maxlength: 10, clearable: true } }
+      { property: 'name', type_options: { placeholder: 'Enter name', maxlength: 10, clearable: true }}
     )
     const input = wrapper.findComponent(ElInput)
     expect(input.props('placeholder')).toBe('Enter name')
@@ -52,7 +52,7 @@ describe('form/input.vue', () => {
   it('applies disabled from type_options to the native input', () => {
     const { wrapper } = mountInput(
       { name: 'x' },
-      { property: 'name', type_options: { disabled: true } }
+      { property: 'name', type_options: { disabled: true }}
     )
     expect(wrapper.find('input').attributes('disabled')).toBeDefined()
   })
@@ -62,7 +62,7 @@ describe('form/input.vue', () => {
     const onFocus = vi.fn()
     const { wrapper } = mountInput(
       { name: 'x' },
-      { property: 'name', type_events: { blur: onBlur, focus: onFocus } }
+      { property: 'name', type_events: { blur: onBlur, focus: onFocus }}
     )
     const input = wrapper.findComponent(ElInput)
     input.vm.$emit('blur', new FocusEvent('blur'))
@@ -79,7 +79,7 @@ describe('form/input.vue', () => {
   })
 
   it('mounts with default props (no form / field given)', () => {
-    const wrapper = mount(InputPlugin, { global: { plugins: [ElementPlus] } })
+    const wrapper = mount(InputPlugin, { global: { plugins: [ElementPlus] }})
     expect(wrapper.findComponent(ElInput).exists()).toBe(true)
   })
 })

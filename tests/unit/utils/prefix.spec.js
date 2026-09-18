@@ -29,7 +29,7 @@ describe('api/prefix', () => {
 
   // normal import for pure function tests (default env)
   let prefixMod
-  beforeEach(async () => {
+  beforeEach(async() => {
     vi.resetModules()
     prefixMod = await import('@/api/prefix.ts')
   })
@@ -75,13 +75,13 @@ describe('api/prefix', () => {
   })
 
   describe('default constants when env absent', () => {
-    it('API_PREFIX defaults to api/v1', async () => {
+    it('API_PREFIX defaults to api/v1', async() => {
       const mod = await loadPrefix({ VITE_API_PREFIX: undefined, VITE_AUTH_API_PREFIX: undefined, VITE_SYSTEM_API_PREFIX: undefined })
       expect(mod.API_PREFIX).toBe('api/v1')
       expect(mod.AUTH_API_PREFIX).toBe('api/auth')
       expect(mod.SYSTEM_API_PREFIX).toBe('system')
     })
-    it('API_PREFIX trims correctly when default fallback has leading slash', async () => {
+    it('API_PREFIX trims correctly when default fallback has leading slash', async() => {
       const mod = await loadPrefix({ VITE_API_PREFIX: undefined })
       // fallback '/api/v1' -> trimSlashes => 'api/v1'
       expect(mod.API_PREFIX).toBe('api/v1')
@@ -89,32 +89,32 @@ describe('api/prefix', () => {
   })
 
   describe('constants with env values', () => {
-    it('uses env value when provided', async () => {
+    it('uses env value when provided', async() => {
       const mod = await loadPrefix({ VITE_API_PREFIX: '/custom/api', VITE_AUTH_API_PREFIX: '/custom/auth', VITE_SYSTEM_API_PREFIX: '/custom/system' })
       expect(mod.API_PREFIX).toBe('custom/api')
       expect(mod.AUTH_API_PREFIX).toBe('custom/auth')
       expect(mod.SYSTEM_API_PREFIX).toBe('custom/system')
     })
-    it('trims multi-slash env values', async () => {
+    it('trims multi-slash env values', async() => {
       const mod = await loadPrefix({ VITE_API_PREFIX: '///custom///', VITE_AUTH_API_PREFIX: '///auth///', VITE_SYSTEM_API_PREFIX: '///sys///' })
       expect(mod.API_PREFIX).toBe('custom')
       expect(mod.AUTH_API_PREFIX).toBe('auth')
       expect(mod.SYSTEM_API_PREFIX).toBe('sys')
     })
-    it('handles env with trailing and leading slashes and inner path', async () => {
+    it('handles env with trailing and leading slashes and inner path', async() => {
       const mod = await loadPrefix({ VITE_API_PREFIX: '//api/v2//', VITE_AUTH_API_PREFIX: '/api/auth/v2/', VITE_SYSTEM_API_PREFIX: 'system/' })
       expect(mod.API_PREFIX).toBe('api/v2')
       expect(mod.AUTH_API_PREFIX).toBe('api/auth/v2')
       expect(mod.SYSTEM_API_PREFIX).toBe('system')
     })
-    it('handles empty string env -> falls back to default (via ||)', async () => {
+    it('handles empty string env -> falls back to default (via ||)', async() => {
       const mod = await loadPrefix({ VITE_API_PREFIX: '', VITE_AUTH_API_PREFIX: '', VITE_SYSTEM_API_PREFIX: '' })
       // '' is falsy -> fallback '/api/v1' etc
       expect(mod.API_PREFIX).toBe('api/v1')
       expect(mod.AUTH_API_PREFIX).toBe('api/auth')
       expect(mod.SYSTEM_API_PREFIX).toBe('system')
     })
-    it('each constant independent with mixed env', async () => {
+    it('each constant independent with mixed env', async() => {
       const mod = await loadPrefix({ VITE_API_PREFIX: '/a', VITE_AUTH_API_PREFIX: undefined, VITE_SYSTEM_API_PREFIX: '///s///' })
       expect(mod.API_PREFIX).toBe('a')
       expect(mod.AUTH_API_PREFIX).toBe('api/auth')
@@ -146,7 +146,7 @@ describe('api/prefix', () => {
     it('first arg multi slash, second empty', () => {
       expect(prefixMod.apiPath('///api///', '')).toBe('/api')
     })
-    it('reuses exported constants with apiPath', async () => {
+    it('reuses exported constants with apiPath', async() => {
       const mod = await loadPrefix({ VITE_API_PREFIX: '/api/v1' })
       expect(mod.apiPath(mod.API_PREFIX, 'users')).toBe('/api/v1/users')
       expect(mod.apiPath(mod.API_PREFIX, '/users/')).toBe('/api/v1/users')

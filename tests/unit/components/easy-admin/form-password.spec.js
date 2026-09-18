@@ -2,9 +2,9 @@ import { mount, flushPromises } from '@vue/test-utils'
 import ElementPlus, { ElInput } from 'element-plus'
 import PasswordField from '@/easyadmin/ui/vue/plugins/form/password.vue'
 
-function mountPassword({ form = {}, field = { property: 'password' }, provide = {} } = {}) {
+function mountPassword({ form = {}, field = { property: 'password' }, provide = {}} = {}) {
   return mount(PasswordField, {
-    props: { form, field, struct: {} },
+    props: { form, field, struct: {}},
     global: {
       plugins: [ElementPlus],
       mocks: { $t: (key) => key },
@@ -19,7 +19,7 @@ const runValidator = (validatorFn, value) => new Promise((resolve) => {
 
 function captureValidator({ form = {}, field = { property: 'password' }, id = 0 } = {}) {
   let captured = null
-  const admin = { id, rules: {}, $refs: { form: { validateField: vi.fn() } } }
+  const admin = { id, rules: {}, $refs: { form: { validateField: vi.fn() }}}
   mountPassword({
     form,
     field,
@@ -33,62 +33,62 @@ function captureValidator({ form = {}, field = { property: 'password' }, id = 0 
 
 describe('form/password.vue', () => {
   it('hides hints when both password and confirm are empty', () => {
-    const wrapper = mountPassword({ form: {} })
+    const wrapper = mountPassword({ form: {}})
     expect(wrapper.vm.showHints).toBe(false)
     expect(wrapper.find('.password-field__hints').exists()).toBe(false)
   })
 
   it('shows hints once the password or confirm has content', async() => {
-    const wrapper = mountPassword({ form: {} })
+    const wrapper = mountPassword({ form: {}})
     wrapper.vm.onUpdate('secret1')
     await wrapper.vm.$nextTick()
     expect(wrapper.vm.showHints).toBe(true)
     expect(wrapper.find('.password-field__hints').exists()).toBe(true)
 
-    const confirmOnly = mountPassword({ form: {} })
+    const confirmOnly = mountPassword({ form: {}})
     confirmOnly.vm.onConfirmUpdate('x')
     await confirmOnly.vm.$nextTick()
     expect(confirmOnly.vm.showHints).toBe(true)
   })
 
   it('evaluates the length requirement at the six-character boundary', () => {
-    const short = mountPassword({ form: { password: 'a1b2c' } })
+    const short = mountPassword({ form: { password: 'a1b2c' }})
     expect(short.vm.isLengthOk).toBe(false)
 
-    const exact = mountPassword({ form: { password: 'a1b2c3' } })
+    const exact = mountPassword({ form: { password: 'a1b2c3' }})
     expect(exact.vm.isLengthOk).toBe(true)
   })
 
   it('evaluates letter and number branches independently', () => {
-    expect(mountPassword({ form: { password: '123456' } }).vm.hasLetter).toBe(false)
-    expect(mountPassword({ form: { password: '123456' } }).vm.hasNumber).toBe(true)
-    expect(mountPassword({ form: { password: 'abcdef' } }).vm.hasLetter).toBe(true)
-    expect(mountPassword({ form: { password: 'abcdef' } }).vm.hasNumber).toBe(false)
-    expect(mountPassword({ form: { password: 'abc123' } }).vm.hasLetter).toBe(true)
-    expect(mountPassword({ form: { password: 'abc123' } }).vm.hasNumber).toBe(true)
-    expect(mountPassword({ form: {} }).vm.hasLetter).toBe(false)
-    expect(mountPassword({ form: {} }).vm.hasNumber).toBe(false)
+    expect(mountPassword({ form: { password: '123456' }}).vm.hasLetter).toBe(false)
+    expect(mountPassword({ form: { password: '123456' }}).vm.hasNumber).toBe(true)
+    expect(mountPassword({ form: { password: 'abcdef' }}).vm.hasLetter).toBe(true)
+    expect(mountPassword({ form: { password: 'abcdef' }}).vm.hasNumber).toBe(false)
+    expect(mountPassword({ form: { password: 'abc123' }}).vm.hasLetter).toBe(true)
+    expect(mountPassword({ form: { password: 'abc123' }}).vm.hasNumber).toBe(true)
+    expect(mountPassword({ form: {}}).vm.hasLetter).toBe(false)
+    expect(mountPassword({ form: {}}).vm.hasNumber).toBe(false)
   })
 
   it('evaluates match branches for hidden and visible modes', () => {
-    const empty = mountPassword({ form: {} })
+    const empty = mountPassword({ form: {}})
     expect(empty.vm.isMatch).toBe(false)
 
-    const mismatch = mountPassword({ form: { password: 'abc123' } })
+    const mismatch = mountPassword({ form: { password: 'abc123' }})
     mismatch.vm.onConfirmUpdate('abc124')
     expect(mismatch.vm.isMatch).toBe(false)
 
-    const match = mountPassword({ form: { password: 'abc123' } })
+    const match = mountPassword({ form: { password: 'abc123' }})
     match.vm.onConfirmUpdate('abc123')
     expect(match.vm.isMatch).toBe(true)
 
-    const visible = mountPassword({ form: { password: 'abc123' } })
+    const visible = mountPassword({ form: { password: 'abc123' }})
     visible.vm.passwordVisible = true
     expect(visible.vm.isMatch).toBe(true)
   })
 
   it('defaults to password type with a visible confirm input', () => {
-    const wrapper = mountPassword({ form: { password: 'abc123' } })
+    const wrapper = mountPassword({ form: { password: 'abc123' }})
     const inputs = wrapper.findAllComponents(ElInput)
     expect(inputs).toHaveLength(2)
     expect(inputs[0].props('type')).toBe('password')
@@ -97,7 +97,7 @@ describe('form/password.vue', () => {
   })
 
   it('toggles visibility, hiding the confirm input and match hint', async() => {
-    const wrapper = mountPassword({ form: { password: 'abc123' } })
+    const wrapper = mountPassword({ form: { password: 'abc123' }})
 
     await wrapper.find('.password-field__toggle').trigger('click')
     expect(wrapper.vm.passwordVisible).toBe(true)
@@ -111,7 +111,7 @@ describe('form/password.vue', () => {
   })
 
   it('marks satisfied hints with the ok class', async() => {
-    const wrapper = mountPassword({ form: {} })
+    const wrapper = mountPassword({ form: {}})
     wrapper.vm.onUpdate('abc123')
     wrapper.vm.onConfirmUpdate('abc123')
     await wrapper.vm.$nextTick()
@@ -122,7 +122,7 @@ describe('form/password.vue', () => {
 
   it('writes updates and normalizes empty strings to null', () => {
     const form = {}
-    const wrapper = mountPassword({ form, field: { property: 'password' } })
+    const wrapper = mountPassword({ form, field: { property: 'password' }})
 
     wrapper.vm.onUpdate('abc123')
     expect(form.password).toBe('abc123')
@@ -143,13 +143,13 @@ describe('form/password.vue', () => {
 
   it('syncs the plainPassword/password alias in both directions', () => {
     const createForm = {}
-    const createWrapper = mountPassword({ form: createForm, field: { property: 'plainPassword' } })
+    const createWrapper = mountPassword({ form: createForm, field: { property: 'plainPassword' }})
     createWrapper.vm.onUpdate('abc123')
     expect(createForm.plainPassword).toBe('abc123')
     expect(createForm.password).toBe('abc123')
 
     const passwordForm = {}
-    const passwordWrapper = mountPassword({ form: passwordForm, field: { property: 'password' } })
+    const passwordWrapper = mountPassword({ form: passwordForm, field: { property: 'password' }})
     passwordWrapper.vm.onUpdate('abc123')
     expect(passwordForm.password).toBe('abc123')
     expect(passwordForm.plainPassword).toBe('abc123')
@@ -157,7 +157,7 @@ describe('form/password.vue', () => {
 
   it('leaves unrelated properties without an alias untouched', () => {
     const form = {}
-    const wrapper = mountPassword({ form, field: { property: 'secret' } })
+    const wrapper = mountPassword({ form, field: { property: 'secret' }})
     wrapper.vm.onUpdate('abc123')
 
     expect(form.secret).toBe('abc123')
@@ -187,7 +187,7 @@ describe('form/password.vue', () => {
     mountPassword({
       form: {},
       field: { property: 'password' },
-      provide: { registerFieldValidator, getFormAdmin: () => ({ id: 0, rules: {} }) }
+      provide: { registerFieldValidator, getFormAdmin: () => ({ id: 0, rules: {}}) }
     })
 
     expect(registerFieldValidator).toHaveBeenCalledTimes(1)
@@ -197,7 +197,7 @@ describe('form/password.vue', () => {
   })
 
   it('falls back to pushing the validator onto formAdmin.rules', () => {
-    const admin = { id: 0, rules: {} }
+    const admin = { id: 0, rules: {}}
     mountPassword({
       form: {},
       field: { property: 'password' },
@@ -210,7 +210,7 @@ describe('form/password.vue', () => {
   })
 
   it('mounts safely with no form admin available', () => {
-    expect(() => mountPassword({ form: {} })).not.toThrow()
+    expect(() => mountPassword({ form: {}})).not.toThrow()
   })
 
   it('requires a password in create mode but not in update mode', async() => {
@@ -251,7 +251,7 @@ describe('form/password.vue', () => {
       field: { property: 'password' },
       provide: {
         registerFieldValidator: (name, fn) => { validator = fn },
-        getFormAdmin: () => ({ id: 7, rules: {} })
+        getFormAdmin: () => ({ id: 7, rules: {}})
       }
     })
     live.vm.onConfirmUpdate('different1')
@@ -267,7 +267,7 @@ describe('form/password.vue', () => {
       field: { property: 'password' },
       provide: {
         registerFieldValidator: (name, fn) => { validator = fn },
-        getFormAdmin: () => ({ id: 7, rules: {} })
+        getFormAdmin: () => ({ id: 7, rules: {}})
       }
     })
     live.vm.onConfirmUpdate('abc123')
@@ -281,7 +281,7 @@ describe('form/password.vue', () => {
       field: { property: 'password' },
       provide: {
         registerFieldValidator: (name, fn) => { validator = fn },
-        getFormAdmin: () => ({ id: 7, rules: {} })
+        getFormAdmin: () => ({ id: 7, rules: {}})
       }
     })
     live.vm.passwordVisible = true
@@ -301,7 +301,7 @@ describe('form/password.vue', () => {
     const wrapper = mountPassword({
       form,
       field: { property: 'password' },
-      provide: { getFormAdmin: () => ({ id: 0, rules: {}, $refs: { form: { validateField } } }) }
+      provide: { getFormAdmin: () => ({ id: 0, rules: {}, $refs: { form: { validateField }}}) }
     })
 
     wrapper.vm.onUpdate('abc123')
@@ -311,7 +311,7 @@ describe('form/password.vue', () => {
   })
 
   it('triggerValidate is a safe no-op without a form admin', async() => {
-    const wrapper = mountPassword({ form: {} })
+    const wrapper = mountPassword({ form: {}})
     expect(() => wrapper.vm.triggerValidate()).not.toThrow()
     await flushPromises()
   })

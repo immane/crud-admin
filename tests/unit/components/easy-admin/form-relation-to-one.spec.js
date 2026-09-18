@@ -2,7 +2,6 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { reactive } from 'vue'
 import ElementPlus, { ElOption, ElSelect } from 'element-plus'
 import RelationToOne from '@/easyadmin/ui/vue/plugins/form/RelationToOne.vue'
-import { loadRelationRecords } from '@/utils/relation'
 
 const { listMock, loadMock, constructed } = vi.hoisted(() => ({
   listMock: vi.fn(),
@@ -24,7 +23,7 @@ vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => ({
 }))
 
 vi.mock('@/configs/entities', () => ({
-  default: { Role: {}, User: {}, Region: {} }
+  default: { Role: {}, User: {}, Region: {}}
 }))
 
 vi.mock('@/utils/relation', async(importOriginal) => {
@@ -37,7 +36,7 @@ const RouterLinkStub = {
   template: '<a class="stub-router-link"><slot /></a>'
 }
 
-const roleField = () => ({ property: 'role', relation: { entity: 'Role', valueKey: 'id' } })
+const roleField = () => ({ property: 'role', relation: { entity: 'Role', valueKey: 'id' }})
 
 function mountOne({ form = {}, field = roleField(), struct = {}, emPrefix = '' } = {}) {
   return mount(RelationToOne, {
@@ -67,7 +66,7 @@ describe('form/RelationToOne.vue', () => {
       ]
     })
     const form = {}
-    const field = { property: 'role', relation: { entity: 'Role', valueKey: 'id' }, relation_filter: { '@order': 'entity.id|ASC' } }
+    const field = { property: 'role', relation: { entity: 'Role', valueKey: 'id' }, relation_filter: { '@order': 'entity.id|ASC' }}
     const wrapper = mountOne({ form, field })
     await flushPromises()
 
@@ -90,7 +89,7 @@ describe('form/RelationToOne.vue', () => {
 
   it('skips preload on created when type_options.remote is true', async() => {
     const wrapper = mountOne({
-      field: { property: 'role', relation: { entity: 'Role', valueKey: 'id' }, type_options: { remote: true } }
+      field: { property: 'role', relation: { entity: 'Role', valueKey: 'id' }, type_options: { remote: true }}
     })
     await flushPromises()
 
@@ -101,7 +100,7 @@ describe('form/RelationToOne.vue', () => {
 
   it('resolves the entity from type_options.entity_name', async() => {
     listMock.mockResolvedValue({ data: [{ id: 3, __toString: 'North' }] })
-    const wrapper = mountOne({ field: { property: 'region', type_options: { entity_name: 'Region' } } })
+    const wrapper = mountOne({ field: { property: 'region', type_options: { entity_name: 'Region' }}})
     await flushPromises()
 
     expect(wrapper.vm.entity).toBe('Region')
@@ -110,7 +109,7 @@ describe('form/RelationToOne.vue', () => {
   })
 
   it('resolves the entity from struct metadata', async() => {
-    const struct = { metadata: { type: 'ManyToOne', targetEntity: 'App\\Entity\\Role' } }
+    const struct = { metadata: { type: 'ManyToOne', targetEntity: 'App\\Entity\\Role' }}
     const wrapper = mountOne({ field: { property: 'role' }, struct })
     await flushPromises()
 
@@ -119,7 +118,7 @@ describe('form/RelationToOne.vue', () => {
   })
 
   it('skips fetching when no relation resolves', async() => {
-    const wrapper = mountOne({ field: { property: 'whatever' } })
+    const wrapper = mountOne({ field: { property: 'whatever' }})
     await flushPromises()
 
     expect(wrapper.vm.entity).toBeNull()
@@ -153,7 +152,7 @@ describe('form/RelationToOne.vue', () => {
     await flushPromises()
     expect(wrapper.vm.options).toEqual([])
 
-    await wrapper.setProps({ form: { role: 42 } })
+    await wrapper.setProps({ form: { role: 42 }})
     await flushPromises()
 
     expect(wrapper.vm.options).toContainEqual({ value: 42, label: '42' })
@@ -164,7 +163,7 @@ describe('form/RelationToOne.vue', () => {
       { uuid: 'u-1', __toString: 'Alice' },
       { uuid: 'u-9', __toString: 'Nobody' }
     ])
-    const wrapper = mountOne({ form: { userUuid: 'u-1' }, field: { property: 'userUuid' } })
+    const wrapper = mountOne({ form: { userUuid: 'u-1' }, field: { property: 'userUuid' }})
     await flushPromises()
     await flushPromises()
 
@@ -184,7 +183,7 @@ describe('form/RelationToOne.vue', () => {
   })
 
   it('skips hydration when nothing is selected', async() => {
-    mountOne({ form: {}, field: { property: 'userUuid' } })
+    mountOne({ form: {}, field: { property: 'userUuid' }})
     await flushPromises()
     await flushPromises()
 
@@ -203,7 +202,7 @@ describe('form/RelationToOne.vue', () => {
     let resolveList
     listMock.mockImplementationOnce(() => new Promise((resolve) => { resolveList = resolve }))
     const wrapper = mountOne({
-      field: { property: 'role', relation: { entity: 'Role', valueKey: 'id' }, type_options: { remote: true } }
+      field: { property: 'role', relation: { entity: 'Role', valueKey: 'id' }, type_options: { remote: true }}
     })
     await flushPromises()
     expect(listMock).not.toHaveBeenCalled()
@@ -221,7 +220,7 @@ describe('form/RelationToOne.vue', () => {
 
   it('remoteSearch with an empty query clears options without fetching', async() => {
     const wrapper = mountOne({
-      field: { property: 'role', relation: { entity: 'Role', valueKey: 'id' }, type_options: { remote: true } }
+      field: { property: 'role', relation: { entity: 'Role', valueKey: 'id' }, type_options: { remote: true }}
     })
     await flushPromises()
     wrapper.vm.options = [{ value: 1, label: 'Admin' }]
@@ -314,7 +313,7 @@ describe('form/RelationToOne.vue', () => {
   })
 
   it('shows a creation link only when field.creationUrl is set', () => {
-    const withUrl = mountOne({ field: { ...roleField(), creationUrl: '/roles/create' } })
+    const withUrl = mountOne({ field: { ...roleField(), creationUrl: '/roles/create' }})
     const link = withUrl.find('.stub-router-link')
     expect(link.exists()).toBe(true)
     expect(withUrl.findComponent(RouterLinkStub).props('to')).toEqual({ path: '/roles/create' })
