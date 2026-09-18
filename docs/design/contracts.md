@@ -1,7 +1,7 @@
 # Code Contracts & API Contracts
 
 > Vue Admin Skeleton — Code Contracts & API Contracts  
-> Last updated: 2026-07-03
+> Last updated: 2026-09-18
 
 ---
 
@@ -18,7 +18,11 @@ interface ApiResponse<T = any> {
 }
 
 interface Paginator {
-  totalCount: number    // Total record count
+  totalCount?: number   // Mapped from backend `total`
+  total?: number
+  page?: number
+  limit?: number
+  pages?: number
 }
 ```
 
@@ -100,7 +104,9 @@ Response (200):
 
 ### 2.4 Token Delivery
 
-- Token stored in Cookie: `dream_studio_admin_token`
+- Token stored in port-isolated Cookie: `dream_studio_admin_token_{port}`
+  (legacy non-suffixed key kept as fallback)
+- Refresh token likewise: `dream_studio_admin_refresh_token_{port}`
 - Each request via Header: `Authorization: Bearer {token}`
 
 ---
@@ -139,10 +145,8 @@ Response:
                                     // 'ManyToOne'|'OneToOne'|'ManyToMany'|'OneToMany'
           "nullable": boolean,
           "targetEntity"?: string,  // Relation fields only
-          "translation"?: {
-            "label"?: string,
-            "help"?: string
-          }
+          "translation"?: string,   // Label text (plain string, not an object)
+          "plaintext"?: string      // NOTE: backend spells it without the 'i'
         }
       }
     }
@@ -173,7 +177,7 @@ The backend currently provides no batch-delete endpoint. `ListAdmin` deletes the
 selected records on the current page with concurrent requests to the single-record
 delete endpoint and reports any partial failures.
 
-### 3.5 Batch Update
+### 3.4 Batch Update
 
 ```
 POST /api/v1/manage/{plural}/batch-update?@basis=id&@mode=update
@@ -197,7 +201,7 @@ Each managed entity exposes a `POST .../batch-update?@basis=id&@mode=update`
 endpoint. The request contains one record per primary key. Each record includes
 only `id` and the fields to update; omitted fields retain their original values.
 
-### 3.6 Query Parameters
+### 3.5 Query Parameters
 
 The list endpoint supports the following query params:
 
@@ -247,7 +251,8 @@ g(entityName: string, title: string, meta?: object, component?: Component): Rout
 
 Entity name transformation: `inflect.dasherize(inflect.underscore(entityName))`
 - `Product` → `product`
-- `Transaction` → `wallet-transaction`
+- `Transaction` → `transaction` (route path; the API plural defaults to
+  `transactions` — `wallet-` prefixes only come from an explicit `plural`)
 
 ---
 
@@ -326,20 +331,26 @@ Props contract shared by both components:
 
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
-| `entityConf` | String \| Object | Yes | Entity name or entity identity config (`EntityConf`) |
-| `value` (v-model) | Object (Form) / Array (List) | No | Bound data |
+| `entityConf` | String \| Object | No (defaults to `{}`) | Entity name or entity identity config (`EntityConf`) |
+| `modelValue` (v-model) | Object (Form) / Array (List) | No | Bound data |
 
 ### 7.2 FormAdmin-Specific Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | Number | 0 | Primary key (0=create, >0=edit) |
+| `id` | Number \| String | 0 | Primary key, incl. UUID (0=create, otherwise edit) |
 | `fields` | Array \| String | — | Field list or `'__all__'` |
+| `structureOverride` | Object \| null | null | Local structure for nested schema forms (skips backend fetch) |
+| `embedded` | Boolean | false | Nested mode: no title bar / save button |
 
 ### 7.3 ListAdmin-Specific Props
 
 | Prop | Type | Description |
 |------|------|-------------|
+| `entityConf` | Object \| String | Entity name or identity config |
+| `tableConf` | Object | Extra `el-table` props (passthrough via `v-bind`) |
+| `tableEvent` | Object | Extra `el-table` events (passthrough via `v-on`) |
+| `modelValue` | Array | Selected/bound rows |
 | `config` | Object | Full entity config |
 | `listDisplay` | Array | Columns to display |
 | `listFilter` | Object | Filter config |
@@ -361,3 +372,14 @@ interface FormPluginProps {
   emPrefix?: string              // API prefix
 }
 ```
+
+### 7.5 FormAdmin Provided/Injected Keys
+
+`FormAdmin` provides via `provide()` (consumed with `inject`, e.g. by field
+plugins and nested forms):
+
+| Key | Value | Purpose |
+|-----|-------|---------|
+| `registerFieldValidator` | `(field, validator, trigger?) => void` | Plugins register custom validators (e.g. `json_schema` registers its Ajv validator with trigger `'change'`; email/image/file use the same path) |
+| `getFormAdmin` | `() => FormAdmin` | Access the enclosing admin instance (e.g. `parent.$refs.form.validateField(prop)` refresh) |
+| `easyadminFormDepth` | `number` | Depth in the FormAdmin nesting tree (top-level = 1); feeds the nesting-depth guard, no consumer action needed |

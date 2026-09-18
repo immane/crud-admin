@@ -1,7 +1,7 @@
 # AI Context
 
 > Vue Admin Skeleton — AI Assistant Context Document  
-> Last updated: 2026-09-02
+> Last updated: 2026-09-18
 
 ---
 
@@ -72,6 +72,7 @@ src/
 ├── utils/                # Utilities
 │   ├── auth.js           # Cookie token management
 │   ├── request.ts        # Axios JWT instance
+│   ├── json-schema-form.js # Schema form helpers: createSchemaForm, applySchemaDefaults, valueForSchemaValidation, isDeepEqual
 │   └── upload.js         # Unified upload (host resolution, headers, path normalisation)
 └── views/                # Page views
     ├── admin/            # Generic CRUD (list + form + detail)
@@ -118,7 +119,6 @@ export default {
 ```
 
 The `detail_display` falls back to `list.list_display` → `form.fields` → all API fields. Detail fields use the same `FieldOption` contract and list rendering plugins as `list_display`.
-```
 
 The auto-loader (`entities.js`) uses `import.meta.glob` to collect all `.js` files under `collections/`. Files at depth 2 (e.g., `trade/Product.js`) are treated as collections and merged via `Object.assign`. Files at depth 3+ would be treated as standalone entities.
 
@@ -129,7 +129,18 @@ Entity configs can embed custom Vue components in `form.fields` via the `compone
 { property: 'specifications', tab: '规格', component: SpecificationManager }
 ```
 
-This is used in `Product.jsx` to embed specification management (ListAdmin + create/edit dialog with nested FormAdmin) directly inside the product form. The component must be a Vue component definition object and relies on direct imports within the config module. It walks `$parent` to find the `FormAdmin` instance for the `productId`.
+This is used in `Product.jsx` to embed specification management (ListAdmin + create/edit dialog with nested FormAdmin) directly inside the product form. The component must be a Vue component definition object and resolves the admin UI through `defineAsyncComponent(() => import(...))` — never static SFC imports (see "Module Layering Rule" below). It walks `$parent` to find the `FormAdmin` instance for the `productId`.
+
+#### Module Layering Rule (configs must not statically import UI)
+
+Dependency direction is strictly one-way: UI/view layers → config layer, never back. `configs/entities.js` eagerly loads **every** collection module (`import.meta.glob(..., { eager: true })`), and `FormAdmin`/`ListAdmin` both import `entities` — so a single static `.vue` import inside any collection file closes the eager cycle `FormAdmin → entities → Product.jsx → ListAdmin → FormAdmin`, which blows up with `Cannot access 'FormAdmin' before initialization` (order-dependent: it can survive fresh loads and detonate after HMR or any import-graph change, blanking async chunks such as the `json_schema` plugins). Custom field components needing admin UI must use async boundaries:
+
+```js
+const ListAdmin = defineAsyncComponent(() => import('@/easyadmin/ui/vue/ListAdmin'))
+const FormAdmin = defineAsyncComponent(() => import('@/easyadmin/ui/vue/FormAdmin'))
+```
+
+Guarded by `tests/unit/easyadmin/configs/product-async-admin.spec.js`. `vite build` must show no `Circular dependency` warnings.
 
 ### 2. Vite Glob Dynamic Loading
 
@@ -305,7 +316,7 @@ Adding a new detail plugin: create `plugins/detail/{type}.vue` with the same pro
 ```bash
 npm run dev          # Development (localhost:9528)
 npm run build        # Production build
-npm run lint         # ESLint
+npm run lint         # ESLint (src/ only; run `npx eslint tests` for unit tests)
 npm run type-check   # TypeScript check
 npm run test         # Vitest unit tests
 ```
@@ -373,6 +384,22 @@ for Vue 2's `v-set` pattern):
 - Simple text input uses `.sync`-free pattern: `:model-value` + `@update:model-value`.
 - Relation plugins fetch options via `CrudSkeletonAdapter.list()` and cache in local `data()`.
 - JSON editor uses direct `import JSONEditor from 'jsoneditor'` (no Vue wrapper).
+
+### Nested FormAdmin Sync (deep-equality echo guard)
+
+`json_schema` renders an embedded `FormAdmin` via `v-model="form[field.property]"`. Every sync emits a **fresh object copy**, so the parent/child watchers must compare with order-insensitive deep equality (`isDeepEqual` in `src/utils/json-schema-form.js`) — a reference check alone ping-pongs forever (`Maximum recursive updates exceeded`) and can starve sibling schema forms on create.
+
+### json_schema Outer Validation Refresh
+
+Nested inputs only notify the **inner** form items, so the outer field's error state would stay red forever after the first failure. `json_schema.vue` therefore watches its nested value and re-runs the parent `validateField(property)` — but only after a validation has actually run (`validatedOnce` flag), so pristine fields are never marked on page open. Same `triggerValidate` pattern as the email/image/file plugins. The Ajv validator itself is unchanged: empty optional root objects pass, empty required roots fail, blank optional properties are stripped from the validation copy only.
+
+### FormAdmin Nesting Depth Guard
+
+`FormAdmin` tracks its depth in the nesting tree via `provide`/`inject` (`easyadminFormDepth`, top-level form = 1), which propagates through plugins, dialogs, and custom field components without cooperation from intermediaries. Past `MAX_FORM_NESTING_DEPTH` (10, in `FormAdmin.vue`) the form renders a warning placeholder (i18n key `Form nesting too deep — check for circular form references`) and skips structure fetching. Genuine trees nest at depth 2–4; anything deeper is a self-referencing config. Tune the single constant if a legitimate schema ever needs more.
+
+### ESLint State
+
+`npm run lint` is clean (exit 0) across `src/` **and** `tests/` (run the latter via `npx eslint tests`). `.eslintrc.js` has a `tests/**` override granting vitest globals (`jest` env + `vi`/`globalThis`). Repo style: single quotes, no semicolons, `async()` with no space before parens, nested-object brace spacing (`objectsInObjects: false`). Keep it green — CI does not run lint, so regressions accumulate silently.
 
 ### Nested API Resources (e.g., Specifications under Products)
 
