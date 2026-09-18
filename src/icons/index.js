@@ -26,7 +26,7 @@ function injectSprite() {
 }
 
 export default function installIcons(app) {
-  app.component('svg-icon', SvgIcon)
+  app.component('SvgIcon', SvgIcon)
   if (document.body) {
     injectSprite()
   } else {

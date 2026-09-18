@@ -1,5 +1,5 @@
 <template>
-    <section class="detail-admin">
+  <section class="detail-admin">
     <header class="detail-admin__header">
       <div>
         <p class="detail-admin__eyebrow">RECORD DETAIL</p>
@@ -88,12 +88,6 @@ export default {
       loaded: false
     }
   },
-  created() {
-    this.properties = (this.fields === '__all__' ? [] : this.fields.filter(field => field !== '__all__')).map(field =>
-      typeof field === 'string' ? { property: field } : (field.component ? { ...field, component: markRaw(toRaw(field.component)) } : field)
-    )
-    this.fetchData()
-  },
   computed: {
     // Skeleton covers the first paint; refetches keep stale content visible.
     showSkeleton() {
@@ -102,6 +96,12 @@ export default {
     skeletonRows() {
       return this.properties.length || 6
     }
+  },
+  created() {
+    this.properties = (this.fields === '__all__' ? [] : this.fields.filter(field => field !== '__all__')).map(field =>
+      typeof field === 'string' ? { property: field } : (field.component ? { ...field, component: markRaw(toRaw(field.component)) } : field)
+    )
+    this.fetchData()
   },
   methods: {
     fetchData() {

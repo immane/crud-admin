@@ -58,7 +58,7 @@ export function shorthandExpression(key: string, field: ShorthandField): Shortha
         } else if (k === '__default') {
           result.default = v
         } else {
-          ;(result.data as Array<{ value: string; label: any }>).push({ value: k, label: v })
+          (result.data as Array<{ value: string; label: any }>).push({ value: k, label: v })
         }
       }
     }

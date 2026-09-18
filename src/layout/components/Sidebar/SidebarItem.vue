@@ -1,36 +1,35 @@
 <template>
-  <template v-if="!item.hidden">
-    <template v-if="hasOneShowingChild(item.children,item) && (!onlyOneChild.children||onlyOneChild.noShowingChildren)&&!item.alwaysShow">
-      <el-menu-item v-if="onlyOneChild.meta" :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}">
-        <item :icon="onlyOneChild.meta.icon||(item.meta&&item.meta.icon)" :title="onlyOneChild.meta.title" />
-      </el-menu-item>
-    </template>
+  <el-menu-item
+    v-if="isSingleMenuItem() && onlyOneChild.meta"
+    :index="resolvePath(onlyOneChild.path)"
+    :class="{'submenu-title-noDropdown':!isNest}"
+  >
+    <item :icon="onlyOneChild.meta.icon||(item.meta&&item.meta.icon)" :title="onlyOneChild.meta.title" />
+  </el-menu-item>
 
-    <el-sub-menu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
-      <template #title>
-        <item v-if="item.meta" :icon="item.meta && item.meta.icon" :title="item.meta.title" />
-      </template>
-      <sidebar-item
-        v-for="child in item.children"
-        :key="child.path"
-        :is-nest="true"
-        :item="child"
-        :base-path="resolvePath(child.path)"
-        class="nest-menu"
-      />
-    </el-sub-menu>
-  </template>
+  <el-sub-menu v-else-if="!item.hidden && !isSingleMenuItem()" ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
+    <template #title>
+      <item v-if="item.meta" :icon="item.meta && item.meta.icon" :title="item.meta.title" />
+    </template>
+    <sidebar-item
+      v-for="child in item.children"
+      :key="child.path"
+      :is-nest="true"
+      :item="child"
+      :base-path="resolvePath(child.path)"
+      class="nest-menu"
+    />
+  </el-sub-menu>
 </template>
 
 <script>
 import { isExternal } from '@/utils/validate'
 import Item from './Item'
-import AppLink from './Link'
 import FixiOSBug from './FixiOSBug'
 
 export default {
   name: 'SidebarItem',
-  components: { Item, AppLink },
+  components: { Item },
   mixins: [FixiOSBug],
   props: {
     // route object
@@ -54,6 +53,16 @@ export default {
     return {}
   },
   methods: {
+    // Single evaluation entry for the template branches below. Short-circuits
+    // on hidden items exactly like the previous nested v-ifs, so
+    // hasOneShowingChild (which records onlyOneChild as a side effect) keeps
+    // the same call semantics. Idempotent: repeated calls settle identically.
+    isSingleMenuItem() {
+      return !this.item.hidden &&
+        this.hasOneShowingChild(this.item.children, this.item) &&
+        (!this.onlyOneChild.children || this.onlyOneChild.noShowingChildren) &&
+        !this.item.alwaysShow
+    },
     hasOneShowingChild(children = [], parent) {
       const showingChildren = children.filter(item => {
         if (item.hidden) {

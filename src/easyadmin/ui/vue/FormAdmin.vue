@@ -275,6 +275,22 @@ export default {
       loaded: false
     }
   },
+  computed: {
+    // Depth of this form in the FormAdmin nesting tree (top-level form is 1).
+    nestingDepth() {
+      return (this.parentFormDepth || 0) + 1
+    },
+    nestingLimitExceeded() {
+      return this.nestingDepth > MAX_FORM_NESTING_DEPTH
+    },
+    // Skeleton covers the first paint; later refreshes keep content visible.
+    showSkeleton() {
+      return this.loading && !this.loaded
+    },
+    skeletonRows() {
+      return this.properties.length || 6
+    }
+  },
   watch: {
     modelValue(value) {
       // Schema-backed child forms mount before the parent finishes fetching edit data.
@@ -414,22 +430,6 @@ export default {
       this.loading = false
       this.loaded = true
     })
-  },
-  computed: {
-    // Depth of this form in the FormAdmin nesting tree (top-level form is 1).
-    nestingDepth() {
-      return (this.parentFormDepth || 0) + 1
-    },
-    nestingLimitExceeded() {
-      return this.nestingDepth > MAX_FORM_NESTING_DEPTH
-    },
-    // Skeleton covers the first paint; later refreshes keep content visible.
-    showSkeleton() {
-      return this.loading && !this.loaded
-    },
-    skeletonRows() {
-      return this.properties.length || 6
-    }
   },
   methods: {
     log(...arg) {

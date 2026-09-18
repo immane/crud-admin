@@ -41,7 +41,7 @@ export function buildExportRequest(
     keys = Object.keys(row)
     keys.forEach((key) => {
       if (typeof row[key] === 'object' && row[key] !== null) {
-        row[key] = (row[key] as Record<string, any>).hasOwnProperty('__toString')
+        row[key] = Object.prototype.hasOwnProperty.call(row[key] as Record<string, any>, '__toString')
           ? (row[key] as Record<string, any>).__toString
           : '[Object]'
       }

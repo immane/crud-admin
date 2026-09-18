@@ -910,10 +910,10 @@ export default {
       // default config
       const exportConf = this.config.list.export
       const listQuery = this.config.list.query
-      let exportQuery = {}, exportLabel = {}
+      let exportQuery = {}; let exportLabel = {}
       if (exportConf) {
-        if (exportConf.hasOwnProperty('query')) exportQuery = exportConf.query
-        if (exportConf.hasOwnProperty('label')) exportLabel = exportConf.label
+        if (Object.prototype.hasOwnProperty.call(exportConf, 'query')) exportQuery = exportConf.query
+        if (Object.prototype.hasOwnProperty.call(exportConf, 'label')) exportLabel = exportConf.label
       }
 
       // Use current filter
