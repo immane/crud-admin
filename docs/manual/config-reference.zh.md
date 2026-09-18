@@ -490,7 +490,7 @@ form: {
 }
 ```
 
-插件渲染一个带远程搜索的 `<el-select>`。选项通过 `EntityManage.list()` 从目标实体获取。
+插件渲染一个带远程搜索的 `<el-select>`。选项通过 `CrudSkeletonAdapter.list()` 从目标实体获取。
 
 对于基于用户输入的动态筛选，设置 `remote: true`：
 
@@ -562,8 +562,8 @@ form: {
 ### 7.2 JSX 配置组件（如 Product.jsx 中的 SpecificationManager）
 
 ```js
-import ListAdmin from '@/components/EasyAdmin/ListAdmin'
-import FormAdmin from '@/components/EasyAdmin/FormAdmin'
+import ListAdmin from '@/easyadmin/ui/vue/ListAdmin'
+import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
 
 const SpecificationManager = {
   components: { ListAdmin, FormAdmin },

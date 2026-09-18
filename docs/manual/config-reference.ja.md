@@ -458,7 +458,7 @@ FormAdmin は `field.rules` / `field.validator` を `el-form` ルールにマー
 }
 ```
 
-プラグインはリモート検索付きの `<el-select>` をレンダリングします。オプションは `EntityManage.list()` を通じて対象エンティティから取得されます。
+プラグインはリモート検索付きの `<el-select>` をレンダリングします。オプションは `CrudSkeletonAdapter.list()` を通じて対象エンティティから取得されます。
 
 ユーザー入力に基づく動的フィルタリングには、`remote: true` を設定します：
 
@@ -530,8 +530,8 @@ FormAdmin は `field.rules` / `field.validator` を `el-form` ルールにマー
 ### 7.2 JSX 設定コンポーネント（Product.jsx の SpecificationManager など）
 
 ```js
-import ListAdmin from '@/components/EasyAdmin/ListAdmin'
-import FormAdmin from '@/components/EasyAdmin/FormAdmin'
+import ListAdmin from '@/easyadmin/ui/vue/ListAdmin'
+import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
 
 const SpecificationManager = {
   components: { ListAdmin, FormAdmin },

@@ -453,7 +453,7 @@ FormAdmin 會將 `field.rules` / `field.validator` 合併到 `el-form` 校驗中
 }
 ```
 
-外掛繪製一個帶遠端搜尋的 `<el-select>`。選項透過 `EntityManage.list()` 從目標實體取得。
+外掛繪製一個帶遠端搜尋的 `<el-select>`。選項透過 `CrudSkeletonAdapter.list()` 從目標實體取得。
 
 對於基於使用者輸入的動態篩選，設定 `remote: true`：
 
@@ -525,8 +525,8 @@ FormAdmin 會將 `field.rules` / `field.validator` 合併到 `el-form` 校驗中
 ### 7.2 JSX 設定組件（如 Product.jsx 中的 SpecificationManager）
 
 ```js
-import ListAdmin from '@/components/EasyAdmin/ListAdmin'
-import FormAdmin from '@/components/EasyAdmin/FormAdmin'
+import ListAdmin from '@/easyadmin/ui/vue/ListAdmin'
+import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
 
 const SpecificationManager = {
   components: { ListAdmin, FormAdmin },

@@ -3,7 +3,7 @@ import { reactive, nextTick } from 'vue'
 
 if (!globalThis.$t) globalThis.$t = (k) => k
 
-vi.mock('@/components/EasyAdmin/FormAdmin', () => ({
+vi.mock('@/easyadmin/ui/vue/FormAdmin', () => ({
   __esModule: true,
   default: {
     name: 'FormAdmin',
@@ -13,7 +13,7 @@ vi.mock('@/components/EasyAdmin/FormAdmin', () => ({
   }
 }))
 
-import JsonCustomPlugin from '@/components/EasyAdmin/plugins/form/json-custom.vue'
+import JsonCustomPlugin from '@/easyadmin/ui/vue/plugins/form/json-custom.vue'
 
 const FormAdminStubName = 'FormAdmin'
 

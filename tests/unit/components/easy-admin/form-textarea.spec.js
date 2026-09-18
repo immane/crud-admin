@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { reactive, nextTick } from 'vue'
 import ElementPlus, { ElInput } from 'element-plus'
-import TextareaPlugin from '@/components/EasyAdmin/plugins/form/textarea.vue'
+import TextareaPlugin from '@/easyadmin/ui/vue/plugins/form/textarea.vue'
 
 function mountTextarea(formData = { bio: '' }, fieldData = { property: 'bio' }) {
   const form = reactive(formData)

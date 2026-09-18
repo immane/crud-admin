@@ -203,11 +203,18 @@ The list endpoint supports the following query params:
 
 | Param | Description | Example |
 |-------|-------------|---------|
-| `@page` | Page number (1-based) | `@page=1` |
-| `@limit` | Items per page | `@limit=25` |
-| `@order` | Sort order | `@order=entity.id\|DESC` |
-| `@filter` | DQL filter expression | `@filter=entity.status=="active"` |
-| `@query` | Free text search | `@query=keyword` |
+| `page` | Page number (1-based) | `page=1` |
+| `limit` | Items per page | `limit=25` |
+| `@order` | Sort order (`field\|DIR`, comma-separated multi-key) | `@order=entity.id\|DESC` |
+| `@filter` | DQL filter expression (`entity.getX()` paths, `&&`/`\|\|` joins) | `@filter=entity.getStatus()=="paid"` |
+
+Advanced params: `@select`, `@groupBy`, `@display` (e.g. `@display=reduce` for relation dropdowns), `@expands`. Never use `@sort` (admin-only in-memory comparator), `@dql`/`@hints` (admin-only), or `@showDQL` (dev only) from normal UI code.
+
+DQL expression rules (backend-verified against crud-skeleton `ExpressionDqlParser`):
+
+- Filter paths must use `entity.getX()` chains (e.g. `entity.getUser().getName()`). Bare property access (`entity.status`), `is*`/`has*` getters (`entity.isSystem()`), and bare names are not DQL-safe: non-admin requests get HTTP 403, admin requests silently fall back to full-table in-memory filtering. Query boolean `isSystem` properties as `entity.getIsSystem()`.
+- Join conditions with `&&` / `||` (never the `and` / `or` keywords). Test null with bare `entity.getX()` (`IS NOT NULL`) or `!entity.getX()` (`IS NULL`) — never `== null` (compiles to `= NULL`, never true).
+- `matches 'text'` is a backend-wrapped substring `LIKE` (do not pre-wrap `%`). `:value` is a frontend pre-substitution placeholder, never interpreted server-side in the `@filter` path.
 
 ---
 
@@ -319,7 +326,7 @@ Props contract shared by both components:
 
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
-| `entityConf` | String \| Object | Yes | Entity name or EntityManage config |
+| `entityConf` | String \| Object | Yes | Entity name or entity identity config (`EntityConf`) |
 | `value` (v-model) | Object (Form) / Array (List) | No | Bound data |
 
 ### 7.2 FormAdmin-Specific Props

@@ -1,0 +1,1431 @@
+<template>
+  <div>
+    <div class="easy-admin-toolbar">
+      <div class="easy-admin-toolbar__title">
+        <slot name="title">
+          <strong>
+            <slot name="titleText">
+              {{ titleText }}
+            </slot>
+          </strong>
+        </slot>
+      </div>
+      <div class="easy-admin-toolbar__body">
+        <div class="easy-admin-toolbar__search">
+          <slot name="filter">
+            <search-filter
+              ref="searchFilter"
+              v-model="listFilterData"
+              v-model:filter="filter"
+              :query="query"
+              :fetch-data-func="fetchFilteredData"
+              :list-filter="listFilter"
+              :refreshing="refreshing"
+              @reset="resetSearch"
+            />
+          </slot>
+        </div>
+        <div class="easy-admin-toolbar__actions">
+          <slot name="extraTopButton">
+            <component
+              :is="action.component"
+              v-for="action in actions.filter(action => action.position === 'top')"
+              :key="action.name"
+              :refresh="fetchData"
+            />
+          </slot>
+          <template v-if="selectedRecords.length && (hasBatchDelete || hasBatchEdit)">
+            <span class="easy-admin-selection-count">{{ $t('{0} records selected', selectedRecords.length) }}</span>
+            <el-popconfirm
+              v-if="hasBatchDelete"
+              :title="$t('Delete {0} selected records?', selectedRecords.length)"
+              @confirm="removeSelected"
+            >
+              <template #reference>
+                <el-button
+                  size="default"
+                  type="danger"
+                  icon="el-icon-delete"
+                  plain
+                  :loading="batchDeleting"
+                >
+                  {{ $t('Batch Delete') }}
+                </el-button>
+              </template>
+            </el-popconfirm>
+            <el-button v-if="hasBatchEdit" size="default" type="primary" icon="el-icon-edit" plain @click="openBatchEditDialog">
+              {{ $t('Batch Edit') }}
+            </el-button>
+          </template>
+          <slot name="topButton">
+            <div class="easy-admin-toolbar__default-actions">
+              <template
+                v-if="!disabledActions.includes('export')
+                  && config && config.list && config.list.export"
+              >
+                <el-button
+                  size="default"
+                  type="primary"
+                  icon="el-icon-download"
+                  plain
+                  @click="exportData"
+                >
+                  {{ $t('Export') }}
+                </el-button>
+              </template>
+              <el-button
+                v-if="!disabledActions.includes('new')"
+                size="default"
+                type="primary"
+                icon="el-icon-plus"
+                @click="() => {
+                  dialog.title = $t('New Record')
+                  delete dialog.data.id
+                  dialog.refresh++
+                  dialog.show = true
+                }"
+              >
+                {{ $t('New') }} {{ $route.meta.title }}
+              </el-button>
+            </div>
+          </slot>
+        </div>
+      </div>
+    </div>
+
+    <el-row>
+      <el-table
+        :key="refreshTable"
+        :data="list"
+        :empty-text="refreshing ? $t('Loading data...') : $t('No data')"
+        fit
+        lazy
+        stripe
+        highlight-current-row
+        v-bind="tableConf"
+        table-layout="auto"
+        style="width: 100%"
+        v-on="tableEvent || {}"
+        @sort-change="changeSort"
+        @selection-change="handleSelectionChange"
+      >
+
+        <slot name="tableSelection" />
+
+        <el-table-column v-if="hasBatchDelete" type="selection" width="48" />
+
+        <el-table-column
+          label="#"
+          type="index"
+        />
+
+        <el-table-column
+          v-for="(field, index) in properties"
+          :key="index"
+          :label="field.label ? field.label : (structure[field.property] ? structure[field.property]['translation']: field.property)"
+          sortable
+          :prop="field.property"
+          v-bind="field.field_options"
+          v-on="field.field_events || {}"
+        >
+          <template #default="scope">
+
+            <!---------------
+            |  Fields slot  |
+            ---------------->
+
+            <slot
+              :name="field.property"
+              :value="extractFields(scope.row, field.property)"
+              :record="scope.row"
+              :refresh="fetchData"
+            >
+              <!-- Dynamic components and JSX function -->
+              <div v-if="Object.keys(field).includes('component')">
+                <component
+                  :is="field.component"
+                  :data="extractFields(scope.row, field.property)"
+                  :scope="scope"
+                  :record="scope.row"
+                  :refresh="fetchData"
+                />
+              </div>
+
+              <!-- Normal fields -->
+              <div v-else>
+                <template v-if="isEditableField(field, structure[field.property])">
+                  <component
+                    :is="EditablePlain"
+                    :em="em"
+                    :scope="scope"
+                    :field="field"
+                    :struct="structure[field.property]"
+                  />
+                </template>
+
+                <template v-else-if="getListPluginType(field, structure[field.property], extractFields(scope.row, field.property))">
+                  <component
+                    :is="loadListPlugin(getListPluginType(field, structure[field.property], extractFields(scope.row, field.property)))"
+                    :value="extractFields(scope.row, field.property)"
+                    :field="field"
+                    :scope="scope"
+                    :em="em"
+                    :struct="structure[field.property]"
+                  />
+                </template>
+
+                <span v-else>
+                  {{ htmlStrip(extractFields(scope.row, field.property)) }}
+                </span>
+              </div>
+            </slot>
+          </template>
+        </el-table-column>
+
+        <el-table-column v-if="!disabledActions.includes('lines')" :label="$t('Actions')" width="240" fixed="right">
+          <template #default="scope">
+            <div class="easy-admin-actions">
+              <component
+                :is="action.component"
+                v-for="action in actions.filter(action => action.position === 'list')"
+                :key="action.name"
+                :record="scope.row"
+                :refresh="fetchData"
+              />
+
+              <slot name="extraAction" :data="scope.row" />
+
+              <slot name="action" :data="scope.row">
+                <slot name="action:detail" :data="scope.row">
+                  <el-button
+                    v-if="config && !disabledActions.includes('detail')"
+                    size="small"
+                    icon="el-icon-view"
+                    plain
+                    @click="$router.push({ name: `${em.name}Detail`, params: { id: scope.row.id } })"
+                  >
+                    {{ $t('Details') }}
+                  </el-button>
+                </slot>
+
+                <slot name="action:edit" :data="scope.row">
+                  <el-button
+                    v-if="!disabledActions.includes('edit')"
+                    size="small"
+                    icon="el-icon-edit"
+                    plain
+                    @click="openEditDialog(scope.row.id)"
+                  >
+                    {{ $t('Edit') }}
+                  </el-button>
+                </slot>
+
+                <slot name="action:delete" :data="scope.row">
+                  <el-popconfirm v-if="!disabledActions.includes('delete')" :title="$t('Delete this record?')" @confirm="removeAction(scope.row.id)">
+                    <template #reference><el-button size="small" type="danger" icon="el-icon-delete" plain>{{ $t('Delete') }}</el-button></template>
+                  </el-popconfirm>
+                </slot>
+              </slot>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-row>
+
+    <el-row v-if="!disabledActions.includes('pager')">
+      <div class="pager block">
+        <el-pagination
+          :current-page="pager.page"
+          :page-size="pager.limit"
+          :page-sizes="[20, 50, 100, 300]"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="pagerTotal"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
+    </el-row>
+
+    <el-dialog
+      v-model="dialog.show"
+      class="easy-admin-dialog"
+      width="1040px"
+      :title="dialog.title"
+      @closed="fetchData"
+    >
+      <form-admin
+        v-if="dialog.show"
+        :id="dialog.data.id"
+        ref="dialogForm"
+        :key="dialog.refresh"
+        :entity-conf="dialog.data.entityConf"
+        :fields="dialog.data.fields"
+        :config="dialog.data.config"
+      >
+        <template #formTitle><span /></template>
+        <template #action><span /></template>
+      </form-admin>
+      <template #footer>
+        <el-button
+          type="primary"
+          icon="el-icon-edit-outline"
+          @click="$refs.dialogForm?.onSubmit(closeEditDialog)"
+        >
+          {{ $t('Save') }}
+        </el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog
+      v-model="batchEditDialog.show"
+      class="easy-admin-dialog"
+      width="640px"
+      :title="$t('Batch Edit')"
+      @closed="resetBatchEditDialog"
+    >
+      <div class="app-container">
+        <el-form label-width="120px">
+          <el-form-item
+            v-for="field in resolvedBatchFields"
+            :key="field.property"
+          >
+            <template #label>
+              <el-checkbox v-model="batchEditDialog.selectedFields" :value="field.property">
+                {{ field.label || (structure[field.property] ? structure[field.property]['translation'] : field.property) }}
+              </el-checkbox>
+            </template>
+            <component
+              :is="loadBatchPlugin(resolveBatchPluginType(field))"
+              :em-prefix="em.prefix"
+              :form="batchEditDialog.form"
+              :field="field"
+              :struct="structure[field.property]"
+            />
+            <template v-if="Object.keys(field).includes('help')">
+              <aside class="help-text">
+                <span class="help-text__icon" aria-hidden="true">
+                  <el-icon><el-icon-info /></el-icon>
+                </span>
+                <div class="help-text__content" v-html="renderHelp(field.help)" />
+              </aside>
+            </template>
+          </el-form-item>
+        </el-form>
+      </div>
+      <template #footer>
+        <el-button @click="batchEditDialog.show = false">{{ $t('Cancel') }}</el-button>
+        <el-button type="primary" icon="el-icon-edit-outline" :loading="batchEditing" @click="submitBatchEdit">
+          {{ $t('Save') }}
+        </el-button>
+      </template>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import { defineAsyncComponent, markRaw, toRaw } from 'vue'
+import CrudSkeletonAdapter from '@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter'
+import entities from '@/configs/entities'
+import { asyncRoutes } from '@/router'
+import { resolveRelation } from '@/utils/relation'
+import SIP from '@/utils/simple-image-process'
+import SearchFilter from './SearchFilter.vue'
+import FormAdmin from './FormAdmin.vue'
+import { createUiFeedback } from './feedback'
+import EditablePlain from './plugins/list/editable-plain.vue'
+import { compileCsqeQuery } from '@/easyadmin/adapters/crudskeleton/CrudSkeletonQueryCompiler'
+import {
+  buildQueryParams as buildUrlQueryParams,
+  applyQueryParams as applyUrlQueryParams
+} from '@/easyadmin/application/query/url-query-sync'
+import { normalizePaginator as normalizePaginatorResult } from '@/easyadmin/core/query/pagination'
+import { formatSortParam, mapElementPlusSort } from '@/easyadmin/core/query/sort-node'
+import {
+  collectBatchDeleteIds,
+  collectBatchUpdateData
+} from '@/easyadmin/application/usecases/batch-update-records'
+import { summarizeSettledDeletions } from '@/easyadmin/application/usecases/delete-records'
+import { buildExportRequest } from '@/easyadmin/application/usecases/export-records'
+
+const listPlugins = import.meta.glob('./plugins/list/*.vue')
+const listPluginCache = {}
+
+const resolveListPlugin = (path) => {
+  if (!listPluginCache[path]) {
+    listPluginCache[path] = defineAsyncComponent(() => listPlugins[path]().then(module => module.default))
+  }
+  return listPluginCache[path]
+}
+
+const formPlugins = import.meta.glob('./plugins/form/*.vue')
+const formPluginCache = {}
+
+const resolveFormPlugin = (path) => {
+  if (!formPluginCache[path]) {
+    formPluginCache[path] = defineAsyncComponent(() => formPlugins[path]().then(module => module.default))
+  }
+  return formPluginCache[path]
+}
+
+export default {
+  name: 'ListAdmin',
+  components: { FormAdmin, SearchFilter },
+
+  props: {
+    /**
+     * Main config
+     * {
+     *    form: [...],
+     *    list: [...]
+     * }
+     */
+    config: {
+      type: [Object],
+      default: () => {}
+    },
+
+    // Entity config or entity name
+    entityConf: {
+      type: [Object, String],
+      default: () => {}
+    },
+
+    // Table config
+    tableConf: {
+      type: [Object],
+      default: () => {}
+    },
+
+    // Table events
+    tableEvent: {
+      type: [Object],
+      default: () => {}
+    },
+
+    modelValue: {
+      type: Array,
+      default: () => []
+    },
+
+    // Export dummy (not extra used)
+    export: {
+      type: [Object],
+      default: () => {
+        return {
+        /**
+         * @description
+         *  Export dummy
+         *
+         * @example
+         *  export: {
+         *    query: {
+         *      '@display': '["id", "name"]'
+         *    },
+         *    label: {
+         *      'id': 'ID',
+         *      'name': 'Name'
+         *    }
+         *  }
+         */
+        }
+      }
+    },
+
+    // Default query including filter, sorter and pager.
+    query: {
+      type: Object,
+      default: () => {
+        /**
+         * @description
+         *  Entity query
+         *
+         * @example
+         * {
+          *   '@filter': 'entity.getId() in [1,3,4] && entity.getUser().getProfile().getAge() > 18',
+          *   '@order': 'entity.id|ASC, entity.createdTime|DESC',
+         *   page: 1, limit: 20,
+         * }
+         */
+      }
+    },
+
+    // Default show fields
+    listDisplay: {
+      type: Array,
+      default: () => [
+        /**
+         * @description
+         *  List display example
+         *  property can including nasted call
+         *
+         * @example
+         * [
+         *   'id',
+         *   'user',
+         *   { property: 'name', label: 'Name',
+         *     component: {
+         *        props: ['data'],
+         *        render(h) {
+         *          return <p>{this.data}</p>
+         *        }
+         *   }},
+         *   { property: 'user.__metadata.profile.phone', label: 'Phone' },
+         *   { property: 'enabled', type: 'boolean', editable: true }
+         *   'createdTime'
+         * ]
+         */
+      ]
+    },
+
+    // Default list filters
+    listFilter: {
+      type: Object,
+      default: () => {
+        /**
+         * @description
+         *  Selection filter or Searcher
+         *  List filter example
+         *
+         * @reference
+          *  @/easyadmin/ui/vue/SearchFilter.vue
+         */
+      }
+    },
+
+    // Actions
+    actions: {
+      type: Array,
+      default: () => [
+        /**
+         * @description
+         *  Actions sample
+         *  property can including nasted call
+         *
+         * @example
+         * [
+         *  { name: 'recycle',
+         *    position: 'list',
+         *    component: {
+         *      props: ['record', 'refresh'],
+         *      methods: {
+         *        recycleContent(id) {
+         *          axios
+         *            .put(`/manage/contents/${id}`, { isDeleted: true })
+         *            .then(() => {
+         *              this.$message('Move to recycle bin success.')
+         *              this.refresh()
+         *            })
+         *        }
+         *      },
+         *      render(h) {
+         *        return (
+         *          <el-button nativeOnClick={ () => this.recycleContent(this.record.id) }
+         *            slot='reference' size='small' type='danger' icon='el-icon-delete' plain>
+         *              Recycle
+         *          </el-button>
+         *        )
+         *      }
+         *    }
+         *  }
+         * ]
+         */
+      ]
+    },
+
+    // Disable default actions
+    // sample: ['new', 'detail', 'edit', 'delete', 'lines', 'pager']
+    disabledActions: {
+      type: Array,
+      default: () => []
+    },
+
+    // Data processor
+    dataProcessor: {
+      type: Function,
+      default: (context, dataProcessor = {}) => {
+        // All loads reuse Reset search icon (no content mask, keep table-layout auto stable)
+        context.refreshing = true
+        // Keep loading false to avoid v-loading flicker; initial empty state shows table with no data
+        context.loading = false
+
+        const promise = [
+          // Fetch Structure
+          context.em.structure().then(res => { context.structure = res }),
+
+          // Fetch Data
+          context.em.list(compileCsqeQuery({
+            query: context.query ? { ...context.query } : {},
+            rawFilterParam: context.filter && context.filter['@filter'],
+            page: context.pager,
+            sort: context.sort
+          })).then(res => {
+            // Assign data
+            context.list = res.data
+            context.paginator = context.normalizePaginator(res.paginator)
+          })
+        ]
+
+        Promise.all(promise.map(p => p.catch(e => e)))
+          .then(res => {
+            context.refreshing = false
+          })
+      }
+    }
+  },
+
+  data() {
+    return {
+      EditablePlain: markRaw(EditablePlain),
+
+      // Entity manager and entity structure
+      // sample: 'Category'
+      em: new CrudSkeletonAdapter(this.entityConf),
+      structure: {},
+
+      // Table refresh key
+      refreshTable: 0,
+
+      // Page title
+      titleText: '',
+
+      // Translated fields
+      properties: [],
+
+      // Table data source
+      list: [],
+      paginator: null,
+      selectedRecords: [],
+      batchDeleting: false,
+      batchEditing: false,
+      batchEditDialog: {
+        show: false,
+        form: {},
+        selectedFields: []
+      },
+
+      // Translated filter config
+      filters: {},
+
+      // List filters or seacher
+      listFilterData: {},
+
+      // Editable object
+      editing: {
+        refresh: 0 // refresh key
+      },
+
+      // Sort query: {'@order': 'entity.id|ASC, entity.createdTime|DESC'}
+      sort: {},
+      // Filter: {'@filter': 'entity.getId() == 1'}
+      filter: {},
+      // Pager: {page: 1, limit: 20}
+      pager: {
+        page: 1,
+        limit: 20
+      },
+
+      // Dialog
+      dialog: {
+        title: 'Dialog',
+        show: false,
+        refresh: 0,
+        data: {}
+      },
+
+      // Other
+      loading: true,
+      refreshing: false
+    }
+  },
+
+  computed: {
+    pagerTotal() {
+      if (!this.paginator) return 0
+      return Number(this.paginator.totalCount ?? this.paginator.total ?? 0)
+    },
+    hasBatchDelete() {
+      return !this.disabledActions.includes('delete') && !this.disabledActions.includes('batch_delete')
+    },
+    hasBatchEdit() {
+      return !this.disabledActions.includes('edit') &&
+        !this.disabledActions.includes('batch_edit') &&
+        this.config?.form?.batch_edit?.fields?.length
+    },
+    resolvedBatchFields() {
+      const fields = this.config?.form?.batch_edit?.fields
+      if (!fields) return []
+      return fields.map(field => {
+        if (typeof field === 'string') return { property: field }
+        return field.component ? { ...field, component: markRaw(toRaw(field.component)) } : field
+      })
+    }
+  },
+
+  watch: {
+    modelValue: {
+      handler: function(value) {
+        this.list = value
+      },
+      deep: true
+    },
+    list: {
+      handler: function(value) {
+        this.$emit('update:modelValue', value)
+      },
+      deep: true
+    },
+    listFilterData: {
+      handler() { this.syncToUrl() },
+      deep: true
+    },
+    'batchEditDialog.form': {
+      handler(form) {
+        if (!this.batchEditDialog.show) return
+
+        const batchFieldProperties = new Set(this.resolvedBatchFields.map(field => field.property))
+        for (const property of Object.keys(form)) {
+          if (!batchFieldProperties.has(property) || this.batchEditDialog.selectedFields.includes(property)) continue
+
+          // RelationToMany initializes an empty array when it mounts; this is not a user edit.
+          if (Array.isArray(form[property]) && form[property].length === 0) continue
+          this.batchEditDialog.selectedFields.push(property)
+        }
+      },
+      deep: true
+    },
+    '$route.query': {
+      handler(query) {
+        this.applyQueryParams(query)
+        this.$nextTick(() => {
+          this.$refs.searchFilter?.filterGenerate()
+          this.fetchData()
+        })
+      }
+    }
+  },
+
+  beforeUnmount() {
+    clearTimeout(this._syncTimer)
+  },
+  async created() {
+    // Process router convert
+    this.routeProcess()
+
+    // Process entity and structure properties
+    this.propertieProcess()
+
+    // Restore filter and pager from URL query params
+    if (Object.keys(this.$route.query).length) {
+      this.applyQueryParams(this.$route.query)
+    }
+
+    // Initialize the reusable edit dialog data.
+    this.loadDialogComponent(
+      {
+        entityConf: this.entityConf,
+        fields: this.config?.form.fields,
+        config: this.config
+      }
+    )
+
+    /**
+     * Fetch base data, like entity structure and validations
+     * Used filter fetch data instead.
+     */
+    // this.fetchData()
+  },
+
+  methods: {
+    buildQueryParams() {
+      return buildUrlQueryParams(this.listFilterData, this.pager)
+    },
+    syncToUrl() {
+      clearTimeout(this._syncTimer)
+      this._syncTimer = setTimeout(() => {
+        const qs = new URLSearchParams(this.buildQueryParams()).toString()
+        const normalizedUrl = qs
+          ? `${window.location.pathname}?${qs}${window.location.hash}`
+          : window.location.pathname + window.location.hash
+        if (normalizedUrl !== window.location.pathname + window.location.search + window.location.hash) {
+          window.history.replaceState(null, '', normalizedUrl)
+        }
+      }, 50)
+    },
+    applyQueryParams(query) {
+      const { filterData, pager } = applyUrlQueryParams(query)
+      this.pager.page = pager.page
+      this.pager.limit = pager.limit
+      this.listFilterData = filterData
+    },
+    uiFeedback() {
+      return createUiFeedback(this)
+    },
+
+    htmlStrip(text) {
+      return text ? String(text).replace(/<[^>]*>/g, '') : ''
+    },
+
+    startLoading(options = {}) {
+      return this.uiFeedback().loading(options)
+    },
+
+    notifySuccess(message) {
+      this.uiFeedback().success(message)
+    },
+
+    /* Debug */
+    _console() {
+      return console
+    },
+
+    /* Check if metadata presented */
+    checkMetadataType(currentStruct, type) {
+      return currentStruct && Object.keys(currentStruct).includes('metadata') && currentStruct.metadata.type === type
+    },
+
+    isEditableField(field, struct) {
+      if (field.property === 'id') return false
+      if (field.type === 'image') return false
+      if (!field.editable) return false
+      const editableTypes = ['string', 'integer', 'float', 'decimal']
+      if (field.type && editableTypes.includes(field.type)) return true
+      if (!field.type && struct?.metadata?.type && editableTypes.includes(struct.metadata.type)) return true
+      return false
+    },
+
+    getListPluginType(field, struct, value) {
+      const relation = resolveRelation(field, struct, entities)
+      if (relation) return relation.multiple ? 'RelationToMany' : 'RelationToOne'
+      const type = field.type || struct?.metadata?.type
+      if (!type) {
+        if (Array.isArray(value)) return 'RelationToMany'
+        return null
+      }
+      if (['boolean', 'currency', 'date', 'datetime', 'datetime_immutable', 'image', 'array'].includes(type)) return type
+      if (['ManyToOne', 'OneToOne'].includes(type)) return 'RelationToOne'
+      if (['ManyToMany', 'OneToMany'].includes(type)) return 'RelationToMany'
+      return null
+    },
+
+    loadListPlugin(type) {
+      const typeMapping = {
+        'ManyToOne': 'RelationToOne',
+        'OneToOne': 'RelationToOne',
+        'ManyToMany': 'RelationToMany',
+        'OneToMany': 'RelationToMany',
+        'datetime_immutable': 'datetime'
+      }
+      const targetType = typeMapping[type] || type
+      const path = `./plugins/list/${targetType}.vue`
+      return resolveListPlugin(path)
+    },
+
+    loadDialogComponent(data) {
+      this.dialog.data = data
+      this.dialog.refresh++
+    },
+
+    openEditDialog(id) {
+      this.dialog.title = this.$t('Edit Record')
+      this.dialog.data.id = id
+      this.dialog.refresh++
+      this.dialog.show = true
+    },
+
+    closeEditDialog() {
+      this.notifySuccess(this.$t('Data saved successfully'))
+      this.dialog.show = false
+    },
+
+    // Get picture
+    getPicture(url) {
+      return SIP.getPicture(url)
+    },
+
+    /* Property process */
+    propertieProcess() {
+      // fields transform
+      const fields =
+        this.listDisplay !== '__all__'
+          ? this.listDisplay
+          : Object.keys(this.structure)
+
+      for (const field of fields) {
+        if (typeof field === 'string') {
+          this.properties.push({
+            property: field
+          })
+        } else {
+          this.properties.push(field.component ? { ...field, component: markRaw(toRaw(field.component)) } : field)
+        }
+      }
+    },
+
+    /* Restore redirected route */
+    routeProcess() {
+      let redirectRoute = null
+
+      // Find router by name recursively
+      for (const mainRoute of asyncRoutes) {
+        if (redirectRoute === null && Object.keys(mainRoute).includes('children')) {
+          for (const childrenRoute of mainRoute.children) {
+            if (childrenRoute.redirect === this.$route.path) {
+              redirectRoute = childrenRoute
+              break
+            }
+          }
+        }
+      }
+      if (redirectRoute) {
+        this.titleText = redirectRoute.meta.title
+      }
+    },
+
+    // Get data from web apis.
+    fetchData() {
+      // data process callback
+      this.dataProcessor(this)
+    },
+
+    fetchFilteredData(_searchFilter, resetPage = true) {
+      if (resetPage) this.pager.page = 1
+      this.fetchData()
+    },
+
+    resetSearch() {
+      this.pager.page = 1
+      this.pager.limit = 20
+      this.fetchData()
+    },
+
+    // Export current list data with merged query, labels and filename.
+    exportData() {
+      const loading = this.startLoading({
+        lock: true,
+        text: this.$t('Exporting data'),
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+
+      // default config
+      const exportConf = this.config.list.export
+      const listQuery = this.config.list.query
+      let exportQuery = {}, exportLabel = {}
+      if (exportConf) {
+        if (exportConf.hasOwnProperty('query')) exportQuery = exportConf.query
+        if (exportConf.hasOwnProperty('label')) exportLabel = exportConf.label
+      }
+
+      // Use current filter
+      const query = Object.assign({}, listQuery, this.filter, exportQuery)
+
+      this.em.list(query).then(res => {
+        loading.close()
+        const req = buildExportRequest(
+          this.em.name,
+          { configQuery: listQuery || {}, filter: this.filter, exportQuery, rows: res.data },
+          exportLabel
+        )
+        this.exportExcelCsv(req.label, req.data, req.filename)
+      })
+    },
+
+    normalizePaginator(paginator = {}) {
+      return normalizePaginatorResult(paginator)
+    },
+
+    // Sorter changed
+    changeSort(val) {
+      const mapped = mapElementPlusSort(val.prop, val.order)
+      this.sort['@order'] = mapped ? formatSortParam([mapped]) : ''
+
+      // Reload data
+      this.fetchData()
+    },
+
+    // Pager size changed
+    handleSizeChange(val) {
+      this.pager.limit = val
+      this.pager.page = 1
+      this.syncToUrl()
+      this.fetchData()
+    },
+
+    handleCurrentChange(val) {
+      this.pager.page = val
+      this.syncToUrl()
+      this.fetchData()
+    },
+
+    handleSelectionChange(records) {
+      this.selectedRecords = records
+    },
+
+    // Remove action
+    removeAction(pk) {
+      this.em.delete(pk).then(res => {
+        this.notifySuccess(this.$t('Deleted successfully'))
+        this.fetchData()
+      })
+    },
+
+    async removeSelected() {
+      const ids = collectBatchDeleteIds(this.selectedRecords)
+      if (!ids.length) return
+
+      this.batchDeleting = true
+      const results = await this.em.deleteMany(ids)
+      this.batchDeleting = false
+
+      const { deleted, failed } = summarizeSettledDeletions(results)
+      if (deleted) this.notifySuccess(this.$t('Deleted {0} records successfully', deleted))
+      if (failed) this.uiFeedback().warning(this.$t('Failed to delete {0} records', failed))
+
+      this.selectedRecords = []
+      this.fetchData()
+    },
+
+    resolveBatchPluginType(field) {
+      if (field.type) return field.type
+      const metadataType = this.structure[field.property]?.metadata?.type || ''
+      const normalized = String(metadataType).replace(/[_-]/g, '').toLowerCase()
+      const relationTypes = {
+        manytoone: 'RelationToOne',
+        onetoone: 'RelationToOne',
+        manytomany: 'RelationToMany',
+        onetomany: 'RelationToMany'
+      }
+      if (relationTypes[normalized]) return relationTypes[normalized]
+      const supported = new Set([
+        'array', 'boolean', 'code', 'date', 'datetime',
+        'datetime_immutable', 'file', 'image', 'images', 'integer',
+        'json', 'text', 'textarea', 'transfer'
+      ])
+      return supported.has(metadataType) ? metadataType : 'input'
+    },
+
+    loadBatchPlugin(type) {
+      const typeMapping = {
+        'images': 'image',
+        'datetime_immutable': 'datetime',
+        'ManyToOne': 'RelationToOne',
+        'OneToOne': 'RelationToOne',
+        'ManyToMany': 'RelationToMany',
+        'OneToMany': 'RelationToMany'
+      }
+      const targetType = typeMapping[type] || type || 'input'
+      const path = formPlugins[`./plugins/form/${targetType}.vue`]
+        ? `./plugins/form/${targetType}.vue`
+        : './plugins/form/input.vue'
+      return resolveFormPlugin(path)
+    },
+
+    openBatchEditDialog() {
+      this.resetBatchEditDialog()
+      this.batchEditDialog.show = true
+    },
+
+    resetBatchEditDialog() {
+      this.batchEditDialog.form = {}
+      this.batchEditDialog.selectedFields = []
+    },
+
+    async submitBatchEdit() {
+      const ids = collectBatchDeleteIds(this.selectedRecords)
+      if (!ids.length) return
+
+      const form = this.batchEditDialog.form
+      const data = collectBatchUpdateData(
+        this.resolvedBatchFields,
+        this.batchEditDialog.selectedFields,
+        form
+      )
+      if (!Object.keys(data).length) {
+        this.uiFeedback().warning(this.$t('No fields to update'))
+        return
+      }
+
+      this.batchEditing = true
+      try {
+        await this.em.batchUpdate(ids, data)
+        this.batchEditing = false
+        this.notifySuccess(this.$t('Data saved successfully'))
+        this.batchEditDialog.show = false
+        this.selectedRecords = []
+        this.fetchData()
+      } catch (err) {
+        this.batchEditing = false
+        this.uiFeedback().error(err.message || 'Error')
+      }
+    },
+
+    /**
+     * Render help text supporting both HTML and Markdown.
+     * - HTML (existing `<code>` etc.) is preserved
+     * - Markdown: `code`, ```block```, **bold**, *italic* / _italic_, [link](url), - list
+     */
+    renderHelp(help) {
+      if (!help) return ''
+      let html = String(help)
+
+      // Fenced code blocks ```...```
+      html = html.replace(/```([\s\S]*?)```/g, (m, p1) => `<pre><code>${p1.trim()}</code></pre>`)
+
+      // Inline code `...`  (avoid already converted <code> tags)
+      html = html.replace(/`([^`\n]+?)`/g, '<code>$1</code>')
+
+      // Bold **...**
+      html = html.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
+
+      // Italic *...* and _..._
+      html = html.replace(/(^|[^*])\*([^*\n]+?)\*(?!\*)/g, '$1<em>$2</em>')
+      html = html.replace(/(^|[^_])_([^_\n]+?)_(?!_)/g, '$1<em>$2</em>')
+
+      // Links [text](url)
+      html = html.replace(/\[([^\]]+?)\]\(([^)]+?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+
+      // Headings # ... (simple bold)
+      html = html.replace(/^#{1,6}\s+(.*)$/gm, '<strong>$1</strong>')
+
+      // Unordered lists: lines starting with - or * -> bullet
+      html = html.replace(/^\s*[-*]\s+(.*)$/gm, '• $1')
+
+      // Preserve existing <br> and convert bare newlines to <br> if needed
+      if (html.includes('\n') && !html.includes('<br')) {
+        html = html.split(/\n{2,}/).map(block => block.replace(/\n/g, '<br>')).join('<br><br>')
+      }
+
+      return html
+    },
+
+    // Extract relation field
+    extractFields(dataObject, field) {
+      // TODO: check if valid expression
+      // Relation format 'a.b.c'
+
+      try {
+        let data = dataObject
+        const relationArray = field.split('.')
+
+        relationArray.forEach((value, index) => {
+          if (Object.keys(data).includes(value)) {
+            data = data[value]
+          } else {
+            data = null
+          }
+        })
+
+        return data
+      } catch (e) {
+        return null
+      }
+    }
+  }
+}
+</script>
+
+<style scoped>
+.el-row {
+    margin-bottom: 1rem;
+}
+.el-table td, .el-table th {
+    padding: 8px 0;
+}
+
+.easy-admin-toolbar {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.easy-admin-toolbar__title {
+  flex: 0 0 auto;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 32px;
+  white-space: nowrap;
+}
+
+.easy-admin-toolbar__body {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.easy-admin-toolbar__search {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.easy-admin-toolbar__actions,
+.easy-admin-toolbar__default-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.easy-admin-toolbar__actions {
+  flex: 0 0 auto;
+  justify-content: flex-end;
+}
+
+.easy-admin-toolbar__actions :deep(.el-button + .el-button),
+.easy-admin-toolbar__default-actions :deep(.el-button + .el-button) {
+  margin-left: 0;
+}
+
+.easy-admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: max-content;
+  white-space: nowrap;
+}
+
+.easy-admin-actions :deep(.el-button + .el-button) {
+  margin-left: 0;
+}
+
+.easy-admin-actions :deep(.el-button) {
+  height: 30px;
+  padding: 7px 10px;
+}
+
+.easy-admin-selection-count {
+  padding: 0 10px;
+  border-radius: 999px;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 32px;
+}
+
+.help-text {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  flex: 0 0 100%;
+  align-items: flex-start;
+  column-gap: 8px;
+  background: linear-gradient(90deg, #f0f7ff 0%, #fafcff 100%);
+  border: 1px solid #d9ecff;
+  border-radius: 5px;
+  padding: 7px 10px;
+  margin-top: 7px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #5f6b7a;
+  word-break: break-word;
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    color: #409eff;
+    background: #fff;
+    border: 1px solid #c6e2ff;
+    border-radius: 50%;
+
+    .el-icon {
+      font-size: 12px;
+    }
+  }
+
+  &__content {
+    min-width: 0;
+  }
+
+  :deep(code) {
+    display: inline;
+    background: rgb(64 158 255 / 9%);
+    color: #337ecc;
+    padding: 0 3px;
+    border-radius: 3px;
+    font-size: 11px;
+    word-break: break-all;
+  }
+
+  :deep(a) {
+    color: #409eff;
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
+
+  :deep(strong) {
+    font-weight: 600;
+    color: #303133;
+  }
+
+  :deep(em) {
+    font-style: italic;
+    color: #606266;
+  }
+}
+
+:deep(.el-overlay-dialog:has(.easy-admin-dialog)) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:deep(.easy-admin-dialog) {
+  display: flex;
+  flex-direction: column;
+  width: min(86vw, 1040px) !important;
+  max-height: min(88vh, 900px);
+  margin: auto !important;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(31, 45, 61, 0.22);
+}
+
+:deep(.easy-admin-dialog .el-dialog__header) {
+  flex-shrink: 0;
+  margin-right: 0;
+  /* padding: 20px 56px 20px 28px; */
+  border-bottom: 1px solid var(--border);
+}
+
+:deep(.easy-admin-dialog .el-dialog__title) {
+  display: block;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 28px;
+  letter-spacing: -0.01em;
+}
+
+:deep(.easy-admin-dialog .el-dialog__headerbtn) {
+  top: 18px;
+  right: 20px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+:deep(.easy-admin-dialog .el-dialog__headerbtn:hover) {
+  background: var(--control-hover);
+}
+
+:deep(.easy-admin-dialog .el-dialog__close) {
+  color: var(--text-secondary);
+  font-size: 18px;
+}
+
+:deep(.easy-admin-dialog .el-dialog__body) {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0;
+  background: var(--surface);
+}
+
+:deep(.easy-admin-dialog .app-container) {
+  padding: 28px;
+}
+
+:deep(.easy-admin-dialog .app-container > .el-row:first-child) {
+  display: none;
+}
+
+:deep(.easy-admin-dialog .el-form-item) {
+  margin-bottom: 22px;
+}
+
+:deep(.easy-admin-dialog .el-form-item__label) {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+:deep(.easy-admin-dialog .el-dialog__footer) {
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+  /* padding: 16px 28px; */
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+:deep(.easy-admin-dialog .el-dialog__footer .el-button) {
+  min-width: 104px;
+  height: 38px;
+  font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .easy-admin-toolbar,
+  .easy-admin-toolbar__body {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .easy-admin-toolbar {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .easy-admin-toolbar__title {
+    padding-top: 0;
+  }
+
+  .easy-admin-toolbar__actions {
+    justify-content: flex-start;
+  }
+
+  :deep(.easy-admin-dialog) {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 24px);
+    border-radius: 10px;
+  }
+
+  :deep(.easy-admin-dialog .el-dialog__header) {
+    padding: 16px 52px 16px 20px;
+  }
+
+  :deep(.easy-admin-dialog .app-container) {
+    padding: 20px 16px;
+  }
+
+  :deep(.easy-admin-dialog .el-form-item) {
+    margin-bottom: 18px;
+  }
+
+  :deep(.easy-admin-dialog .el-form-item__label) {
+    float: none;
+    display: block;
+    width: auto !important;
+    height: auto;
+    margin-bottom: 6px;
+    line-height: 20px;
+    text-align: left;
+  }
+
+  :deep(.easy-admin-dialog .el-form-item__content) {
+    margin-left: 0 !important;
+  }
+
+  :deep(.easy-admin-dialog .el-dialog__footer) {
+    padding: 14px 16px;
+  }
+
+  :deep(.easy-admin-dialog .el-dialog__footer .el-button) {
+    width: 100%;
+  }
+}
+</style>

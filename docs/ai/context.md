@@ -44,7 +44,7 @@ src/
 ├── api/                  # API endpoint definitions
 │   ├── prefix.ts         # VITE_* prefix constants
 │   └── user.ts           # login(), getInfo(), logout()
-├── components/EasyAdmin/  # ⭐ Core CRUD Engine
+├── easyadmin/ui/vue/      # ⭐ Core CRUD UI
 │   ├── FormAdmin.vue     # Dynamic form builder
 │   ├── ListAdmin.vue     # Dynamic list builder
 │   ├── DetailAdmin.vue   # Configurable record detail page
@@ -71,7 +71,6 @@ src/
 ├── types/                # TypeScript type definitions
 ├── utils/                # Utilities
 │   ├── auth.js           # Cookie token management
-│   ├── entity.ts         # EntityManage CRUD class (CRUD + deleteMany + batchUpdate)
 │   ├── request.ts        # Axios JWT instance
 │   └── upload.js         # Unified upload (host resolution, headers, path normalisation)
 └── views/                # Page views
@@ -280,13 +279,13 @@ Adding a new detail plugin: create `plugins/detail/{type}.vue` with the same pro
 
 ### Adding a New Detail Plugin
 
-1. Create `src/components/EasyAdmin/plugins/detail/{type}.vue` with props: `value`, `field`, `scope`, `em`, `struct`
+1. Create `src/easyadmin/ui/vue/plugins/detail/{type}.vue` with props: `value`, `field`, `scope`, `em`, `struct`
 2. Add the type name to `getListPluginType()` in `DetailAdmin.vue` (if not already present)
 3. Done — priority over list plugins, auto-discovered via `import.meta.glob`
 
 ### Adding a New List Plugin
 
-1. Create `src/components/EasyAdmin/plugins/list/{type}.vue` with props: `value`, `field`, `scope`, `em`, `struct`
+1. Create `src/easyadmin/ui/vue/plugins/list/{type}.vue` with props: `value`, `field`, `scope`, `em`, `struct`
 2. Add the type name to `getListPluginType()` in `ListAdmin.vue`
 3. Done — auto-discovered via `import.meta.glob`
 
@@ -363,7 +362,7 @@ for Vue 2's `v-set` pattern):
 
 ### Form Field Visibility (`hidden`)
 
-- `FormAdmin` supports `field.hidden`: `true`/`false` or `[]`/`['create']`/`['update']`/`['create','update']` (also `'edit'` alias for `update`). Checked via `isHidden(field)` using `this.id` (create `!id` vs update `!!id`), hidden fields are excluded from `plainFields`/`rules`, not rendered, not validated, not submitted. Example Wallet: `user`/`currency` `hidden:['update']`, `balance` `hidden:true`.
+- `FormAdmin` supports `field.hidden`: `true`/`false`, a mode string (`'create'`/`'update'`/`'edit'` alias), an array of those, or a `(form, id) => boolean` predicate. Checked via `isHidden(field)` using `this.id` (create `!id` vs update `!!id`), hidden fields are excluded from `plainFields`/`rules`, not rendered, not validated, not submitted. Example Wallet: `user`/`currency` `hidden:['update']`, `balance` `hidden:true`; Assignment uses bare `hidden:'create'`.
 
 ### Form Plugins — Vue 3 Model Contract
 
@@ -372,7 +371,7 @@ for Vue 2's `v-set` pattern):
 - File/image upload plugins use `:on-exceed="handleExceed"` to replace existing files
   (clear files → handleStart → submit) since Element Plus limits upload by count.
 - Simple text input uses `.sync`-free pattern: `:model-value` + `@update:model-value`.
-- Relation plugins fetch options via `EntityManage.list()` and cache in local `data()`.
+- Relation plugins fetch options via `CrudSkeletonAdapter.list()` and cache in local `data()`.
 - JSON editor uses direct `import JSONEditor from 'jsoneditor'` (no Vue wrapper).
 
 ### Nested API Resources (e.g., Specifications under Products)
@@ -415,11 +414,11 @@ The `json.vue` form plugin uses the vanilla `jsoneditor` library directly from n
 #### Batch Delete
 
 - Button appears in the toolbar alongside a count badge when records are selected.
-- Uses `EntityManage.deleteMany(ids)` which calls `Promise.allSettled` on individual `DELETE /{plural}/{id}` calls.
+- Uses `CrudSkeletonAdapter.deleteMany(ids)` which calls `Promise.allSettled` on individual `DELETE /{plural}/{id}` calls.
 - Reports success count and, on partial failure, a warning with the failure count.
 - `disabled_actions` available: `'batch_delete'`, or inherits `'delete'` (if delete is disabled, batch delete hides too).
 
-#### Batch Edit (`EntityManage.batchUpdate`)
+#### Batch Edit (`CrudSkeletonAdapter.batchUpdate`)
 
 **Config location**: `form.batch_edit.fields` in entity config:
 ```js
@@ -446,7 +445,7 @@ Each record includes only `id` and the fields to update; omitted fields retain t
 - **Auto-selection**: When a user modifies a field value, the corresponding checkbox is automatically checked (except for empty arrays from `RelationToMany` initialisation).
 - Only checked fields with a value present in the form object (`Object.hasOwn(form, key)`) are included in the request.
 
-**`EntityManage` methods**:
+**`CrudSkeletonAdapter` methods**:
 ```ts
 deleteMany(pks: Array<number | string>): Promise<PromiseSettledResult<ApiResponse<unknown>>[]>
 batchUpdate(ids: Array<number | string>, data: Record<string, any>): Promise<ApiResponse<unknown>>
@@ -526,8 +525,8 @@ The i18n system uses **flat English strings as translation keys** instead of nes
 
 ### Dashboard
 
-- `src/views/dashboard/index.vue` fetches live data from `EntityManage` for
-  Order, Product, User, Transaction
+- `src/views/dashboard/index.vue` fetches live data from `CrudSkeletonAdapter` for
+  Order, Product, User, Transaction, Store, Material
 - SVG sparkline chart derived from order amounts (no chart library dependency)
 - Browser geolocation + Open-Meteo API for local weather; falls back to Beijing
 - All API calls are `.catch(() => ...)` — dashboard remains functional even when

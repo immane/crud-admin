@@ -2,7 +2,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 
 vi.mock('@/i18n', () => ({ t: key => `translated:${key}` }))
 
-import DetailJsonSchema from '@/components/EasyAdmin/plugins/detail/json_schema.vue'
+import DetailJsonSchema from '@/easyadmin/ui/vue/plugins/detail/json_schema.vue'
 
 async function settled(wrapper) {
   await flushPromises()

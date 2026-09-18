@@ -51,7 +51,7 @@ flowchart TB
         F1 --> F4
     end
     subgraph Data ["Data Layer"]
-        D1["utils/entity.ts - EntityManage CRUD class"]
+        D1["adapters/crudskeleton - CrudSkeletonAdapter + MetaProvider"]
         D2["utils/request.ts - Axios JWT instance"]
         D3["store/entity.js - Vuex structure cache"]
     end
@@ -72,14 +72,14 @@ flowchart TD
     B["views/admin/list.vue - Extract route params entityParam"]
     C["Camelize entityParam and lookup admin.entities by alias"]
     D["Pass config to ListAdmin component"]
-    E["ListAdmin created - Create EntityManage instance"]
+    E["ListAdmin created - Create CrudSkeletonAdapter instance"]
     F["Call dataProcessor - default em.structure plus em.list"]
     G["Build table columns from list_display config"]
     H["Render el-table"]
     I["User clicks Create - router.push to entity create route"]
     J["views/admin/form.vue - Same entityParam extraction"]
     K["Pass config fields to FormAdmin component"]
-    L["FormAdmin created - Create EntityManage instance"]
+    L["FormAdmin created - Create CrudSkeletonAdapter instance"]
     M["Call em.structure to get field metadata"]
     N["Transform fields - string to property object"]
     O["Generate validation rules from metadata nullable"]
@@ -211,8 +211,22 @@ User clicks Search:
     Trigger fetchDataFunc()
 ```
 
-### 6.2 Filter Widget Types
+### 6.2 DQL Expression Rules (backend-verified)
 
+Against crud-skeleton `ExpressionDqlParser`:
+
+- Filter paths must use `entity.getX()` chains. Bare property access
+  (`entity.status`), `is*`/`has*` getters (`entity.isSystem()`), and bare
+  names are not DQL-safe (non-admin → HTTP 403, admin → full-table
+  in-memory fallback). Boolean `isSystem` properties are queried as
+  `entity.getIsSystem()`.
+- Join with `&&` / `||` (never `and` / `or`). Null tests: bare
+  `entity.getX()` (`IS NOT NULL`) or `!entity.getX()` (`IS NULL`) —
+  never `== null`.
+- Sort with `@order` (`field|DIR`, comma-separated). Never `@sort`
+  (admin-only in-memory comparator).
+
+### 6.3 Filter Widget Types
 | type | Widget |
 |------|--------|
 | `datetime` / `date` / `time` | `<el-date-picker>` |
@@ -223,7 +237,11 @@ User clicks Search:
 
 ---
 
-## 7. EntityManage Class
+## 7. CrudSkeletonAdapter Class
+
+`CrudSkeletonAdapter` implements the core `AdminRepository` and `MetaProvider`
+ports; metadata flows through `CrudSkeletonMetaProvider` while the Vuex store
+remains the persistence detail.
 
 ### 7.1 Constructor
 
@@ -299,7 +317,7 @@ structure():
 ### 8.4 Custom Field Plugins
 
 ```
-src/components/EasyAdmin/plugins/form/my-custom.vue
+src/easyadmin/ui/vue/plugins/form/my-custom.vue
 ```
 
 As long as the plugin follows the Plugin Props Contract, it will be automatically discovered and loaded by `import.meta.glob`.
@@ -313,6 +331,6 @@ As long as the plugin follows the Plugin Props Contract, it will be automaticall
 ### 8.4 自定义字段插件
 
 ```
-src/components/EasyAdmin/plugins/form/my-custom.vue
+src/easyadmin/ui/vue/plugins/form/my-custom.vue
 ```
 只要遵循 plugin props 契约即可自动被 `import.meta.glob` 发现并加载。

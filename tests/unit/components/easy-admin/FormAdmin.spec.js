@@ -15,7 +15,7 @@ const feedbackMocks = vi.hoisted(() => ({
   warning: vi.fn()
 }))
 
-vi.mock('@/utils/entity', () => {
+vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => {
   class EntityManageMock {
     constructor(conf) {
       this.conf = conf
@@ -41,7 +41,7 @@ vi.mock('@/components/Tinymce', () => ({
   default: { name: 'Tinymce', template: '<div class="tinymce-stub" />' }
 }))
 
-vi.mock('@/components/EasyAdmin/ui/feedback', () => ({
+vi.mock('@/easyadmin/ui/vue/feedback', () => ({
   createUiFeedback: () => feedbackMocks
 }))
 
@@ -52,7 +52,7 @@ vi.mock('@/utils/request', () => ({
   default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() }
 }))
 
-import FormAdmin from '@/components/EasyAdmin/FormAdmin.vue'
+import FormAdmin from '@/easyadmin/ui/vue/FormAdmin.vue'
 
 const PluginStub = { name: 'PluginStub', template: '<div class="plugin-stub" />' }
 

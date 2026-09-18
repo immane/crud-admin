@@ -38,7 +38,7 @@ Core directories:
 - `src/router/generator.js`: EasyAdmin route generators
 - `src/store/index.js`: Vuex auto-loading module
 - `src/permission.js`: Auth, roles, dynamic route guard
-- `src/components/EasyAdmin/*`: Config-driven CRUD core components
+- `src/easyadmin/ui/vue/*`: Config-driven CRUD core components
 - `src/configs/*`: Entity, route, and collection configs
 - `src/icons/index.js`: Webpack SVG sprite registration
 - `src/utils/request.ts`: Axios wrapper and UI error notifications
@@ -148,7 +148,7 @@ Key changes:
 
 Goal: Replace Element UI 2, ensure page component behavior works.
 
-Files: `src/main.js`, `src/permission.js`, `src/utils/request.ts`, `src/components/EasyAdmin/ui/feedback.ts`, all `.vue` files using `el-*`
+Files: `src/main.js`, `src/permission.js`, `src/utils/request.ts`, `src/easyadmin/ui/vue/feedback.ts`, all `.vue` files using `el-*`
 
 API changes:
 
@@ -194,7 +194,7 @@ P1 — Page rendering:
 - `src/permission.js`, `src/store/modules/user.js`, `src/router/generator.js`, `src/utils/request.ts`, `src/api/prefix.ts`, `src/components/SvgIcon/index.vue`, `src/layout/**/*.vue`, `src/views/login/index.vue`
 
 P2 — CRUD functionality:
-- `src/components/EasyAdmin/ListAdmin.vue`, `FormAdmin.vue`, `SearchFilter.vue`, `plugins/**/*.vue`, `src/configs/entities.js`, `src/configs/routes.js`
+- `src/easyadmin/ui/vue/ListAdmin.vue`, `FormAdmin.vue`, `SearchFilter.vue`, `plugins/**/*.vue`, `src/configs/entities.js`, `src/configs/routes.js`
 
 P3 — Future modernization:
 - Vuex → Pinia, Options API → Composition API, TSX sub-components, icon classes → `@element-plus/icons-vue`, Jest → Vitest full coverage

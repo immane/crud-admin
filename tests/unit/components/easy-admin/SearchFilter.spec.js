@@ -1,5 +1,5 @@
 import { mount, shallowMount, flushPromises } from '@vue/test-utils'
-import SearchFilter from '@/components/EasyAdmin/SearchFilter.vue'
+import SearchFilter from '@/easyadmin/ui/vue/SearchFilter.vue'
 
 const tick = async (wrapper) => {
   await flushPromises()

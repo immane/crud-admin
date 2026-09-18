@@ -192,7 +192,7 @@ interface FieldOption {
   type_events?: Record<string, any>     // Events → field plugin component
   rules?: object[]                      // Custom el-form rules (merged)
   validator?: Function | Function[]        // Shorthand -> { validator, trigger:'blur' }
-  hidden?: boolean | string[]           // true/false or ['create'] / ['update'] / ['create','update'] (also 'edit' alias)
+  hidden?: boolean | string | string[] | Function  // true/false, 'create'/'update'/'edit', array, or (form, id) predicate
   relation_filter?: {                   // Only for relation fields
     '@filter'?: string                  // DQL expression
     '@order'?: string                   // Sort order
@@ -523,7 +523,7 @@ form: {
 }
 ```
 
-The plugin renders an `<el-select>` with remote search. Options are fetched from the target entity via `EntityManage.list()`.
+The plugin renders an `<el-select>` with remote search. Options are fetched from the target entity via `CrudSkeletonAdapter.list()`.
 
 For dynamic filtering based on user input, set `remote: true`:
 
@@ -595,8 +595,8 @@ The component receives props: `data` (the current field value), `form` (the full
 ### 7.2 JSX Config Components (e.g. SpecificationManager in Product.jsx)
 
 ```js
-import ListAdmin from '@/components/EasyAdmin/ListAdmin'
-import FormAdmin from '@/components/EasyAdmin/FormAdmin'
+import ListAdmin from '@/easyadmin/ui/vue/ListAdmin'
+import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
 
 const SpecificationManager = {
   components: { ListAdmin, FormAdmin },

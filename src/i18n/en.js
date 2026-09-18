@@ -134,6 +134,8 @@ export default {
   'Export': 'Export',
   'Actions': 'Actions',
   'Loading...': 'Loading...',
+  'Loading data...': 'Loading data...',
+  'No data': 'No data',
   'New / Edit': 'New / Edit',
   'Default': 'Default',
   'Delete this record?': 'Delete this record?',

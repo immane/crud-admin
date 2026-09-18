@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/vue-3.5-brightgreen?logo=vue.js" alt="Vue 3">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/vite-5.x-646CFF?logo=vite" alt="Vite">
-  <img src="https://img.shields.io/badge/node-%3E%3D14-green?logo=node.js" alt="Node">
+  <img src="https://img.shields.io/badge/node-%3E%3D18-green?logo=node.js" alt="Node">
   <br><br>
 </p>
 
@@ -50,12 +50,12 @@
 - **JWT Authentication** — Bearer-token login with automatic refresh token rotation, port-isolated cookie persistence (`dream_studio_admin_token_{port}` avoids same-host cross-port conflict), and concurrent-request queuing
 - **Role-Based Access Control** — Dynamic routes filtered by user roles via Vuex + Vue Router 4
 - **Entity Introspection** — Queries backend `/system/entities` to infer field types, nullability, and relationships
-- **Dynamic Filter & Sort** — Server-side filter expressions (`@filter`, `@sort`, `@order`) built from config-driven search UIs
+- **Dynamic Filter & Sort** — Server-side filter expressions (`@filter`, `@order`) built from config-driven search UIs
 - **Enterprise Dashboard** — Live order/product/user metrics, SVG sparkline chart, geolocation weather widget
 - **Responsive Layout** — Collapsible sidebar with SVG icons, breadcrumb navigation, fixed header option
 - **Code Splitting & Build Optimization** — Vite-powered chunk splitting with tree-shaking
 - **Server Health Monitor** — navbar status dot polling `GET /health/live`, `/health/ready` and `/metrics`
-- **Vitest Unit Testing** — 1041 tests across 78 spec files with 100% coverage thresholds on `src/components/EasyAdmin`
+- **Vitest Unit Testing** — 1330 tests across 101 spec files with 100% coverage thresholds on `src/easyadmin/{ui/vue,core,application,adapters/crudskeleton}`
 - **Tracked Lockfile** — `package-lock.json` is committed for reproducible installs
 
 
@@ -94,16 +94,31 @@ Translation keys use the English string directly (flat format), e.g. `$t('New / 
 .
 ├── src/
 │   ├── main.js                      # App entry: createApp, install plugins, mount
+│   ├── App.vue                      # Root component (<router-view />)
 │   ├── permission.js                # Navigation guard (auth + role check)
-│   ├── components/EasyAdmin/        # ⭐ Core CRUD Engine
-│   │   ├── FormAdmin.vue            # Dynamic form builder
-│   │   ├── ListAdmin.vue            # Dynamic list/table builder
-│   │   ├── DetailAdmin.vue          # Configurable record detail page
-│   │   ├── SearchFilter.vue         # Dynamic filter UI
-│   │   └── plugins/
-│   │       ├── form/                # 21 field-type plugins
-│   │       ├── list/                # 10 list-rendering plugins
-│   │       └── detail/              # 2 detail-only plugins
+│   ├── settings.js                  # App title, layout options
+│   ├── config.js                    # Re-exports declarative configs
+│   ├── api/                         # Endpoint definitions (prefix, user/auth)
+│   ├── assets/                      # Static images (login background, 404)
+│   ├── components/                  # Shared UI (Breadcrumb, Hamburger, SvgIcon, Tinymce)
+│   ├── easyadmin/                   # ⭐ Config-driven CRUD engine
+│   │   ├── core/query/              # Pure query model (AdminQuery, FilterNode, sort, pagination, DQL helpers)
+│   │   ├── core/model/              # Entity identity, records, field config, admin metadata
+│   │   ├── core/ports/              # Repository, metadata, compiler interfaces
+│   │   ├── application/query/       # AdminQuery builder + URL query sync
+│   │   ├── application/usecases/    # Save, delete, batch, export, relation, batch-field helpers
+│   │   ├── adapters/crudskeleton/   # Adapter, metadata provider, CSQE query compiler
+│   │   ├── adapters/graphql/        # Reserved placeholder (no backend contract yet)
+│   │   └── ui/vue/                  # Vue UI: List/Form/Detail/SearchFilter + plugins
+│   │       ├── FormAdmin.vue        # Dynamic form builder
+│   │       ├── ListAdmin.vue        # Dynamic list/table builder
+│   │       ├── DetailAdmin.vue      # Configurable record detail page
+│   │       ├── SearchFilter.vue     # Dynamic filter UI
+│   │       ├── feedback.ts          # Element Plus message/loading helper
+│   │       └── plugins/
+│   │           ├── form/            # 21 field-type plugins
+│   │           ├── list/            # 10 list-rendering plugins
+│   │           └── detail/          # 3 detail-only plugins
 │   ├── configs/                     # Declarative entity configs
 │   │   ├── routes.js                # Menu / route definitions
 │   │   ├── entities.js              # Auto-loader (import.meta.glob)
@@ -115,16 +130,23 @@ Translation keys use the English string directly (flat format), e.g. `$t('New / 
 │   ├── router/                      # Vue Router 4 + r()/g() generators
 │   ├── store/                       # Vuex 4 (auto-loads modules/)
 │   ├── styles/                      # Global SCSS (sidebar, transitions, overrides)
-│   ├── utils/                       # auth.js, entity.ts, request.ts, etc.
+│   ├── types/                       # TypeScript definitions (admin, api)
+│   ├── utils/                       # auth.js, request.ts, etc.
 │   └── views/                       # Page views
 │       ├── admin/                   # Generic CRUD (list + form + detail)
 │       ├── dashboard/               # Enterprise dashboard
 │       └── login/                   # Login page
-├── tests/unit/                      # 1041 Vitest tests (78 spec files)
-├── docs/                            # Design contracts + AI context
-│   └── ai/context.md                # AI assistant reference
+├── tests/unit/                      # 1330 Vitest tests (101 spec files)
+│   ├── components/                  # Component + plugin specs
+│   ├── easyadmin/                   # Core/application/adapter/golden/config specs
+│   └── store/, router/, utils/      # Store, router, utility specs
+├── docs/                            # design/, manual/, plan/, tasks/, ai/context.md
+├── mock/                            # Legacy dev API mocks (not wired into the Vite build)
+├── public/                          # favicon.ico, .htaccess
+├── index.html                       # Vite entry HTML
+├── .env.development/.staging/.production
 ├── vite.config.ts                   # Vite 5 + Vue 3 + JSX config
-├── vitest.config.ts                 # Vitest configuration
+├── vitest.config.ts                 # Vitest configuration (100% thresholds on easyadmin paths)
 ├── tsconfig.json
 └── package.json
 ```
@@ -133,8 +155,8 @@ Translation keys use the English string directly (flat format), e.g. `$t('New / 
 
 ### Prerequisites
 
-- **Node.js** >= 14.18
-- **npm** >= 6.0.0
+- **Node.js** >= 18.0
+- **npm** >= 9.0.0
 
 ### 1) Clone
 
@@ -151,10 +173,11 @@ npm install
 
 ### 3) Configure environment
 
-Copy and edit the development environment file:
+Edit the development environment file (`.env.development` is committed with local defaults — there is no `.env.example`):
 
 ```bash
-cp .env.example .env.development
+# .env.development — point the proxy at your backend
+VITE_PROXY_TARGET=http://127.0.0.1:8000
 ```
 
 Key variables:
@@ -165,6 +188,7 @@ VITE_PROXY_TARGET=http://127.0.0.1:8000
 VITE_API_PREFIX=/api/v1
 VITE_AUTH_API_PREFIX=/api/auth
 VITE_SYSTEM_API_PREFIX=/system
+MEDIA_STORAGE_DEFAULT=local
 ```
 
 ### 4) Run
@@ -197,6 +221,7 @@ npm run test         # Vitest
 | `VITE_AUTH_API_PREFIX` | Auth API prefix | `/api/auth` |
 | `VITE_SYSTEM_API_PREFIX` | System API prefix | `/system` |
 | `VITE_TINYMCE_SRC` | TinyMCE script source | `''` |
+| `MEDIA_STORAGE_DEFAULT` | Default upload storage driver (`local` / `qiniu`) | `local` |
 
 ### Build Customization
 
@@ -213,11 +238,11 @@ EasyAdmin is the heart of this project — a configuration-driven engine that **
 
 ```mermaid
 flowchart LR
-    Config["Entity Config<br/>(collections/)<br/>fields / list_display<br/>list_filter / detail_display"] --> Meta["Backend API<br/>/system/entities<br/>field types, nullability, relations"]
-    Meta --> List["ListAdmin (table)"]
-    Meta --> Form["FormAdmin (form)"]
-    List --> UI["Rendered UI"]
-    Form --> UI
+    Config["Entity Config<br/>(collections/)<br/>fields / list_display<br/>list_filter / detail_display"] --> UI["ListAdmin / FormAdmin /<br/>DetailAdmin + SearchFilter"]
+    UI --> Query["Application<br/>AdminQuery + use cases"]
+    Query --> CSQE["CrudSkeleton adapter<br/>@filter / @order"]
+    Meta["Backend /system/entities<br/>field types, nullability, relations"] --> CSQE
+    CSQE --> API["CrudSkeleton REST API"]
 ```
 
 ### Step 1 — Define an Entity Config
@@ -226,28 +251,35 @@ In `src/configs/collections/common/Content.js`:
 
 ```js
 import { t } from '@/i18n'
+import axios from '@/utils/request'
+import { API_PREFIX, apiPath } from '@/api/prefix'
+import { orderByIdDesc } from '../helpers'
 
 export default {
   Content: {
     form: {
       fields: [
         'title',
-        { property: 'category', required: false },
-        { property: 'tags', required: false }
-      ]
+        { property: 'body', required: true },
+        { property: 'category', required: false, tab: `${t('Metadata')}` },
+        { property: 'tags', required: false, tab: `${t('Metadata')}` }
+      ],
+      batch_edit: {
+        fields: ['category', 'tags']
+      }
     },
     list: {
-      query: { '@order': 'entity.id|DESC' },
+      query: orderByIdDesc,
       list_filter: {
         title: t('Title'),
         'category.id': () => axios
-          .get('/api/v1/manage/categories')
+          .get(apiPath(API_PREFIX, 'manage/categories'))
           .then(res => Object.assign({ __label: t('Category') }, ...res.data.map(v => ({ [v.id]: v.name }))))
       },
-      list_display: ['id', 'title', 'category', 'tags', 'createdAt']
+      list_display: ['id', 'title', 'category', 'tags', 'createdAt', 'updatedAt']
     },
     detail: {
-      detail_display: ['id', 'title', 'category', 'tags', 'body', 'createdAt']
+      detail_display: '__all__'
     }
   }
 }
@@ -312,8 +344,9 @@ interface FieldOption {
   field_events?: object      // Events bound to el-form-item
   type_options?: object      // Props passed to the field plugin
   type_events?: object       // Events bound to the field plugin
-  hidden?: boolean | string[]            // true/false or ['create']/['update']/['create','update'] (also 'edit' alias)
+  hidden?: boolean | string | string[] | Function  // true/false, 'create'/'update'/'edit', array, or (form, id) predicate
   relation_filter?: object   // Filter for relation queries
+  relation?: object         // Relation target override (entity, valueKey, cardinality)
   component?: object         // Custom component (JSX render function)
   help?: string              // Help text below the field
   full_width?: boolean       // Span full grid width (detail view)
@@ -414,11 +447,12 @@ Built-in validators live in `src/utils/validate.js` (`isPasswordCompliant`, `cre
 - **[EasyAdmin Config Contract](docs/design/easyadmin-config-contract.md)** — Complete config schema reference
 - **[Config Reference Manual](docs/manual/config-reference.md)** — Complete EasyAdmin config guide, from simple to advanced
 - **[AI Context](docs/ai/context.md)** — Quick reference for AI-assisted development
+- **[EasyAdmin Query Adapter Plan](docs/plan/easyadmin-query-adapter-architecture.md)** — Layered query/compiler/adapter architecture and migration phases
 - **[Vue 3 Migration Plan](docs/plan/vue3-tsx-vite-migration.md)** — Migration notes and current status
 
 ## Testing
 
-**1041 tests across 78 spec files · Vitest 2.1 · 100% statements/branches/lines thresholds on `src/components/EasyAdmin`**
+**1330 tests across 101 spec files · Vitest 2.1 · 100% statements/branches/lines thresholds on `src/easyadmin/{ui/vue,core,application,adapters/crudskeleton}`**
 
 ```bash
 npm run test              # Run all tests (watch mode off in CI)
@@ -430,9 +464,9 @@ npm run test:ci           # CI (type-check + test)
 
 Tests organized in `tests/unit/`:
 - **Component tests**: Breadcrumb, Hamburger, SvgIcon, EasyAdmin feedback UI
-- **Utility tests**: `request.ts`, `validate.js`, `entity.ts`, `formatTime`, `parseTime`, `param2Obj`
+- **Utility tests**: `request.ts`, `validate.js`, `formatTime`, `parseTime`, `param2Obj`, plus EasyAdmin query core/adapter goldens
 
-Configuration: `vitest.config.ts` (jsdom environment, Vue 3 plugin; 100% statements/branches/lines thresholds enforced on `src/components/EasyAdmin`).
+Configuration: `vitest.config.ts` (jsdom environment, Vue 3 plugin; 100% statements/branches/lines thresholds enforced on `src/easyadmin/{ui/vue,core,application,adapters/crudskeleton}`).
 
 CI: GitHub Actions runs type-check plus sharded unit tests and a coverage job. Docs/config/i18n-only changes are path-filtered so CI jobs are skipped.
 
@@ -442,12 +476,12 @@ CI: GitHub Actions runs type-check plus sharded unit tests and a coverage job. D
 
 ```
 dist/
-├── static/
-│   ├── css/
-│   ├── js/
-│   └── img/
+├── index.html
 ├── favicon.ico
-└── index.html
+└── static/
+    ├── index-[hash].js
+    ├── index-[hash].css
+    └── ... (images and fonts with content hashes)
 ```
 
 ### Deployment Notes

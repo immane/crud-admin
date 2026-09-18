@@ -391,6 +391,21 @@ list_filter: {
 
 Auto-conversion rule: In the `Promise` result, `__label` is the label, `__default` is the default value, and the remaining key-value pairs are options.
 
+### 7.4 DQL Expression Rules (backend-verified)
+
+Custom `expression` values must follow the crud-skeleton `ExpressionDqlParser` contract:
+
+- Use `entity.getX()` chains (e.g. `entity.getCategory().getId()`). Bare property access (`entity.status`), `is*`/`has*` getters (`entity.isSystem()`), and bare names are not DQL-safe. Boolean `isSystem` properties are queried as `entity.getIsSystem()`.
+- Join with `&&` / `||` (never `and` / `or`). Null tests use bare `entity.getX()` (`IS NOT NULL`) or `!entity.getX()` (`IS NULL`), never `== null`.
+- Sort with `@order` (`field|DIR`, comma-separated), never `@sort`.
+
+Every `list_filter.expression` and `relation_filter['@filter']` is checked by the
+config-wide DQL fast-path validator. Every entity's complete `list_filter` map,
+default query, URL state, and resolved REST identity is also locked in
+`tests/unit/easyadmin/golden/__fixtures__/all-config-query-matrix.golden.json`.
+Update that explicit JSON golden in the same change as a query-relevant config
+edit; snapshots are intentionally not used.
+
 ---
 
 ## 8. ActionButton

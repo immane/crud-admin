@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import ElementPlus, { ElImage } from 'element-plus'
-import DetailImage from '@/components/EasyAdmin/plugins/detail/image.vue'
+import DetailImage from '@/easyadmin/ui/vue/plugins/detail/image.vue'
 import SIP from '@/utils/simple-image-process'
 
 function mountCell(value) {

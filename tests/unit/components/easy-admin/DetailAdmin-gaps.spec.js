@@ -1,8 +1,8 @@
 import { mount, flushPromises } from '@vue/test-utils'
 import ElementPlus from 'element-plus'
-import DetailAdmin from '@/components/EasyAdmin/DetailAdmin.vue'
+import DetailAdmin from '@/easyadmin/ui/vue/DetailAdmin.vue'
 
-vi.mock('@/utils/entity', () => {
+vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => {
   const MockEntityManage = vi.fn(function (conf) {
     this.entityConf = conf
     this.name = typeof conf === 'string' ? conf : (conf && conf.name) || 'TestEntity'

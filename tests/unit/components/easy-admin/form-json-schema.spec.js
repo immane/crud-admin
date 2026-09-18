@@ -1,7 +1,7 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { reactive } from 'vue'
 
-vi.mock('@/components/EasyAdmin/FormAdmin', () => ({
+vi.mock('@/easyadmin/ui/vue/FormAdmin', () => ({
   __esModule: true,
   default: {
     name: 'FormAdmin',
@@ -16,12 +16,12 @@ vi.mock('@/components/EasyAdmin/FormAdmin', () => ({
   }
 }))
 
-vi.mock('@/components/EasyAdmin/plugins/form/json.vue', () => ({
+vi.mock('@/easyadmin/ui/vue/plugins/form/json.vue', () => ({
   __esModule: true,
   default: { name: 'JsonEditor', template: '<div class="json-editor-stub" />' }
 }))
 
-import JsonSchemaPlugin from '@/components/EasyAdmin/plugins/form/json_schema.vue'
+import JsonSchemaPlugin from '@/easyadmin/ui/vue/plugins/form/json_schema.vue'
 
 async function settled(wrapper) {
   await flushPromises()

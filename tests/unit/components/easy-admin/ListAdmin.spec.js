@@ -1,8 +1,8 @@
 import { mount } from '@vue/test-utils'
 import ElementPlus from 'element-plus'
-import ListAdmin from '@/components/EasyAdmin/ListAdmin.vue'
+import ListAdmin from '@/easyadmin/ui/vue/ListAdmin.vue'
 
-vi.mock('@/utils/entity', () => {
+vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => {
   const MockEntityManage = vi.fn(function (conf) {
     this.entityConf = conf
     this.name = typeof conf === 'string' ? conf : (conf && conf.name) || 'TestEntity'
@@ -34,7 +34,7 @@ vi.mock('@/utils/simple-image-process', () => ({
   default: { getPicture: (url) => url }
 }))
 
-vi.mock('@/components/EasyAdmin/FormAdmin.vue', async () => {
+vi.mock('@/easyadmin/ui/vue/FormAdmin.vue', async () => {
   const { h } = await import('vue')
   return {
     __esModule: true,
@@ -527,6 +527,15 @@ describe('ListAdmin.vue', () => {
       wrapper.vm.applyQueryParams({ page: 'oops', limit: '-3' })
       expect(wrapper.vm.pager.page).toBe(1)
       expect(wrapper.vm.pager.limit).toBe(1)
+    })
+
+    it('shows loading empty text while refreshing', async () => {
+      const { wrapper } = mountList()
+      const table = () => wrapper.findComponent({ name: 'ElTable' })
+      await wrapper.setData({ refreshing: true })
+      expect(table().props('emptyText')).toBe('Loading data...')
+      await wrapper.setData({ refreshing: false })
+      expect(table().props('emptyText')).toBe('No data')
     })
 
     it('syncToUrl debounces filter state into history.replaceState', async () => {

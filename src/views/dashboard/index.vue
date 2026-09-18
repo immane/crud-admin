@@ -12,19 +12,22 @@
       </div>
     </section>
 
-    <section v-loading="loading" class="dashboard__metrics">
-      <article v-for="metric in metrics" :key="metric.label" class="metric-card" :class="`metric-card--${metric.tone}`">
-        <div class="metric-card__icon"><el-icon><component :is="metric.icon" /></el-icon></div>
-        <div>
-          <p>{{ metric.label }}</p>
-          <strong>{{ metric.value }}</strong>
-          <small>{{ metric.hint }}</small>
-        </div>
-      </article>
+    <section class="dashboard__metrics">
+      <admin-skeleton v-if="showSkeleton" :rows="6" :cols="3" />
+      <template v-else>
+        <article v-for="metric in metrics" :key="metric.label" class="metric-card" :class="`metric-card--${metric.tone}`">
+          <div class="metric-card__icon"><el-icon><component :is="metric.icon" /></el-icon></div>
+          <div>
+            <p>{{ metric.label }}</p>
+            <strong>{{ metric.value }}</strong>
+            <small>{{ metric.hint }}</small>
+          </div>
+        </article>
+      </template>
     </section>
 
     <section class="dashboard__grid">
-      <article v-loading="loading" class="panel panel--revenue">
+      <article class="panel panel--revenue">
         <header class="panel__header">
           <div>
             <p class="panel__kicker">ORDER PULSE</p>
@@ -32,7 +35,9 @@
           </div>
           <span class="panel__badge">{{ $t('Last {0} orders', orderSeries.length) }}</span>
         </header>
-        <div v-if="orderSeries.length" class="chart">
+        <admin-skeleton v-if="showSkeleton" :rows="3" />
+        <template v-else>
+          <div v-if="orderSeries.length" class="chart">
           <div class="chart__summary">
             <strong>{{ formatAmount(orderTotal) }}</strong>
             <span>{{ $t('Current sample total') }}</span>
@@ -52,6 +57,7 @@
           <div class="chart__axis"><span>{{ $t('Earlier') }}</span><span>{{ $t('Now') }}</span></div>
         </div>
         <div v-else class="panel__empty">{{ $t('No order amount data available for analysis') }}</div>
+        </template>
       </article>
 
       <article class="panel panel--weather" :class="weatherClass">
@@ -72,12 +78,14 @@
     </section>
 
     <section class="dashboard__lower-grid">
-      <article v-loading="loading" class="panel panel--orders">
+      <article class="panel panel--orders">
         <header class="panel__header">
           <div><p class="panel__kicker">LATEST ORDERS</p><h2>{{ $t('Recent Orders') }}</h2></div>
           <router-link :to="{ name: 'OrderList' }">{{ $t('View all') }} <el-icon><el-icon-arrow-right /></el-icon></router-link>
         </header>
-        <div v-if="recentOrders.length" class="order-list">
+        <admin-skeleton v-if="showSkeleton" :rows="4" />
+        <template v-else>
+          <div v-if="recentOrders.length" class="order-list">
           <div v-for="order in recentOrders" :key="order.id" class="order-row">
             <div class="order-row__identity"><span class="order-row__avatar">{{ orderInitial(order) }}</span><div><b>#{{ order.id }}</b><small>{{ order.user?.__toString || order.user?.username || order.uuid || $t('Guest order') }}</small></div></div>
             <span>{{ formatAmount(order.totalAmount) }}</span>
@@ -85,11 +93,14 @@
           </div>
         </div>
         <div v-else class="panel__empty">{{ $t('No order data') }}</div>
+        </template>
       </article>
 
-      <article v-loading="loading" class="panel panel--activity">
+      <article class="panel panel--activity">
         <header class="panel__header"><div><p class="panel__kicker">SYSTEM ACTIVITY</p><h2>{{ $t('Wallet & Business Activity') }}</h2></div></header>
-        <div v-if="recentTransactions.length" class="activity-list">
+        <admin-skeleton v-if="showSkeleton" :rows="4" />
+        <template v-else>
+          <div v-if="recentTransactions.length" class="activity-list">
           <div v-for="transaction in recentTransactions" :key="transaction.id" class="activity-row">
             <span class="activity-row__icon"><el-icon><component :is="transactionIcon(transaction.type)" /></el-icon></span>
             <div><b>{{ transactionLabel(transaction.type) }}</b><small>{{ transaction.referenceId || transaction.uuid || `Transaction #${transaction.id}` }}</small></div>
@@ -97,6 +108,7 @@
           </div>
         </div>
         <div v-else class="panel__empty">{{ $t('No transaction data') }}</div>
+        </template>
       </article>
     </section>
   </main>
@@ -105,15 +117,16 @@
 <script>
 import { mapGetters } from 'vuex'
 import { t as $t } from '@/i18n'
-import EntityManage from '@/utils/entity'
+import CrudSkeletonAdapter from '@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter'
+import AdminSkeleton from '@/components/AdminSkeleton.vue'
 
 const entityManagers = {
-  orders: new EntityManage('Order'),
-  products: new EntityManage('Product'),
-  users: new EntityManage('User'),
-  transactions: new EntityManage({ name: 'Transaction', plural: 'transactions' }),
-  stores: new EntityManage({ name: 'Store', plural: 'stores' }),
-  materials: new EntityManage({ name: 'Material', prefix: '/api/v1/manage/inventory', plural: 'materials' })
+  orders: new CrudSkeletonAdapter('Order'),
+  products: new CrudSkeletonAdapter('Product'),
+  users: new CrudSkeletonAdapter('User'),
+  transactions: new CrudSkeletonAdapter({ name: 'Transaction', plural: 'transactions' }),
+  stores: new CrudSkeletonAdapter({ name: 'Store', plural: 'stores' }),
+  materials: new CrudSkeletonAdapter({ name: 'Material', prefix: '/api/v1/manage/inventory', plural: 'materials' })
 }
 
 const weatherByCode = {
@@ -134,9 +147,11 @@ const weatherByCode = {
 
 export default {
   name: 'Dashboard',
+  components: { AdminSkeleton },
   data() {
     return {
       loading: true,
+      loaded: false,
       updatedAt: '--:--',
       totals: { orders: 0, products: 0, users: 0, pending: 0, stores: 0, materials: 0 },
       recentOrders: [],
@@ -184,7 +199,11 @@ export default {
       const last = this.chartPoints[this.chartPoints.length - 1]
       return `M ${first.x} 170 ${this.linePath} L ${last.x} 170 Z`
     },
-    weatherClass() { return this.weather.tone }
+    weatherClass() { return this.weather.tone },
+    // Skeleton covers the first paint; refreshes keep stale content visible.
+    showSkeleton() {
+      return this.loading && !this.loaded
+    }
   },
   created() {
     this.loadDashboard()
@@ -216,6 +235,7 @@ export default {
       }
       this.updatedAt = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
       this.loading = false
+      this.loaded = true
     },
     totalOf(response) {
       return Number(response.paginator?.totalCount ?? response.paginator?.total ?? response.data?.length ?? 0)

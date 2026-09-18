@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { reactive, nextTick } from 'vue'
 import ElementPlus from 'element-plus'
-import DatePlugin from '@/components/EasyAdmin/plugins/form/date.vue'
+import DatePlugin from '@/easyadmin/ui/vue/plugins/form/date.vue'
 
 function makeWrapper(form, field) {
   return mount(DatePlugin, {

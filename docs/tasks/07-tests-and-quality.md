@@ -40,7 +40,7 @@ Priority P0:
 - `tests/unit/utils/formatTime.spec.js`
 - `tests/unit/utils/parseTime.spec.js`
 - `tests/unit/utils/param2Obj.spec.js`
-- `tests/unit/utils/entity.spec.js`
+- `tests/unit/easyadmin/adapters/crudskeleton-adapter.spec.js`
 
 Priority P1:
 

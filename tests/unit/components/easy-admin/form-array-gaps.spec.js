@@ -1,8 +1,8 @@
 import { mount } from '@vue/test-utils'
 import ElementPlus from 'element-plus'
-import ArrayField from '@/components/EasyAdmin/plugins/form/array.vue'
+import ArrayField from '@/easyadmin/ui/vue/plugins/form/array.vue'
 
-vi.mock('@/components/EasyAdmin/FormAdmin', () => ({
+vi.mock('@/easyadmin/ui/vue/FormAdmin', () => ({
   default: {
     name: 'FormAdmin',
     template: '<div class="form-admin-stub" />',

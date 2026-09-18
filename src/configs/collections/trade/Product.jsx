@@ -1,7 +1,7 @@
 import { t } from '@/i18n'
 import { orderByIdDesc, statusFilterLabel } from '../helpers'
-import ListAdmin from '@/components/EasyAdmin/ListAdmin'
-import FormAdmin from '@/components/EasyAdmin/FormAdmin'
+import ListAdmin from '@/easyadmin/ui/vue/ListAdmin'
+import FormAdmin from '@/easyadmin/ui/vue/FormAdmin'
 import specificationConfig from './Specification'
 
 const SpecificationManager = {
@@ -180,7 +180,7 @@ export default {
         isDeleted: {
           label: t('Deleted'),
           type: 'boolean',
-          expression: 'entity.isDeleted() == :value'
+          expression: 'entity.getIsDeleted() == :value'
         }
       },
       list_display: ['id', 'name', 'status', 'isDeleted', 'createdAt', 'updatedAt']

@@ -5,7 +5,12 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 
 export default defineConfig({
   plugins: [vue(), vueJsx({ include: [/\.[jt]sx?$/] })],
-  resolve: { alias: { '@': path.resolve(__dirname, 'src') }, extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'] },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src')
+    },
+    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
+  },
   test: {
     environment: 'jsdom',
     globals: true,
@@ -13,7 +18,13 @@ export default defineConfig({
     include: ['tests/unit/**/*.spec.js'],
     coverage: {
       provider: 'v8',
-      include: ['src/components/EasyAdmin/**/*.{vue,ts}'],
+      include: [
+        'src/easyadmin/ui/vue/**/*.{vue,ts}',
+        'src/easyadmin/core/**/*.ts',
+        'src/easyadmin/application/**/*.ts',
+        'src/easyadmin/adapters/crudskeleton/**/*.ts'
+      ],
+      exclude: ['src/easyadmin/adapters/graphql/**'],
       thresholds: {
         statements: 100,
         branches: 100,

@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import ElementPlus, { ElButton } from 'element-plus'
-import DetailJson from '@/components/EasyAdmin/plugins/detail/json.vue'
+import DetailJson from '@/easyadmin/ui/vue/plugins/detail/json.vue'
 
 function mountCell(value) {
   return mount(DetailJson, {

@@ -1,9 +1,9 @@
 import { mount, flushPromises } from '@vue/test-utils'
 import ElementPlus from 'element-plus'
-import RelationToOne from '@/components/EasyAdmin/plugins/list/RelationToOne.vue'
+import RelationToOne from '@/easyadmin/ui/vue/plugins/list/RelationToOne.vue'
 import { loadRelationRecords } from '@/utils/relation'
 
-vi.mock('@/utils/entity', () => ({ default: class { async list() { return [] } } }))
+vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => ({ default: class { async list() { return [] } } }))
 vi.mock('@/configs/entities', () => ({ default: {} }))
 vi.mock('@/utils/relation', async (importOriginal) => {
   const mod = await importOriginal()

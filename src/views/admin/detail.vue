@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import DetailAdmin from '@/components/EasyAdmin/DetailAdmin'
+import DetailAdmin from '@/easyadmin/ui/vue/DetailAdmin'
 import admin from '@/config'
 import inflectFactory from 'i'
 

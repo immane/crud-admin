@@ -30,7 +30,7 @@ vi.mock('@/utils/simple-image-process', () => ({
   default: { getPicture: (...args) => sipMocks.getPicture(...args) }
 }))
 
-import ImagePlugin from '@/components/EasyAdmin/plugins/form/image.vue'
+import ImagePlugin from '@/easyadmin/ui/vue/plugins/form/image.vue'
 
 const UploadStub = {
   name: 'ElUpload',

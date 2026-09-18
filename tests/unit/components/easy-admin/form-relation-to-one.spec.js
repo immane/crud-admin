@@ -1,7 +1,7 @@
 import { mount, flushPromises } from '@vue/test-utils'
 import { reactive } from 'vue'
 import ElementPlus, { ElOption, ElSelect } from 'element-plus'
-import RelationToOne from '@/components/EasyAdmin/plugins/form/RelationToOne.vue'
+import RelationToOne from '@/easyadmin/ui/vue/plugins/form/RelationToOne.vue'
 import { loadRelationRecords } from '@/utils/relation'
 
 const { listMock, loadMock, constructed } = vi.hoisted(() => ({
@@ -10,7 +10,7 @@ const { listMock, loadMock, constructed } = vi.hoisted(() => ({
   constructed: []
 }))
 
-vi.mock('@/utils/entity', () => ({
+vi.mock('@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter', () => ({
   default: class EntityManageMock {
     constructor(conf) {
       this.conf = conf

@@ -122,6 +122,8 @@ export default {
   'Export': 'エクスポート',
   'Actions': '操作',
   'Loading...': '読み込み中...',
+  'Loading data...': 'データを読み込み中...',
+  'No data': 'データがありません',
   'New / Edit': '新規 / 編集',
   'Default': 'デフォルト',
   'Delete this record?': 'このレコードを削除しますか？',

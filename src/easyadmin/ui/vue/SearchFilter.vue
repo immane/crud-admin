@@ -1,0 +1,387 @@
+<template>
+  <div class="easy-admin-search-filter">
+    <div class="easy-admin-search-filter__fields">
+      <template v-for="(v, k) in filters" :key="k">
+        <!-- Dynamic components and JSX function -->
+        <div v-if="Object.keys(v).includes('component')">
+          <component
+            :is="v.component"
+            v-model="filterData[k]"
+          />
+        </div>
+
+        <!-- Datetime -->
+        <el-date-picker
+          v-if="v.type === 'datetime' || v.type === 'date' || v.type === 'time'"
+          v-model="filterData[k]"
+          :type="v.type"
+          :placeholder="`${v.label ? v.label : k}`"
+          style="width: 150px;"
+          size="default"
+          :value-format="{
+            datetime: 'yyyy-MM-dd HH:mm:ss',
+            date: 'yyyy-MM-dd',
+            time: 'HH:mm:ss',
+          }[v.type]
+          "
+        />
+
+        <!-- Input -->
+        <el-input
+          v-else-if="v.type === 'input'"
+          v-model="filterData[k]"
+          :placeholder="`${v.label ? v.label : k}`"
+          style="width: 150px;"
+          size="default"
+          clearable
+        >
+          <template #prefix><el-icon><el-icon-search /></el-icon></template>
+        </el-input>
+
+        <!-- Boolean -->
+        <el-switch
+          v-else-if="v.type === 'boolean'"
+          v-model="filterData[k]"
+          :inactive-text="`${v.label ? v.label : k}`"
+          size="default"
+        />
+
+        <!-- Select -->
+        <el-select
+          v-else
+          v-model="filterData[k]"
+          :filterable="!v.data || v.data.length > 8"
+          clearable
+          :placeholder="`${v.label ? v.label : k}`"
+          style="width: 150px;"
+          size="default"
+        >
+          <el-option
+            v-for="item in v.data"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </template>
+    </div>
+
+    <div v-if="Object.keys(filters).length" class="easy-admin-search-filter__actions">
+      <el-button
+        size="default"
+        type="primary"
+        icon="el-icon-search"
+        circle
+        @click="filterGenerate(); fetchData();"
+      />
+
+      <el-button
+        size="default"
+        icon="el-icon-refresh"
+        title="Reset search"
+        circle
+        :class="{ 'search-filter__reset--refreshing': refreshing }"
+        @click="reset"
+      />
+    </div>
+  </div>
+</template>
+
+<script>
+import {
+  joinExpressions,
+  shorthandExpression,
+  shouldIncludeValue,
+  substituteValue
+} from '@/easyadmin/core/query/dql-ops'
+
+export default {
+  name: 'SearchFilter',
+
+  props: {
+    refreshing: {
+      type: Boolean,
+      default: false
+    },
+    // v-model
+    modelValue: {
+      type: Object,
+      default: () => ({})
+    },
+
+    query: {
+      type: Object,
+      default: () => {}
+    },
+
+    filter: {
+      type: Object,
+      default: () => {}
+    },
+
+    fetchDataFunc: {
+      type: Function,
+      default: () => () => {}
+    },
+
+    // Default list filters
+    listFilter: {
+      type: Object,
+      default: () => {
+        /**
+         * @description
+         *  Selection filter or Searcher
+         *  List filter example
+         *
+         * @example
+         * {
+         *    //////////////////
+         *    // Reduce style //
+         *    //////////////////
+         *
+         *    // 1. Selection
+         *    status: {
+         *      __label: 'Status',
+         *      __default: 0,
+         *      0: 'Pending', 1: 'Paid', 2: 'Completed'
+         *    }
+         *
+         *    // 2. Input
+         *    status: 'Label here'
+         *
+         *    ////////////////
+         *    // Full style //
+         *    ////////////////
+         *
+         *    // 1. Selection
+         *    'category': {
+         *      expression: 'entity.getCategory().getId() == ":value"',
+         *      label: 'Please Provide Category',
+         *      type: 'select', // Types: select, input, datetime, date, time
+         *      data: [
+         *        { value: 'book', label: 'Book' },
+         *        { value: 'paper', label: 'Paper' },
+         *      ],
+         *      default: 'book'
+         *    }
+         *
+         *    // 2. Input
+         *    'user.username': {
+         *      expression: 'entity.getUser().getUsername() matches ":value"',
+         *      label: 'Please Provide Username',
+         *      type: 'input',
+         *      default: 'Rin'
+         *    }
+         *
+         *    // 3. Input
+         *    'userEnabled': {
+         *      expression: 'entity.getUser().getIsEnabled() == :value',
+         *      label: 'User enabled',
+         *      type: 'boolean',
+         *      default: true
+         *    }
+         *
+         *    // 4. DateTime / Date / Time
+         *    beforeCreatedTime: {
+         *      expression: 'entity.getCreatedTime() >= datetime.get(":value")',
+         *      label: 'Before Time',
+         *      type: 'datetime'
+         *    }
+         *
+         *    //////////////////
+         *    // Async sample //
+         *    //////////////////
+         *
+         *    'category.id': () => {
+         *      return axios
+         *        .get('/api/categories',
+         *          { params: { '@filter': 'entity.getType().getSlug() == "content"' }})
+         *        .then(res =>
+         *          Object.assign(
+         *            { __label: 'Category', __default: 1 },
+         *            ...res.data.map(v => { return { [v.id]: v.name } })
+         *          )
+         *        )
+         *    }
+         * }
+         */
+      }
+    }
+  },
+
+  data() {
+    return {
+      // Table data source
+      list: [],
+
+      // Translated filter config
+      filters: {},
+      filterData: {}
+    }
+  },
+
+  watch: {
+    modelValue: {
+      handler: function(value) {
+        this.filterData = { ...value }
+      },
+      deep: true
+    }
+  },
+
+  async created() {
+    // Process filter
+    await this.filterProcess()
+
+    // Restore any values already present in modelValue (from URL / parent)
+    if (this.modelValue) {
+      for (const key of Object.keys(this.modelValue)) {
+        if (this.modelValue[key] != null && this.modelValue[key] !== '') {
+          this.filterData[key] = this.modelValue[key]
+        }
+      }
+    }
+
+    // Generate filter
+    this.filterGenerate()
+
+    /**
+     * Fetch base data, like entity structure and validations
+     */
+    this.fetchData(false)
+  },
+
+  methods: {
+    /* Debug */
+    _console() {
+      return console
+    },
+
+    /* Filter process */
+
+    async filterProcess() {
+      const filter = {}
+      const isFunction = functionToCheck => functionToCheck && {}.toString.call(functionToCheck) === '[object Function]'
+      const transform = (field, key) => {
+        // Reduced styles derive their DQL expression from the core helper;
+        // full-style filters (with `expression`) pass through untouched.
+        filter[key] = shorthandExpression(key, field)
+
+        this.filterData[key] = filter[key]['default']
+      }
+
+      for (const key in this.listFilter) {
+        let field = this.listFilter[key]
+
+        // receive async function
+        if (isFunction(field)) {
+          const promise = this.listFilter[key]()
+          if (promise instanceof Promise) {
+            const res = await this.listFilter[key]()
+            field = res
+            transform(res, key)
+          } else throw Error('Async filter must return promise object!')
+        } else {
+          // receive normal value
+          transform(field, key)
+        }
+      }
+
+      this.filters = filter
+    },
+
+    filterGenerate() {
+      // The final `@filter` HTTP param is produced downstream by the
+      // CrudSkeleton compiler; here filter state becomes joined expressions
+      // through the core helpers (falsy values intentionally dropped).
+      const base = this.query && Object.keys(this.query).includes('@filter')
+        ? this.query['@filter']
+        : undefined
+
+      const expressions = []
+      for (const key in this.filterData) {
+        const value = this.filterData[key]
+        if (!shouldIncludeValue(value)) continue
+        expressions.push(substituteValue(this.filters[key].expression, value))
+      }
+
+      const joined = joinExpressions(base, expressions)
+      const filter = joined ? { '@filter': joined } : {}
+      this.$emit('update:modelValue', { ...this.filterData })
+      this.$emit('update:filter', filter)
+    },
+
+    reset() {
+      this.filterData = Object.fromEntries(
+        Object.entries(this.filters).map(([key, filter]) => [key, filter.default])
+      )
+      this.filterGenerate()
+      this.$emit('reset')
+    },
+
+    fetchData(resetPage = true) {
+      // data process callback
+      this.fetchDataFunc(this, resetPage)
+    }
+  }
+}
+</script>
+
+<style scoped>
+.easy-admin-search-filter,
+.easy-admin-search-filter__fields,
+.easy-admin-search-filter__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.easy-admin-search-filter {
+  flex-wrap: wrap;
+}
+
+.easy-admin-search-filter__fields {
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+}
+
+.search-filter__reset--refreshing {
+  border-color: #e6a23c !important;
+  background-color: #faecd8 !important;
+  color: #e6a23c !important;
+  box-shadow: 0 0 0 3px rgba(230, 162, 60, 0.26), 0 4px 14px rgba(230, 162, 60, 0.38) !important;
+  animation: refreshing-pulse 1.4s ease-in-out infinite !important;
+}
+.search-filter__reset--refreshing .el-icon,
+.search-filter__reset--refreshing i {
+  color: #e6a23c !important;
+}
+.search-filter__reset--refreshing :deep(.el-icon),
+.search-filter__reset--refreshing :deep(i) {
+  animation: rotating 1s linear infinite !important;
+  transform-origin: center center;
+  display: inline-block;
+  filter: drop-shadow(0 0 2px rgba(230, 162, 60, 0.55));
+}
+@keyframes rotating {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes refreshing-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(230, 162, 60, 0.26), 0 4px 14px rgba(230, 162, 60, 0.38); }
+  50% { box-shadow: 0 0 0 6px rgba(230, 162, 60, 0.14), 0 6px 18px rgba(230, 162, 60, 0.5); }
+}
+
+@media (max-width: 767px) {
+  .easy-admin-search-filter,
+  .easy-admin-search-filter__fields {
+    align-items: stretch;
+  }
+
+  .easy-admin-search-filter__fields :deep(.el-input),
+  .easy-admin-search-filter__fields :deep(.el-select),
+  .easy-admin-search-filter__fields :deep(.el-date-editor) {
+    width: 100% !important;
+  }
+}
+</style>

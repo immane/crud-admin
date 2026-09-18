@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { reactive, nextTick } from 'vue'
 import ElementPlus, { ElInputNumber } from 'element-plus'
-import CurrencyPlugin from '@/components/EasyAdmin/plugins/form/currency.vue'
+import CurrencyPlugin from '@/easyadmin/ui/vue/plugins/form/currency.vue'
 
 function mountCurrency(formData = { amount: 0 }, fieldData = { property: 'amount' }) {
   const form = reactive(formData)

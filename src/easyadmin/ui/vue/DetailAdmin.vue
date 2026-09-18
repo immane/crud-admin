@@ -1,0 +1,208 @@
+<template>
+    <section class="detail-admin">
+    <header class="detail-admin__header">
+      <div>
+        <p class="detail-admin__eyebrow">RECORD DETAIL</p>
+        <h1>{{ title }}</h1>
+        <p class="detail-admin__subtitle">#{{ id }}</p>
+      </div>
+      <div class="detail-admin__actions">
+        <slot name="actions" :record="record" :refresh="fetchData">
+          <el-button icon="el-icon-arrow-left" @click="$router.go(-1)">{{ $t('Back') }}</el-button>
+          <el-button v-if="editable" type="primary" icon="el-icon-edit" @click="goToUpdate">{{ $t('Edit') }}</el-button>
+        </slot>
+      </div>
+    </header>
+
+    <admin-skeleton v-if="showSkeleton" :rows="skeletonRows" :cols="2" />
+    <div v-else class="detail-admin__grid">
+      <article v-for="field in properties" :key="field.property" class="detail-admin__field" :class="{ 'detail-admin__field--wide': field.span === 2 || field.full_width }">
+        <div class="detail-admin__label">{{ getLabel(field) }}</div>
+        <div class="detail-admin__value">
+          <slot :name="field.property" :value="extractField(record, field.property)" :record="record" :refresh="fetchData">
+            <component
+              :is="field.component"
+              v-if="field.component"
+              :data="extractField(record, field.property)"
+              :record="record"
+              :scope="{ row: record }"
+              :refresh="fetchData"
+            />
+            <component
+              :is="loadPlugin(getListPluginType(field, structure[field.property], extractField(record, field.property)))"
+              v-else-if="getListPluginType(field, structure[field.property], extractField(record, field.property))"
+              :value="extractField(record, field.property)"
+              :field="field"
+              :scope="{ row: record }"
+              :em="em"
+              :struct="structure[field.property]"
+            />
+            <span v-else>{{ formatValue(extractField(record, field.property)) }}</span>
+          </slot>
+        </div>
+      </article>
+    </div>
+  </section>
+</template>
+
+<script>
+import { defineAsyncComponent, markRaw, toRaw } from 'vue'
+import CrudSkeletonAdapter from '@/easyadmin/adapters/crudskeleton/CrudSkeletonAdapter'
+import entities from '@/configs/entities'
+import { resolveRelation } from '@/utils/relation'
+import { createUiFeedback } from './feedback'
+import AdminSkeleton from '@/components/AdminSkeleton.vue'
+
+const detailPlugins = import.meta.glob('./plugins/detail/*.vue')
+const listPlugins = import.meta.glob('./plugins/list/*.vue')
+const pluginCache = {}
+
+const resolvePlugin = path => {
+  if (!pluginCache[path]) {
+    pluginCache[path] = defineAsyncComponent(() => {
+      const loader = detailPlugins[path] || listPlugins[path]
+      return loader().then(module => module.default)
+    })
+  }
+  return pluginCache[path]
+}
+
+export default {
+  name: 'DetailAdmin',
+  components: { AdminSkeleton },
+  props: {
+    id: { type: [Number, String], required: true },
+    entityConf: { type: [Object, String], required: true },
+    fields: { type: [Array, String], default: () => [] },
+    title: { type: String, default: '' },
+    editable: { type: Boolean, default: true }
+  },
+  data() {
+    return {
+      em: new CrudSkeletonAdapter(this.entityConf),
+      structure: {},
+      record: {},
+      properties: [],
+      loading: true,
+      // First successful fetch flips this; skeleton covers only the first paint.
+      loaded: false
+    }
+  },
+  created() {
+    this.properties = (this.fields === '__all__' ? [] : this.fields.filter(field => field !== '__all__')).map(field =>
+      typeof field === 'string' ? { property: field } : (field.component ? { ...field, component: markRaw(toRaw(field.component)) } : field)
+    )
+    this.fetchData()
+  },
+  computed: {
+    // Skeleton covers the first paint; refetches keep stale content visible.
+    showSkeleton() {
+      return this.loading && !this.loaded
+    },
+    skeletonRows() {
+      return this.properties.length || 6
+    }
+  },
+  methods: {
+    fetchData() {
+      this.loading = true
+      Promise.all([this.em.structure(), this.em.retrieve(this.id)])
+        .then(([structure, response]) => {
+          this.structure = structure
+          this.record = response.data
+          if (this.fields === '__all__' || this.fields.includes('__all__')) {
+            const configuredFields = this.fields === '__all__' ? [] : this.fields.filter(field => field !== '__all__')
+            const explicitFields = configuredFields.filter(field => typeof field !== 'string')
+            const explicitProperties = new Set(explicitFields.map(field => field.property))
+            this.properties = [...explicitFields, ...Object.keys(structure)
+              .filter(property => !explicitProperties.has(property))
+              .map(property => ({ property }))]
+          }
+        })
+        .catch(error => createUiFeedback(this).error(error.message || this.$t('Failed to load record')))
+        .finally(() => { this.loading = false; this.loaded = true })
+    },
+    getLabel(field) {
+      return field.label || field.field_options?.label || this.structure[field.property]?.translation || field.property
+    },
+    getListPluginType(field, struct, value) {
+      const relation = resolveRelation(field, struct, entities)
+      if (relation) return relation.multiple ? 'RelationToMany' : 'RelationToOne'
+      const type = field.type || struct?.metadata?.type
+      if (!type) return Array.isArray(value) ? 'RelationToMany' : null
+      if (['boolean', 'currency', 'date', 'datetime', 'datetime_immutable', 'image', 'array', 'json', 'json_schema'].includes(type)) return type
+      if (['ManyToOne', 'OneToOne'].includes(type)) return 'RelationToOne'
+      if (['ManyToMany', 'OneToMany'].includes(type)) return 'RelationToMany'
+      return null
+    },
+    loadPlugin(type) {
+      const typeMapping = {
+        ManyToOne: 'RelationToOne', OneToOne: 'RelationToOne',
+        ManyToMany: 'RelationToMany', OneToMany: 'RelationToMany', datetime_immutable: 'datetime'
+      }
+      const resolvedType = typeMapping[type] || type
+      const detailPath = `./plugins/detail/${resolvedType}.vue`
+      const listPath = `./plugins/list/${resolvedType}.vue`
+      return detailPlugins[detailPath] ? resolvePlugin(detailPath) : resolvePlugin(listPath)
+    },
+    extractField(data, property) {
+      return property.split('.').reduce((value, key) => value != null ? value[key] : null, data)
+    },
+    formatValue(value) {
+      if (value === null || typeof value === 'undefined' || value === '') return '-'
+      if (typeof value === 'object') return value.__toString || JSON.stringify(value)
+      return String(value).replace(/<[^>]*>/g, '')
+    },
+    goToUpdate() {
+      this.$router.push({ name: `${this.em.name}Update`, params: { id: this.id }})
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.detail-admin {
+  min-height: 360px;
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(49, 78, 112, 0.08);
+  overflow: hidden;
+}
+
+.detail-admin__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 32px;
+  color: #fff;
+  background: var(--detail-header);
+}
+
+.detail-admin__eyebrow, .detail-admin__subtitle { margin: 0; color: var(--detail-header-muted); }
+.detail-admin__eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; }
+.detail-admin__header h1 { margin: 6px 0 3px; font-size: 24px; font-weight: 600; }
+.detail-admin__subtitle { font-size: 13px; }
+.detail-admin__actions { flex-shrink: 0; }
+
+.detail-admin__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border-top: 1px solid var(--border);
+}
+
+.detail-admin__field { min-height: 96px; padding: 20px 28px; background: var(--surface); }
+.detail-admin__field--wide { grid-column: span 2; }
+.detail-admin__label { margin-bottom: 10px; color: var(--text-secondary); font-size: 12px; font-weight: 600; }
+.detail-admin__value { color: var(--text-primary); line-height: 1.6; word-break: break-word; }
+
+@media screen and (max-width: 768px) {
+  .detail-admin__header { align-items: flex-start; flex-direction: column; padding: 24px; }
+  .detail-admin__grid { grid-template-columns: 1fr; }
+  .detail-admin__field, .detail-admin__field--wide { grid-column: span 1; padding: 18px 20px; }
+}
+</style>

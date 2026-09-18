@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/vue-3.5-brightgreen?logo=vue.js" alt="Vue 3">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/vite-5.x-646CFF?logo=vite" alt="Vite">
-  <img src="https://img.shields.io/badge/node-%3E%3D14-green?logo=node.js" alt="Node">
+  <img src="https://img.shields.io/badge/node-%3E%3D18-green?logo=node.js" alt="Node">
   <br><br>
 </p>
 
@@ -50,12 +50,12 @@
 - **JWT 认证** — Bearer token 登录，自动刷新 token 轮换，Cookie 按端口隔离（`dream_studio_admin_token_{port}` 避免同主机跨端口冲突），并发请求排队
 - **基于角色的权限控制** — 通过 Vuex + Vue Router 4 按用户角色过滤动态路由
 - **实体自省** — 查询后端 `/system/entities` 自动推断字段类型、可空性和关联关系
-- **动态筛选与排序** — 基于配置驱动的搜索 UI 生成服务端筛选表达式（`@filter`、`@sort`、`@order`）
+- **动态筛选与排序** — 基于配置驱动的搜索 UI 生成服务端筛选表达式（`@filter`、`@order`）
 - **企业控制台** — 实时订单/商品/用户指标、SVG 折线图、浏览器定位天气组件
 - **响应式布局** — 可折叠侧边栏（SVG 图标）、面包屑导航、可选固定顶栏
 - **代码分割与构建优化** — Vite 驱动的 chunk 分割和 tree-shaking
 - **服务端健康监控** — 导航栏状态点轮询 `GET /health/live`、`/health/ready` 和 `/metrics`
-- **Vitest 单元测试** — 78 个 spec 文件共 1041 项测试，`src/components/EasyAdmin` 上强制 100% 覆盖率阈值
+- **Vitest 单元测试** — 101 个 spec 文件共 1330 项测试，`src/easyadmin/{ui/vue,core,application,adapters/crudskeleton}` 上强制 100% 覆盖率阈值
 - **锁定文件已提交** — `package-lock.json` 已提交以保证可复现安装
 
 
@@ -94,16 +94,31 @@
 .
 ├── src/
 │   ├── main.js                      # 应用入口：createApp、安装插件、挂载
+│   ├── App.vue                      # 根组件（<router-view />）
 │   ├── permission.js                # 路由守卫（认证 + 角色检查）
-│   ├── components/EasyAdmin/        # ⭐ 核心 CRUD 引擎
-│   │   ├── FormAdmin.vue            # 动态表单生成器
-│   │   ├── ListAdmin.vue            # 动态列表/表格生成器
-│   │   ├── DetailAdmin.vue          # 可配置记录详情页
-│   │   ├── SearchFilter.vue         # 动态筛选 UI
-│   │   └── plugins/
-│   │       ├── form/                # 21 个字段类型插件
-│   │       ├── list/                # 10 个列表渲染插件
-│   │       └── detail/              # 2 个详情专用插件
+│   ├── settings.js                  # 应用标题、布局选项
+│   ├── config.js                    # 声明式配置再导出
+│   ├── api/                         # 接口定义（prefix、user/auth）
+│   ├── assets/                      # 静态图片（登录背景、404）
+│   ├── components/                  # 通用 UI（Breadcrumb、Hamburger、SvgIcon、Tinymce）
+│   ├── easyadmin/                   # ⭐ 配置驱动 CRUD 引擎
+│   │   ├── core/query/              # 纯查询模型（AdminQuery、FilterNode、排序、分页、DQL 工具）
+│   │   ├── core/model/              # 实体标识、记录、字段配置、管理元数据
+│   │   ├── core/ports/              # 仓储、元数据、编译器接口
+│   │   ├── application/query/       # AdminQuery 构建 + URL 查询同步
+│   │   ├── application/usecases/    # 保存、删除、批量、导出、关联、分批字段工具
+│   │   ├── adapters/crudskeleton/   # 适配器、元数据提供器、CSQE 查询编译器
+│   │   ├── adapters/graphql/        # 预留占位（暂无后端契约）
+│   │   └── ui/vue/                  # Vue UI：List/Form/Detail/SearchFilter + 插件
+│   │       ├── FormAdmin.vue        # 动态表单生成器
+│   │       ├── ListAdmin.vue        # 动态列表/表格生成器
+│   │       ├── DetailAdmin.vue      # 可配置记录详情页
+│   │       ├── SearchFilter.vue     # 动态筛选 UI
+│   │       ├── feedback.ts          # Element Plus 消息/加载工具
+│   │       └── plugins/
+│   │           ├── form/            # 21 个字段类型插件
+│   │           ├── list/            # 10 个列表渲染插件
+│   │           └── detail/          # 3 个详情专用插件
 │   ├── configs/                     # 声明式实体配置
 │   │   ├── routes.js                # 菜单/路由定义
 │   │   ├── entities.js              # 自动加载器（import.meta.glob）
@@ -115,16 +130,23 @@
 │   ├── router/                      # Vue Router 4 + r()/g() 生成器
 │   ├── store/                       # Vuex 4（自动加载 modules/）
 │   ├── styles/                      # 全局 SCSS（侧边栏、过渡、覆写）
-│   ├── utils/                       # auth.js、entity.ts、request.ts 等
+│   ├── types/                       # TypeScript 定义（admin、api）
+│   ├── utils/                       # auth.js、request.ts 等
 │   └── views/                       # 页面视图
 │       ├── admin/                   # 通用 CRUD（list + form + detail）
 │       ├── dashboard/               # 企业控制台
 │       └── login/                   # 登录页
-├── tests/unit/                      # 1041 项 Vitest 测试（78 个 spec 文件）
-├── docs/                            # 设计合约 + AI 上下文
-│   └── ai/context.md                # AI 助手参考文档
+├── tests/unit/                      # 1330 项 Vitest 测试（101 个 spec 文件）
+│   ├── components/                  # 组件 + 插件测试
+│   ├── easyadmin/                   # core/application/adapter/golden/config 测试
+│   └── store/、router/、utils/      # Store、路由、工具函数测试
+├── docs/                            # design/、manual/、plan/、tasks/、ai/context.md
+├── mock/                            # 历史遗留开发 API 模拟（未接入 Vite 构建）
+├── public/                          # favicon.ico、.htaccess
+├── index.html                       # Vite 入口 HTML
+├── .env.development/.staging/.production
 ├── vite.config.ts                   # Vite 5 + Vue 3 + JSX 配置
-├── vitest.config.ts                 # Vitest 配置
+├── vitest.config.ts                 # Vitest 配置（easyadmin 路径 100% 阈值）
 ├── tsconfig.json
 └── package.json
 ```
@@ -133,8 +155,8 @@
 
 ### 前置要求
 
-- **Node.js** >= 14.18
-- **npm** >= 6.0.0
+- **Node.js** >= 18.0
+- **npm** >= 9.0.0
 
 ### 1) 克隆
 
@@ -151,10 +173,11 @@ npm install
 
 ### 3) 配置环境变量
 
-复制并编辑开发环境文件：
+编辑开发环境文件（`.env.development` 已提交本地默认值，不提供 `.env.example`）：
 
 ```bash
-cp .env.example .env.development
+# .env.development — 将代理指向你的后端
+VITE_PROXY_TARGET=http://127.0.0.1:8000
 ```
 
 关键变量：
@@ -165,6 +188,7 @@ VITE_PROXY_TARGET=http://127.0.0.1:8000
 VITE_API_PREFIX=/api/v1
 VITE_AUTH_API_PREFIX=/api/auth
 VITE_SYSTEM_API_PREFIX=/system
+MEDIA_STORAGE_DEFAULT=local
 ```
 
 ### 4) 运行
@@ -197,6 +221,7 @@ npm run test         # Vitest
 | `VITE_AUTH_API_PREFIX` | 认证 API 前缀 | `/api/auth` |
 | `VITE_SYSTEM_API_PREFIX` | 系统 API 前缀 | `/system` |
 | `VITE_TINYMCE_SRC` | TinyMCE 脚本源 | `''` |
+| `MEDIA_STORAGE_DEFAULT` | 默认上传存储驱动（`local` / `qiniu`） | `local` |
 
 ### 构建自定义配置
 
@@ -213,11 +238,11 @@ EasyAdmin 是本项目的核心——一个**配置驱动引擎**，能够根据
 
 ```mermaid
 flowchart LR
-    Config["实体配置<br/>(collections/)<br/>fields / list_display<br/>list_filter / detail_display"] --> Meta["后端 API<br/>/system/entities<br/>字段类型、可空性、关联关系"]
-    Meta --> List["ListAdmin (表格)"]
-    Meta --> Form["FormAdmin (表单)"]
-    List --> UI["渲染出的 UI"]
-    Form --> UI
+    Config["实体配置<br/>(collections/)<br/>fields / list_display<br/>list_filter / detail_display"] --> UI["ListAdmin / FormAdmin /<br/>DetailAdmin + SearchFilter"]
+    UI --> Query["应用层<br/>AdminQuery + 用例"]
+    Query --> CSQE["CrudSkeleton 适配器<br/>@filter / @order"]
+    Meta["后端 /system/entities<br/>字段类型、可空性、关联关系"] --> CSQE
+    CSQE --> API["CrudSkeleton REST API"]
 ```
 
 ### 第一步 — 定义实体配置
@@ -226,28 +251,35 @@ flowchart LR
 
 ```js
 import { t } from '@/i18n'
+import axios from '@/utils/request'
+import { API_PREFIX, apiPath } from '@/api/prefix'
+import { orderByIdDesc } from '../helpers'
 
 export default {
   Content: {
     form: {
       fields: [
         'title',
-        { property: 'category', required: false },
-        { property: 'tags', required: false }
-      ]
+        { property: 'body', required: true },
+        { property: 'category', required: false, tab: `${t('Metadata')}` },
+        { property: 'tags', required: false, tab: `${t('Metadata')}` }
+      ],
+      batch_edit: {
+        fields: ['category', 'tags']
+      }
     },
     list: {
-      query: { '@order': 'entity.id|DESC' },
+      query: orderByIdDesc,
       list_filter: {
         title: t('Title'),
         'category.id': () => axios
-          .get('/api/v1/manage/categories')
+          .get(apiPath(API_PREFIX, 'manage/categories'))
           .then(res => Object.assign({ __label: t('Category') }, ...res.data.map(v => ({ [v.id]: v.name }))))
       },
-      list_display: ['id', 'title', 'category', 'tags', 'createdAt']
+      list_display: ['id', 'title', 'category', 'tags', 'createdAt', 'updatedAt']
     },
     detail: {
-      detail_display: ['id', 'title', 'category', 'tags', 'body', 'createdAt']
+      detail_display: '__all__'
     }
   }
 }
@@ -312,8 +344,9 @@ interface FieldOption {
   field_events?: object      // 绑定到 el-form-item 的事件
   type_options?: object      // 传递给字段插件的 Props
   type_events?: object       // 绑定到字段插件的事件
-  hidden?: boolean | string[]            // true/false 或 ['create']/['update']/['create','update']（'edit' 别名）
+  hidden?: boolean | string | string[] | Function  // true/false、'create'/'update'/'edit'、数组或 (form, id) 判定函数
   relation_filter?: object   // 关联查询的筛选条件
+  relation?: object         // 关联目标覆盖（entity、valueKey、cardinality）
   component?: object         // 自定义组件（JSX 渲染函数）
   help?: string              // 字段下方帮助文本
   full_width?: boolean       // 详情视图中跨满网格列宽
@@ -404,11 +437,12 @@ FormAdmin 会将 `field.rules` / `field.validator` 合并到 `el-form` 校验中
 - **[EasyAdmin 配置契约](docs/design/easyadmin-config-contract.md)** — 完整配置 Schema 参考
 - **[配置参考手册](docs/manual/config-reference.zh.md)** — EasyAdmin 配置完整指南，从入门到高级
 - **[AI 上下文](docs/ai/context.md)** — 面向 AI 辅助开发的快速参考
+- **[EasyAdmin 查询适配器计划](docs/plan/easyadmin-query-adapter-architecture.md)** — 分层查询/编译器/适配器架构与迁移阶段
 - **[Vue 3 迁移计划](docs/plan/vue3-tsx-vite-migration.md)** — 迁移说明及当前状态
 
 ## 测试
 
-**1041 项测试，共 78 个 spec 文件 · Vitest 2.1 · `src/components/EasyAdmin` 上 100% statements/branches/lines 覆盖率阈值**
+**1330 项测试，共 101 个 spec 文件 · Vitest 2.1 · `src/easyadmin/{ui/vue,core,application,adapters/crudskeleton}` 上 100% statements/branches/lines 覆盖率阈值**
 
 ```bash
 npm run test              # 运行全部测试（CI 中关闭 watch 模式）
@@ -420,9 +454,9 @@ npm run test:ci           # CI（类型检查 + 测试）
 
 测试文件位于 `tests/unit/`：
 - **组件测试**：Breadcrumb、Hamburger、SvgIcon、EasyAdmin feedback UI
-- **工具函数测试**：`request.ts`、`validate.js`、`entity.ts`、`formatTime`、`parseTime`、`param2Obj`
+- **工具函数测试**：`request.ts`、`validate.js`、`formatTime`、`parseTime`、`param2Obj`，以及 EasyAdmin 查询 core/adapter golden 测试
 
-配置文件：`vitest.config.ts`（jsdom 环境，Vue 3 插件；`src/components/EasyAdmin` 上强制 100% statements/branches/lines 阈值）。
+配置文件：`vitest.config.ts`（jsdom 环境，Vue 3 插件；`src/easyadmin/{ui/vue,core,application,adapters/crudskeleton}` 上强制 100% statements/branches/lines 阈值）。
 
 CI：GitHub Actions 运行类型检查、分片单元测试和覆盖率任务。仅文档/配置/i18n 变更会被路径过滤跳过 CI 任务。
 
@@ -432,12 +466,12 @@ CI：GitHub Actions 运行类型检查、分片单元测试和覆盖率任务。
 
 ```
 dist/
-├── static/
-│   ├── css/
-│   ├── js/
-│   └── img/
+├── index.html
 ├── favicon.ico
-└── index.html
+└── static/
+    ├── index-[hash].js
+    ├── index-[hash].css
+    └── ...（带内容哈希的图片与字体文件）
 ```
 
 ### 部署说明
