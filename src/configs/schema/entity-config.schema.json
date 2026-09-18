@@ -54,7 +54,7 @@
           "items": { "$ref": "#/definitions/fieldConfig" }
         },
         "list_filter": {
-          "description": "Filter declarations: string/null shorthand, select-shorthand objects, full-style expressions, or async factories (projected, not deep-validated).",
+          "description": "Filter declarations: string/null shorthand, select-shorthand objects, full-style expressions, or async factories. Function values are valid at runtime but cannot be expressed in JSON Schema: tooling must project them (e.g. to {$fn:true}) before validating, as the companion spec does.",
           "type": "object",
           "additionalProperties": {
             "anyOf": [
@@ -147,6 +147,10 @@
             },
             "relation_filter": { "type": "object" },
             "relation": { "type": "object" },
+            "creationUrl": {
+              "description": "Link to create related entity (rendered by relation plugins when present).",
+              "type": "string"
+            },
             "component": {
               "description": "Custom Vue/JSX component (permitted, not deep-validated)."
             },
