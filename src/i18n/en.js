@@ -125,6 +125,9 @@ export default {
   // EasyAdmin CRUD
   'New Record': 'New Record',
   'Edit Record': 'Edit Record',
+  'Expand to main area': 'Expand to main area',
+  'Restore dialog size': 'Restore dialog size',
+  'Resize dialog': 'Resize dialog',
   'Theme': 'Theme',
   'Ocean Blue': 'Ocean Blue',
   'Light Gray': 'Light Gray',
