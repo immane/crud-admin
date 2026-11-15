@@ -246,10 +246,9 @@
       </div>
     </el-row>
 
-    <el-dialog
+    <record-dialog
       v-model="dialog.show"
       class="easy-admin-dialog"
-      width="1040px"
       :title="dialog.title"
       @closed="fetchData"
     >
@@ -274,7 +273,7 @@
           {{ $t('Save') }}
         </el-button>
       </template>
-    </el-dialog>
+    </record-dialog>
 
     <el-dialog
       v-model="batchEditDialog.show"
@@ -331,6 +330,7 @@ import { resolveRelation } from '@/utils/relation'
 import SIP from '@/utils/simple-image-process'
 import SearchFilter from './SearchFilter.vue'
 import FormAdmin from './FormAdmin.vue'
+import RecordDialog from './RecordDialog.vue'
 import { createUiFeedback } from './feedback'
 import EditablePlain from './plugins/list/editable-plain.vue'
 import { compileCsqeQuery } from '@/easyadmin/adapters/crudskeleton/CrudSkeletonQueryCompiler'
@@ -369,7 +369,7 @@ const resolveFormPlugin = (path) => {
 
 export default {
   name: 'ListAdmin',
-  components: { FormAdmin, SearchFilter },
+  components: { FormAdmin, SearchFilter, RecordDialog },
 
   props: {
     /**
